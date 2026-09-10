@@ -4902,75 +4902,7 @@ export default function App() {
               </button>
             </form>
 
-            {/* Quick Demo Accounts Fill */}
-            <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "14px" }}>
-              <div style={{ fontSize: "10.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: "8px", textAlign: "center" }}>
-                ⚡ Quick Demo One-Click Fill:
-              </div>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", justifyContent: "center" }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginEmail("salesflowcrmhelp@gmail.com");
-                    setPasswordInput("482910");
-                    setLoginError("");
-                  }}
-                  style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 9px", borderRadius: "8px", border: "1px solid rgba(245, 158, 11, 0.3)", backgroundColor: "rgba(245, 158, 11, 0.12)", color: "#fbbf24", fontSize: "11px", fontWeight: "750", cursor: "pointer" }}
-                  title="Login as Super Admin Harsh"
-                >
-                  👑 Admin (Harsh)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginEmail("harsh.accomation@gmail.com");
-                    setPasswordInput("978421");
-                    setLoginError("");
-                  }}
-                  style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 9px", borderRadius: "8px", border: "1px solid rgba(16, 185, 129, 0.3)", backgroundColor: "rgba(16, 185, 129, 0.12)", color: "#34d399", fontSize: "11px", fontWeight: "750", cursor: "pointer" }}
-                  title="Login as Harsh (Sales Rep)"
-                >
-                  💼 Harsh Rep
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoginEmail("rohan@apexsales.com");
-                    setPasswordInput("112233");
-                    setLoginError("");
-                  }}
-                  style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 9px", borderRadius: "8px", border: "1px solid rgba(139, 92, 246, 0.3)", backgroundColor: "rgba(139, 92, 246, 0.12)", color: "#c084fc", fontSize: "11px", fontWeight: "750", cursor: "pointer" }}
-                  title="Login as Rohan Sharma"
-                >
-                  💼 Rohan Rep
-                </button>
-              </div>
-            </div>
 
-            {/* Quick Biometrics / Touch ID / Face ID option */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "14px", paddingTop: "2px" }}>
-              <button
-                type="button"
-                onClick={handleBiometricFingerprint}
-                style={{ display: "flex", alignItems: "center", gap: "6px", background: "none", border: "1px solid rgba(255, 255, 255, 0.1)", padding: "5px 12px", borderRadius: "8px", color: "#94a3b8", fontSize: "11.5px", fontWeight: "650", cursor: "pointer", transition: "all 0.15s" }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = "#38bdf8"; e.currentTarget.style.borderColor = "#38bdf8"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)"; }}
-              >
-                <Fingerprint size={15} />
-                <span>Touch ID</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={startFaceIdScan}
-                style={{ display: "flex", alignItems: "center", gap: "6px", background: "none", border: "1px solid rgba(255, 255, 255, 0.1)", padding: "5px 12px", borderRadius: "8px", color: "#94a3b8", fontSize: "11.5px", fontWeight: "650", cursor: "pointer", transition: "all 0.15s" }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = "#38bdf8"; e.currentTarget.style.borderColor = "#38bdf8"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)"; }}
-              >
-                <ScanFace size={15} />
-                <span>Face ID</span>
-              </button>
-            </div>
 
             {/* Footer Notice */}
             <div style={{ textAlign: "center", fontSize: "11px", color: "#475569", fontWeight: "500", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
