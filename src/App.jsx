@@ -4976,7 +4976,7 @@ export default function App() {
                         </>
                       ) : (
                         <>
-                          <span>Send Verification OTP (ओटीपी भेजें)</span>
+                          <span>Send Verification OTP</span>
                           <span style={{ fontSize: "16px" }}>✉️</span>
                         </>
                       )}
@@ -5004,7 +5004,7 @@ export default function App() {
                         onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
                         onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
                       >
-                        ← Back to Login (लॉगिन पर वापस जाएं)
+                        ← Back to Login
                       </button>
                     </div>
                   </form>
@@ -5200,7 +5200,7 @@ export default function App() {
                           cursor: forgotCountdown > 0 ? "default" : "pointer"
                         }}
                       >
-                        {forgotCountdown > 0 ? `Resend OTP in ${forgotCountdown}s` : "Resend OTP (ओटीपी दोबारा भेजें)"}
+                        {forgotCountdown > 0 ? `Resend OTP in ${forgotCountdown}s` : "Resend OTP"}
                       </button>
                     </div>
                   </form>
@@ -5356,7 +5356,7 @@ export default function App() {
                       onMouseLeave={(e) => (e.currentTarget.style.color = "#38bdf8")}
                     >
                       <KeyRound size={12} />
-                      <span>Forgot Password? (पासवर्ड भूल गए?)</span>
+                      <span>Forgot Password?</span>
                     </button>
                   </div>
 
