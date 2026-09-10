@@ -18,6 +18,7 @@
     "jimp": "^1.6.1",
     "lucide-react": "^1.28.0",
     "mongodb": "^7.6.0",
+    "nodemailer": "^10.0.3",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "vite": "^8.2.0"

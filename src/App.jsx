@@ -1179,6 +1179,32 @@ export default function App() {
     email: "",
     phone: ""
   });
+
+  // Email-Restricted Login & Invitation System States
+  const [inviteTokenParam] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).get("invite");
+    } catch(e) {
+      return null;
+    }
+  });
+  const [inviteEmailParam] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).get("email") || "";
+    } catch(e) {
+      return "";
+    }
+  });
+  const [inviteDetails, setInviteDetails] = useState(null);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteError, setInviteError] = useState("");
+  const [invitePinInput, setInvitePinInput] = useState("");
+  const [inviteNameInput, setInviteNameInput] = useState("");
+  const [inviteAccepting, setInviteAccepting] = useState(false);
+
+  // Email Login & Created Invite Sharing States
+  const [loginEmail, setLoginEmail] = useState("");
+  const [createdInviteInfo, setCreatedInviteInfo] = useState(null);
   const [customFields, setCustomFields] = useState(() => {
     try {
       const saved = localStorage.getItem("crm_custom_fields");
@@ -1980,11 +2006,13 @@ export default function App() {
     }
 
     try {
+      const emailToSubmit = loginEmail ? loginEmail.trim().toLowerCase() : (selectedLoginUser?.email ? selectedLoginUser.email.trim().toLowerCase() : "");
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           pin: pinToVerify, 
+          email: emailToSubmit,
           username: selectedLoginUser?.username || "" 
         })
       });
@@ -2013,7 +2041,7 @@ export default function App() {
         }
         return;
       } else {
-        setLoginError(data.message || "Incorrect PIN. Please try again.");
+        setLoginError(data.message || "Incorrect PIN or user not found. Please try again.");
       }
     } catch(err) {
       console.warn("Server login fallback:", err);
@@ -2031,6 +2059,69 @@ export default function App() {
       } else {
         setLoginError("Incorrect PIN or server offline.");
       }
+    }
+  };
+
+  // Check invitation link on page load
+  useEffect(() => {
+    if (inviteTokenParam) {
+      setInviteLoading(true);
+      fetch(`/api/auth/invite/${encodeURIComponent(inviteTokenParam)}`)
+        .then(res => res.json())
+        .then(data => {
+          setInviteLoading(false);
+          if (data && data.success && data.invite) {
+            setInviteDetails(data.invite);
+            setInviteNameInput(data.invite.name || "");
+          } else {
+            setInviteError(data.message || "Invitation link is invalid or has expired.");
+          }
+        })
+        .catch(err => {
+          setInviteLoading(false);
+          setInviteError("Could not verify invitation link. Please check network.");
+        });
+    }
+  }, [inviteTokenParam]);
+
+  const handleAcceptInvite = async (e) => {
+    if (e) e.preventDefault();
+    if (!invitePinInput || invitePinInput.trim().length < 4) {
+      setInviteError("Please choose a secret PIN with at least 4 digits.");
+      return;
+    }
+    setInviteAccepting(true);
+    setInviteError("");
+    try {
+      const res = await fetch("/api/auth/accept-invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: inviteTokenParam,
+          pin: invitePinInput.trim(),
+          name: inviteNameInput || inviteDetails?.name || ""
+        })
+      });
+      const data = await res.json();
+      setInviteAccepting(false);
+      if (res.ok && data.success && data.user) {
+        setIsLoggedIn(true);
+        setCurrentUser(data.user);
+        setCurrentLoggedInUser(data.user.name);
+        setCurrentUserRole(data.user.role);
+        try {
+          sessionStorage.setItem("crm_auth_user", JSON.stringify(data.user));
+          sessionStorage.setItem("crm_auth_token", data.token);
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch(e) {}
+        showToast(`🎉 Welcome ${data.user.name}! Your account has been activated.`, "success");
+        await loadLeadsFromBackend(data.user);
+      } else {
+        setInviteError(data.message || "Failed to activate account.");
+      }
+    } catch(err) {
+      setInviteAccepting(false);
+      setInviteError("Network error while activating account.");
     }
   };
 
@@ -2053,11 +2144,44 @@ export default function App() {
     setIsLoggedIn(false);
     setPinDigits(["", "", "", "", "", ""]);
     setSelectedLoginUser(null);
+    setLoginEmail("");
     try {
       sessionStorage.removeItem("crm_auth_user");
       sessionStorage.removeItem("crm_auth_token");
     } catch(e) {}
     showToast("Logged out. Workspace locked.", "info");
+  };
+
+  const handleInviteUser = async (e) => {
+    if (e) e.preventDefault();
+    if (!newUserData.email.trim()) {
+      showToast("Email address is required to invite a team member.", "error");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/users/invite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-role": currentUser?.role || "admin",
+          "x-user-name": currentUser?.name || "Admin User"
+        },
+        body: JSON.stringify(newUserData)
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(data.message || `Invitation created for ${newUserData.email}!`, "success");
+        setCreatedInviteInfo(data);
+        setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", email: "", phone: "" });
+        setShowAddUserSubModal(false);
+        loadUsersFromBackend();
+      } else {
+        showToast(data.message || "Failed to create invitation.", "error");
+      }
+    } catch(err) {
+      showToast("Network error creating invitation.", "error");
+    }
   };
 
   const handleCreateUser = async (e) => {
@@ -4395,7 +4519,190 @@ export default function App() {
   }
 }`;
 
-  // Render login/setup screens if not logged in
+  // Render invitation acceptance screen if opened with invite token
+  if (!isLoggedIn && inviteTokenParam) {
+    return (
+      <div 
+        style={{ 
+          position: "fixed", 
+          inset: 0, 
+          backgroundColor: "#0b0f19", 
+          backgroundImage: "radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.2) 0%, rgba(15, 23, 42, 0.95) 75%)",
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          padding: "20px", 
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          zIndex: 99999,
+          overflow: "hidden"
+        }}
+      >
+        <div
+          style={{
+            width: "440px",
+            maxWidth: "92vw",
+            backgroundColor: "rgba(15, 23, 42, 0.92)",
+            backdropFilter: "blur(24px)",
+            border: "1.5px solid rgba(255, 255, 255, 0.16)",
+            borderRadius: "24px",
+            padding: "28px 26px",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8)",
+            color: "#ffffff",
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px"
+          }}
+        >
+          {/* Header */}
+          <div style={{ textAlign: "center" }}>
+            <div style={{ width: "52px", height: "52px", borderRadius: "16px", backgroundColor: "#2563eb", display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: "12px", boxShadow: "0 8px 24px rgba(37, 99, 235, 0.45)" }}>
+              <Mail size={26} color="#ffffff" />
+            </div>
+            <h2 style={{ fontSize: "20px", fontWeight: "850", margin: "0 0 6px 0", letterSpacing: "-0.3px" }}>
+              Accept CRM Invitation
+            </h2>
+            <p style={{ margin: 0, fontSize: "12.5px", color: "#94a3b8" }}>
+              Activate your account and access your sales workspace
+            </p>
+          </div>
+
+          {inviteLoading ? (
+            <div style={{ textAlign: "center", padding: "30px 0", color: "#94a3b8", fontSize: "13px" }}>
+              Verifying invitation link... ⌛
+            </div>
+          ) : inviteError ? (
+            <div style={{ backgroundColor: "rgba(239, 68, 68, 0.12)", border: "1px solid #ef4444", borderRadius: "12px", padding: "16px", textAlign: "center" }}>
+              <p style={{ color: "#f87171", fontSize: "13px", fontWeight: "700", margin: "0 0 12px 0" }}>{inviteError}</p>
+              <button
+                type="button"
+                onClick={() => window.location.href = "/"}
+                style={{ padding: "7px 16px", backgroundColor: "#ffffff", color: "#0f172a", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: "750", cursor: "pointer" }}
+              >
+                Go to Regular Login &rarr;
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleAcceptInvite} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {/* Authorized Email (Locked & Verified) */}
+              <div>
+                <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "10.5px", fontWeight: "750", color: "#94a3b8", marginBottom: "4px", textTransform: "uppercase" }}>
+                  <span>Authorized Email Address</span>
+                  <span style={{ color: "#10b981", fontSize: "10px", display: "flex", alignItems: "center", gap: "3px" }}>
+                    ✓ Locked & Authorized
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  value={inviteDetails?.email || inviteEmailParam}
+                  disabled
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    backgroundColor: "rgba(30, 41, 59, 0.7)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "8px",
+                    color: "#cbd5e1",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    boxSizing: "border-box"
+                  }}
+                />
+              </div>
+
+              {/* Full Name */}
+              <div>
+                <label style={{ display: "block", fontSize: "10.5px", fontWeight: "750", color: "#cbd5e1", marginBottom: "4px", textTransform: "uppercase" }}>
+                  Your Full Name *
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Rahul Sharma"
+                  value={inviteNameInput}
+                  onChange={(e) => setInviteNameInput(e.target.value)}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    backgroundColor: "rgba(15, 23, 42, 0.9)",
+                    border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                    borderRadius: "8px",
+                    color: "#ffffff",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    boxSizing: "border-box"
+                  }}
+                />
+              </div>
+
+              {/* Assigned Role */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "rgba(30, 41, 59, 0.6)", padding: "7px 12px", borderRadius: "8px", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: "600" }}>ASSIGNED ROLE</span>
+                <span style={{ fontSize: "11px", fontWeight: "800", color: inviteDetails?.role === "admin" ? "#fcd34d" : "#93c5fd" }}>
+                  {inviteDetails?.role === "admin" ? "👑 Super Admin (Full Pipeline)" : "💼 Sales Rep (Isolated Data)"}
+                </span>
+              </div>
+
+              {/* Set Secret PIN */}
+              <div>
+                <label style={{ display: "block", fontSize: "10.5px", fontWeight: "750", color: "#cbd5e1", marginBottom: "4px", textTransform: "uppercase" }}>
+                  Create Secret Login PIN (4 to 6 Digits) *
+                </label>
+                <input
+                  type="password"
+                  maxLength={6}
+                  placeholder="Choose 4-6 digit PIN"
+                  value={invitePinInput}
+                  onChange={(e) => setInvitePinInput(e.target.value.replace(/[^0-9]/g, ''))}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "9px 12px",
+                    backgroundColor: "rgba(15, 23, 42, 0.9)",
+                    border: "1.5px solid #3b82f6",
+                    borderRadius: "8px",
+                    color: "#ffffff",
+                    fontSize: "17px",
+                    fontWeight: "800",
+                    letterSpacing: "4px",
+                    textAlign: "center",
+                    boxSizing: "border-box"
+                  }}
+                />
+              </div>
+
+              {inviteError && (
+                <div style={{ color: "#f87171", fontSize: "11px", fontWeight: "700", textAlign: "center" }}>
+                  {inviteError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={inviteAccepting}
+                style={{
+                  width: "100%",
+                  padding: "11px",
+                  backgroundColor: "#2563eb",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: "9px",
+                  fontSize: "13px",
+                  fontWeight: "800",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 14px rgba(37, 99, 235, 0.4)",
+                  marginTop: "4px"
+                }}
+              >
+                {inviteAccepting ? "Activating Account..." : "Activate Account & Enter Workspace 🚀"}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Render regular login/setup screen if not logged in
   if (!isLoggedIn) {
     return (
         <div 
@@ -4455,18 +4762,19 @@ export default function App() {
                 User:
               </span>
               {(allUsersList.length > 0 ? allUsersList : [
-                { id: "usr_admin", name: "Admin User", displayName: "Harsh (Admin)", username: "admin", role: "admin", pin: "482910" },
-                { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan", username: "rohan", role: "sales_rep", pin: "112233" },
-                { id: "usr_priya", name: "Priya Verma", displayName: "Priya", username: "priya", role: "sales_rep", pin: "223344" },
-                { id: "usr_amit", name: "Amit Patel", displayName: "Amit", username: "amit", role: "sales_rep", pin: "334455" }
+                { id: "usr_admin", name: "Admin User", displayName: "Harsh (Admin)", username: "admin", role: "admin", pin: "482910", email: "admin@apexsales.com" },
+                { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan", username: "rohan", role: "sales_rep", pin: "112233", email: "rohan@apexsales.com" },
+                { id: "usr_priya", name: "Priya Verma", displayName: "Priya", username: "priya", role: "sales_rep", pin: "223344", email: "priya@apexsales.com" },
+                { id: "usr_amit", name: "Amit Patel", displayName: "Amit", username: "amit", role: "sales_rep", pin: "334455", email: "amit@apexsales.com" }
               ]).map(u => {
-                const isSelected = selectedLoginUser?.id === u.id;
+                const isSelected = selectedLoginUser?.id === u.id || (loginEmail && u.email && loginEmail.toLowerCase() === u.email.toLowerCase());
                 return (
                   <button
                     key={u.id}
                     type="button"
                     onClick={() => {
                       setSelectedLoginUser(u);
+                      setLoginEmail(u.email || "");
                       setPinDigits(["", "", "", "", "", ""]);
                       setLoginError("");
                       const firstInput = document.getElementById("pin-box-0");
@@ -4495,28 +4803,49 @@ export default function App() {
               })}
             </div>
 
-            {/* Selected User Indicator */}
-            {selectedLoginUser && (
-              <div 
-                style={{ 
-                  position: "absolute", 
-                  top: "44.5%", 
-                  left: "50%", 
-                  transform: "translateX(-50%)", 
-                  fontSize: "11px", 
-                  fontWeight: "750", 
-                  color: selectedLoginUser.role === "admin" ? "#fcd34d" : "#93c5fd",
-                  backgroundColor: "rgba(15, 23, 42, 0.8)",
-                  padding: "2px 10px",
-                  borderRadius: "9999px",
-                  border: "1px solid rgba(255, 255, 255, 0.12)",
-                  whiteSpace: "nowrap",
-                  zIndex: 10
-                }}
-              >
-                {selectedLoginUser.role === "admin" ? "👑 Admin: Enter PIN (482910)" : `💼 ${selectedLoginUser.name}: Enter Rep PIN`}
+            {/* ✉️ Authorized Email Input Field (Strict Access Control) */}
+            <div 
+              style={{ 
+                position: "absolute", 
+                top: "43.5%", 
+                left: "50%", 
+                transform: "translateX(-50%)", 
+                width: "74%", 
+                zIndex: 20 
+              }}
+            >
+              <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                <Mail size={13} style={{ position: "absolute", left: "10px", color: loginEmail ? "#38bdf8" : "#94a3b8" }} />
+                <input
+                  type="email"
+                  placeholder="Enter authorized email address"
+                  value={loginEmail}
+                  onChange={(e) => {
+                    setLoginEmail(e.target.value);
+                    setLoginError("");
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const firstPin = document.getElementById("pin-box-0");
+                      if (firstPin) firstPin.focus();
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "6px 10px 6px 28px",
+                    fontSize: "11.5px",
+                    fontWeight: "650",
+                    color: "#ffffff",
+                    backgroundColor: "rgba(15, 23, 42, 0.85)",
+                    border: loginEmail ? "1.2px solid #38bdf8" : "1.2px solid rgba(255, 255, 255, 0.22)",
+                    borderRadius: "8px",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif"
+                  }}
+                />
               </div>
-            )}
+            </div>
 
             {/* 1. 6-Digit PIN Inputs + Eye Toggle in Unified Clean Row */}
             <div 
@@ -16725,14 +17054,14 @@ export default function App() {
                   }}
                 >
                   <UserPlus size={15} />
-                  <span>{showAddUserSubModal ? "Close Form" : "+ Add Team Member"}</span>
+                  <span>{showAddUserSubModal ? "Close Form" : "+ Invite Member by Email"}</span>
                 </button>
               </div>
 
-              {/* Add New User Sub-Form (Collapsible) */}
+              {/* Add / Invite New User Sub-Form (Collapsible) */}
               {showAddUserSubModal && (
                 <form 
-                  onSubmit={handleCreateUser} 
+                  onSubmit={handleInviteUser} 
                   style={{ 
                     padding: "16px", 
                     backgroundColor: "#f0fdf4", 
@@ -16745,15 +17074,33 @@ export default function App() {
                 >
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <UserPlus size={16} color="#16a34a" />
-                      <strong style={{ fontSize: "13px", color: "#166534" }}>Register New Team Member / Sub-User</strong>
+                      <Mail size={16} color="#16a34a" />
+                      <strong style={{ fontSize: "13px", color: "#166534" }}>Invite New Team Member by Email</strong>
                     </div>
                     <span style={{ fontSize: "10.5px", color: "#15803d", fontWeight: "600" }}>
-                      They can log in from their phone or laptop using this PIN
+                      🔒 Strictly only this authorized Email ID can log in
                     </span>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: "10px" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
+                        Authorized Email Address *
+                      </label>
+                      <input 
+                        type="email"
+                        placeholder="e.g. rahul@company.com"
+                        value={newUserData.email}
+                        onChange={(e) => setNewUserData(prev => ({ 
+                          ...prev, 
+                          email: e.target.value,
+                          username: prev.username || e.target.value.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '_')
+                        }))}
+                        required
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1.5px solid #86efac", borderRadius: "7px", boxSizing: "border-box", fontWeight: "600" }}
+                      />
+                    </div>
+
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
                         Full Name *
@@ -16771,40 +17118,36 @@ export default function App() {
                           }));
                         }}
                         required
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
                       />
                     </div>
 
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
-                        Login Username / Handle
+                        Secret Login PIN (4-6 Digits)
                       </label>
-                      <input 
-                        type="text"
-                        placeholder="e.g. rahul"
-                        value={newUserData.username}
-                        onChange={(e) => setNewUserData(prev => ({ ...prev, username: e.target.value.toLowerCase().trim() }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
-                        Secret Login PIN (4 to 6 Digits) *
-                      </label>
-                      <input 
-                        type="text"
-                        maxLength={6}
-                        placeholder="e.g. 554433"
-                        value={newUserData.pin}
-                        onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value.replace(/[^0-9]/g, '') }))}
-                        required
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box", fontWeight: "800", letterSpacing: "2px" }}
-                      />
+                      <div style={{ display: "flex", gap: "4px" }}>
+                        <input 
+                          type="text"
+                          maxLength={6}
+                          placeholder="Auto PIN"
+                          value={newUserData.pin}
+                          onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value.replace(/[^0-9]/g, '') }))}
+                          style={{ flex: 1, padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box", fontWeight: "800", letterSpacing: "2px" }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setNewUserData(prev => ({ ...prev, pin: String(Math.floor(100000 + Math.random() * 900000)) }))}
+                          title="Generate Random PIN"
+                          style={{ padding: "0 8px", backgroundColor: "#e2e8f0", border: "1px solid #cbd5e1", borderRadius: "7px", fontSize: "11px", cursor: "pointer", fontWeight: "700" }}
+                        >
+                          🎲
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: "10px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "10px" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
                         Role & Access Level
@@ -16812,36 +17155,23 @@ export default function App() {
                       <select
                         value={newUserData.role}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, role: e.target.value }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                       >
-                        <option value="sales_rep">💼 Sales Rep (Only Sees Own Leads - Strict Privacy)</option>
-                        <option value="admin">👑 Super Admin (Full Access to All Leads & Reports)</option>
+                        <option value="sales_rep">💼 Sales Rep (Strict Privacy: Only Sees Own Leads)</option>
+                        <option value="admin">👑 Super Admin (Full Access: All Deals & Reports)</option>
                       </select>
                     </div>
 
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
-                        Mobile Phone
+                        Mobile Phone (Optional)
                       </label>
                       <input 
                         type="text"
                         placeholder="e.g. 9898000005"
                         value={newUserData.phone}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, phone: e.target.value }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
-                        Email Address
-                      </label>
-                      <input 
-                        type="email"
-                        placeholder="e.g. rahul@apexsales.com"
-                        value={newUserData.email}
-                        onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
                       />
                     </div>
                   </div>
@@ -16850,15 +17180,15 @@ export default function App() {
                     <button 
                       type="button" 
                       onClick={() => setShowAddUserSubModal(false)}
-                      style={{ padding: "6px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "7px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
+                      style={{ padding: "7px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "7px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit"
-                      style={{ padding: "6px 16px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "11.5px", fontWeight: "750", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                      style={{ padding: "7px 18px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: "750", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 6px rgba(22, 163, 74, 0.3)" }}
                     >
-                      <Check size={14} /> Create Member & Enable Login
+                      <Send size={14} /> Send Invitation & Generate Login Link
                     </button>
                   </div>
                 </form>
@@ -16870,25 +17200,29 @@ export default function App() {
                   <thead>
                     <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#64748b", fontWeight: "700" }}>
                       <th style={{ padding: "8px 12px" }}>TEAM MEMBER</th>
-                      <th style={{ padding: "8px 12px" }}>ROLE & PRIVACY</th>
+                      <th style={{ padding: "8px 12px" }}>AUTHORIZED EMAIL</th>
+                      <th style={{ padding: "8px 12px" }}>ROLE & ACCESS</th>
+                      <th style={{ padding: "8px 12px", textAlign: "center" }}>STATUS</th>
                       <th style={{ padding: "8px 12px" }}>LOGIN PIN</th>
-                      <th style={{ padding: "8px 12px", textAlign: "center" }}>ASSIGNED LEADS</th>
+                      <th style={{ padding: "8px 12px", textAlign: "center" }}>LEADS</th>
                       <th style={{ padding: "8px 12px", textAlign: "right" }}>ACTIONS</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(allUsersList.length > 0 ? allUsersList : [
-                      { id: "usr_admin", name: "Admin User", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", phone: "9876543210" },
-                      { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", pin: "112233", role: "sales_rep", phone: "9898000001" },
-                      { id: "usr_priya", name: "Priya Verma", displayName: "Priya Verma", username: "priya", pin: "223344", role: "sales_rep", phone: "9898000002" },
-                      { id: "usr_amit", name: "Amit Patel", displayName: "Amit Patel", username: "amit", pin: "334455", role: "sales_rep", phone: "9898000003" }
+                      { id: "usr_admin", name: "Admin User", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", email: "admin@apexsales.com", status: "active" },
+                      { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", pin: "112233", role: "sales_rep", email: "rohan@apexsales.com", status: "active" },
+                      { id: "usr_priya", name: "Priya Verma", displayName: "Priya Verma", username: "priya", pin: "223344", role: "sales_rep", email: "priya@apexsales.com", status: "active" },
+                      { id: "usr_amit", name: "Amit Patel", displayName: "Amit Patel", username: "amit", pin: "334455", role: "sales_rep", email: "amit@apexsales.com", status: "active" }
                     ]).map((usr) => {
                       const isPinVisible = userPinVisibilityMap[usr.id];
                       const leadsCount = leads.filter(l => (l.owner || "").toLowerCase() === usr.name.toLowerCase()).length;
                       const isAdminRole = usr.role === "admin";
+                      const isInvitedStatus = usr.status === "invited";
+                      const directInviteUrl = `${window.location.origin}?invite=${usr.inviteToken || ('inv_' + usr.id)}&email=${encodeURIComponent(usr.email || '')}`;
 
                       return (
-                        <tr key={usr.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                        <tr key={usr.id} style={{ borderBottom: "1px solid #f1f5f9", backgroundColor: isInvitedStatus ? "#fffbeb" : "#ffffff" }}>
                           {/* Member info */}
                           <td style={{ padding: "8px 12px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -16897,20 +17231,40 @@ export default function App() {
                               </div>
                               <div>
                                 <div style={{ fontWeight: "750", color: "#0f172a" }}>{usr.displayName || usr.name}</div>
-                                <div style={{ fontSize: "10.5px", color: "#64748b" }}>@{usr.username || "user"} • {usr.phone || "No phone"}</div>
+                                <div style={{ fontSize: "10px", color: "#64748b" }}>@{usr.username || "user"}</div>
                               </div>
                             </div>
+                          </td>
+
+                          {/* Email */}
+                          <td style={{ padding: "8px 12px" }}>
+                            <span style={{ fontWeight: "650", color: usr.email ? "#0f172a" : "#94a3b8", fontSize: "11px" }}>
+                              {usr.email || "No email set"}
+                            </span>
                           </td>
 
                           {/* Role & Privacy */}
                           <td style={{ padding: "8px 12px" }}>
                             {isAdminRole ? (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2.5px 7px", backgroundColor: "#fef3c7", color: "#92400e", borderRadius: "6px", fontSize: "10.5px", fontWeight: "750", border: "1px solid #fde68a" }}>
-                                👑 Super Admin (Full Pipeline)
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2.5px 7px", backgroundColor: "#fef3c7", color: "#92400e", borderRadius: "6px", fontSize: "10px", fontWeight: "750", border: "1px solid #fde68a" }}>
+                                👑 Super Admin
                               </span>
                             ) : (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2.5px 7px", backgroundColor: "#eff6ff", color: "#1e40af", borderRadius: "6px", fontSize: "10.5px", fontWeight: "750", border: "1px solid #bfdbfe" }}>
-                                💼 Sales Rep (Isolated - Own Data Only)
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2.5px 7px", backgroundColor: "#eff6ff", color: "#1e40af", borderRadius: "6px", fontSize: "10px", fontWeight: "750", border: "1px solid #bfdbfe" }}>
+                                💼 Sales Rep
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Status */}
+                          <td style={{ padding: "8px 12px", textAlign: "center" }}>
+                            {isInvitedStatus ? (
+                              <span style={{ display: "inline-block", padding: "2px 7px", backgroundColor: "#fef3c7", color: "#b45309", borderRadius: "9999px", fontSize: "10px", fontWeight: "750", border: "1px solid #fde68a" }}>
+                                Invited ⌛
+                              </span>
+                            ) : (
+                              <span style={{ display: "inline-block", padding: "2px 7px", backgroundColor: "#ecfdf5", color: "#059669", borderRadius: "9999px", fontSize: "10px", fontWeight: "750", border: "1px solid #a7f3d0" }}>
+                                Active 🟢
                               </span>
                             )}
                           </td>
@@ -16918,7 +17272,7 @@ export default function App() {
                           {/* Login PIN */}
                           <td style={{ padding: "8px 12px" }}>
                             <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 7px", borderRadius: "6px" }}>
-                              <span style={{ fontFamily: "monospace", fontSize: "13px", fontWeight: "800", letterSpacing: "2px", color: "#0f172a" }}>
+                              <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: "800", letterSpacing: "2px", color: "#0f172a" }}>
                                 {isPinVisible ? (usr.pin || "••••") : "••••••"}
                               </span>
                               <button
@@ -16927,37 +17281,50 @@ export default function App() {
                                 style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "1px", display: "flex", alignItems: "center" }}
                                 title={isPinVisible ? "Hide PIN" : "Reveal PIN"}
                               >
-                                {isPinVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                                {isPinVisible ? <EyeOff size={12} /> : <Eye size={12} />}
                               </button>
                             </div>
                           </td>
 
                           {/* Assigned Leads */}
                           <td style={{ padding: "8px 12px", textAlign: "center" }}>
-                            <span style={{ padding: "2px 8px", borderRadius: "9999px", backgroundColor: "#f1f5f9", fontWeight: "800", color: "#334155", fontSize: "11px" }}>
-                              {leadsCount} Deals
+                            <span style={{ padding: "2px 8px", borderRadius: "9999px", backgroundColor: "#f1f5f9", fontWeight: "800", color: "#334155", fontSize: "10.5px" }}>
+                              {leadsCount}
                             </span>
                           </td>
 
                           {/* Actions */}
                           <td style={{ padding: "8px 12px", textAlign: "right" }}>
-                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                              {usr.email && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(directInviteUrl);
+                                    showToast(`Invite link for ${usr.email} copied!`, "success");
+                                  }}
+                                  style={{ padding: "4px 8px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "5px", fontSize: "10px", fontWeight: "750", color: "#1d4ed8", cursor: "pointer" }}
+                                  title="Copy activation link"
+                                >
+                                  📋 Link
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 onClick={() => handleUpdateUserPin(usr.id, usr.name)}
-                                style={{ padding: "4px 8px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "10.5px", fontWeight: "600", color: "#334155", cursor: "pointer" }}
+                                style={{ padding: "4px 7px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "10px", fontWeight: "600", color: "#334155", cursor: "pointer" }}
                                 title="Reset or change PIN"
                               >
-                                🔑 Reset PIN
+                                🔑 PIN
                               </button>
                               {!isAdminRole && (
                                 <button
                                   type="button"
                                   onClick={() => handleDeactivateUser(usr.id, usr.name)}
-                                  style={{ padding: "4px 8px", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "5px", fontSize: "10.5px", fontWeight: "600", color: "#dc2626", cursor: "pointer" }}
+                                  style={{ padding: "4px 7px", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "5px", fontSize: "10px", fontWeight: "600", color: "#dc2626", cursor: "pointer" }}
                                   title="Deactivate user"
                                 >
-                                  Deactivate
+                                  ✕
                                 </button>
                               )}
                             </div>
@@ -16968,6 +17335,64 @@ export default function App() {
                   </tbody>
                 </table>
               </div>
+
+              {/* ✉️ INVITATION SUCCESS / SHARE POPUP */}
+              {createdInviteInfo && (
+                <div style={{ backgroundColor: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: "12px", padding: "14px 16px", display: "flex", flexDirection: "column", gap: "10px", marginTop: "4px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <Send size={16} color="#16a34a" />
+                      <strong style={{ fontSize: "12.5px", color: "#166534" }}>
+                        🎉 Invitation Generated for: {createdInviteInfo.user?.email}
+                      </strong>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCreatedInviteInfo(null)}
+                      style={{ background: "none", border: "none", color: "#166534", cursor: "pointer", fontWeight: "700" }}
+                    >
+                      ✕ Close
+                    </button>
+                  </div>
+
+                  <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                    <input 
+                      type="text" 
+                      readOnly 
+                      value={createdInviteInfo.inviteUrl} 
+                      style={{ flex: 1, padding: "6px 10px", fontSize: "11px", backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "6px", color: "#166534" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(createdInviteInfo.inviteUrl);
+                        showToast("Direct invitation link copied!", "success");
+                      }}
+                      style={{ padding: "6px 12px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "750", cursor: "pointer" }}
+                    >
+                      📋 Copy Link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(createdInviteInfo.inviteMessage || createdInviteInfo.inviteUrl);
+                        showToast("Complete WhatsApp/Email message copied!", "success");
+                      }}
+                      style={{ padding: "6px 12px", backgroundColor: "#25d366", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "750", cursor: "pointer" }}
+                    >
+                      📱 WhatsApp
+                    </button>
+                    <a
+                      href={`mailto:${encodeURIComponent(createdInviteInfo.user?.email || "")}?subject=${encodeURIComponent("Invitation to join ApexSales CRM")}&body=${encodeURIComponent(createdInviteInfo.inviteMessage || createdInviteInfo.inviteUrl)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ padding: "6px 12px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "750", cursor: "pointer", textDecoration: "none" }}
+                    >
+                      ✉️ Email
+                    </a>
+                  </div>
+                </div>
+              )}
 
             </div>
 
