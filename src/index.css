@@ -2,6 +2,10 @@
 
 /* src/index.css */
 
+html {
+  zoom: 85%;
+}
+
 :root {
   --primary-color: #ea580c; /* Orange Brand Primary */
   --primary-hover: #c2410c;
