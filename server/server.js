@@ -35,27 +35,43 @@ const MONGODB_URI = process.env.MONGODB_URI || '';
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 
-// --- DYNAMIC EMAIL TRANSPORTER (GMAIL / SMTP CONFIGURABLE VIA DB OR ENV) ---
+// --- DYNAMIC EMAIL DISPATCH ENGINE (RESEND API, BREVO API, OR SMTP) ---
+const ENV_RESEND_KEY = process.env.RESEND_API_KEY || '';
+const ENV_BREVO_KEY = process.env.BREVO_API_KEY || '';
 const ENV_SMTP_USER = process.env.SMTP_USER || process.env.GMAIL_USER || '';
 const ENV_SMTP_PASS = process.env.SMTP_PASS || process.env.GMAIL_APP_PASS || '';
 const ENV_SMTP_HOST = process.env.SMTP_HOST || (ENV_SMTP_USER.includes('@gmail.com') ? 'smtp.gmail.com' : '');
 const ENV_SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465;
 
-async function getSmtpConfig() {
+async function getEmailConfig() {
   if (isMongoConnected && mongoDb) {
     try {
-      const dbConfig = await mongoDb.collection('settings').findOne({ id: 'smtp_config' });
-      if (dbConfig && dbConfig.user && dbConfig.pass) {
-        return dbConfig;
+      const apiCfg = await mongoDb.collection('settings').findOne({ id: 'email_api_config' });
+      if (apiCfg && apiCfg.apiKey) {
+        return apiCfg;
+      }
+      const smtpCfg = await mongoDb.collection('settings').findOne({ id: 'smtp_config' });
+      if (smtpCfg && smtpCfg.user && smtpCfg.pass) {
+        return { type: 'smtp', ...smtpCfg };
       }
     } catch (e) {}
   }
   const local = readLocalDB();
+  if (local.settings?.email_api?.apiKey) {
+    return local.settings.email_api;
+  }
   if (local.settings?.smtp?.user && local.settings?.smtp?.pass) {
-    return local.settings.smtp;
+    return { type: 'smtp', ...local.settings.smtp };
+  }
+  if (ENV_RESEND_KEY) {
+    return { type: 'resend', apiKey: ENV_RESEND_KEY, fromEmail: 'ApexSales CRM <onboarding@resend.dev>' };
+  }
+  if (ENV_BREVO_KEY) {
+    return { type: 'brevo', apiKey: ENV_BREVO_KEY };
   }
   if (ENV_SMTP_USER && ENV_SMTP_PASS) {
     return {
+      type: 'smtp',
       user: ENV_SMTP_USER,
       pass: ENV_SMTP_PASS,
       host: ENV_SMTP_HOST || 'smtp.gmail.com',
@@ -65,40 +81,14 @@ async function getSmtpConfig() {
   return null;
 }
 
-async function getEmailTransporter() {
-  const cfg = await getSmtpConfig();
-  if (!cfg || !cfg.user || !cfg.pass) return null;
-  try {
-    const isGmail = cfg.user.includes('@gmail.com');
-    const transporter = nodemailer.createTransport({
-      host: cfg.host || (isGmail ? 'smtp.gmail.com' : 'smtp.gmail.com'),
-      port: cfg.port ? Number(cfg.port) : 465,
-      secure: (cfg.port ? Number(cfg.port) : 465) === 465,
-      auth: {
-        user: cfg.user.trim(),
-        pass: cfg.pass.replace(/\s+/g, '').trim()
-      }
-    });
-    return { transporter, senderEmail: cfg.user.trim() };
-  } catch (err) {
-    console.warn('⚠️ Error initializing transporter:', err.message);
-    return null;
-  }
-}
-
 async function sendInvitationEmail({ toEmail, recipientName, role, inviteUrl, initialPin, inviterName }) {
-  const emailSetup = await getEmailTransporter();
-  if (!emailSetup) {
-    return { sent: false, reason: 'SMTP not configured' };
+  const cfg = await getEmailConfig();
+  if (!cfg) {
+    return { sent: false, reason: 'Email delivery not configured' };
   }
 
-  const { transporter, senderEmail } = emailSetup;
   const roleTitle = role === 'admin' ? 'Super Admin' : 'Sales Representative';
-  const mailOptions = {
-    from: `"ApexSales CRM" <${senderEmail}>`,
-    to: toEmail,
-    subject: `🎉 Welcome to ApexSales CRM - Your Account & Login Password`,
-    html: `
+  const emailHtml = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -181,17 +171,96 @@ async function sendInvitationEmail({ toEmail, recipientName, role, inviteUrl, in
         </div>
       </body>
       </html>
-    `
-  };
+  `;
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✉️ Automatic invitation email sent successfully to ${toEmail}: ${info.messageId}`);
-    return { sent: true, messageId: info.messageId };
-  } catch (err) {
-    console.error(`⚠️ Failed to send automatic invitation email to ${toEmail}:`, err.message);
-    return { sent: false, reason: err.message };
+  // 1. Send via Resend Email API
+  if (cfg.type === 'resend') {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${cfg.apiKey.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: cfg.fromEmail || 'ApexSales CRM <onboarding@resend.dev>',
+          to: [toEmail],
+          subject: `🎉 Welcome to ApexSales CRM - Your Account & Login Password`,
+          html: emailHtml
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(`✉️ Automatic invitation email sent via Resend API to ${toEmail}: ${data.id}`);
+        return { sent: true, messageId: data.id, provider: 'resend' };
+      } else {
+        console.error('⚠️ Resend API send error:', data);
+        return { sent: false, reason: data.message || 'Resend error' };
+      }
+    } catch (err) {
+      console.error('⚠️ Resend dispatch failed:', err.message);
+      return { sent: false, reason: err.message };
+    }
   }
+
+  // 2. Send via Brevo Email API
+  if (cfg.type === 'brevo') {
+    try {
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'api-key': cfg.apiKey.trim(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: 'ApexSales CRM', email: cfg.senderEmail || 'salesflowcrmhelp@gmail.com' },
+          to: [{ email: toEmail, name: recipientName }],
+          subject: `🎉 Welcome to ApexSales CRM - Your Account & Login Password`,
+          htmlContent: emailHtml
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(`✉️ Automatic invitation email sent via Brevo API to ${toEmail}: ${data.messageId}`);
+        return { sent: true, messageId: data.messageId, provider: 'brevo' };
+      } else {
+        console.error('⚠️ Brevo API send error:', data);
+        return { sent: false, reason: data.message || 'Brevo error' };
+      }
+    } catch (err) {
+      console.error('⚠️ Brevo dispatch failed:', err.message);
+      return { sent: false, reason: err.message };
+    }
+  }
+
+  // 3. Send via SMTP (Gmail / Custom)
+  if (cfg.type === 'smtp' && cfg.user && cfg.pass) {
+    try {
+      const isGmail = cfg.user.includes('@gmail.com');
+      const transporter = nodemailer.createTransport({
+        host: cfg.host || (isGmail ? 'smtp.gmail.com' : 'smtp.gmail.com'),
+        port: cfg.port ? Number(cfg.port) : 465,
+        secure: (cfg.port ? Number(cfg.port) : 465) === 465,
+        auth: {
+          user: cfg.user.trim(),
+          pass: cfg.pass.replace(/\s+/g, '').trim()
+        }
+      });
+      const info = await transporter.sendMail({
+        from: `"ApexSales CRM" <${cfg.user.trim()}>`,
+        to: toEmail,
+        subject: `🎉 Welcome to ApexSales CRM - Your Account & Login Password`,
+        html: emailHtml
+      });
+      console.log(`✉️ Automatic invitation email sent via SMTP to ${toEmail}: ${info.messageId}`);
+      return { sent: true, messageId: info.messageId, provider: 'smtp' };
+    } catch (err) {
+      console.error(`⚠️ Failed to send invitation email via SMTP to ${toEmail}:`, err.message);
+      return { sent: false, reason: err.message };
+    }
+  }
+
+  return { sent: false, reason: 'No active email provider configured' };
 }
 
 // --- DATABASE LAYER (DUAL-MODE: MONGODB ATLAS WITH LOCAL JSON FALLBACK) ---
@@ -697,27 +766,127 @@ app.post('/api/users/invite', async (req, res) => {
 
 // Admin: Get Current Email Dispatch Configuration Status
 app.get('/api/settings/email', async (req, res) => {
-  const cfg = await getSmtpConfig();
+  const cfg = await getEmailConfig();
   if (!cfg) {
-    return res.json({ success: true, configured: false, senderEmail: '' });
+    return res.json({ success: true, configured: false, provider: '', senderEmail: '' });
   }
   res.json({
     success: true,
     configured: true,
-    senderEmail: cfg.user,
-    host: cfg.host || 'smtp.gmail.com'
+    provider: cfg.type,
+    senderEmail: cfg.user || cfg.senderEmail || (cfg.type === 'resend' ? 'onboarding@resend.dev' : '')
   });
 });
 
-// Admin: Save & Verify Email Dispatch Configuration (e.g. Gmail App Password)
+// Admin: Save & Verify Email Dispatch Configuration (Resend API, Brevo API, or Gmail SMTP)
 app.post('/api/settings/email', async (req, res) => {
   if (req.user?.role !== 'admin') {
     return res.status(403).json({ success: false, message: 'Access denied. Only Admin can configure email dispatch.' });
   }
 
-  const { user, pass, host, port } = req.body;
+  const { type = 'resend', apiKey, user, pass, host, port, senderEmail } = req.body;
+
+  // 1. Handle Resend Email API
+  if (type === 'resend') {
+    if (!apiKey || !String(apiKey).trim()) {
+      return res.status(400).json({ success: false, message: 'Resend API Key is required.' });
+    }
+    const cleanKey = String(apiKey).trim();
+
+    try {
+      const testRes = await fetch('https://api.resend.com/api-keys', {
+        headers: { 'Authorization': `Bearer ${cleanKey}` }
+      });
+      if (!testRes.ok) {
+        return res.status(400).json({ success: false, message: 'Invalid Resend API Key. Please verify your key on resend.com.' });
+      }
+
+      const configData = {
+        id: 'email_api_config',
+        type: 'resend',
+        apiKey: cleanKey,
+        provider: 'Resend Email API',
+        fromEmail: (senderEmail && String(senderEmail).trim()) || 'ApexSales CRM <onboarding@resend.dev>',
+        updatedAt: new Date().toISOString(),
+        updatedBy: req.user?.name || 'Admin'
+      };
+
+      if (isMongoConnected && mongoDb) {
+        await mongoDb.collection('settings').updateOne(
+          { id: 'email_api_config' },
+          { $set: configData },
+          { upsert: true }
+        );
+      }
+      const local = readLocalDB();
+      if (!local.settings) local.settings = {};
+      local.settings.email_api = configData;
+      writeLocalDB(local);
+
+      console.log(`✅ Resend Email API connected successfully!`);
+      return res.json({
+        success: true,
+        message: 'Resend Email API connected successfully! All new users will now automatically receive branded emails via API.',
+        provider: 'resend',
+        senderEmail: configData.fromEmail
+      });
+    } catch (err) {
+      return res.status(400).json({ success: false, message: `Could not verify Resend API: ${err.message}` });
+    }
+  }
+
+  // 2. Handle Brevo Email API
+  if (type === 'brevo') {
+    if (!apiKey || !String(apiKey).trim()) {
+      return res.status(400).json({ success: false, message: 'Brevo API Key is required.' });
+    }
+    const cleanKey = String(apiKey).trim();
+
+    try {
+      const testRes = await fetch('https://api.brevo.com/v3/account', {
+        headers: { 'api-key': cleanKey }
+      });
+      if (!testRes.ok) {
+        return res.status(400).json({ success: false, message: 'Invalid Brevo API Key. Please verify on brevo.com.' });
+      }
+
+      const configData = {
+        id: 'email_api_config',
+        type: 'brevo',
+        apiKey: cleanKey,
+        provider: 'Brevo Email API',
+        senderEmail: (senderEmail && String(senderEmail).trim()) || 'salesflowcrmhelp@gmail.com',
+        updatedAt: new Date().toISOString(),
+        updatedBy: req.user?.name || 'Admin'
+      };
+
+      if (isMongoConnected && mongoDb) {
+        await mongoDb.collection('settings').updateOne(
+          { id: 'email_api_config' },
+          { $set: configData },
+          { upsert: true }
+        );
+      }
+      const local = readLocalDB();
+      if (!local.settings) local.settings = {};
+      local.settings.email_api = configData;
+      writeLocalDB(local);
+
+      console.log(`✅ Brevo Email API connected successfully!`);
+      return res.json({
+        success: true,
+        message: 'Brevo Email API connected successfully! All new users will now automatically receive branded emails via API.',
+        provider: 'brevo',
+        senderEmail: configData.senderEmail
+      });
+    } catch (err) {
+      return res.status(400).json({ success: false, message: `Could not verify Brevo API: ${err.message}` });
+    }
+  }
+
+  // 3. Handle Gmail / Custom SMTP
   if (!user || !pass) {
-    return res.status(400).json({ success: false, message: 'Gmail/Email Address and App Password are required.' });
+    return res.status(400).json({ success: false, message: 'Gmail Address and App Password are required for SMTP.' });
   }
 
   const cleanUser = String(user).trim();
@@ -738,6 +907,7 @@ app.post('/api/settings/email', async (req, res) => {
 
     const configData = {
       id: 'smtp_config',
+      type: 'smtp',
       user: cleanUser,
       pass: cleanPass,
       host: cleanHost,
@@ -762,7 +932,8 @@ app.post('/api/settings/email', async (req, res) => {
     res.json({
       success: true,
       message: `Connected successfully! All invitations will now automatically be delivered to user inboxes from "${cleanUser}".`,
-      senderEmail: cleanUser
+      senderEmail: cleanUser,
+      provider: 'smtp'
     });
   } catch (err) {
     console.error('SMTP test failed:', err.message);
