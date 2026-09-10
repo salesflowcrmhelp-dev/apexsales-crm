@@ -672,7 +672,7 @@ app.post('/api/users/invite', async (req, res) => {
   const baseUrl = `${protocol}://${host}`;
   const inviteUrl = `${baseUrl}?invite=${inviteToken}&email=${encodeURIComponent(cleanEmail)}`;
 
-  const inviteMessage = `👋 Hello ${cleanName},\n\nYou have been invited to join the ApexSales CRM workspace as ${userRole === 'admin' ? 'Super Admin' : 'Sales Representative'}!\n\n🔑 Your Login Credentials:\n• Authorized Email: ${cleanEmail}\n• Secret Login PIN: ${userPin}\n\n👉 Click here to activate your account and start:\n${inviteUrl}\n\n(Note: Only your email ID is authorized to log in)`;
+  const inviteMessage = `✨ Welcome to ApexSales CRM! ✨\n\nHello ${cleanName},\n\nYour account has been created on the ApexSales CRM workspace as ${userRole === 'admin' ? 'Super Admin' : 'Sales Representative'}.\n\n🔐 Official Login Credentials:\n• Authorized Email: ${cleanEmail}\n• Login Password / PIN: ${userPin}\n\n👉 Click here to open your workspace:\n${inviteUrl}\n\n(Strict Security Notice: Only your registered email ID is authorized to log in)\n\n---\nApexSales CRM • High-Performance Revenue & Sales Workspace`;
 
   const emailResult = await sendInvitationEmail({
     toEmail: cleanEmail,

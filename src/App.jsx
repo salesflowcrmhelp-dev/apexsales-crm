@@ -17509,12 +17509,21 @@ export default function App() {
                       📱 WhatsApp
                     </button>
                     <a
-                      href={`mailto:${encodeURIComponent(createdInviteInfo.user?.email || "")}?subject=${encodeURIComponent("Invitation to join ApexSales CRM")}&body=${encodeURIComponent(createdInviteInfo.inviteMessage || createdInviteInfo.inviteUrl)}`}
+                      href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(createdInviteInfo.user?.email || "")}&su=${encodeURIComponent("🎉 Welcome to ApexSales CRM - Your Account & Login Password")}&body=${encodeURIComponent(createdInviteInfo.inviteMessage || createdInviteInfo.inviteUrl)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ padding: "6px 12px", backgroundColor: "#ea4335", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "750", cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      title="Open Gmail with recipient, credentials and brand message pre-filled"
+                    >
+                      ✉️ 1-Click Gmail
+                    </a>
+                    <a
+                      href={`mailto:${encodeURIComponent(createdInviteInfo.user?.email || "")}?subject=${encodeURIComponent("🎉 Welcome to ApexSales CRM - Your Account & Login Password")}&body=${encodeURIComponent(createdInviteInfo.inviteMessage || createdInviteInfo.inviteUrl)}`}
                       target="_blank"
                       rel="noreferrer"
                       style={{ padding: "6px 12px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "750", cursor: "pointer", textDecoration: "none" }}
                     >
-                      ✉️ Email
+                      ✉️ Default Mail
                     </a>
                   </div>
                 </div>
