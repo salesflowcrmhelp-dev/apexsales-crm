@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { 
   Download, Plus, Save, RefreshCw, FileSpreadsheet, 
   HelpCircle, X, Check, AlertCircle, TrendingUp, IndianRupee, Award, Grid, Upload, Trash2, Target, Pencil, Gift, Lock, Unlock, KeyRound, Calendar, Phone, AlertTriangle, Flame, CheckCircle2, MessageCircle, Clock, Bell, Sparkles, RotateCcw,
-  Bookmark, Sun, Layers, UserCheck, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2
+  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2
 } from "lucide-react";
 
 // Dropdown options
@@ -1450,7 +1450,10 @@ export default function App() {
   const [profileConfirmPassword, setProfileConfirmPassword] = useState("");
 
   // Delete Confirmation Modal State
-  const [deleteConfirmData, setDeleteConfirmData] = useState(null); // { title, message, onConfirm, confirmLabel }
+  const [deleteConfirmData, setDeleteConfirmData] = useState(null); // { title, message, onConfirm, confirmLabel, icon }
+
+  // Custom In-App Reset PIN Modal State (replaces browser window.prompt)
+  const [pinModalData, setPinModalData] = useState(null); // { userId, userName, pin: "" }
 
   const requestDeleteTask = (task) => {
     if (!task) return;
@@ -1609,7 +1612,7 @@ export default function App() {
     }
 
     if (idsToDelete.length === 0) {
-      alert("Please select a lead row to delete first.");
+      showToast("Please select a lead row to delete first.", "error");
       return;
     }
 
@@ -2361,53 +2364,38 @@ export default function App() {
     }
   };
 
-  const handleUpdateUserPin = async (userId, userName) => {
-    const newPin = window.prompt(`Enter new 4 to 6 digit login PIN for ${userName}:`);
-    if (!newPin || !newPin.trim()) return;
-
-    try {
-      const res = await fetch(`/api/users/${encodeURIComponent(userId)}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-role": currentUser?.role || "admin",
-          "x-user-name": currentUser?.name || "Admin User"
-        },
-        body: JSON.stringify({ pin: newPin.trim() })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showToast(`PIN for ${userName} updated successfully to: ${newPin.trim()}`, "success");
-        loadUsersFromBackend();
-      } else {
-        showToast(data.message || "Failed to update PIN.", "error");
-      }
-    } catch(err) {
-      showToast("Error updating PIN.", "error");
-    }
+  const handleUpdateUserPin = (userId, userName) => {
+    setPinModalData({ userId, userName, pin: "" });
   };
 
-  const handleDeactivateUser = async (userId, userName) => {
-    if (!window.confirm(`Are you sure you want to deactivate ${userName}?`)) return;
-
-    try {
-      const res = await fetch(`/api/users/${encodeURIComponent(userId)}`, {
-        method: "DELETE",
-        headers: {
-          "x-user-role": currentUser?.role || "admin",
-          "x-user-name": currentUser?.name || "Admin User"
+  const handleDeactivateUser = (userId, userName) => {
+    setDeleteConfirmData({
+      title: "Deactivate Team Member?",
+      message: `Are you sure you want to deactivate ${userName}? They will be marked as inactive and will immediately lose access to the CRM.`,
+      confirmLabel: "Yes, Deactivate",
+      icon: "user-x",
+      onConfirm: async () => {
+        setDeleteConfirmData(null);
+        try {
+          const res = await fetch(`/api/users/${encodeURIComponent(userId)}`, {
+            method: "DELETE",
+            headers: {
+              "x-user-role": currentUser?.role || "admin",
+              "x-user-name": currentUser?.name || "Admin User"
+            }
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            showToast(`User ${userName} deactivated successfully.`, "info");
+            loadUsersFromBackend();
+          } else {
+            showToast(data.message || "Failed to deactivate user.", "error");
+          }
+        } catch(err) {
+          showToast("Error deactivating user.", "error");
         }
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showToast(`User ${userName} deactivated.`, "info");
-        loadUsersFromBackend();
-      } else {
-        showToast(data.message || "Failed to deactivate user.", "error");
       }
-    } catch(err) {
-      showToast("Error deactivating user.", "error");
-    }
+    });
   };
 
   const saveTasksToStorage = (updatedTasks) => {
@@ -16830,7 +16818,11 @@ export default function App() {
                 justifyContent: "center", 
                 flexShrink: 0
               }}>
-                <Trash2 size={22} color="#e11d48" />
+                {deleteConfirmData.icon === "user-x" ? (
+                  <UserX size={22} color="#e11d48" />
+                ) : (
+                  <Trash2 size={22} color="#e11d48" />
+                )}
               </div>
             </div>
 
@@ -16957,9 +16949,215 @@ export default function App() {
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#be123c"}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#e11d48"}
               >
-                <Trash2 size={14} /> {deleteConfirmData.confirmLabel || "Delete Lead"}
+                {deleteConfirmData.icon === "user-x" ? <UserX size={14} /> : <Trash2 size={14} />} {deleteConfirmData.confirmLabel || "Delete Lead"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🔑 Custom Reset PIN Modal (Replaces browser window.prompt) */}
+      {pinModalData && (
+        <div 
+          className="modal-overlay" 
+          onClick={() => setPinModalData(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(15, 23, 42, 0.6)",
+            backdropFilter: "blur(6px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 10000,
+            padding: "16px"
+          }}
+        >
+          <div 
+            className="modal-content animate-fade-in" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ 
+              maxWidth: "400px", 
+              width: "100%",
+              borderRadius: "18px", 
+              padding: "26px 24px 22px 24px", 
+              backgroundColor: "#ffffff", 
+              boxShadow: "0 25px 60px -15px rgba(15, 23, 42, 0.3), 0 0 0 1px rgba(15, 23, 42, 0.06)",
+              border: "1px solid #f1f5f9",
+              position: "relative",
+              textAlign: "center",
+              fontFamily: "'Plus Jakarta Sans', sans-serif"
+            }}
+          >
+            {/* Top Close Button */}
+            <button
+              onClick={() => setPinModalData(null)}
+              style={{
+                position: "absolute",
+                top: "14px",
+                right: "14px",
+                background: "none",
+                border: "none",
+                color: "#94a3b8",
+                cursor: "pointer",
+                padding: "6px",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.15s ease"
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#f1f5f9"; e.currentTarget.style.color = "#475569"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "#94a3b8"; }}
+            >
+              <X size={15} />
+            </button>
+
+            {/* Centered Key Icon with Soft Glowing Ring */}
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "14px" }}>
+              <div style={{ 
+                width: "52px", 
+                height: "52px", 
+                borderRadius: "50%", 
+                backgroundColor: "#eff6ff", 
+                border: "6px solid #dbeafe",
+                color: "#2563eb", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center", 
+                flexShrink: 0
+              }}>
+                <KeyRound size={22} color="#2563eb" />
+              </div>
+            </div>
+
+            {/* Title & Subtitle */}
+            <h3 style={{ fontSize: "17px", fontWeight: "800", color: "#0f172a", margin: "0 0 6px 0", letterSpacing: "-0.2px" }}>
+              Reset Login PIN
+            </h3>
+            <p style={{ fontSize: "12.5px", color: "#64748b", margin: "0 0 18px 0", lineHeight: "1.5" }}>
+              Enter a new 4 to 6 digit login PIN for <strong>{pinModalData.userName}</strong>.
+            </p>
+
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const trimmed = (pinModalData.pin || "").trim();
+              if (!trimmed || trimmed.length < 4 || trimmed.length > 6) {
+                showToast("PIN must be 4 to 6 digits.", "error");
+                return;
+              }
+              try {
+                const res = await fetch(`/api/users/${encodeURIComponent(pinModalData.userId)}`, {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-user-role": currentUser?.role || "admin",
+                    "x-user-name": currentUser?.name || "Admin User"
+                  },
+                  body: JSON.stringify({ pin: trimmed })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                  showToast(`PIN for ${pinModalData.userName} updated successfully to: ${trimmed}`, "success");
+                  setPinModalData(null);
+                  loadUsersFromBackend();
+                } else {
+                  showToast(data.message || "Failed to update PIN.", "error");
+                }
+              } catch(err) {
+                showToast("Error updating PIN.", "error");
+              }
+            }}>
+              <div style={{ marginBottom: "18px" }}>
+                <input
+                  type="text"
+                  autoFocus
+                  maxLength={6}
+                  placeholder="e.g. 1234"
+                  value={pinModalData.pin || ""}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    setPinModalData(prev => ({ ...prev, pin: val }));
+                  }}
+                  style={{
+                    width: "100%",
+                    height: "46px",
+                    textAlign: "center",
+                    fontSize: "22px",
+                    letterSpacing: "6px",
+                    fontWeight: "800",
+                    color: "#0f172a",
+                    backgroundColor: "#f8fafc",
+                    border: "1.5px solid #cbd5e1",
+                    borderRadius: "10px",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    transition: "all 0.15s ease"
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "#2563eb"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.12)"; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "#cbd5e1"; e.currentTarget.style.boxShadow = "none"; }}
+                />
+                <div style={{ fontSize: "11px", color: "#94a3b8", marginTop: "6px" }}>
+                  Only numeric digits (4-6 digits)
+                </div>
+              </div>
+
+              {/* Actions Footer with 2-Button Grid */}
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button 
+                  type="button"
+                  onClick={() => setPinModalData(null)}
+                  style={{ 
+                    flex: 1,
+                    height: "40px", 
+                    backgroundColor: "#ffffff", 
+                    color: "#334155", 
+                    border: "1px solid #cbd5e1", 
+                    borderRadius: "10px", 
+                    fontSize: "13px", 
+                    fontWeight: "600", 
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                    fontFamily: "inherit",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#ffffff"}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={!pinModalData.pin || pinModalData.pin.length < 4}
+                  style={{ 
+                    flex: 1,
+                    height: "40px", 
+                    backgroundColor: (!pinModalData.pin || pinModalData.pin.length < 4) ? "#94a3b8" : "#2563eb", 
+                    color: "#ffffff", 
+                    border: "none", 
+                    borderRadius: "10px", 
+                    fontSize: "13px", 
+                    fontWeight: "700", 
+                    cursor: (!pinModalData.pin || pinModalData.pin.length < 4) ? "not-allowed" : "pointer", 
+                    display: "inline-flex", 
+                    alignItems: "center", 
+                    justifyContent: "center",
+                    gap: "6px", 
+                    boxShadow: (!pinModalData.pin || pinModalData.pin.length < 4) ? "none" : "0 2px 8px rgba(37, 99, 235, 0.3)",
+                    transition: "all 0.15s ease",
+                    fontFamily: "inherit"
+                  }}
+                  onMouseEnter={(e) => {
+                    if (pinModalData.pin && pinModalData.pin.length >= 4) e.currentTarget.style.backgroundColor = "#1d4ed8";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (pinModalData.pin && pinModalData.pin.length >= 4) e.currentTarget.style.backgroundColor = "#2563eb";
+                  }}
+                >
+                  <KeyRound size={14} /> Update PIN
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
