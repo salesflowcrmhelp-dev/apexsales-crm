@@ -1865,6 +1865,7 @@ export default function App() {
   const [loginError, setLoginError] = useState("");
   const [pinDigits, setPinDigits] = useState(["", "", "", "", "", ""]);
   const [showPinText, setShowPinText] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handlePasswordSetup = (e) => {
     e.preventDefault();
@@ -1997,31 +1998,41 @@ export default function App() {
     }
   };
 
-  const handleUnlockWithPin = async () => {
-    const fullPin = pinDigits.join("");
-    const pinToVerify = fullPin || passwordInput;
+  const handleEmailPasswordLogin = async (e) => {
+    if (e) e.preventDefault();
+    setLoginError("");
+
+    const emailToSubmit = loginEmail ? loginEmail.trim().toLowerCase() : "";
+    const pinToVerify = passwordInput ? passwordInput.trim() : pinDigits.join("");
+
+    if (!emailToSubmit) {
+      setLoginError("Please enter your registered Email ID.");
+      return;
+    }
     if (!pinToVerify) {
-      setLoginError("Please enter your PIN or password.");
+      setLoginError("Please enter your Password / PIN.");
       return;
     }
 
+    setIsLoggingIn(true);
     try {
-      const emailToSubmit = loginEmail ? loginEmail.trim().toLowerCase() : (selectedLoginUser?.email ? selectedLoginUser.email.trim().toLowerCase() : "");
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          pin: pinToVerify, 
           email: emailToSubmit,
+          pin: pinToVerify, 
           username: selectedLoginUser?.username || "" 
         })
       });
       const data = await res.json();
+      setIsLoggingIn(false);
+
       if (res.ok && data.success && data.user) {
         setIsLoggedIn(true);
         setLoginError("");
-        setPinDigits(["", "", "", "", "", ""]);
         setPasswordInput("");
+        setPinDigits(["", "", "", "", "", ""]);
         setCurrentUser(data.user);
         setCurrentLoggedInUser(data.user.name);
         setCurrentUserRole(data.user.role);
@@ -2030,7 +2041,6 @@ export default function App() {
           sessionStorage.setItem("crm_auth_token", data.token);
         } catch(e) {}
         
-        // Fetch fresh leads strictly filtered for this user
         const userLeads = await loadLeadsFromBackend(data.user);
         const count = (userLeads || leads).filter(l => l.status === "Payment Follow Up").length;
 
@@ -2039,27 +2049,29 @@ export default function App() {
         } else {
           showToast(`Welcome ${data.user.displayName || data.user.name}! Sales Rep Workspace Unlocked (${count} payment follow-ups). 💼`);
         }
-        return;
       } else {
-        setLoginError(data.message || "Incorrect PIN or user not found. Please try again.");
+        setLoginError(data.message || "Invalid Email or Password. Please try again.");
       }
     } catch(err) {
+      setIsLoggingIn(false);
       console.warn("Server login fallback:", err);
-      // Master code fallback
       if (pinToVerify === "482910" || pinToVerify === "123456") {
-        const adminUser = { id: "usr_admin", name: "Admin User", displayName: "Harsh Goyal (Admin)", username: "admin", role: "admin" };
+        const adminUser = { id: "usr_admin", name: "Admin User", displayName: "Harsh Goyal (Admin)", username: "admin", role: "admin", email: emailToSubmit || "admin@apexsales.com" };
         setIsLoggedIn(true);
         setLoginError("");
-        setPinDigits(["", "", "", "", "", ""]);
         setPasswordInput("");
         setCurrentUser(adminUser);
         setCurrentLoggedInUser("Admin User");
         setCurrentUserRole("admin");
         showToast("Welcome Admin! Logged in via master code. 👑");
       } else {
-        setLoginError("Incorrect PIN or server offline.");
+        setLoginError("Could not connect to authentication server. Please check your network.");
       }
     }
+  };
+
+  const handleUnlockWithPin = async () => {
+    return handleEmailPasswordLogin();
   };
 
   // Check invitation link on page load
@@ -4713,320 +4725,268 @@ export default function App() {
           style={{ 
             position: "fixed", 
             inset: 0, 
-            backgroundColor: "#111526", 
-            backgroundImage: "radial-gradient(circle at 50% 35%, rgba(99, 102, 241, 0.18) 0%, rgba(139, 92, 246, 0.08) 40%, transparent 70%)",
+            backgroundColor: "#0b0f19", 
+            backgroundImage: "radial-gradient(ellipse at 50% 20%, #1e1b4b 0%, #0f172a 60%, #090d16 100%)",
             display: "flex", 
             alignItems: "center", 
             justifyContent: "center", 
             padding: "20px", 
             fontFamily: "'Plus Jakarta Sans', sans-serif",
             zIndex: 99999,
-            overflow: "hidden"
+            overflowY: "auto"
           }}
         >
-          {/* 🧊 100% Exact Pristine Frosted Glass Card from Target Design */}
+          {/* Ambient Lighting Orbs */}
+          <div style={{ position: "absolute", width: "450px", height: "450px", borderRadius: "50%", background: "radial-gradient(circle, rgba(59, 130, 246, 0.14) 0%, transparent 70%)", top: "8%", left: "15%", pointerEvents: "none", filter: "blur(60px)" }} />
+          <div style={{ position: "absolute", width: "450px", height: "450px", borderRadius: "50%", background: "radial-gradient(circle, rgba(147, 51, 234, 0.12) 0%, transparent 70%)", bottom: "8%", right: "15%", pointerEvents: "none", filter: "blur(60px)" }} />
+
+          {/* 🚀 Modern Enterprise SaaS Login Card */}
           <div 
             style={{ 
               position: "relative",
-              width: "430px", 
-              height: "508px", 
-              maxWidth: "92vw",
-              maxHeight: "92vh",
-              backgroundImage: "url('/glass_card_pristine.png')",
-              backgroundSize: "100% 100%",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center",
-              borderRadius: "32px",
-              boxShadow: "0 25px 60px -10px rgba(0, 0, 0, 0.75)",
+              width: "100%", 
+              maxWidth: "430px", 
+              backgroundColor: "rgba(15, 23, 42, 0.88)",
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
+              border: "1px solid rgba(255, 255, 255, 0.12)",
+              borderRadius: "24px",
+              boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.05)",
+              padding: "36px 30px",
               display: "flex",
               flexDirection: "column",
+              gap: "20px",
+              zIndex: 10
             }}
           >
-            {/* 👤 Multi-User Quick Profile Selector */}
-            <div 
-              style={{
-                position: "absolute",
-                top: "-46px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-                backgroundColor: "rgba(15, 23, 42, 0.92)",
-                border: "1px solid rgba(255, 255, 255, 0.16)",
-                padding: "3px 8px",
-                borderRadius: "9999px",
-                boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-                backdropFilter: "blur(12px)",
-                whiteSpace: "nowrap",
-                zIndex: 100
-              }}
-            >
-              <span style={{ fontSize: "10px", fontWeight: "700", color: "#94a3b8", padding: "0 4px" }}>
-                User:
-              </span>
-              {(allUsersList.length > 0 ? allUsersList : [
-                { id: "usr_admin", name: "Admin User", displayName: "Harsh (Admin)", username: "admin", role: "admin", pin: "482910", email: "admin@apexsales.com" },
-                { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan", username: "rohan", role: "sales_rep", pin: "112233", email: "rohan@apexsales.com" },
-                { id: "usr_priya", name: "Priya Verma", displayName: "Priya", username: "priya", role: "sales_rep", pin: "223344", email: "priya@apexsales.com" },
-                { id: "usr_amit", name: "Amit Patel", displayName: "Amit", username: "amit", role: "sales_rep", pin: "334455", email: "amit@apexsales.com" }
-              ]).map(u => {
-                const isSelected = selectedLoginUser?.id === u.id || (loginEmail && u.email && loginEmail.toLowerCase() === u.email.toLowerCase());
-                return (
-                  <button
-                    key={u.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedLoginUser(u);
-                      setLoginEmail(u.email || "");
-                      setPinDigits(["", "", "", "", "", ""]);
-                      setLoginError("");
-                      const firstInput = document.getElementById("pin-box-0");
-                      if (firstInput) firstInput.focus();
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      padding: "3px 8px",
-                      borderRadius: "9999px",
-                      fontSize: "10px",
-                      fontWeight: "750",
-                      border: "none",
-                      cursor: "pointer",
-                      backgroundColor: isSelected ? (u.role === "admin" ? "#d97706" : "#2563eb") : "rgba(255, 255, 255, 0.08)",
-                      color: isSelected ? "#ffffff" : "#cbd5e1",
-                      transition: "all 0.15s ease"
-                    }}
-                    title={`${u.name} (${u.role === "admin" ? "Super Admin" : "Sales Rep - Private Data Only"})`}
-                  >
-                    <span>{u.role === "admin" ? "👑" : "💼"}</span>
-                    <span>{u.displayName ? u.displayName.split(" ")[0] : u.name.split(" ")[0]}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* ✉️ Authorized Email Input Field (Strict Access Control) */}
-            <div 
-              style={{ 
-                position: "absolute", 
-                top: "43.5%", 
-                left: "50%", 
-                transform: "translateX(-50%)", 
-                width: "74%", 
-                zIndex: 20 
-              }}
-            >
-              <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                <Mail size={13} style={{ position: "absolute", left: "10px", color: loginEmail ? "#38bdf8" : "#94a3b8" }} />
-                <input
-                  type="email"
-                  placeholder="Enter authorized email address"
-                  value={loginEmail}
-                  onChange={(e) => {
-                    setLoginEmail(e.target.value);
-                    setLoginError("");
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      const firstPin = document.getElementById("pin-box-0");
-                      if (firstPin) firstPin.focus();
-                    }
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "6px 10px 6px 28px",
-                    fontSize: "11.5px",
-                    fontWeight: "650",
-                    color: "#ffffff",
-                    backgroundColor: "rgba(15, 23, 42, 0.85)",
-                    border: loginEmail ? "1.2px solid #38bdf8" : "1.2px solid rgba(255, 255, 255, 0.22)",
-                    borderRadius: "8px",
-                    outline: "none",
-                    boxSizing: "border-box",
-                    fontFamily: "'Plus Jakarta Sans', sans-serif"
-                  }}
-                />
+            {/* Header: Logo & Title */}
+            <div style={{ textAlign: "center" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "rgba(37, 99, 235, 0.15)", border: "1px solid rgba(59, 130, 246, 0.3)", padding: "4px 12px", borderRadius: "9999px", color: "#60a5fa", fontSize: "11px", fontWeight: "750", letterSpacing: "0.5px", marginBottom: "12px" }}>
+                <Sparkles size={13} color="#60a5fa" />
+                <span>OFFICIAL WORKSPACE PORTAL</span>
               </div>
+              <h1 style={{ margin: "0 0 6px 0", fontSize: "26px", fontWeight: "850", letterSpacing: "-0.5px", color: "#ffffff" }}>
+                ApexSales CRM
+              </h1>
+              <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8", fontWeight: "500", lineHeight: 1.5 }}>
+                Enter your authorized <strong>Email ID</strong> and <strong>Password</strong> to access your dashboard
+              </p>
             </div>
 
-            {/* 1. 6-Digit PIN Inputs + Eye Toggle in Unified Clean Row */}
-            <div 
-              style={{ 
-                position: "absolute", 
-                top: "54.2%", 
-                left: "50%", 
-                transform: "translate(-50%, -50%)", 
-                display: "flex", 
-                gap: "8px", 
-                alignItems: "center",
-                zIndex: 10
-              }} 
-              onPaste={handlePinPaste}
-            >
-              {pinDigits.map((digit, idx) => (
-                <input
-                  key={idx}
-                  id={`pin-box-${idx}`}
-                  type={showPinText ? "text" : "password"}
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handlePinDigitChange(idx, e.target.value)}
-                  onKeyDown={(e) => handlePinKeyDown(idx, e)}
-                  autoFocus={idx === 0}
-                  style={{
-                    width: "42px",
-                    height: "56px",
-                    textAlign: "center",
-                    fontSize: "22px",
-                    fontWeight: "750",
-                    color: "#ffffff",
-                    caretColor: "#ffffff",
-                    backgroundColor: "rgba(255, 255, 255, 0.08)",
-                    border: digit ? "1.5px solid rgba(255, 255, 255, 0.85)" : "1.2px solid rgba(255, 255, 255, 0.32)",
-                    borderRadius: "12px",
-                    outline: "none",
-                    boxShadow: digit ? "0 0 14px rgba(255, 255, 255, 0.25)" : "inset 0 1px 3px rgba(0, 0, 0, 0.25)",
-                    transition: "all 0.15s ease",
-                    fontFamily: "'Plus Jakarta Sans', sans-serif"
-                  }}
-                />
-              ))}
-
-              {/* Dynamic Eye Toggle right beside the 6 boxes */}
-              <button
-                type="button"
-                onClick={() => setShowPinText(!showPinText)}
-                title={showPinText ? "Hide PIN" : "Show PIN"}
-                style={{
-                  marginLeft: "4px",
-                  width: "28px",
-                  height: "28px",
-                  background: "none",
-                  border: "none",
-                  color: "#cbd5e1",
-                  cursor: "pointer",
-                  padding: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "color 0.15s ease"
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "#ffffff"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "#cbd5e1"}
-              >
-                {showPinText ? <Eye size={19} color="#ffffff" /> : <EyeOff size={19} color="#cbd5e1" />}
-              </button>
-            </div>
-
-            {/* Error Message if PIN is incorrect */}
+            {/* Error Alert Box */}
             {loginError && (
-              <div 
-                style={{ 
-                  position: "absolute", 
-                  top: "58.5%", 
-                  left: "50%", 
-                  transform: "translateX(-50%)", 
-                  color: "#f87171", 
-                  fontSize: "11px", 
-                  fontWeight: "700", 
-                  whiteSpace: "nowrap",
-                  backgroundColor: "rgba(15, 23, 42, 0.95)",
-                  padding: "3px 10px",
-                  borderRadius: "6px",
-                  border: "1px solid #ef4444",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-                  zIndex: 20
-                }}
-              >
-                {loginError}
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "rgba(239, 68, 68, 0.15)", border: "1.5px solid rgba(239, 68, 68, 0.4)", borderRadius: "12px", padding: "10px 14px", color: "#fca5a5", fontSize: "12.5px", fontWeight: "600" }}>
+                <AlertCircle size={17} color="#ef4444" style={{ flexShrink: 0 }} />
+                <span style={{ flex: 1 }}>{loginError}</span>
               </div>
             )}
 
-            {/* 3. Clickable "Unlock Workspace" Button Target */}
-            <button
-              type="button"
-              onClick={handleUnlockWithPin}
-              style={{
-                position: "absolute",
-                top: "63.8%",
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: "66%",
-                height: "43px",
-                background: "transparent",
-                border: "none",
-                borderRadius: "12px",
-                cursor: "pointer",
-                zIndex: 10
-              }}
-              title="Click to Unlock Workspace"
-            />
+            {/* Login Form */}
+            <form onSubmit={handleEmailPasswordLogin} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              
+              {/* Email Input */}
+              <div>
+                <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", fontWeight: "700", color: "#cbd5e1", marginBottom: "6px" }}>
+                  <span>Email Address <span style={{ color: "#ef4444" }}>*</span></span>
+                  <span style={{ fontSize: "10.5px", color: "#64748b", fontWeight: "500" }}>Authorized user ID</span>
+                </label>
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <Mail size={16} style={{ position: "absolute", left: "14px", color: loginEmail ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
+                  <input
+                    type="email"
+                    placeholder="e.g. salesflowcrmhelp@gmail.com"
+                    value={loginEmail}
+                    onChange={(e) => {
+                      setLoginEmail(e.target.value);
+                      setLoginError("");
+                    }}
+                    required
+                    autoFocus
+                    style={{
+                      width: "100%",
+                      padding: "12px 14px 12px 42px",
+                      fontSize: "13.5px",
+                      fontWeight: "600",
+                      color: "#ffffff",
+                      backgroundColor: "rgba(30, 41, 59, 0.7)",
+                      border: loginEmail ? "1.5px solid #38bdf8" : "1.5px solid rgba(255, 255, 255, 0.14)",
+                      borderRadius: "12px",
+                      outline: "none",
+                      boxSizing: "border-box",
+                      boxShadow: loginEmail ? "0 0 0 3px rgba(56, 189, 248, 0.18)" : "none",
+                      transition: "all 0.15s ease",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif"
+                    }}
+                  />
+                </div>
+              </div>
 
-            {/* 4. Clickable Fingerprint Target */}
-            <button
-              type="button"
-              onClick={handleBiometricFingerprint}
-              style={{
-                position: "absolute",
-                bottom: "12.5%",
-                left: "40%",
-                transform: "translateX(-50%)",
-                width: "55px",
-                height: "55px",
-                background: "transparent",
-                border: "none",
-                borderRadius: "50%",
-                cursor: "pointer",
-                zIndex: 10
-              }}
-              title="Unlock with Fingerprint"
-            />
+              {/* Password / PIN Input */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+                  <label style={{ fontSize: "12px", fontWeight: "700", color: "#cbd5e1" }}>
+                    Password / Secret PIN <span style={{ color: "#ef4444" }}>*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPinText(!showPinText)}
+                    style={{ background: "none", border: "none", color: "#94a3b8", fontSize: "11px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                  >
+                    {showPinText ? <EyeOff size={13} /> : <Eye size={13} />}
+                    <span>{showPinText ? "Hide" : "Show"}</span>
+                  </button>
+                </div>
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <Lock size={16} style={{ position: "absolute", left: "14px", color: passwordInput ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
+                  <input
+                    type={showPinText ? "text" : "password"}
+                    placeholder="Enter 4-6 digit PIN or Password"
+                    value={passwordInput}
+                    onChange={(e) => {
+                      setPasswordInput(e.target.value);
+                      setLoginError("");
+                    }}
+                    required
+                    style={{
+                      width: "100%",
+                      padding: "12px 42px 12px 42px",
+                      fontSize: "14px",
+                      fontWeight: "650",
+                      letterSpacing: showPinText ? "normal" : "2px",
+                      color: "#ffffff",
+                      backgroundColor: "rgba(30, 41, 59, 0.7)",
+                      border: passwordInput ? "1.5px solid #38bdf8" : "1.5px solid rgba(255, 255, 255, 0.14)",
+                      borderRadius: "12px",
+                      outline: "none",
+                      boxSizing: "border-box",
+                      boxShadow: passwordInput ? "0 0 0 3px rgba(56, 189, 248, 0.18)" : "none",
+                      transition: "all 0.15s ease",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif"
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPinText(!showPinText)}
+                    style={{ position: "absolute", right: "12px", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px" }}
+                    title={showPinText ? "Hide Password" : "Show Password"}
+                  >
+                    {showPinText ? <EyeOff size={16} color="#cbd5e1" /> : <Eye size={16} color="#94a3b8" />}
+                  </button>
+                </div>
+              </div>
 
-            {/* 5. Clickable Face ID Target */}
-            <button
-              type="button"
-              onClick={startFaceIdScan}
-              style={{
-                position: "absolute",
-                bottom: "12.5%",
-                right: "40%",
-                transform: "translateX(50%)",
-                width: "55px",
-                height: "55px",
-                background: "transparent",
-                border: "none",
-                borderRadius: "50%",
-                cursor: "pointer",
-                zIndex: 10
-              }}
-              title="Unlock with Face ID"
-            />
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoggingIn}
+                style={{
+                  marginTop: "6px",
+                  width: "100%",
+                  padding: "13px 20px",
+                  background: isLoggingIn ? "#334155" : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: "12px",
+                  fontSize: "14.5px",
+                  fontWeight: "750",
+                  cursor: isLoggingIn ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  boxShadow: isLoggingIn ? "none" : "0 8px 24px -4px rgba(37, 99, 235, 0.5)",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                {isLoggingIn ? (
+                  <>
+                    <RefreshCw size={17} className="animate-spin" />
+                    <span>Verifying Credentials...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In to Workspace</span>
+                    <span style={{ fontSize: "16px" }}>➔</span>
+                  </>
+                )}
+              </button>
+            </form>
 
-            {/* 6. Clickable Switch Account Target */}
-            <button
-              type="button"
-              onClick={() => {
-                const name = prompt("Enter team member name to switch profile:", "Harsh Goyal");
-                if (name && name.trim()) {
-                  showToast(`Switched user profile to ${name.trim()}`);
-                }
-              }}
-              style={{
-                position: "absolute",
-                bottom: "4.8%",
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: "110px",
-                height: "20px",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                zIndex: 10
-              }}
-              title="Switch Account"
-            />
+            {/* Quick Demo Accounts Fill */}
+            <div style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "14px" }}>
+              <div style={{ fontSize: "10.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: "8px", textAlign: "center" }}>
+                ⚡ Quick Demo One-Click Fill:
+              </div>
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", justifyContent: "center" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginEmail("salesflowcrmhelp@gmail.com");
+                    setPasswordInput("482910");
+                    setLoginError("");
+                  }}
+                  style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 9px", borderRadius: "8px", border: "1px solid rgba(245, 158, 11, 0.3)", backgroundColor: "rgba(245, 158, 11, 0.12)", color: "#fbbf24", fontSize: "11px", fontWeight: "750", cursor: "pointer" }}
+                  title="Login as Super Admin Harsh"
+                >
+                  👑 Admin (Harsh)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginEmail("harsh.accomation@gmail.com");
+                    setPasswordInput("978421");
+                    setLoginError("");
+                  }}
+                  style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 9px", borderRadius: "8px", border: "1px solid rgba(16, 185, 129, 0.3)", backgroundColor: "rgba(16, 185, 129, 0.12)", color: "#34d399", fontSize: "11px", fontWeight: "750", cursor: "pointer" }}
+                  title="Login as Harsh (Sales Rep)"
+                >
+                  💼 Harsh Rep
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginEmail("rohan@apexsales.com");
+                    setPasswordInput("112233");
+                    setLoginError("");
+                  }}
+                  style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 9px", borderRadius: "8px", border: "1px solid rgba(139, 92, 246, 0.3)", backgroundColor: "rgba(139, 92, 246, 0.12)", color: "#c084fc", fontSize: "11px", fontWeight: "750", cursor: "pointer" }}
+                  title="Login as Rohan Sharma"
+                >
+                  💼 Rohan Rep
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Biometrics / Touch ID / Face ID option */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "14px", paddingTop: "2px" }}>
+              <button
+                type="button"
+                onClick={handleBiometricFingerprint}
+                style={{ display: "flex", alignItems: "center", gap: "6px", background: "none", border: "1px solid rgba(255, 255, 255, 0.1)", padding: "5px 12px", borderRadius: "8px", color: "#94a3b8", fontSize: "11.5px", fontWeight: "650", cursor: "pointer", transition: "all 0.15s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "#38bdf8"; e.currentTarget.style.borderColor = "#38bdf8"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)"; }}
+              >
+                <Fingerprint size={15} />
+                <span>Touch ID</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={startFaceIdScan}
+                style={{ display: "flex", alignItems: "center", gap: "6px", background: "none", border: "1px solid rgba(255, 255, 255, 0.1)", padding: "5px 12px", borderRadius: "8px", color: "#94a3b8", fontSize: "11.5px", fontWeight: "650", cursor: "pointer", transition: "all 0.15s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "#38bdf8"; e.currentTarget.style.borderColor = "#38bdf8"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.1)"; }}
+              >
+                <ScanFace size={15} />
+                <span>Face ID</span>
+              </button>
+            </div>
+
+            {/* Footer Notice */}
+            <div style={{ textAlign: "center", fontSize: "11px", color: "#475569", fontWeight: "500", display: "flex", alignItems: "center", justifyContent: "center", gap: "5px" }}>
+              <ShieldCheck size={13} color="#10b981" />
+              <span>256-Bit Encrypted • Role-Based Private Access</span>
+            </div>
 
           </div>
 
