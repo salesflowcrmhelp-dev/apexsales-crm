@@ -978,7 +978,49 @@ app.post('/api/users', async (req, res) => {
 
   await saveUser(newUser);
 
-  res.json({ success: true, user: newUser, message: `User "${newUser.name}" added successfully!` });
+  let emailSent = false;
+  let emailError = null;
+  if (email && email.trim()) {
+    const cleanEmail = email.trim().toLowerCase();
+    const host = req.get('host') || 'apexsales-crm.onrender.com';
+    const protocol = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
+    const baseUrl = `${protocol}://${host}`;
+    const inviteUrl = `${baseUrl}?email=${encodeURIComponent(cleanEmail)}`;
+
+    try {
+      const emailResult = await sendInvitationEmail({
+        toEmail: cleanEmail,
+        recipientName: name.trim(),
+        role: newUser.role,
+        inviteUrl,
+        initialPin: String(pin).trim(),
+        inviterName: req.user?.name || 'Admin'
+      });
+      emailSent = emailResult.sent;
+      emailError = emailResult.reason || null;
+      console.log(`✉️ Automated invitation dispatched in /api/users to ${cleanEmail}: ${emailSent}`);
+    } catch (err) {
+      console.error('⚠️ Failed to dispatch invitation email in /api/users:', err.message);
+      emailError = err.message;
+    }
+  }
+
+  const host = req.get('host') || 'apexsales-crm.onrender.com';
+  const protocol = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
+  const inviteUrl = `${protocol}://${host}?email=${encodeURIComponent(newUser.email || '')}`;
+  const inviteMessage = `✨ Welcome to ApexSales CRM! ✨\n\nHello ${newUser.name},\n\nYour account has been created on the ApexSales CRM workspace as ${newUser.role === 'admin' ? 'Super Admin' : 'Sales Representative'}.\n\n🔐 Official Login Credentials:\n• Authorized Email: ${newUser.email}\n• Login Password / PIN: ${newUser.pin}\n\n👉 Click here to open your workspace:\n${inviteUrl}\n\n---\nApexSales CRM • High-Performance Revenue & Sales Workspace`;
+
+  res.json({ 
+    success: true, 
+    user: newUser, 
+    emailSent, 
+    emailError,
+    inviteUrl,
+    inviteMessage,
+    message: emailSent 
+      ? `User "${newUser.name}" added & official email dispatched to ${newUser.email}!` 
+      : `User "${newUser.name}" added successfully!` 
+  });
 });
 
 // Admin: Update User

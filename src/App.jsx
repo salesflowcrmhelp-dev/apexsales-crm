@@ -2202,8 +2202,8 @@ export default function App() {
 
   const handleCreateUser = async (e) => {
     if (e) e.preventDefault();
-    if (!newUserData.name.trim() || !newUserData.pin.trim()) {
-      showToast("Please provide both Name and PIN.", "error");
+    if (!newUserData.name.trim()) {
+      showToast("Please provide team member Name.", "error");
       return;
     }
 
@@ -2219,7 +2219,12 @@ export default function App() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(`Team member "${data.user.name}" created successfully! PIN: ${data.user.pin}`, "success");
+        if (data.emailSent) {
+          showToast(`🎉 Team member created! Official invitation email sent to ${newUserData.email}`, "success");
+        } else {
+          showToast(`Team member "${data.user.name}" created! PIN: ${data.user.pin}`, "success");
+        }
+        setCreatedInviteInfo(data);
         setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", email: "", phone: "" });
         setShowAddUserSubModal(false);
         loadUsersFromBackend();
