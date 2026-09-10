@@ -43,6 +43,62 @@
       "email": "amit@apexsales.com",
       "phone": "9898000003",
       "active": true
+    },
+    {
+      "id": "usr_1789031781293_oz7i",
+      "active": true,
+      "createdAt": "2026-09-10T09:16:21.293Z",
+      "displayName": "Harsh",
+      "email": "harsh.accomation@gmail.com",
+      "name": "Harsh",
+      "phone": "9784213450",
+      "pin": "securepass987",
+      "role": "sales_rep",
+      "username": "hasrh",
+      "inviteToken": "inv_1789033779109_62nvm7",
+      "invitedAt": "2026-09-10T09:49:39.109Z",
+      "invitedBy": "Admin User",
+      "status": "invited"
+    },
+    {
+      "id": "usr_1789034273640_co87",
+      "name": "Kashish Test",
+      "displayName": "Kashish Test",
+      "username": "kashish_test_run",
+      "pin": "778899",
+      "role": "sales_rep",
+      "email": "kashish.accomation@gmail.com",
+      "phone": "",
+      "active": true,
+      "createdAt": "2026-09-10T09:57:53.640Z"
+    },
+    {
+      "id": "usr_1789034300073_x0g4",
+      "name": "Kashish Verify",
+      "displayName": "Kashish Verify",
+      "username": "kashish_verify_1789034299902",
+      "pin": "99999",
+      "role": "sales_rep",
+      "email": "kashish.accomation@gmail.com",
+      "phone": "",
+      "active": true,
+      "createdAt": "2026-09-10T09:58:20.073Z"
+    },
+    {
+      "id": "usr_1789031606011_esng",
+      "active": true,
+      "createdAt": "2026-09-10T09:13:26.011Z",
+      "displayName": "Admin (SalesFlow)",
+      "email": "salesflowcrmhelp@gmail.com",
+      "inviteToken": "inv_1789031670730_mmofns",
+      "invitedAt": "2026-09-10T09:14:30.730Z",
+      "invitedBy": "Super Admin",
+      "name": "Harsh Goyal",
+      "phone": "",
+      "pin": "HarshAdmin#2026",
+      "role": "admin",
+      "status": "invited",
+      "username": "salesflowcrmhelp"
     }
   ],
   "leads": [

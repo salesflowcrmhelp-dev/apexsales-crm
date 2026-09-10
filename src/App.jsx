@@ -1853,6 +1853,129 @@ export default function App() {
   const [showPinText, setShowPinText] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
+  // Forgot Password States
+  const [isForgotPasswordView, setIsForgotPasswordView] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1); // 1 = Enter Email, 2 = Enter OTP & Set New Password
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotOtp, setForgotOtp] = useState("");
+  const [forgotNewPass, setForgotNewPass] = useState("");
+  const [forgotConfirmPass, setForgotConfirmPass] = useState("");
+  const [forgotShowPass, setForgotShowPass] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState("");
+  const [forgotSuccess, setForgotSuccess] = useState("");
+  const [forgotCountdown, setForgotCountdown] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (forgotCountdown > 0) {
+      timer = setInterval(() => {
+        setForgotCountdown(prev => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [forgotCountdown]);
+
+  const handleRequestPasswordResetOtp = async (e) => {
+    if (e) e.preventDefault();
+    setForgotError("");
+    setForgotSuccess("");
+    const targetEmail = (forgotEmail || loginEmail || "").trim().toLowerCase();
+    if (!targetEmail) {
+      setForgotError("Please enter your registered email address.");
+      return;
+    }
+    setForgotLoading(true);
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: targetEmail })
+      });
+      const data = await res.json();
+      setForgotLoading(false);
+      if (res.ok && data.success) {
+        setForgotEmail(targetEmail);
+        setForgotStep(2);
+        setForgotSuccess(data.message || `A 6-digit OTP has been sent to ${targetEmail}.`);
+        setForgotCountdown(60);
+      } else {
+        setForgotError(data.message || "Could not send OTP. Please check your email.");
+      }
+    } catch(err) {
+      setForgotLoading(false);
+      setForgotError("Network error. Please check your connection and try again.");
+    }
+  };
+
+  const handleVerifyOtpAndResetPassword = async (e) => {
+    if (e) e.preventDefault();
+    setForgotError("");
+    setForgotSuccess("");
+    const targetEmail = (forgotEmail || "").trim().toLowerCase();
+    const cleanOtp = String(forgotOtp || "").trim();
+    const cleanNewPass = String(forgotNewPass || "").trim();
+    const cleanConfirmPass = String(forgotConfirmPass || "").trim();
+
+    if (!cleanOtp || cleanOtp.length < 6) {
+      setForgotError("Please enter the complete 6-digit OTP code.");
+      return;
+    }
+    if (!cleanNewPass) {
+      setForgotError("Please enter your new password.");
+      return;
+    }
+    if (cleanNewPass.length < 4) {
+      setForgotError("New password must be at least 4 characters.");
+      return;
+    }
+    if (cleanNewPass !== cleanConfirmPass) {
+      setForgotError("Passwords do not match. Please re-enter.");
+      return;
+    }
+
+    setForgotLoading(true);
+    try {
+      const res = await fetch("/api/auth/verify-reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: targetEmail,
+          otp: cleanOtp,
+          newPassword: cleanNewPass
+        })
+      });
+      const data = await res.json();
+      setForgotLoading(false);
+      if (res.ok && data.success && data.user) {
+        showToast("🎉 Password updated successfully! Logging you in...");
+        setIsLoggedIn(true);
+        setLoginError("");
+        setPasswordInput("");
+        setCurrentUser(data.user);
+        setCurrentLoggedInUser(data.user.name);
+        setCurrentUserRole(data.user.role);
+        try {
+          sessionStorage.setItem("crm_auth_user", JSON.stringify(data.user));
+          sessionStorage.setItem("crm_auth_token", data.token);
+        } catch(e) {}
+        setIsForgotPasswordView(false);
+        setForgotStep(1);
+        setForgotOtp("");
+        setForgotNewPass("");
+        setForgotConfirmPass("");
+        setForgotError("");
+        setForgotSuccess("");
+        await loadLeadsFromBackend(data.user);
+      } else {
+        setForgotError(data.message || "Failed to verify OTP. Please try again.");
+      }
+    } catch(err) {
+      setForgotLoading(false);
+      setForgotError("Network error. Please check your connection and try again.");
+    }
+  };
+
   const handlePasswordSetup = (e) => {
     e.preventDefault();
     if (!setupPasswordInput) {
@@ -4749,158 +4872,532 @@ export default function App() {
               zIndex: 10
             }}
           >
-            {/* Header: Logo & Title */}
-            <div style={{ textAlign: "center" }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "rgba(37, 99, 235, 0.15)", border: "1px solid rgba(59, 130, 246, 0.3)", padding: "4px 12px", borderRadius: "9999px", color: "#60a5fa", fontSize: "11px", fontWeight: "750", letterSpacing: "0.5px", marginBottom: "12px" }}>
-                <Sparkles size={13} color="#60a5fa" />
-                <span>OFFICIAL WORKSPACE PORTAL</span>
-              </div>
-              <h1 style={{ margin: "0 0 6px 0", fontSize: "26px", fontWeight: "850", letterSpacing: "-0.5px", color: "#ffffff" }}>
-                ApexSales CRM
-              </h1>
-              <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8", fontWeight: "500", lineHeight: 1.5 }}>
-                Enter your authorized <strong>Email ID</strong> and <strong>Password</strong> to access your dashboard
-              </p>
-            </div>
-
-            {/* Error Alert Box */}
-            {loginError && (
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "rgba(239, 68, 68, 0.15)", border: "1.5px solid rgba(239, 68, 68, 0.4)", borderRadius: "12px", padding: "10px 14px", color: "#fca5a5", fontSize: "12.5px", fontWeight: "600" }}>
-                <AlertCircle size={17} color="#ef4444" style={{ flexShrink: 0 }} />
-                <span style={{ flex: 1 }}>{loginError}</span>
-              </div>
-            )}
-
-            {/* Login Form */}
-            <form onSubmit={handleEmailPasswordLogin} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              
-              {/* Email Input */}
-              <div>
-                <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", fontWeight: "700", color: "#cbd5e1", marginBottom: "6px" }}>
-                  <span>Email Address <span style={{ color: "#ef4444" }}>*</span></span>
-                  <span style={{ fontSize: "10.5px", color: "#64748b", fontWeight: "500" }}>Authorized user ID</span>
-                </label>
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <Mail size={16} style={{ position: "absolute", left: "14px", color: loginEmail ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
-                  <input
-                    type="email"
-                    placeholder="e.g. salesflowcrmhelp@gmail.com"
-                    value={loginEmail}
-                    onChange={(e) => {
-                      setLoginEmail(e.target.value);
-                      setLoginError("");
-                    }}
-                    required
-                    autoFocus
-                    style={{
-                      width: "100%",
-                      padding: "12px 14px 12px 42px",
-                      fontSize: "13.5px",
-                      fontWeight: "600",
-                      color: "#ffffff",
-                      backgroundColor: "rgba(30, 41, 59, 0.7)",
-                      border: loginEmail ? "1.5px solid #38bdf8" : "1.5px solid rgba(255, 255, 255, 0.14)",
-                      borderRadius: "12px",
-                      outline: "none",
-                      boxSizing: "border-box",
-                      boxShadow: loginEmail ? "0 0 0 3px rgba(56, 189, 248, 0.18)" : "none",
-                      transition: "all 0.15s ease",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif"
-                    }}
-                  />
+            {isForgotPasswordView ? (
+              /* Forgot Password Card */
+              <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                {/* Header */}
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "rgba(245, 158, 11, 0.15)", border: "1px solid rgba(245, 158, 11, 0.35)", padding: "4px 12px", borderRadius: "9999px", color: "#fbbf24", fontSize: "11px", fontWeight: "750", letterSpacing: "0.5px", marginBottom: "12px" }}>
+                    <KeyRound size={13} color="#fbbf24" />
+                    <span>{forgotStep === 1 ? "PASSWORD RECOVERY • STEP 1/2" : "SECURITY VERIFICATION • STEP 2/2"}</span>
+                  </div>
+                  <h1 style={{ margin: "0 0 6px 0", fontSize: "24px", fontWeight: "850", letterSpacing: "-0.5px", color: "#ffffff" }}>
+                    {forgotStep === 1 ? "Forgot Password?" : "Verify OTP & Reset"}
+                  </h1>
+                  <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8", fontWeight: "500", lineHeight: 1.5 }}>
+                    {forgotStep === 1 
+                      ? "Enter your registered email ID. We will send a 6-digit verification code."
+                      : <span>Enter the code sent to <strong style={{ color: "#38bdf8" }}>{forgotEmail}</strong> and your new password.</span>
+                    }
+                  </p>
                 </div>
-              </div>
 
-              {/* Password / PIN Input */}
-              <div>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-                  <label style={{ fontSize: "12px", fontWeight: "700", color: "#cbd5e1" }}>
-                    Password / Secret PIN <span style={{ color: "#ef4444" }}>*</span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setShowPinText(!showPinText)}
-                    style={{ background: "none", border: "none", color: "#94a3b8", fontSize: "11px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
-                  >
-                    {showPinText ? <EyeOff size={13} /> : <Eye size={13} />}
-                    <span>{showPinText ? "Hide" : "Show"}</span>
-                  </button>
-                </div>
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <Lock size={16} style={{ position: "absolute", left: "14px", color: passwordInput ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
-                  <input
-                    type={showPinText ? "text" : "password"}
-                    placeholder="Enter 4-6 digit PIN or Password"
-                    value={passwordInput}
-                    onChange={(e) => {
-                      setPasswordInput(e.target.value);
-                      setLoginError("");
-                    }}
-                    required
-                    style={{
-                      width: "100%",
-                      padding: "12px 42px 12px 42px",
-                      fontSize: "14px",
-                      fontWeight: "650",
-                      letterSpacing: showPinText ? "normal" : "2px",
-                      color: "#ffffff",
-                      backgroundColor: "rgba(30, 41, 59, 0.7)",
-                      border: passwordInput ? "1.5px solid #38bdf8" : "1.5px solid rgba(255, 255, 255, 0.14)",
-                      borderRadius: "12px",
-                      outline: "none",
-                      boxSizing: "border-box",
-                      boxShadow: passwordInput ? "0 0 0 3px rgba(56, 189, 248, 0.18)" : "none",
-                      transition: "all 0.15s ease",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif"
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPinText(!showPinText)}
-                    style={{ position: "absolute", right: "12px", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px" }}
-                    title={showPinText ? "Hide Password" : "Show Password"}
-                  >
-                    {showPinText ? <EyeOff size={16} color="#cbd5e1" /> : <Eye size={16} color="#94a3b8" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoggingIn}
-                style={{
-                  marginTop: "6px",
-                  width: "100%",
-                  padding: "13px 20px",
-                  background: isLoggingIn ? "#334155" : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "12px",
-                  fontSize: "14.5px",
-                  fontWeight: "750",
-                  cursor: isLoggingIn ? "not-allowed" : "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  boxShadow: isLoggingIn ? "none" : "0 8px 24px -4px rgba(37, 99, 235, 0.5)",
-                  transition: "all 0.2s ease"
-                }}
-              >
-                {isLoggingIn ? (
-                  <>
-                    <RefreshCw size={17} className="animate-spin" />
-                    <span>Verifying Credentials...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Sign In to Workspace</span>
-                    <span style={{ fontSize: "16px" }}>➔</span>
-                  </>
+                {/* Error Alert Box */}
+                {forgotError && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "rgba(239, 68, 68, 0.15)", border: "1.5px solid rgba(239, 68, 68, 0.4)", borderRadius: "12px", padding: "10px 14px", color: "#fca5a5", fontSize: "12.5px", fontWeight: "600" }}>
+                    <AlertCircle size={17} color="#ef4444" style={{ flexShrink: 0 }} />
+                    <span style={{ flex: 1 }}>{forgotError}</span>
+                  </div>
                 )}
-              </button>
-            </form>
+
+                {/* Success Alert Box */}
+                {forgotSuccess && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "rgba(16, 185, 129, 0.15)", border: "1.5px solid rgba(16, 185, 129, 0.4)", borderRadius: "12px", padding: "10px 14px", color: "#6ee7b7", fontSize: "12.5px", fontWeight: "600" }}>
+                    <CheckCircle2 size={17} color="#10b981" style={{ flexShrink: 0 }} />
+                    <span style={{ flex: 1 }}>{forgotSuccess}</span>
+                  </div>
+                )}
+
+                {forgotStep === 1 ? (
+                  /* Step 1 Form */
+                  <form onSubmit={handleRequestPasswordResetOtp} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    <div>
+                      <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", fontWeight: "700", color: "#cbd5e1", marginBottom: "6px" }}>
+                        <span>Registered Email Address <span style={{ color: "#ef4444" }}>*</span></span>
+                        <span style={{ fontSize: "10.5px", color: "#64748b", fontWeight: "500" }}>Linked CRM account</span>
+                      </label>
+                      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                        <Mail size={16} style={{ position: "absolute", left: "14px", color: forgotEmail ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
+                        <input
+                          type="email"
+                          placeholder="e.g. salesflowcrmhelp@gmail.com"
+                          value={forgotEmail}
+                          onChange={(e) => {
+                            setForgotEmail(e.target.value);
+                            setForgotError("");
+                          }}
+                          required
+                          autoFocus
+                          style={{
+                            width: "100%",
+                            padding: "12px 14px 12px 42px",
+                            fontSize: "13.5px",
+                            fontWeight: "600",
+                            color: "#ffffff",
+                            backgroundColor: "rgba(30, 41, 59, 0.7)",
+                            border: forgotEmail ? "1.5px solid #38bdf8" : "1.5px solid rgba(255, 255, 255, 0.14)",
+                            borderRadius: "12px",
+                            outline: "none",
+                            boxSizing: "border-box",
+                            boxShadow: forgotEmail ? "0 0 0 3px rgba(56, 189, 248, 0.18)" : "none",
+                            transition: "all 0.15s ease",
+                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      style={{
+                        marginTop: "6px",
+                        width: "100%",
+                        padding: "13px 20px",
+                        background: forgotLoading ? "#334155" : "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "12px",
+                        fontSize: "14.5px",
+                        fontWeight: "750",
+                        cursor: forgotLoading ? "not-allowed" : "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        boxShadow: forgotLoading ? "none" : "0 8px 24px -4px rgba(245, 158, 11, 0.4)",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {forgotLoading ? (
+                        <>
+                          <RefreshCw size={17} className="animate-spin" />
+                          <span>Sending OTP to Mail...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Send Verification OTP (ओटीपी भेजें)</span>
+                          <span style={{ fontSize: "16px" }}>✉️</span>
+                        </>
+                      )}
+                    </button>
+
+                    <div style={{ textAlign: "center", marginTop: "4px" }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsForgotPasswordView(false);
+                          setForgotError("");
+                          setForgotSuccess("");
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#94a3b8",
+                          fontSize: "12.5px",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "5px"
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = "#ffffff")}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
+                      >
+                        ← Back to Login (लॉगिन पर वापस जाएं)
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  /* Step 2 Form */
+                  <form onSubmit={handleVerifyOtpAndResetPassword} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    {/* OTP Input */}
+                    <div>
+                      <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", fontWeight: "700", color: "#cbd5e1", marginBottom: "6px" }}>
+                        <span>Enter 6-Digit Verification OTP <span style={{ color: "#ef4444" }}>*</span></span>
+                        <span style={{ fontSize: "10.5px", color: "#f59e0b", fontWeight: "650" }}>⏱️ Valid 10 mins</span>
+                      </label>
+                      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                        <KeyRound size={16} style={{ position: "absolute", left: "14px", color: forgotOtp ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
+                        <input
+                          type="text"
+                          maxLength={6}
+                          placeholder="123456"
+                          value={forgotOtp}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9]/g, "").slice(0, 6);
+                            setForgotOtp(val);
+                            setForgotError("");
+                          }}
+                          required
+                          autoFocus
+                          style={{
+                            width: "100%",
+                            padding: "12px 14px 12px 42px",
+                            fontSize: "20px",
+                            fontWeight: "800",
+                            letterSpacing: "6px",
+                            color: "#38bdf8",
+                            backgroundColor: "rgba(30, 41, 59, 0.7)",
+                            border: forgotOtp.length === 6 ? "1.5px solid #10b981" : "1.5px solid rgba(255, 255, 255, 0.14)",
+                            borderRadius: "12px",
+                            outline: "none",
+                            boxSizing: "border-box",
+                            boxShadow: forgotOtp ? "0 0 0 3px rgba(56, 189, 248, 0.18)" : "none",
+                            transition: "all 0.15s ease",
+                            fontFamily: "monospace"
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* New Password Input */}
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+                        <label style={{ fontSize: "12px", fontWeight: "700", color: "#cbd5e1" }}>
+                          New Password / PIN <span style={{ color: "#ef4444" }}>*</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setForgotShowPass(!forgotShowPass)}
+                          style={{ background: "none", border: "none", color: "#94a3b8", fontSize: "11px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                        >
+                          {forgotShowPass ? <EyeOff size={13} /> : <Eye size={13} />}
+                          <span>{forgotShowPass ? "Hide" : "Show"}</span>
+                        </button>
+                      </div>
+                      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                        <Lock size={16} style={{ position: "absolute", left: "14px", color: forgotNewPass ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
+                        <input
+                          type={forgotShowPass ? "text" : "password"}
+                          placeholder="Create new 4-6 digit password"
+                          value={forgotNewPass}
+                          onChange={(e) => {
+                            setForgotNewPass(e.target.value);
+                            setForgotError("");
+                          }}
+                          required
+                          style={{
+                            width: "100%",
+                            padding: "12px 14px 12px 42px",
+                            fontSize: "14px",
+                            fontWeight: "650",
+                            color: "#ffffff",
+                            backgroundColor: "rgba(30, 41, 59, 0.7)",
+                            border: forgotNewPass ? "1.5px solid #38bdf8" : "1.5px solid rgba(255, 255, 255, 0.14)",
+                            borderRadius: "12px",
+                            outline: "none",
+                            boxSizing: "border-box",
+                            transition: "all 0.15s ease",
+                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Confirm Password Input */}
+                    <div>
+                      <label style={{ fontSize: "12px", fontWeight: "700", color: "#cbd5e1", marginBottom: "6px", display: "block" }}>
+                        Confirm New Password <span style={{ color: "#ef4444" }}>*</span>
+                      </label>
+                      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                        <Lock size={16} style={{ position: "absolute", left: "14px", color: forgotConfirmPass ? (forgotConfirmPass === forgotNewPass ? "#10b981" : "#ef4444") : "#64748b", pointerEvents: "none" }} />
+                        <input
+                          type={forgotShowPass ? "text" : "password"}
+                          placeholder="Re-enter new password"
+                          value={forgotConfirmPass}
+                          onChange={(e) => {
+                            setForgotConfirmPass(e.target.value);
+                            setForgotError("");
+                          }}
+                          required
+                          style={{
+                            width: "100%",
+                            padding: "12px 14px 12px 42px",
+                            fontSize: "14px",
+                            fontWeight: "650",
+                            color: "#ffffff",
+                            backgroundColor: "rgba(30, 41, 59, 0.7)",
+                            border: forgotConfirmPass ? (forgotConfirmPass === forgotNewPass ? "1.5px solid #10b981" : "1.5px solid #ef4444") : "1.5px solid rgba(255, 255, 255, 0.14)",
+                            borderRadius: "12px",
+                            outline: "none",
+                            boxSizing: "border-box",
+                            transition: "all 0.15s ease",
+                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      style={{
+                        marginTop: "6px",
+                        width: "100%",
+                        padding: "13px 20px",
+                        background: forgotLoading ? "#334155" : "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                        color: "#ffffff",
+                        border: "none",
+                        borderRadius: "12px",
+                        fontSize: "14.5px",
+                        fontWeight: "750",
+                        cursor: forgotLoading ? "not-allowed" : "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        boxShadow: forgotLoading ? "none" : "0 8px 24px -4px rgba(16, 185, 129, 0.4)",
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      {forgotLoading ? (
+                        <>
+                          <RefreshCw size={17} className="animate-spin" />
+                          <span>Verifying & Setting Password...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Verify OTP & Set Password 🚀</span>
+                        </>
+                      )}
+                    </button>
+
+                    {/* Resend & Back */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "4px" }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForgotStep(1);
+                          setForgotError("");
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#94a3b8",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px"
+                        }}
+                      >
+                        ← Change Email
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={forgotCountdown > 0 || forgotLoading}
+                        onClick={handleRequestPasswordResetOtp}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: forgotCountdown > 0 ? "#64748b" : "#38bdf8",
+                          fontSize: "12px",
+                          fontWeight: "650",
+                          cursor: forgotCountdown > 0 ? "default" : "pointer"
+                        }}
+                      >
+                        {forgotCountdown > 0 ? `Resend OTP in ${forgotCountdown}s` : "Resend OTP (ओटीपी दोबारा भेजें)"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            ) : (
+              /* Regular Login Card */
+              <>
+                {/* Header: Logo & Title */}
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "rgba(37, 99, 235, 0.15)", border: "1px solid rgba(59, 130, 246, 0.3)", padding: "4px 12px", borderRadius: "9999px", color: "#60a5fa", fontSize: "11px", fontWeight: "750", letterSpacing: "0.5px", marginBottom: "12px" }}>
+                    <Sparkles size={13} color="#60a5fa" />
+                    <span>OFFICIAL WORKSPACE PORTAL</span>
+                  </div>
+                  <h1 style={{ margin: "0 0 6px 0", fontSize: "26px", fontWeight: "850", letterSpacing: "-0.5px", color: "#ffffff" }}>
+                    ApexSales CRM
+                  </h1>
+                  <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8", fontWeight: "500", lineHeight: 1.5 }}>
+                    Enter your authorized <strong>Email ID</strong> and <strong>Password</strong> to access your dashboard
+                  </p>
+                </div>
+
+                {/* Error Alert Box */}
+                {loginError && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "rgba(239, 68, 68, 0.15)", border: "1.5px solid rgba(239, 68, 68, 0.4)", borderRadius: "12px", padding: "10px 14px", color: "#fca5a5", fontSize: "12.5px", fontWeight: "600" }}>
+                    <AlertCircle size={17} color="#ef4444" style={{ flexShrink: 0 }} />
+                    <span style={{ flex: 1 }}>{loginError}</span>
+                  </div>
+                )}
+
+                {/* Login Form */}
+                <form onSubmit={handleEmailPasswordLogin} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  
+                  {/* Email Input */}
+                  <div>
+                    <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", fontWeight: "700", color: "#cbd5e1", marginBottom: "6px" }}>
+                      <span>Email Address <span style={{ color: "#ef4444" }}>*</span></span>
+                      <span style={{ fontSize: "10.5px", color: "#64748b", fontWeight: "500" }}>Authorized user ID</span>
+                    </label>
+                    <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                      <Mail size={16} style={{ position: "absolute", left: "14px", color: loginEmail ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
+                      <input
+                        type="email"
+                        placeholder="e.g. salesflowcrmhelp@gmail.com"
+                        value={loginEmail}
+                        onChange={(e) => {
+                          setLoginEmail(e.target.value);
+                          setLoginError("");
+                        }}
+                        required
+                        autoFocus
+                        style={{
+                          width: "100%",
+                          padding: "12px 14px 12px 42px",
+                          fontSize: "13.5px",
+                          fontWeight: "600",
+                          color: "#ffffff",
+                          backgroundColor: "rgba(30, 41, 59, 0.7)",
+                          border: loginEmail ? "1.5px solid #38bdf8" : "1.5px solid rgba(255, 255, 255, 0.14)",
+                          borderRadius: "12px",
+                          outline: "none",
+                          boxSizing: "border-box",
+                          boxShadow: loginEmail ? "0 0 0 3px rgba(56, 189, 248, 0.18)" : "none",
+                          transition: "all 0.15s ease",
+                          fontFamily: "'Plus Jakarta Sans', sans-serif"
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password / PIN Input */}
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+                      <label style={{ fontSize: "12px", fontWeight: "700", color: "#cbd5e1" }}>
+                        Password / Secret PIN <span style={{ color: "#ef4444" }}>*</span>
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setShowPinText(!showPinText)}
+                        style={{ background: "none", border: "none", color: "#94a3b8", fontSize: "11px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      >
+                        {showPinText ? <EyeOff size={13} /> : <Eye size={13} />}
+                        <span>{showPinText ? "Hide" : "Show"}</span>
+                      </button>
+                    </div>
+                    <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                      <Lock size={16} style={{ position: "absolute", left: "14px", color: passwordInput ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
+                      <input
+                        type={showPinText ? "text" : "password"}
+                        placeholder="Enter 4-6 digit PIN or Password"
+                        value={passwordInput}
+                        onChange={(e) => {
+                          setPasswordInput(e.target.value);
+                          setLoginError("");
+                        }}
+                        required
+                        style={{
+                          width: "100%",
+                          padding: "12px 42px 12px 42px",
+                          fontSize: "14px",
+                          fontWeight: "650",
+                          letterSpacing: showPinText ? "normal" : "2px",
+                          color: "#ffffff",
+                          backgroundColor: "rgba(30, 41, 59, 0.7)",
+                          border: passwordInput ? "1.5px solid #38bdf8" : "1.5px solid rgba(255, 255, 255, 0.14)",
+                          borderRadius: "12px",
+                          outline: "none",
+                          boxSizing: "border-box",
+                          boxShadow: passwordInput ? "0 0 0 3px rgba(56, 189, 248, 0.18)" : "none",
+                          transition: "all 0.15s ease",
+                          fontFamily: "'Plus Jakarta Sans', sans-serif"
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPinText(!showPinText)}
+                        style={{ position: "absolute", right: "12px", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px" }}
+                        title={showPinText ? "Hide Password" : "Show Password"}
+                      >
+                        {showPinText ? <EyeOff size={16} color="#cbd5e1" /> : <Eye size={16} color="#94a3b8" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Forgot Password Link */}
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "-4px" }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsForgotPasswordView(true);
+                        setForgotStep(1);
+                        setForgotEmail(loginEmail || "");
+                        setForgotError("");
+                        setForgotSuccess("");
+                        setForgotOtp("");
+                        setForgotNewPass("");
+                        setForgotConfirmPass("");
+                      }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#38bdf8",
+                        fontSize: "12px",
+                        fontWeight: "650",
+                        cursor: "pointer",
+                        padding: "2px 0",
+                        transition: "color 0.15s ease",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px"
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "#7dd3fc")}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "#38bdf8")}
+                    >
+                      <KeyRound size={12} />
+                      <span>Forgot Password? (पासवर्ड भूल गए?)</span>
+                    </button>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={isLoggingIn}
+                    style={{
+                      marginTop: "6px",
+                      width: "100%",
+                      padding: "13px 20px",
+                      background: isLoggingIn ? "#334155" : "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "12px",
+                      fontSize: "14.5px",
+                      fontWeight: "750",
+                      cursor: isLoggingIn ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      boxShadow: isLoggingIn ? "none" : "0 8px 24px -4px rgba(37, 99, 235, 0.5)",
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    {isLoggingIn ? (
+                      <>
+                        <RefreshCw size={17} className="animate-spin" />
+                        <span>Verifying Credentials...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Sign In to Workspace</span>
+                        <span style={{ fontSize: "16px" }}>➔</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </>
+            )}
 
 
 

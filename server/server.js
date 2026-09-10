@@ -263,6 +263,126 @@ async function sendInvitationEmail({ toEmail, recipientName, role, inviteUrl, in
   return { sent: false, reason: 'No active email provider configured' };
 }
 
+// In-memory OTP storage cache for fast verification
+const passwordResetOTPs = new Map();
+
+async function sendPasswordResetOTPEmail({ toEmail, recipientName, otp }) {
+  const cfg = await getEmailConfig();
+  if (!cfg) {
+    return { sent: false, reason: 'Email delivery not configured' };
+  }
+
+  const emailHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body style="margin: 0; padding: 24px 10px; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+      <div style="max-width: 540px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+        
+        <!-- HEADER -->
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2563eb 100%); padding: 32px 24px; text-align: center; color: #ffffff;">
+          <div style="display: inline-block; padding: 5px 12px; background: rgba(255, 255, 255, 0.15); border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;">
+            🔐 Password Reset Request
+          </div>
+          <h1 style="margin: 0; font-size: 24px; font-weight: 850; color: #ffffff;">
+            ApexSales CRM
+          </h1>
+          <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">
+            Official Workspace Security Verification
+          </p>
+        </div>
+
+        <!-- BODY -->
+        <div style="padding: 30px 24px; color: #334155; line-height: 1.6;">
+          <h2 style="font-size: 18px; color: #0f172a; margin: 0 0 12px 0; font-weight: 750;">
+            Hello ${recipientName || 'User'}, 👋
+          </h2>
+          <p style="font-size: 13.5px; color: #475569; margin: 0 0 20px 0;">
+            We received a request to reset your password for your <strong>ApexSales CRM</strong> account (<strong>${toEmail}</strong>). Use the verification code below to proceed:
+          </p>
+
+          <!-- OTP CODE BOX -->
+          <div style="text-align: center; margin: 26px 0;">
+            <div style="display: inline-block; background-color: #f8fafc; border: 2px dashed #93c5fd; border-radius: 14px; padding: 18px 36px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);">
+              <span style="display: block; font-size: 11px; font-weight: 800; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;">YOUR VERIFICATION CODE</span>
+              <span style="font-size: 36px; font-weight: 900; letter-spacing: 10px; color: #1d4ed8; font-family: monospace;">${otp}</span>
+            </div>
+            <p style="margin: 12px 0 0 0; font-size: 12px; color: #dc2626; font-weight: 600;">
+              ⏱️ Valid for 10 minutes only.
+            </p>
+          </div>
+
+          <p style="font-size: 12.5px; color: #64748b; margin: 20px 0 0 0; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+            🔒 <strong>Strict Security Notice:</strong> Never share this OTP with anyone. If you did not request a password reset, you can safely ignore this email — your account remains secure.
+          </p>
+        </div>
+
+        <!-- FOOTER -->
+        <div style="background-color: #f8fafc; padding: 16px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11.5px; color: #94a3b8;">
+          © ${new Date().getFullYear()} ApexSales CRM • SalesFlow Hub Workspace
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  if (cfg.type === 'resend') {
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${cfg.apiKey.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: cfg.fromEmail || 'ApexSales CRM <welcome@salesflowhub.cloud>',
+          to: [toEmail],
+          subject: `🔐 Password Reset OTP: ${otp} - ApexSales CRM`,
+          html: emailHtml
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(`✉️ Password reset OTP dispatched via Resend to ${toEmail}: ${data.id}`);
+        return { sent: true, messageId: data.id, provider: 'resend' };
+      } else {
+        console.error('⚠️ Resend OTP send error:', data);
+        return { sent: false, reason: data.message || 'Resend error' };
+      }
+    } catch (err) {
+      console.error('⚠️ Resend OTP dispatch failed:', err.message);
+      return { sent: false, reason: err.message };
+    }
+  }
+
+  if (cfg.type === 'smtp' && cfg.user && cfg.pass) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: cfg.host || 'smtp.gmail.com',
+        port: cfg.port ? Number(cfg.port) : 465,
+        secure: (cfg.port ? Number(cfg.port) : 465) === 465,
+        auth: { user: cfg.user.trim(), pass: cfg.pass.replace(/\s+/g, '').trim() }
+      });
+      const info = await transporter.sendMail({
+        from: `"ApexSales CRM" <${cfg.user.trim()}>`,
+        to: toEmail,
+        subject: `🔐 Password Reset OTP: ${otp} - ApexSales CRM`,
+        html: emailHtml
+      });
+      console.log(`✉️ Password reset OTP dispatched via SMTP to ${toEmail}: ${info.messageId}`);
+      return { sent: true, messageId: info.messageId, provider: 'smtp' };
+    } catch (err) {
+      console.error(`⚠️ Failed to send OTP email via SMTP to ${toEmail}:`, err.message);
+      return { sent: false, reason: err.message };
+    }
+  }
+
+  return { sent: false, reason: 'No active email provider configured' };
+}
+
 // --- DATABASE LAYER (DUAL-MODE: MONGODB ATLAS WITH LOCAL JSON FALLBACK) ---
 
 let mongoClient = null;
@@ -645,6 +765,202 @@ app.post('/api/auth/accept-invite', async (req, res) => {
       phone: user.phone || ''
     },
     token: authToken
+  });
+});
+
+// Forgot Password: Send 6-digit OTP to user's registered email
+app.post('/api/auth/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email || !String(email).trim()) {
+    return res.status(400).json({ success: false, message: 'Please provide your registered email address.' });
+  }
+
+  const cleanEmail = String(email).trim().toLowerCase();
+  const allUsers = await getUsers();
+  const user = allUsers.find(u => u.email && u.email.trim().toLowerCase() === cleanEmail);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: `No account found with email "${cleanEmail}". Please check your email or contact your Admin.`
+    });
+  }
+
+  if (user.active === false) {
+    return res.status(403).json({
+      success: false,
+      message: `Account for "${cleanEmail}" has been deactivated. Please contact your Admin.`
+    });
+  }
+
+  // Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+  // Cache OTP in memory
+  passwordResetOTPs.set(cleanEmail, {
+    otp,
+    userId: user.id,
+    expiresAt,
+    attempts: 0
+  });
+
+  // Store in MongoDB if available
+  if (isMongoConnected && mongoDb) {
+    try {
+      await mongoDb.collection('password_resets').updateOne(
+        { email: cleanEmail },
+        {
+          $set: {
+            email: cleanEmail,
+            otp,
+            userId: user.id,
+            expiresAt: new Date(expiresAt),
+            attempts: 0,
+            updatedAt: new Date()
+          }
+        },
+        { upsert: true }
+      );
+    } catch (e) {
+      console.error('Failed to cache OTP in MongoDB:', e.message);
+    }
+  }
+
+  // Send OTP Email via Resend / SMTP / Brevo
+  const emailRes = await sendPasswordResetOTPEmail({
+    toEmail: user.email,
+    recipientName: user.displayName || user.name || 'User',
+    otp
+  });
+
+  if (!emailRes.sent) {
+    console.error(`Failed to send password reset OTP to ${cleanEmail}:`, emailRes.reason);
+    return res.status(500).json({
+      success: false,
+      message: `Could not send verification email (${emailRes.reason || 'Email service unavailable'}). Please contact support.`
+    });
+  }
+
+  return res.json({
+    success: true,
+    message: `A 6-digit verification OTP has been sent to ${cleanEmail}. It is valid for 10 minutes.`,
+    email: cleanEmail
+  });
+});
+
+// Verify OTP and Set New Password
+app.post('/api/auth/verify-reset-password', async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+  if (!email || !otp || !newPassword) {
+    return res.status(400).json({ success: false, message: 'Email, OTP code, and new password are required.' });
+  }
+
+  const cleanEmail = String(email).trim().toLowerCase();
+  const cleanOtp = String(otp).trim();
+  const cleanPassword = String(newPassword).trim();
+
+  if (cleanPassword.length < 4) {
+    return res.status(400).json({ success: false, message: 'Password must be at least 4 characters long.' });
+  }
+
+  // Retrieve OTP record from memory or MongoDB
+  let record = passwordResetOTPs.get(cleanEmail);
+  if (!record && isMongoConnected && mongoDb) {
+    try {
+      const doc = await mongoDb.collection('password_resets').findOne({ email: cleanEmail });
+      if (doc) {
+        record = {
+          otp: doc.otp,
+          userId: doc.userId,
+          expiresAt: doc.expiresAt instanceof Date ? doc.expiresAt.getTime() : doc.expiresAt,
+          attempts: doc.attempts || 0
+        };
+      }
+    } catch (e) {
+      console.error('MongoDB OTP lookup error:', e.message);
+    }
+  }
+
+  if (!record) {
+    return res.status(400).json({
+      success: false,
+      message: 'No active OTP request found for this email. Please request a new OTP.'
+    });
+  }
+
+  if (Date.now() > record.expiresAt) {
+    passwordResetOTPs.delete(cleanEmail);
+    if (isMongoConnected && mongoDb) {
+      try { await mongoDb.collection('password_resets').deleteOne({ email: cleanEmail }); } catch (e) {}
+    }
+    return res.status(400).json({
+      success: false,
+      message: 'The OTP has expired. Please request a fresh OTP.'
+    });
+  }
+
+  if (record.attempts >= 5) {
+    passwordResetOTPs.delete(cleanEmail);
+    if (isMongoConnected && mongoDb) {
+      try { await mongoDb.collection('password_resets').deleteOne({ email: cleanEmail }); } catch (e) {}
+    }
+    return res.status(400).json({
+      success: false,
+      message: 'Too many incorrect attempts. Please request a new OTP.'
+    });
+  }
+
+  if (record.otp !== cleanOtp) {
+    record.attempts = (record.attempts || 0) + 1;
+    passwordResetOTPs.set(cleanEmail, record);
+    if (isMongoConnected && mongoDb) {
+      try {
+        await mongoDb.collection('password_resets').updateOne(
+          { email: cleanEmail },
+          { $set: { attempts: record.attempts } }
+        );
+      } catch (e) {}
+    }
+    return res.status(400).json({
+      success: false,
+      message: `Incorrect OTP code. You have ${5 - record.attempts} attempt(s) remaining.`
+    });
+  }
+
+  // OTP verified! Update user's password/PIN
+  const allUsers = await getUsers();
+  const user = allUsers.find(u => (record.userId && u.id === record.userId) || (u.email && u.email.trim().toLowerCase() === cleanEmail));
+
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'User account not found.' });
+  }
+
+  user.pin = cleanPassword;
+  await saveUser(user);
+
+  // Clear used OTP
+  passwordResetOTPs.delete(cleanEmail);
+  if (isMongoConnected && mongoDb) {
+    try { await mongoDb.collection('password_resets').deleteOne({ email: cleanEmail }); } catch (e) {}
+  }
+
+  const token = `token_${user.id}_${Date.now()}`;
+  console.log(`🔑 Password successfully reset for user: ${user.email} (${user.id})`);
+
+  return res.json({
+    success: true,
+    message: 'Your password has been successfully updated! You can now access your workspace.',
+    user: {
+      id: user.id,
+      name: user.name,
+      displayName: user.displayName || user.name,
+      username: user.username,
+      role: user.role || 'sales_rep',
+      email: user.email || '',
+      phone: user.phone || ''
+    },
+    token
   });
 });
 
