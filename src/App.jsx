@@ -1228,6 +1228,11 @@ export default function App() {
   const [selectedLeadIds, setSelectedLeadIds] = useState([]);
   const [sheetFilterCriteria, setSheetFilterCriteria] = useState(null);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
+  const [showImportLeadsModal, setShowImportLeadsModal] = useState(false);
+  const [importPreviewLeads, setImportPreviewLeads] = useState([]);
+  const [importFileName, setImportFileName] = useState("");
+  const [isImportingLeads, setIsImportingLeads] = useState(false);
+  const [importError, setImportError] = useState("");
   const [newLeadData, setNewLeadData] = useState({
     name: "",
     company: "",
@@ -4544,50 +4549,212 @@ export default function App() {
     showToast("Spreadsheet exported as CSV!");
   };
 
-  // Handle CSV file upload
+  // Helper: parse a single CSV line accounting for double quotes and commas
+  const parseCSVLine = (text) => {
+    const result = [];
+    let cur = "";
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (c === '"') {
+        if (inQuotes && text[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (c === ',' && !inQuotes) {
+        result.push(cur.trim());
+        cur = "";
+      } else {
+        cur += c;
+      }
+    }
+    result.push(cur.trim());
+    return result;
+  };
+
+  // Download Sample CSV Template
+  const downloadSampleCSV = () => {
+    const sampleRows = [
+      "Lead Name,Company,Phone,Email,Deal Value,Status,Source,Lead Score,Next Follow Up,Remarks / Notes,Owner",
+      "Rajesh Sharma,TechCorp Solutions,9876543210,rajesh@techcorp.in,25000,New,Website,Hot,2026-09-15,Interested in 10-user enterprise CRM plan,Harsh Goyal",
+      "Ananya Patel,BlueSky Logistics,9823456789,ananya@bluesky.com,18000,Qualified,LinkedIn,Warm,2026-09-16,Need product demo and custom quotation,Harsh Goyal",
+      "Vikram Mehta,Mehta & Sons Retail,9911223344,vikram@mehtaretail.com,35000,Won,Referral,Hot,2026-09-12,Paid full annual subscription via NEFT,Harsh Goyal",
+      "Pooja Verma,Apex Digital Media,9812345678,pooja@apexdigital.com,12000,Demo Booked,Cold Call,Warm,2026-09-14,Demo scheduled for Friday 3 PM,Harsh Goyal",
+      "Suresh Reddy,Reddy Infra Projects,9745612300,suresh@reddyinfra.com,50000,Negotiation,Direct Inbound,Hot,2026-09-18,Contract terms discussion underway,Harsh Goyal"
+    ];
+    const csvBlob = new Blob([sampleRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const downloadUrl = URL.createObjectURL(csvBlob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.setAttribute("download", "sample_leads_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(downloadUrl);
+    showToast("Sample CSV Template downloaded! Fill your leads and upload to import.");
+  };
+
+  // Helper to parse file and populate leads array
+  const parseLeadsFromFile = (fileText) => {
+    const lines = fileText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length < 2) throw new Error("The file must contain a header row and at least one lead data row.");
+
+    const rawHeaders = parseCSVLine(lines[0]);
+    const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]/g, ""));
+
+    // Smart column index matching
+    const findIdx = (keywords) => headers.findIndex(h => keywords.some(k => h.includes(k)));
+
+    const nameIdx = findIdx(["name", "lead", "client", "contact"]);
+    const compIdx = findIdx(["company", "org", "business"]);
+    const phoneIdx = findIdx(["phone", "mobile", "contactno", "cell"]);
+    const emailIdx = findIdx(["email", "mail"]);
+    const valIdx = findIdx(["value", "amount", "price", "deal"]);
+    const statusIdx = findIdx(["status", "stage"]);
+    const srcIdx = findIdx(["source", "channel"]);
+    const scoreIdx = findIdx(["score", "priority"]);
+    const followIdx = findIdx(["follow", "nextdate", "followup"]);
+    const notesIdx = findIdx(["note", "remark", "comment"]);
+    const ownerIdx = findIdx(["owner", "rep", "assigned"]);
+
+    const parsed = [];
+    const defaultOwner = currentUser?.role === "sales_rep" ? currentUser.name : (currentUser?.name || "Harsh Goyal");
+
+    for (let i = 1; i < lines.length; i++) {
+      const cells = parseCSVLine(lines[i]);
+      const leadName = nameIdx !== -1 ? cells[nameIdx] : (cells[0] || "");
+      if (!leadName || !leadName.trim()) continue;
+
+      const valRaw = valIdx !== -1 ? cells[valIdx] : "";
+      const cleanVal = Number(String(valRaw).replace(/[^0-9.]/g, "")) || 0;
+      const rowOwner = ownerIdx !== -1 && cells[ownerIdx] ? cells[ownerIdx].trim() : defaultOwner;
+
+      const leadObj = {
+        id: `lead_import_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 4)}`,
+        name: leadName.trim(),
+        company: compIdx !== -1 && cells[compIdx] ? cells[compIdx].trim() : "",
+        phone: phoneIdx !== -1 && cells[phoneIdx] ? cells[phoneIdx].trim() : "",
+        email: emailIdx !== -1 && cells[emailIdx] ? cells[emailIdx].trim() : "",
+        value: cleanVal,
+        status: statusIdx !== -1 && cells[statusIdx] ? cells[statusIdx].trim() : "New",
+        source: srcIdx !== -1 && cells[srcIdx] ? cells[srcIdx].trim() : "Manual",
+        score: scoreIdx !== -1 && cells[scoreIdx] ? cells[scoreIdx].trim() : "Warm",
+        next_follow_up: followIdx !== -1 && cells[followIdx] ? cells[followIdx].trim() : "",
+        notes: notesIdx !== -1 && cells[notesIdx] ? cells[notesIdx].trim() : "",
+        owner: rowOwner,
+        createdAt: new Date().toISOString()
+      };
+
+      parsed.push(sanitizeLeadObject(leadObj));
+    }
+
+    return parsed;
+  };
+
+  // Submit Bulk Import to Server & update local state
+  const executeBulkImport = async (leadsToImport) => {
+    if (!Array.isArray(leadsToImport) || leadsToImport.length === 0) {
+      showToast("No valid leads found in file to import.", "error");
+      return;
+    }
+
+    setIsImportingLeads(true);
+    setImportError("");
+
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (currentUser) {
+        headers["x-user-role"] = currentUser.role;
+        headers["x-user-name"] = currentUser.name;
+        headers["x-user-id"] = currentUser.id;
+      }
+      const token = sessionStorage.getItem("crm_auth_token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch("/api/leads/bulk-import", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ leads: leadsToImport })
+      });
+
+      const data = await res.json();
+      setIsImportingLeads(false);
+
+      if (res.ok && data.success) {
+        saveLeadsToStorage([...leadsToImport, ...leads]);
+        showToast(`🎉 Successfully imported ${data.count || leadsToImport.length} leads!`);
+        setShowImportLeadsModal(false);
+        setImportPreviewLeads([]);
+        setImportFileName("");
+        await loadLeadsFromBackend();
+      } else {
+        saveLeadsToStorage([...leadsToImport, ...leads]);
+        showToast(`Imported ${leadsToImport.length} leads into your workspace!`);
+        setShowImportLeadsModal(false);
+        setImportPreviewLeads([]);
+        setImportFileName("");
+      }
+    } catch(err) {
+      setIsImportingLeads(false);
+      console.warn("Server import fallback to local storage:", err);
+      saveLeadsToStorage([...leadsToImport, ...leads]);
+      showToast(`Imported ${leadsToImport.length} leads into local workspace!`);
+      setShowImportLeadsModal(false);
+      setImportPreviewLeads([]);
+      setImportFileName("");
+    }
+  };
+
+  // Handle direct file upload (e.g. from Actions dropdown)
   const handleCSVImport = (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const text = e.target.result;
-        const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
-        if (lines.length < 2) throw new Error("Empty CSV file");
-
-        const headers = lines[0].split(",").map(h => h.replace(/^"|"$/g, '').trim());
-        const importedLeads = [];
-
-        for (let i = 1; i < lines.length; i++) {
-          const cells = lines[i].split(",").map(c => c.replace(/^"|"$/g, '').trim());
-          const leadObj = { id: "lead_imported_" + i + "_" + Date.now() };
-          
-          COLUMNS.forEach((col, idx) => {
-            const headerIdx = headers.findIndex(h => h.toLowerCase() === col.label.toLowerCase());
-            if (headerIdx !== -1) {
-              let cellVal = cells[headerIdx] || "";
-              if (col.type === "currency") {
-                cellVal = Number(cellVal.replace(/[^0-9.]/g, "")) || 0;
-              }
-              leadObj[col.field] = cellVal;
-            } else {
-              // Defaults if header column missing
-              leadObj[col.field] = col.type === "currency" ? 0 : col.type === "status" ? "New" : col.type === "score" ? "Warm" : "";
-            }
-          });
-
-          importedLeads.push(leadObj);
+        const parsed = parseLeadsFromFile(text);
+        if (parsed.length === 0) {
+          showToast("No valid leads found in file.", "error");
+          return;
         }
-
-        saveLeadsToStorage([...importedLeads, ...leads]);
-        showToast(`Successfully imported ${importedLeads.length} leads!`);
+        await executeBulkImport(parsed);
       } catch (err) {
-        showToast("Invalid CSV format. Please try again.", "error");
+        showToast(err.message || "Invalid CSV format. Please use the sample template.", "error");
       }
     };
     reader.readAsText(file);
-    // Reset file input
+    event.target.value = null;
+  };
+
+  // Handle file chosen in Import Leads Modal (loads preview first)
+  const handleModalFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setImportFileName(file.name);
+    setImportError("");
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const parsed = parseLeadsFromFile(text);
+        if (parsed.length === 0) {
+          setImportError("No valid leads found in file. Please make sure the Lead Name column is filled.");
+          setImportPreviewLeads([]);
+          return;
+        }
+        setImportPreviewLeads(parsed);
+      } catch(err) {
+        setImportError(err.message || "Could not parse CSV file. Please use the sample template.");
+        setImportPreviewLeads([]);
+      }
+    };
+    reader.readAsText(file);
     event.target.value = null;
   };
 
@@ -9670,7 +9837,6 @@ export default function App() {
                         <span>Delete Lead{selectedLeadIds.length > 1 ? ` (${selectedLeadIds.length})` : ""}</span>
                       </button>
                     )}
-
                     <button 
                       onClick={addNewRow} 
                       style={{ 
@@ -9685,12 +9851,46 @@ export default function App() {
                         fontSize: "11.5px", 
                         fontWeight: "600", 
                         cursor: "pointer", 
-                        boxShadow: "0 1px 2px rgba(37, 99, 235, 0.25)",
+                        boxShadow: "0 1px 2px rgba(37, 99, 235, 0.25)", 
                         fontFamily: "'Plus Jakarta Sans', sans-serif",
                         height: "32px"
                       }}
                     >
                       <Plus size={13} /> Add Lead
+                    </button>
+
+                    {/* Dedicated Import Leads Button */}
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setImportPreviewLeads([]);
+                        setImportFileName("");
+                        setImportError("");
+                        setShowImportLeadsModal(true);
+                      }}
+                      style={{ 
+                        display: "inline-flex", 
+                        alignItems: "center", 
+                        gap: "5px", 
+                        backgroundColor: "#ffffff", 
+                        color: "#1e293b", 
+                        border: "1px solid #cbd5e1", 
+                        borderRadius: "7px", 
+                        padding: "5px 12px", 
+                        fontSize: "11.5px", 
+                        fontWeight: "650", 
+                        cursor: "pointer", 
+                        boxShadow: "0 1px 2px rgba(0,0,0,0.04)", 
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        height: "32px",
+                        transition: "all 0.15s ease"
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#f8fafc"; e.currentTarget.style.borderColor = "#94a3b8"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#ffffff"; e.currentTarget.style.borderColor = "#cbd5e1"; }}
+                      title="Upload and bulk import leads from CSV"
+                    >
+                      <Upload size={13} color="#2563eb" />
+                      <span>Import Leads</span>
                     </button>
 
                     {/* Secondary Actions Dropdown */}
@@ -9728,7 +9928,7 @@ export default function App() {
                             borderRadius: "8px",
                             boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                             zIndex: 50,
-                            minWidth: "150px",
+                            minWidth: "175px",
                             padding: "4px 0",
                             display: "flex",
                             flexDirection: "column"
@@ -9736,20 +9936,34 @@ export default function App() {
                           onMouseLeave={() => setShowActionsDropdown(false)}
                         >
                           <button
+                            onClick={() => { downloadSampleCSV(); setShowActionsDropdown(false); }}
+                            style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#2563eb", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "650" }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#eff6ff"}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                          >
+                            <FileSpreadsheet size={12} color="#2563eb" /> Download Sample CSV
+                          </button>
+                          <button
+                            onClick={() => {
+                              setImportPreviewLeads([]);
+                              setImportFileName("");
+                              setImportError("");
+                              setShowImportLeadsModal(true);
+                              setShowActionsDropdown(false);
+                            }}
+                            style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#334155", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                          >
+                            <Upload size={12} color="#64748b" /> Import Leads (CSV)
+                          </button>
+                          <button
                             onClick={() => { exportToCSV(); setShowActionsDropdown(false); }}
                             style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#334155", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
                             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
                             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                           >
                             <Download size={12} color="#64748b" /> Export CSV
-                          </button>
-                          <button
-                            onClick={() => { fileInputRef.current.click(); setShowActionsDropdown(false); }}
-                            style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#334155", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                          >
-                            <Upload size={12} color="#64748b" /> Import CSV
                           </button>
                           <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "3px 0" }} />
                           <button
@@ -17195,6 +17409,265 @@ export default function App() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 📥 Bulk Import Leads Modal Popup */}
+      {showImportLeadsModal && (
+        <div 
+          className="modal-overlay" 
+          onClick={() => setShowImportLeadsModal(false)}
+          style={{ backdropFilter: "blur(4px)", backgroundColor: "rgba(15, 23, 42, 0.55)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <div 
+            className="modal-content" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ 
+              maxWidth: "680px", 
+              width: "94%", 
+              maxHeight: "92vh", 
+              borderRadius: "16px", 
+              overflow: "hidden", 
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", 
+              padding: 0, 
+              display: "flex", 
+              flexDirection: "column", 
+              backgroundColor: "#ffffff", 
+              border: "1px solid #e2e8f0" 
+            }}
+          >
+            {/* Header */}
+            <div style={{ padding: "16px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", backgroundColor: "#ffffff" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "9px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Upload size={20} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
+                    Bulk Import Leads via CSV / Excel
+                  </h3>
+                  <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
+                    Upload your leads list easily with automatic column mapping
+                  </span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowImportLeadsModal(false)}
+                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "6px" }}
+                title="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: "16px", overflowY: "auto", flex: 1 }}>
+              
+              {/* Step 1: Download Sample File Card */}
+              <div style={{ backgroundColor: "#f8fafc", border: "1.5px dashed #93c5fd", borderRadius: "12px", padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                  <div style={{ width: "36px", height: "36px", borderRadius: "8px", backgroundColor: "#dbeafe", color: "#1d4ed8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
+                    <FileSpreadsheet size={18} />
+                  </div>
+                  <div>
+                    <strong style={{ fontSize: "13.5px", color: "#0f172a", display: "block", fontWeight: "750" }}>
+                      Step 1: Download Sample CSV Template
+                    </strong>
+                    <p style={{ margin: "2px 0 0 0", fontSize: "12px", color: "#475569", lineHeight: 1.4 }}>
+                      Use this template with pre-filled headers (Name, Phone, Email, Value, Stage, etc.) to format your data accurately.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={downloadSampleCSV}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    backgroundColor: "#2563eb",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "9px 16px",
+                    fontSize: "12px",
+                    fontWeight: "750",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    boxShadow: "0 2px 8px rgba(37, 99, 235, 0.25)",
+                    flexShrink: 0
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#1d4ed8"}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#2563eb"}
+                >
+                  <Download size={14} />
+                  <span>Download Sample CSV</span>
+                </button>
+              </div>
+
+              {/* Step 2: Upload File Card */}
+              <div>
+                <label style={{ display: "block", fontSize: "13px", fontWeight: "750", color: "#0f172a", marginBottom: "8px" }}>
+                  Step 2: Choose Your Filled CSV File
+                </label>
+                
+                <div 
+                  onClick={() => document.getElementById("import-modal-file-input").click()}
+                  style={{
+                    border: importFileName ? "2px solid #3b82f6" : "2px dashed #cbd5e1",
+                    borderRadius: "12px",
+                    padding: "24px 20px",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    backgroundColor: importFileName ? "#eff6ff" : "#ffffff",
+                    transition: "all 0.15s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!importFileName) e.currentTarget.style.borderColor = "#3b82f6";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!importFileName) e.currentTarget.style.borderColor = "#cbd5e1";
+                  }}
+                >
+                  <input 
+                    id="import-modal-file-input"
+                    type="file" 
+                    accept=".csv"
+                    onChange={handleModalFileSelect}
+                    style={{ display: "none" }} 
+                  />
+                  <Upload size={28} color={importFileName ? "#2563eb" : "#64748b"} style={{ margin: "0 auto 8px auto", display: "block" }} />
+                  {importFileName ? (
+                    <div>
+                      <span style={{ fontSize: "14px", fontWeight: "750", color: "#1d4ed8", display: "block" }}>
+                        📄 {importFileName}
+                      </span>
+                      <span style={{ fontSize: "12px", color: "#059669", fontWeight: "650", display: "block", marginTop: "4px" }}>
+                        ✓ {importPreviewLeads.length} valid lead(s) detected and ready to import!
+                      </span>
+                      <span style={{ fontSize: "11px", color: "#64748b", display: "block", marginTop: "2px" }}>
+                        Click to choose a different file
+                      </span>
+                    </div>
+                  ) : (
+                    <div>
+                      <span style={{ fontSize: "13px", fontWeight: "700", color: "#1e293b", display: "block" }}>
+                        Click to browse or drag and drop your CSV file here
+                      </span>
+                      <span style={{ fontSize: "11px", color: "#64748b", display: "block", marginTop: "4px" }}>
+                        Supports standard .csv export files from Excel, Google Sheets, or any CRM
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Error Box */}
+              {importError && (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", padding: "10px 14px", color: "#b91c1c", fontSize: "12px", fontWeight: "600" }}>
+                  <AlertCircle size={16} color="#dc2626" style={{ flexShrink: 0 }} />
+                  <span>{importError}</span>
+                </div>
+              )}
+
+              {/* Preview Table if leads detected */}
+              {importPreviewLeads.length > 0 && (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "750", color: "#334155" }}>
+                      Data Preview (Showing first {Math.min(5, importPreviewLeads.length)} of {importPreviewLeads.length} leads):
+                    </span>
+                    <span style={{ fontSize: "11px", color: "#15803d", fontWeight: "700", backgroundColor: "#dcfce7", padding: "2px 8px", borderRadius: "12px" }}>
+                      {importPreviewLeads.length} Total Leads
+                    </span>
+                  </div>
+
+                  <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflow: "hidden", maxHeight: "180px", overflowY: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11.5px" }}>
+                      <thead>
+                        <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", textAlign: "left", color: "#64748b" }}>
+                          <th style={{ padding: "8px 10px" }}>Lead Name</th>
+                          <th style={{ padding: "8px 10px" }}>Company</th>
+                          <th style={{ padding: "8px 10px" }}>Phone</th>
+                          <th style={{ padding: "8px 10px" }}>Value</th>
+                          <th style={{ padding: "8px 10px" }}>Status</th>
+                          <th style={{ padding: "8px 10px" }}>Owner</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importPreviewLeads.slice(0, 5).map((lead, idx) => (
+                          <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                            <td style={{ padding: "7px 10px", fontWeight: "700", color: "#0f172a" }}>{lead.name}</td>
+                            <td style={{ padding: "7px 10px", color: "#475569" }}>{lead.company || "-"}</td>
+                            <td style={{ padding: "7px 10px", color: "#475569" }}>{lead.phone || "-"}</td>
+                            <td style={{ padding: "7px 10px", fontWeight: "700", color: "#16a34a" }}>₹{(Number(lead.value) || 0).toLocaleString("en-IN")}</td>
+                            <td style={{ padding: "7px 10px" }}>
+                              <span style={{ backgroundColor: "#f1f5f9", padding: "2px 6px", borderRadius: "4px", fontSize: "10px", fontWeight: "600", color: "#334155" }}>
+                                {lead.status || "New"}
+                              </span>
+                            </td>
+                            <td style={{ padding: "7px 10px", color: "#64748b" }}>{lead.owner || "-"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{ padding: "14px 22px", borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc" }}>
+              <button
+                type="button"
+                onClick={() => setShowImportLeadsModal(false)}
+                style={{
+                  background: "none",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "8px",
+                  padding: "8px 16px",
+                  fontSize: "12px",
+                  fontWeight: "650",
+                  color: "#475569",
+                  cursor: "pointer"
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                disabled={importPreviewLeads.length === 0 || isImportingLeads}
+                onClick={() => executeBulkImport(importPreviewLeads)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  backgroundColor: importPreviewLeads.length === 0 || isImportingLeads ? "#94a3b8" : "#10b981",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "9px 22px",
+                  fontSize: "13px",
+                  fontWeight: "750",
+                  cursor: importPreviewLeads.length === 0 || isImportingLeads ? "not-allowed" : "pointer",
+                  boxShadow: importPreviewLeads.length > 0 && !isImportingLeads ? "0 4px 12px rgba(16, 185, 129, 0.35)" : "none"
+                }}
+              >
+                {isImportingLeads ? (
+                  <>
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>Importing Leads...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Import {importPreviewLeads.length > 0 ? `${importPreviewLeads.length} Leads` : "Leads"} to CRM</span>
+                    <span style={{ fontSize: "14px" }}>➔</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -103,6 +103,23 @@
   ],
   "leads": [
     {
+      "id": "lead_import_1789038270816_0_3qso",
+      "name": "Rajesh Sharma Test",
+      "company": "TechCorp Solutions",
+      "phone": "9876543210",
+      "email": "rajesh@techcorp.in",
+      "value": 25000,
+      "status": "New",
+      "source": "Website",
+      "score": "Hot",
+      "next_follow_up": "",
+      "demo_booked_time": "",
+      "won_date": "",
+      "notes": "Sample lead import test",
+      "owner": "Harsh Goyal",
+      "createdAt": "2026-09-10T11:04:30.816Z"
+    },
+    {
       "id": "lead_juned",
       "name": "Juned Malkani",
       "company": "",

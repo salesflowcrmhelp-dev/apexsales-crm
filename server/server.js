@@ -1459,6 +1459,60 @@ app.post('/api/leads', async (req, res) => {
   res.json({ success: true, lead: newLead, message: 'Lead created successfully!' });
 });
 
+// Bulk Import Leads Endpoint
+app.post('/api/leads/bulk-import', async (req, res) => {
+  const user = req.user;
+  const { leads: incomingLeads } = req.body;
+
+  if (!Array.isArray(incomingLeads) || incomingLeads.length === 0) {
+    return res.status(400).json({ success: false, message: 'No leads provided to import.' });
+  }
+
+  const validIncoming = [];
+  const defaultOwner = (user?.role === 'sales_rep') ? user.name : (user?.name || 'Harsh Goyal');
+
+  for (let i = 0; i < incomingLeads.length; i++) {
+    const raw = incomingLeads[i];
+    if (!raw.name || !String(raw.name).trim()) continue;
+
+    // Determine ownership
+    let leadOwner = defaultOwner;
+    if (user?.role === 'admin' && raw.owner && String(raw.owner).trim()) {
+      leadOwner = String(raw.owner).trim();
+    }
+
+    const leadId = raw.id || `lead_import_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 4)}`;
+    const newLead = {
+      id: leadId,
+      name: String(raw.name).trim(),
+      company: String(raw.company || '').trim(),
+      phone: String(raw.phone || '').trim(),
+      email: String(raw.email || '').trim(),
+      value: Number(raw.value) || 0,
+      status: String(raw.status || 'New').trim(),
+      source: String(raw.source || 'Manual').trim(),
+      score: String(raw.score || 'Warm').trim(),
+      next_follow_up: String(raw.next_follow_up || '').trim(),
+      demo_booked_time: String(raw.demo_booked_time || '').trim(),
+      won_date: String(raw.won_date || '').trim(),
+      notes: typeof raw.notes === 'string' ? raw.notes : Array.isArray(raw.notes) ? raw.notes : '',
+      owner: leadOwner,
+      createdAt: raw.createdAt || new Date().toISOString()
+    };
+
+    validIncoming.push(newLead);
+    await saveLead(newLead);
+  }
+
+  console.log(`📥 Bulk imported ${validIncoming.length} leads by ${user?.name || 'Anonymous'}`);
+  return res.json({
+    success: true,
+    count: validIncoming.length,
+    leads: validIncoming,
+    message: `Successfully imported ${validIncoming.length} leads!`
+  });
+});
+
 // Update Lead
 app.put('/api/leads/:id', async (req, res) => {
   const { id } = req.params;
