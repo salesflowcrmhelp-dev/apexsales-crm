@@ -97,40 +97,90 @@ async function sendInvitationEmail({ toEmail, recipientName, role, inviteUrl, in
   const mailOptions = {
     from: `"ApexSales CRM" <${senderEmail}>`,
     to: toEmail,
-    subject: `You have been invited to ApexSales CRM as ${roleTitle}`,
+    subject: `🎉 Welcome to ApexSales CRM - Your Account & Login Password`,
     html: `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.06);">
-        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 28px 24px; text-align: center; color: #ffffff;">
-          <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">ApexSales CRM</h1>
-          <p style="margin: 6px 0 0 0; font-size: 13px; color: #94a3b8;">High-Performance Revenue & Sales Workspace</p>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 24px 10px; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+          
+          <!-- BRAND HEADER -->
+          <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2563eb 100%); padding: 36px 28px; text-align: center; color: #ffffff;">
+            <div style="display: inline-block; padding: 6px 14px; background: rgba(255, 255, 255, 0.15); border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; backdrop-filter: blur(4px);">
+              ✨ Official Team Invitation
+            </div>
+            <h1 style="margin: 0; font-size: 26px; font-weight: 850; letter-spacing: -0.5px; color: #ffffff;">
+              ApexSales CRM
+            </h1>
+            <p style="margin: 6px 0 0 0; font-size: 13px; color: #cbd5e1; font-weight: 500;">
+              High-Performance Revenue & Sales Pipeline Workspace
+            </p>
+          </div>
+
+          <!-- CONTENT BODY -->
+          <div style="padding: 32px 28px; color: #334155; line-height: 1.6;">
+            <h2 style="font-size: 20px; color: #0f172a; margin: 0 0 12px 0; font-weight: 750;">
+              Welcome to the Team, ${recipientName}! 👋
+            </h2>
+            <p style="font-size: 14px; color: #475569; margin: 0 0 20px 0;">
+              <strong>${inviterName || 'Your Workspace Admin'}</strong> has created your account on <strong>ApexSales CRM</strong> as <strong>${roleTitle}</strong>.
+            </p>
+
+            <!-- CREDENTIALS BOX WITH BRAND -->
+            <div style="background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); border: 2px solid #cbd5e1; border-radius: 12px; padding: 22px; margin: 24px 0;">
+              <div style="font-size: 11px; font-weight: 800; color: #2563eb; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px;">
+                🔐 YOUR LOGIN CREDENTIALS
+              </div>
+              
+              <div style="margin-bottom: 14px;">
+                <span style="display: block; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Authorized Login Email:</span>
+                <span style="display: block; font-size: 15px; font-weight: 750; color: #0f172a; word-break: break-all; margin-top: 2px;">
+                  ${toEmail}
+                </span>
+              </div>
+
+              <div style="margin-bottom: 6px;">
+                <span style="display: block; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">Your Login Password / PIN:</span>
+                <div style="display: inline-block; background-color: #ffffff; border: 1.5px solid #93c5fd; border-radius: 8px; padding: 6px 16px; margin-top: 4px;">
+                  <span style="font-size: 22px; font-weight: 900; color: #2563eb; letter-spacing: 4px; font-family: monospace;">
+                    ${initialPin}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- PRIMARY CALL TO ACTION BUTTON -->
+            <div style="text-align: center; margin: 28px 0 20px 0;">
+              <a href="${inviteUrl}" target="_blank" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; padding: 14px 34px; border-radius: 10px; font-weight: 750; font-size: 14.5px; display: inline-block; box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);">
+                🚀 Log In to Your CRM Workspace &rarr;
+              </a>
+            </div>
+
+            <p style="font-size: 12px; color: #64748b; text-align: center; margin: 0 0 24px 0;">
+              Click above to log in directly with your email and password.
+            </p>
+
+            <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #1e40af; line-height: 1.5;">
+              🔒 <strong>Security Note:</strong> This workspace is strictly restricted. Only this registered email (${toEmail}) and password can access your assigned leads.
+            </div>
+
+            <div style="font-size: 11.5px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 18px; margin-top: 28px; text-align: center;">
+              Direct Link: <a href="${inviteUrl}" style="color: #2563eb; word-break: break-all;">${inviteUrl}</a>
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 18px 24px; text-align: center; font-size: 11.5px; color: #64748b;">
+            <strong>ApexSales CRM</strong> • Cloud Revenue & Pipeline Management<br/>
+            This is an automated system email sent to ${toEmail}.
+          </div>
         </div>
-        <div style="padding: 28px 24px; color: #334155; line-height: 1.6;">
-          <h2 style="font-size: 18px; color: #0f172a; margin-top: 0;">Hello ${recipientName || 'Team Member'},</h2>
-          <p style="font-size: 14px; margin-bottom: 18px;">
-            <strong>${inviterName || 'Your Workspace Admin'}</strong> has invited you to join the <strong>ApexSales CRM</strong> team workspace as <strong>${roleTitle}</strong>.
-          </p>
-          <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 18px; margin: 20px 0;">
-            <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Authorized Email Address</p>
-            <p style="margin: 0 0 14px 0; font-size: 16px; font-weight: 750; color: #0f172a;">${toEmail}</p>
-            ${initialPin ? `
-            <p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Your Secret Login PIN</p>
-            <p style="margin: 0; font-size: 20px; font-weight: 850; color: #2563eb; letter-spacing: 3px;">${initialPin}</p>
-            ` : ''}
-          </div>
-          <div style="text-align: center; margin: 28px 0;">
-            <a href="${inviteUrl}" target="_blank" style="background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 9px; font-weight: 750; font-size: 14px; display: inline-block; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);">
-              Accept Invitation & Open CRM &rarr;
-            </a>
-          </div>
-          <p style="font-size: 12.5px; color: #64748b; margin-top: 24px;">
-            Or copy and paste this direct activation link into your browser:<br/>
-            <a href="${inviteUrl}" target="_blank" style="color: #2563eb; word-break: break-all; font-size: 12px;">${inviteUrl}</a>
-          </p>
-          <div style="font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 24px;">
-            🔒 <strong>Strict Security Notice:</strong> Only this specific email address (${toEmail}) is authorized to access this CRM workspace.
-          </div>
-        </div>
-      </div>
+      </body>
+      </html>
     `
   };
 

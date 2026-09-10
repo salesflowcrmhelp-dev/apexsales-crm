@@ -2178,7 +2178,11 @@ export default function App() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(data.message || `Invitation created for ${newUserData.email}!`, "success");
+        if (data.emailSent) {
+          showToast(`🎉 User created! Branded email with login password sent to ${newUserData.email}`, "success");
+        } else {
+          showToast(`User created! Login PIN: ${data.user?.pin || newUserData.pin}`, "success");
+        }
         setCreatedInviteInfo(data);
         setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", email: "", phone: "" });
         setShowAddUserSubModal(false);
@@ -17126,7 +17130,15 @@ export default function App() {
                   {/* Invite Member Button */}
                   <button
                     type="button"
-                    onClick={() => setShowAddUserSubModal(!showAddUserSubModal)}
+                    onClick={() => {
+                      if (!showAddUserSubModal && !newUserData.pin) {
+                        setNewUserData(prev => ({
+                          ...prev,
+                          pin: String(Math.floor(100000 + Math.random() * 900000))
+                        }));
+                      }
+                      setShowAddUserSubModal(!showAddUserSubModal);
+                    }}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -17143,7 +17155,7 @@ export default function App() {
                     }}
                   >
                     <UserPlus size={15} />
-                    <span>{showAddUserSubModal ? "Close Form" : "+ Invite Member by Email"}</span>
+                    <span>{showAddUserSubModal ? "Close Form" : "+ Create & Invite Member"}</span>
                   </button>
                 </div>
               </div>
@@ -17165,10 +17177,10 @@ export default function App() {
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <Mail size={16} color="#16a34a" />
-                      <strong style={{ fontSize: "13px", color: "#166534" }}>Invite New Team Member by Email</strong>
+                      <strong style={{ fontSize: "13px", color: "#166534" }}>Create Team Member & Send Password to Email</strong>
                     </div>
                     <span style={{ fontSize: "10.5px", color: "#15803d", fontWeight: "600" }}>
-                      🔒 Strictly only this authorized Email ID can log in
+                      🔒 User ko unke email par ApexSales CRM brand ke saath password jayega
                     </span>
                   </div>
 
@@ -17214,7 +17226,7 @@ export default function App() {
 
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
-                        Secret Login PIN (4-6 Digits)
+                        Login Password / PIN *
                       </label>
                       <div style={{ display: "flex", gap: "4px" }}>
                         <input 
@@ -17223,6 +17235,7 @@ export default function App() {
                           placeholder="Auto PIN"
                           value={newUserData.pin}
                           onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value.replace(/[^0-9]/g, '') }))}
+                          required
                           style={{ flex: 1, padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box", fontWeight: "800", letterSpacing: "2px" }}
                         />
                         <button
@@ -17278,7 +17291,7 @@ export default function App() {
                       type="submit"
                       style={{ padding: "7px 18px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: "750", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 6px rgba(22, 163, 74, 0.3)" }}
                     >
-                      <Send size={14} /> Send Invitation & Generate Login Link
+                      <Send size={14} /> ✨ Create User & Send Password to Email
                     </button>
                   </div>
                 </form>
