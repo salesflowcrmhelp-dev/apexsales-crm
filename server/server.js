@@ -11,6 +11,22 @@ const __dirname = path.dirname(__filename);
 const DB_FILE = path.join(__dirname, 'data', 'db.json');
 const DIST_PATH = path.join(__dirname, '..', 'dist');
 
+// Auto-load .env file if present
+const ENV_FILE = path.join(__dirname, '..', '.env');
+if (fs.existsSync(ENV_FILE)) {
+  const envContent = fs.readFileSync(ENV_FILE, 'utf8');
+  envContent.split('\n').forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx !== -1) {
+      const key = trimmed.slice(0, eqIdx).trim();
+      const val = trimmed.slice(eqIdx + 1).trim();
+      if (!process.env[key]) process.env[key] = val;
+    }
+  });
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || '';
