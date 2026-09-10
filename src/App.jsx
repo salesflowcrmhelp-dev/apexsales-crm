@@ -1261,7 +1261,9 @@ export default function App() {
   });
 
   useEffect(() => {
-    document.documentElement.style.zoom = zoomLevel;
+    const numericZoom = parseFloat(zoomLevel) / 100 || 0.85;
+    document.documentElement.style.setProperty("--crm-zoom", numericZoom);
+    document.documentElement.style.zoom = "";
     try {
       localStorage.setItem("apexsales_zoom_level", zoomLevel);
     } catch (e) {}

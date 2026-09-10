@@ -2,11 +2,8 @@
 
 /* src/index.css */
 
-html {
-  zoom: 85%;
-}
-
 :root {
+  --crm-zoom: 0.85;
   --primary-color: #ea580c; /* Orange Brand Primary */
   --primary-hover: #c2410c;
   --orange-accent: #f97316;
@@ -34,13 +31,15 @@ html {
   text-rendering: optimizeLegibility;
 }
 
-body {
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
   font-family: var(--font-family);
   background-color: var(--bg-app);
   color: var(--text-main);
   overflow: hidden;
-  height: 100vh;
-  width: 100vw;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -52,15 +51,17 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 #root {
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
-/* CRM App Shell with Left Sidebar */
+/* CRM App Shell with Left Sidebar - Seamless Full Width Responsive Scaling */
 .crm-app-shell {
   display: flex;
-  height: 100vh;
-  width: 100vw;
   background-color: #f8fafc;
   overflow: hidden;
+  zoom: var(--crm-zoom, 0.85);
+  width: calc(100vw / var(--crm-zoom, 0.85));
+  height: calc(100vh / var(--crm-zoom, 0.85));
 }
 
 /* Slim Left Sidebar */
