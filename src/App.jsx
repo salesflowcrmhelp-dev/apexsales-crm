@@ -2613,17 +2613,29 @@ export default function App() {
     if (saved) {
       try { 
         const parsed = JSON.parse(saved); 
+        let modified = false;
         if (parsed["2026-08"] === 250000 || parsed["2026-08"] === 0 || !parsed["2026-08"]) {
           parsed["2026-08"] = 110000;
+          modified = true;
+        }
+        if (!parsed["2026-09"] || parsed["2026-09"] === 0 || parsed["2026-09"] === "0") {
+          parsed["2026-09"] = 120000;
+          modified = true;
+        }
+        if (!parsed["2026-10"] || parsed["2026-10"] === 0 || parsed["2026-10"] === "0") {
+          parsed["2026-10"] = 130000;
+          modified = true;
+        }
+        if (modified) {
           localStorage.setItem("salesflow_monthly_targets", JSON.stringify(parsed));
         }
         return parsed;
       } catch (e) {}
     }
     const initial = {
-      "2026-08": 110000, // User's actual August Target: ₹1,10,000 (100% Achieved)
-      "2026-09": 0, // Fresh month - Target is not assigned yet (0 = Pending)
-      "2026-10": 0
+      "2026-08": 110000, // August Target: ₹1,10,000 (100% Achieved)
+      "2026-09": 120000, // September Target: ₹1,20,000 (Active Month)
+      "2026-10": 130000  // October Target: ₹1,30,000
     };
     try { localStorage.setItem("salesflow_monthly_targets", JSON.stringify(initial)); } catch(e) {}
     return initial;
@@ -2633,7 +2645,7 @@ export default function App() {
   const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [targetModalMonth, setTargetModalMonth] = useState("2026-09");
-  const [targetModalInput, setTargetModalInput] = useState("0");
+  const [targetModalInput, setTargetModalInput] = useState("120000");
   const [spotIncentives, setSpotIncentives] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("salesflow_spot_incentives")) || {};
@@ -2648,16 +2660,26 @@ export default function App() {
 
   const targetValue = useMemo(() => {
     if (selectedPeriodMonth === "all") {
-      return Object.values(monthlyTargets).reduce((a, b) => a + Number(b), 0);
+      const total = Object.values(monthlyTargets).reduce((a, b) => a + Number(b), 0);
+      return total > 0 ? total : 230000;
     }
     const val = monthlyTargets[selectedPeriodMonth];
-    return (val !== undefined && val !== null) ? Number(val) : 0;
+    if (val !== undefined && val !== null && Number(val) > 0) {
+      return Number(val);
+    }
+    // Reliable default fallbacks so target never shows as missing or pending
+    if (selectedPeriodMonth === "2026-09") return 120000;
+    if (selectedPeriodMonth === "2026-08") return 110000;
+    if (selectedPeriodMonth === "2026-10") return 130000;
+    return Number(val) || 120000;
   }, [monthlyTargets, selectedPeriodMonth]);
 
   const startEditingTarget = (chosenMonth) => {
     const monthKey = chosenMonth || (selectedPeriodMonth === "all" ? "2026-09" : selectedPeriodMonth);
     setTargetModalMonth(monthKey);
-    setTargetModalInput(String(monthlyTargets[monthKey] !== undefined ? monthlyTargets[monthKey] : 0));
+    const existingVal = monthlyTargets[monthKey];
+    const defaultVal = monthKey === "2026-09" ? 120000 : monthKey === "2026-08" ? 110000 : 130000;
+    setTargetModalInput(String(existingVal !== undefined && existingVal !== null && Number(existingVal) > 0 ? existingVal : defaultVal));
     setTargetModalSpotInput(String(spotIncentives[monthKey]?.amount || 0));
     setTargetModalSpotNote(spotIncentives[monthKey]?.note || "");
     setShowTargetModal(true);
@@ -8561,14 +8583,24 @@ export default function App() {
                   </div>
 
                   {/* Card 4: SALES TARGET */}
-                  <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                  <div 
+                    className="kpi-luxury-card" 
+                    onClick={() => startEditingTarget()}
+                    title="Click to view or edit monthly sales target"
+                    style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
+                  >
                     <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
-                        <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <Target size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
+                          <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <Target size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
+                          </div>
+                          <span style={{ fontSize: "9px", fontWeight: "750", color: "#64748b", letterSpacing: "0.2px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                            SALES TARGET
+                          </span>
                         </div>
-                        <span style={{ fontSize: "9px", fontWeight: "750", color: "#64748b", letterSpacing: "0.2px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                          SALES TARGET
+                        <span style={{ fontSize: "8.5px", color: "#ea580c", fontWeight: "700", marginLeft: "4px" }}>
+                          Edit ✎
                         </span>
                       </div>
                       
@@ -8585,7 +8617,12 @@ export default function App() {
                   </div>
 
                   {/* Card 5: DAILY TARGET */}
-                  <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                  <div 
+                    className="kpi-luxury-card" 
+                    onClick={() => startEditingTarget()}
+                    title="Click to view or edit target breakdown"
+                    style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
+                  >
                     <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
                         <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -15587,7 +15624,11 @@ export default function App() {
                       type="button"
                       onClick={() => {
                         setTargetModalMonth(m.id);
-                        setTargetModalInput(String(monthlyTargets[m.id] !== undefined ? monthlyTargets[m.id] : 0));
+                        const existingVal = monthlyTargets[m.id];
+                        const defaultVal = m.id === "2026-09" ? 120000 : m.id === "2026-08" ? 110000 : 130000;
+                        setTargetModalInput(String(existingVal !== undefined && existingVal !== null && Number(existingVal) > 0 ? existingVal : defaultVal));
+                        setTargetModalSpotInput(String(spotIncentives[m.id]?.amount || 0));
+                        setTargetModalSpotNote(spotIncentives[m.id]?.note || "");
                       }}
                       style={{
                         padding: "8px 10px",
@@ -15613,9 +15654,9 @@ export default function App() {
                 </label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                   {[
-                    { label: "⏳ Target Pending (₹0)", value: "0" },
                     { label: "₹1.10 Lakh", value: "110000" },
-                    { label: "₹1.5 Lakh", value: "150000" },
+                    { label: "₹1.20 Lakh (Active Goal)", value: "120000" },
+                    { label: "₹1.50 Lakh", value: "150000" },
                     { label: "₹2.0 Lakh", value: "200000" },
                     { label: "₹2.5 Lakh", value: "250000" },
                     { label: "₹3.0 Lakh", value: "300000" },
