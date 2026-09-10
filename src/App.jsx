@@ -651,34 +651,23 @@ function CircularProgress({ percentage, color = "#ea580c", size = 52, strokeWidt
 export default function App() {
   const [leads, setLeads] = useState(() => {
     try {
-      const userParam = new URLSearchParams(window.location.search).get("user");
       const savedUser = sessionStorage.getItem("crm_auth_user");
-      let activeRole = "admin";
-      let activeName = "Admin User";
-      if (userParam === "rohan") { activeRole = "sales_rep"; activeName = "Rohan Sharma"; }
-      else if (userParam === "priya") { activeRole = "sales_rep"; activeName = "Priya Verma"; }
-      else if (userParam === "amit") { activeRole = "sales_rep"; activeName = "Amit Patel"; }
-      else if (savedUser) {
-        const u = JSON.parse(savedUser);
-        activeRole = u.role;
-        activeName = u.name;
+      if (!savedUser) return []; // STRICT PRIVACY: Zero leads in memory until user is authenticated!
+      const u = JSON.parse(savedUser);
+      if (u.role === "sales_rep") {
+        return []; // Fresh sales rep starts strictly with 0 leads until their assigned leads load!
       }
-
       const saved = localStorage.getItem("salesflow_standalone_leads");
-      let initialList = INITIAL_LEADS;
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          initialList = parsed;
+          return parsed.map(sanitizeLeadObject);
         }
       }
-
-      if (activeRole === "sales_rep") {
-        initialList = initialList.filter(l => (l.owner || "").trim().toLowerCase() === activeName.trim().toLowerCase());
-      }
-      return initialList.map(sanitizeLeadObject);
-    } catch(e) {}
-    return INITIAL_LEADS.map(sanitizeLeadObject);
+      return INITIAL_LEADS.map(sanitizeLeadObject);
+    } catch(e) {
+      return [];
+    }
   });
   const [selectedCell, setSelectedCell] = useState(null); // { rowIndex, colIndex }
   const [editingCell, setEditingCell] = useState(null); // { rowIndex, colIndex }
@@ -1148,18 +1137,14 @@ export default function App() {
   // Multi-User & Role-Based Access Control (RBAC) States
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const p = new URLSearchParams(window.location.search).get("user");
-      if (p === "rohan") return { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", role: "sales_rep" };
-      if (p === "priya") return { id: "usr_priya", name: "Priya Verma", displayName: "Priya Verma", username: "priya", role: "sales_rep" };
-      if (p === "amit") return { id: "usr_amit", name: "Amit Patel", displayName: "Amit Patel", username: "amit", role: "sales_rep" };
-      const saved = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
-      return saved ? JSON.parse(saved) : { id: "usr_admin", name: "Admin User", displayName: "Harsh Goyal (Admin)", username: "admin", role: "admin" };
+      const saved = sessionStorage.getItem("crm_auth_user");
+      return saved ? JSON.parse(saved) : null;
     } catch(e) {
-      return { id: "usr_admin", name: "Admin User", displayName: "Harsh Goyal (Admin)", username: "admin", role: "admin" };
+      return null;
     }
   });
-  const [currentUserRole, setCurrentUserRole] = useState(() => currentUser?.role || "admin");
-  const [currentLoggedInUser, setCurrentLoggedInUser] = useState(() => currentUser?.name || "Admin User");
+  const [currentUserRole, setCurrentUserRole] = useState(() => currentUser?.role || "sales_rep");
+  const [currentLoggedInUser, setCurrentLoggedInUser] = useState(() => currentUser?.name || "");
   const [allUsersList, setAllUsersList] = useState([]);
   const [showUserManagementModal, setShowUserManagementModal] = useState(() => {
     try {
@@ -1852,10 +1837,11 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     try {
       if (new URLSearchParams(window.location.search).get("lock") === "true") return false;
-      const pwd = localStorage.getItem("salesflow_login_password") || "";
-      return !pwd; // Auto logged-in if no passcode set!
+      const savedUser = sessionStorage.getItem("crm_auth_user");
+      const savedToken = sessionStorage.getItem("crm_auth_token");
+      return !!(savedUser && savedToken);
     } catch(e) {
-      return true;
+      return false;
     }
   });
   const [savedPassword, setSavedPassword] = useState("");
@@ -1957,27 +1943,38 @@ export default function App() {
   const loadLeadsFromBackend = async (userToUse) => {
     try {
       const activeUser = userToUse || currentUser;
+      if (!activeUser) return [];
       const headers = {};
-      if (activeUser) {
-        headers["x-user-role"] = activeUser.role;
-        headers["x-user-name"] = activeUser.name;
-        headers["x-user-id"] = activeUser.id;
-      }
+      headers["x-user-role"] = activeUser.role || "sales_rep";
+      headers["x-user-name"] = activeUser.name || "";
+      headers["x-user-id"] = activeUser.id || "";
+      const token = sessionStorage.getItem("crm_auth_token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
       const res = await fetch("/api/leads", { headers });
       if (res.ok) {
         const data = await res.json();
         if (data && data.success && Array.isArray(data.leads)) {
-          const sanitized = data.leads.map(sanitizeLeadObject);
+          let sanitized = data.leads.map(sanitizeLeadObject);
+          // STRICT ROLE-BASED DATA ISOLATION GUARD:
+          // Sales Reps can NEVER see Admin leads or other reps' leads
+          if (activeUser.role === "sales_rep") {
+            const userNameLower = (activeUser.name || "").trim().toLowerCase();
+            sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
+          }
           setLeads(sanitized);
-          try {
-            localStorage.setItem("salesflow_standalone_leads", JSON.stringify(sanitized));
-          } catch(e) {}
+          if (activeUser.role === "admin") {
+            try {
+              localStorage.setItem("salesflow_standalone_leads", JSON.stringify(sanitized));
+            } catch(e) {}
+          }
           return sanitized;
         }
       }
     } catch(e) {
       console.warn("Backend leads fetch fallback to local:", e);
     }
+    return [];
   };
 
   const syncLeadsToBackend = async (leadsToSync) => {
@@ -3173,13 +3170,14 @@ export default function App() {
 
     // Strict Role-Based Privacy: Sales Reps ONLY see their own assigned deals
     if (currentUser?.role === "sales_rep") {
-      baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === currentUser.name.trim().toLowerCase());
+      const repName = (currentUser.name || "").trim().toLowerCase();
+      baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === repName);
     }
 
-    // Search query: if provided, search across ALL leads in the database
+    // Search query: filtered strictly within baseLeads
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      baseLeads = leads.filter(l => 
+      baseLeads = baseLeads.filter(l => 
         (l.name || "").toLowerCase().includes(q) ||
         (l.company || "").toLowerCase().includes(q) ||
         (l.email || "").toLowerCase().includes(q) ||
@@ -3189,13 +3187,13 @@ export default function App() {
       );
     } else {
       if (currentTab === "Active Pipeline") {
-        baseLeads = leads.filter(l => isActiveStatus(l.status));
+        baseLeads = baseLeads.filter(l => isActiveStatus(l.status));
       } else if (currentTab === "Won Deals") {
-        baseLeads = leads.filter(l => isWonStatus(l.status));
+        baseLeads = baseLeads.filter(l => isWonStatus(l.status));
       } else if (currentTab === "Lost Deals") {
-        baseLeads = leads.filter(l => isLostStatus(l.status));
+        baseLeads = baseLeads.filter(l => isLostStatus(l.status));
       } else if (currentTab === "Renewal Leads") {
-        baseLeads = leads.filter(l => (l.status || "").toLowerCase() === "renewal");
+        baseLeads = baseLeads.filter(l => (l.status || "").toLowerCase() === "renewal");
       }
     }
     
@@ -3264,12 +3262,23 @@ export default function App() {
       }
     }
 
+    // Strict Role-Based Privacy: Sales Reps can NEVER see other users' data
+    if (currentUser?.role === "sales_rep") {
+      const repName = (currentUser.name || "").trim().toLowerCase();
+      baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === repName);
+    }
+
     return baseLeads;
-  }, [leads, currentTab, searchQuery, filterStage, filterScore, filterSource, filterMinVal, filterOwner, currentLoggedInUser, currentUser]);
+  }, [leads, currentTab, searchQuery, filterStage, filterScore, filterSource, filterMinVal, filterOwner, currentLoggedInUser, currentUser, sheetFilterCriteria]);
 
   // Dynamic Real-Time Filtered Report Leads Calculation (Advanced Multi-Criteria Engine)
   const filteredReportLeads = useMemo(() => {
     return leads.filter(l => {
+      // 0. Strict Role Isolation: Sales Reps ONLY see their own deals in Reports
+      if (currentUser?.role === "sales_rep") {
+        const repName = (currentUser.name || "").trim().toLowerCase();
+        if ((l.owner || "").trim().toLowerCase() !== repName) return false;
+      }
       // 0. Search Query Filter (Name, Company, Phone, Email, Notes)
       if (reportSearchQuery.trim()) {
         const q = reportSearchQuery.toLowerCase();
@@ -3873,36 +3882,12 @@ export default function App() {
     // 1. Fetch users from central backend
     loadUsersFromBackend();
 
-    // 2. Fetch leads with role-based filtering from central backend
-    loadLeadsFromBackend(currentUser);
-
-    const savedLeads = localStorage.getItem("salesflow_standalone_leads");
-    if (savedLeads) {
-      try {
-        const parsed = JSON.parse(savedLeads);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const cleanedLeads = parsed.map(sanitizeLeadObject);
-          setLeads(cleanedLeads);
-          const savedUrl = localStorage.getItem("salesflow_standalone_webhook") || "";
-          setWebhookUrl(savedUrl);
-          const pwd = localStorage.getItem("salesflow_login_password") || "";
-          setSavedPassword(pwd);
-          const savedTasks = localStorage.getItem("salesflow_standalone_tasks");
-          if (savedTasks) {
-            try { setTasks(JSON.parse(savedTasks)); } catch (e) { setTasks([]); }
-          }
-          return;
-        }
-      } catch(e) {}
+    // 2. Fetch leads strictly for authenticated user
+    if (currentUser) {
+      loadLeadsFromBackend(currentUser);
+    } else {
+      setLeads([]);
     }
-
-    // Default initialization if local storage is empty
-    setLeads(INITIAL_LEADS);
-    try {
-      localStorage.setItem("salesflow_standalone_leads", JSON.stringify(INITIAL_LEADS));
-      localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(INITIAL_LEADS));
-    } catch(e) {}
-
     const savedUrl = localStorage.getItem("salesflow_standalone_webhook") || "";
     setWebhookUrl(savedUrl);
 
