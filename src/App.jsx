@@ -1791,6 +1791,7 @@ export default function App() {
 
       updatedLeads[actualIndex] = updatedLeadObj;
       saveLeadsToStorage(updatedLeads);
+      syncSingleLeadToBackend(updatedLeadObj);
       showToast(`Stage updated to "${newStatus}"!`, "success");
 
       if (isNowWon) {
@@ -2111,11 +2112,21 @@ export default function App() {
   const syncLeadsToBackend = async (leadsToSync) => {
     try {
       const headers = { "Content-Type": "application/json" };
-      if (currentUser) {
-        headers["x-user-role"] = currentUser.role;
-        headers["x-user-name"] = currentUser.name;
-        headers["x-user-id"] = currentUser.id;
+      const token = sessionStorage.getItem("crm_auth_token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const savedUserStr = sessionStorage.getItem("crm_auth_user");
+      let activeUser = currentUser;
+      if (!activeUser && savedUserStr) {
+        try { activeUser = JSON.parse(savedUserStr); } catch(e) {}
       }
+
+      if (activeUser) {
+        headers["x-user-role"] = activeUser.role || "admin";
+        headers["x-user-name"] = activeUser.name || "Admin User";
+        headers["x-user-id"] = activeUser.id || "";
+      }
+
       await fetch("/api/sync/bulk", {
         method: "POST",
         headers,
@@ -2123,6 +2134,35 @@ export default function App() {
       });
     } catch(e) {
       console.warn("Background sync to Node server deferred:", e);
+    }
+  };
+
+  const syncSingleLeadToBackend = async (lead) => {
+    if (!lead || !lead.id) return;
+    try {
+      const headers = { "Content-Type": "application/json" };
+      const token = sessionStorage.getItem("crm_auth_token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const savedUserStr = sessionStorage.getItem("crm_auth_user");
+      let activeUser = currentUser;
+      if (!activeUser && savedUserStr) {
+        try { activeUser = JSON.parse(savedUserStr); } catch(e) {}
+      }
+
+      if (activeUser) {
+        headers["x-user-role"] = activeUser.role || "admin";
+        headers["x-user-name"] = activeUser.name || "Admin User";
+        headers["x-user-id"] = activeUser.id || "";
+      }
+
+      await fetch(`/api/leads/${encodeURIComponent(lead.id)}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(lead)
+      });
+    } catch(e) {
+      console.warn("Direct lead sync deferred:", e);
     }
   };
 
@@ -4028,10 +4068,8 @@ export default function App() {
       localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(cleaned));
     } catch(e) {}
 
-    // Synchronize updates to Central Node Backend
-    if (currentUser?.role === "admin") {
-      syncLeadsToBackend(cleaned);
-    }
+    // Synchronize updates immediately to Central Node Backend & MongoDB Atlas
+    syncLeadsToBackend(cleaned);
   };
 
   const showToast = (message, type = "success") => {
@@ -10824,10 +10862,7 @@ export default function App() {
                     }
                     return l;
                   });
-                  setLeads(updatedLeads);
-                  try {
-                    localStorage.setItem("salesflow_standalone_leads", JSON.stringify(updatedLeads));
-                  } catch(e) {}
+                  saveLeadsToStorage(updatedLeads);
                 };
 
                 const handleAddSplitNote = () => {

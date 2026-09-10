@@ -564,20 +564,56 @@ async function syncBulkData(leads, users) {
   if (isMongoConnected && mongoDb) {
     try {
       if (Array.isArray(leads) && leads.length > 0) {
-        await mongoDb.collection('leads').deleteMany({});
-        await mongoDb.collection('leads').insertMany(leads);
+        const leadOps = leads.map(l => {
+          const { _id, ...leadData } = l;
+          return {
+            updateOne: {
+              filter: { id: String(leadData.id) },
+              update: { $set: leadData },
+              upsert: true
+            }
+          };
+        });
+        await mongoDb.collection('leads').bulkWrite(leadOps);
       }
       if (Array.isArray(users) && users.length > 0) {
-        await mongoDb.collection('users').deleteMany({});
-        await mongoDb.collection('users').insertMany(users);
+        const userOps = users.map(u => {
+          const { _id, ...userData } = u;
+          return {
+            updateOne: {
+              filter: { id: String(userData.id) },
+              update: { $set: userData },
+              upsert: true
+            }
+          };
+        });
+        await mongoDb.collection('users').bulkWrite(userOps);
       }
     } catch (e) {
       console.error('MongoDB syncBulkData error:', e);
     }
   }
   const local = readLocalDB();
-  if (Array.isArray(leads) && leads.length > 0) local.leads = leads;
-  if (Array.isArray(users) && users.length > 0) local.users = users;
+  if (Array.isArray(leads) && leads.length > 0) {
+    leads.forEach(lead => {
+      const idx = local.leads.findIndex(l => String(l.id) === String(lead.id));
+      if (idx !== -1) {
+        local.leads[idx] = lead;
+      } else {
+        local.leads.push(lead);
+      }
+    });
+  }
+  if (Array.isArray(users) && users.length > 0) {
+    users.forEach(user => {
+      const idx = local.users.findIndex(u => String(u.id) === String(user.id));
+      if (idx !== -1) {
+        local.users[idx] = user;
+      } else {
+        local.users.push(user);
+      }
+    });
+  }
   writeLocalDB(local);
 }
 
@@ -1563,13 +1599,25 @@ app.delete('/api/leads/:id', async (req, res) => {
 
 // Bulk Sync Endpoint
 app.post('/api/sync/bulk', async (req, res) => {
-  if (req.user?.role !== 'admin') {
-    return res.status(403).json({ success: false, message: 'Only Admin can perform bulk sync.' });
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: 'Authentication required for synchronization.' });
   }
 
   const { leads, users } = req.body;
-  await syncBulkData(leads, users);
 
+  if (req.user.role === 'sales_rep') {
+    // Sales reps can safely sync the leads assigned to them
+    const repLeads = Array.isArray(leads) 
+      ? leads.filter(l => (l.owner || '').trim().toLowerCase() === (req.user.name || '').trim().toLowerCase()) 
+      : [];
+    if (repLeads.length > 0) {
+      await syncBulkData(repLeads, null);
+    }
+    return res.json({ success: true, message: 'Assigned leads synchronized successfully!' });
+  }
+
+  // Admin syncs all leads & users
+  await syncBulkData(leads, users);
   res.json({ success: true, message: 'Bulk data synchronized successfully!' });
 });
 
