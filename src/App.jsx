@@ -1255,19 +1255,12 @@ export default function App() {
   const [whatsappApiKey, setWhatsappApiKey] = useState(() => localStorage.getItem("whatsapp_api_key") || "");
   const [autoOpenWaWeb, setAutoOpenWaWeb] = useState(() => localStorage.getItem("auto_open_wa_web") === "true");
 
-  // Screen Zoom Control State (Defaults to 85% for compact crisp display)
-  const [zoomLevel, setZoomLevel] = useState(() => {
-    return localStorage.getItem("apexsales_zoom_level") || "85%";
-  });
-
   useEffect(() => {
-    const numericZoom = parseFloat(zoomLevel) / 100 || 0.85;
-    document.documentElement.style.setProperty("--crm-zoom", numericZoom);
     document.documentElement.style.zoom = "";
     try {
-      localStorage.setItem("apexsales_zoom_level", zoomLevel);
+      localStorage.removeItem("apexsales_zoom_level");
     } catch (e) {}
-  }, [zoomLevel]);
+  }, []);
   const handleSyncSheet = async () => {
     if (!webhookUrl) {
       if (showToast) showToast("Please enter a Google Apps Script Webhook URL first.", "error");
@@ -5394,71 +5387,6 @@ export default function App() {
             <div className="header-notification-btn" onClick={() => setShowStartMyDay(true)} title="3 Pending Follow-ups">
               <Bell className="w-4 h-4 text-slate-600" />
               <span className="notification-badge-dot">3</span>
-            </div>
-
-            {/* Display Zoom Controller */}
-            <div 
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                backgroundColor: "#f8fafc",
-                border: "1px solid #e2e8f0",
-                borderRadius: "8px",
-                padding: "2px 5px",
-                gap: "2px",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
-              }}
-              title="Display Zoom Scale (Click - or + to make screen smaller or bigger)"
-            >
-              <button 
-                type="button"
-                onClick={() => {
-                  const levels = ["75%", "80%", "85%", "90%", "95%", "100%"];
-                  const idx = levels.indexOf(zoomLevel);
-                  if (idx > 0) setZoomLevel(levels[idx - 1]);
-                  else if (idx === -1) setZoomLevel("80%");
-                }}
-                style={{
-                  border: "none",
-                  backgroundColor: "transparent",
-                  cursor: "pointer",
-                  padding: "1px 5px",
-                  fontSize: "14px",
-                  fontWeight: "800",
-                  color: "#64748b",
-                  borderRadius: "4px",
-                  lineHeight: "1"
-                }}
-                title="Zoom Out (Make UI Smaller)"
-              >
-                −
-              </button>
-              <span style={{ fontSize: "10.5px", fontWeight: "750", color: "#334155", minWidth: "30px", textAlign: "center", userSelect: "none" }}>
-                {zoomLevel}
-              </span>
-              <button 
-                type="button"
-                onClick={() => {
-                  const levels = ["75%", "80%", "85%", "90%", "95%", "100%"];
-                  const idx = levels.indexOf(zoomLevel);
-                  if (idx !== -1 && idx < levels.length - 1) setZoomLevel(levels[idx + 1]);
-                  else if (idx === -1) setZoomLevel("90%");
-                }}
-                style={{
-                  border: "none",
-                  backgroundColor: "transparent",
-                  cursor: "pointer",
-                  padding: "1px 5px",
-                  fontSize: "14px",
-                  fontWeight: "800",
-                  color: "#64748b",
-                  borderRadius: "4px",
-                  lineHeight: "1"
-                }}
-                title="Zoom In (Make UI Bigger)"
-              >
-                +
-              </button>
             </div>
 
             {/* Logged in User Badge */}
