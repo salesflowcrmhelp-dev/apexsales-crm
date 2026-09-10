@@ -35,40 +35,67 @@ const MONGODB_URI = process.env.MONGODB_URI || '';
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 
-// --- EMAIL TRANSPORTER CONFIGURATION (GMAIL / SMTP) ---
-let emailTransporter = null;
-const SMTP_USER = process.env.SMTP_USER || process.env.GMAIL_USER || '';
-const SMTP_PASS = process.env.SMTP_PASS || process.env.GMAIL_APP_PASS || '';
-const SMTP_HOST = process.env.SMTP_HOST || (SMTP_USER.includes('@gmail.com') ? 'smtp.gmail.com' : '');
-const SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465;
+// --- DYNAMIC EMAIL TRANSPORTER (GMAIL / SMTP CONFIGURABLE VIA DB OR ENV) ---
+const ENV_SMTP_USER = process.env.SMTP_USER || process.env.GMAIL_USER || '';
+const ENV_SMTP_PASS = process.env.SMTP_PASS || process.env.GMAIL_APP_PASS || '';
+const ENV_SMTP_HOST = process.env.SMTP_HOST || (ENV_SMTP_USER.includes('@gmail.com') ? 'smtp.gmail.com' : '');
+const ENV_SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465;
 
-if (SMTP_USER && SMTP_PASS) {
+async function getSmtpConfig() {
+  if (isMongoConnected && mongoDb) {
+    try {
+      const dbConfig = await mongoDb.collection('settings').findOne({ id: 'smtp_config' });
+      if (dbConfig && dbConfig.user && dbConfig.pass) {
+        return dbConfig;
+      }
+    } catch (e) {}
+  }
+  const local = readLocalDB();
+  if (local.settings?.smtp?.user && local.settings?.smtp?.pass) {
+    return local.settings.smtp;
+  }
+  if (ENV_SMTP_USER && ENV_SMTP_PASS) {
+    return {
+      user: ENV_SMTP_USER,
+      pass: ENV_SMTP_PASS,
+      host: ENV_SMTP_HOST || 'smtp.gmail.com',
+      port: ENV_SMTP_PORT || 465
+    };
+  }
+  return null;
+}
+
+async function getEmailTransporter() {
+  const cfg = await getSmtpConfig();
+  if (!cfg || !cfg.user || !cfg.pass) return null;
   try {
-    emailTransporter = nodemailer.createTransport({
-      host: SMTP_HOST || 'smtp.gmail.com',
-      port: SMTP_PORT,
-      secure: SMTP_PORT === 465,
+    const isGmail = cfg.user.includes('@gmail.com');
+    const transporter = nodemailer.createTransport({
+      host: cfg.host || (isGmail ? 'smtp.gmail.com' : 'smtp.gmail.com'),
+      port: cfg.port ? Number(cfg.port) : 465,
+      secure: (cfg.port ? Number(cfg.port) : 465) === 465,
       auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS
+        user: cfg.user.trim(),
+        pass: cfg.pass.replace(/\s+/g, '').trim()
       }
     });
-    console.log(`✉️ Email Transporter initialized with user: ${SMTP_USER}`);
+    return { transporter, senderEmail: cfg.user.trim() };
   } catch (err) {
-    console.warn('⚠️ Could not initialize email transporter:', err.message);
+    console.warn('⚠️ Error initializing transporter:', err.message);
+    return null;
   }
-} else {
-  console.log('ℹ️ No SMTP_USER/SMTP_PASS found. Invite links will be generated with 1-click WhatsApp/Email copy ready.');
 }
 
 async function sendInvitationEmail({ toEmail, recipientName, role, inviteUrl, initialPin, inviterName }) {
-  if (!emailTransporter) {
+  const emailSetup = await getEmailTransporter();
+  if (!emailSetup) {
     return { sent: false, reason: 'SMTP not configured' };
   }
 
+  const { transporter, senderEmail } = emailSetup;
   const roleTitle = role === 'admin' ? 'Super Admin' : 'Sales Representative';
   const mailOptions = {
-    from: `"ApexSales CRM" <${SMTP_USER}>`,
+    from: `"ApexSales CRM" <${senderEmail}>`,
     to: toEmail,
     subject: `You have been invited to ApexSales CRM as ${roleTitle}`,
     html: `
@@ -108,11 +135,11 @@ async function sendInvitationEmail({ toEmail, recipientName, role, inviteUrl, in
   };
 
   try {
-    const info = await emailTransporter.sendMail(mailOptions);
-    console.log(`✉️ Invitation email sent successfully to ${toEmail}: ${info.messageId}`);
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✉️ Automatic invitation email sent successfully to ${toEmail}: ${info.messageId}`);
     return { sent: true, messageId: info.messageId };
   } catch (err) {
-    console.error(`⚠️ Failed to send invitation email to ${toEmail}:`, err.message);
+    console.error(`⚠️ Failed to send automatic invitation email to ${toEmail}:`, err.message);
     return { sent: false, reason: err.message };
   }
 }
@@ -616,6 +643,84 @@ app.post('/api/users/invite', async (req, res) => {
     emailSent: emailResult.sent,
     emailStatus: emailResult.sent ? 'sent' : 'manual_dispatch_ready'
   });
+});
+
+// Admin: Get Current Email Dispatch Configuration Status
+app.get('/api/settings/email', async (req, res) => {
+  const cfg = await getSmtpConfig();
+  if (!cfg) {
+    return res.json({ success: true, configured: false, senderEmail: '' });
+  }
+  res.json({
+    success: true,
+    configured: true,
+    senderEmail: cfg.user,
+    host: cfg.host || 'smtp.gmail.com'
+  });
+});
+
+// Admin: Save & Verify Email Dispatch Configuration (e.g. Gmail App Password)
+app.post('/api/settings/email', async (req, res) => {
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ success: false, message: 'Access denied. Only Admin can configure email dispatch.' });
+  }
+
+  const { user, pass, host, port } = req.body;
+  if (!user || !pass) {
+    return res.status(400).json({ success: false, message: 'Gmail/Email Address and App Password are required.' });
+  }
+
+  const cleanUser = String(user).trim();
+  const cleanPass = String(pass).replace(/\s+/g, '').trim();
+  const cleanHost = (host && String(host).trim()) || (cleanUser.includes('@gmail.com') ? 'smtp.gmail.com' : 'smtp.gmail.com');
+  const cleanPort = port ? Number(port) : 465;
+
+  // Test connection immediately before saving!
+  try {
+    const testTransporter = nodemailer.createTransport({
+      host: cleanHost,
+      port: cleanPort,
+      secure: cleanPort === 465,
+      auth: { user: cleanUser, pass: cleanPass }
+    });
+
+    await testTransporter.verify();
+
+    const configData = {
+      id: 'smtp_config',
+      user: cleanUser,
+      pass: cleanPass,
+      host: cleanHost,
+      port: cleanPort,
+      updatedAt: new Date().toISOString(),
+      updatedBy: req.user?.name || 'Admin'
+    };
+
+    if (isMongoConnected && mongoDb) {
+      await mongoDb.collection('settings').updateOne(
+        { id: 'smtp_config' },
+        { $set: configData },
+        { upsert: true }
+      );
+    }
+    const local = readLocalDB();
+    if (!local.settings) local.settings = {};
+    local.settings.smtp = configData;
+    writeLocalDB(local);
+
+    console.log(`✅ Automatic email dispatch successfully connected for ${cleanUser}!`);
+    res.json({
+      success: true,
+      message: `Connected successfully! All invitations will now automatically be delivered to user inboxes from "${cleanUser}".`,
+      senderEmail: cleanUser
+    });
+  } catch (err) {
+    console.error('SMTP test failed:', err.message);
+    res.status(400).json({
+      success: false,
+      message: `Connection failed: ${err.message}. Please check that 2-Step Verification is ON in your Google Account and you generated a 16-character App Password.`
+    });
+  }
 });
 
 // Admin: Add New User

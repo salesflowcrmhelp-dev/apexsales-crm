@@ -1205,6 +1205,13 @@ export default function App() {
   // Email Login & Created Invite Sharing States
   const [loginEmail, setLoginEmail] = useState("");
   const [createdInviteInfo, setCreatedInviteInfo] = useState(null);
+
+  // Automatic Email Dispatch (SMTP / Gmail) States
+  const [emailConfigStatus, setEmailConfigStatus] = useState({ configured: false, senderEmail: "" });
+  const [showEmailConfigModal, setShowEmailConfigModal] = useState(false);
+  const [emailConfigForm, setEmailConfigForm] = useState({ user: "", pass: "" });
+  const [emailConfigSaving, setEmailConfigSaving] = useState(false);
+  const [emailConfigError, setEmailConfigError] = useState("");
   const [customFields, setCustomFields] = useState(() => {
     try {
       const saved = localStorage.getItem("crm_custom_fields");
@@ -2181,6 +2188,57 @@ export default function App() {
       }
     } catch(err) {
       showToast("Network error creating invitation.", "error");
+    }
+  };
+
+  const loadEmailConfigStatus = async () => {
+    try {
+      const res = await fetch("/api/settings/email");
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success) {
+          setEmailConfigStatus(data);
+          if (data.senderEmail) {
+            setEmailConfigForm(prev => ({ ...prev, user: data.senderEmail }));
+          }
+        }
+      }
+    } catch(e) {}
+  };
+
+  const handleSaveEmailConfig = async (e) => {
+    if (e) e.preventDefault();
+    if (!emailConfigForm.user.trim() || !emailConfigForm.pass.trim()) {
+      setEmailConfigError("Please provide your Gmail address and 16-character App Password.");
+      return;
+    }
+    setEmailConfigSaving(true);
+    setEmailConfigError("");
+    try {
+      const res = await fetch("/api/settings/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-role": currentUser?.role || "admin",
+          "x-user-name": currentUser?.name || "Admin User"
+        },
+        body: JSON.stringify({
+          user: emailConfigForm.user.trim(),
+          pass: emailConfigForm.pass.trim()
+        })
+      });
+      const data = await res.json();
+      setEmailConfigSaving(false);
+      if (res.ok && data.success) {
+        showToast("🎉 " + data.message, "success");
+        setEmailConfigStatus({ configured: true, senderEmail: data.senderEmail });
+        setShowEmailConfigModal(false);
+      } else {
+        setEmailConfigError(data.message || "Failed to verify email credentials.");
+      }
+    } catch(err) {
+      setEmailConfigSaving(false);
+      setEmailConfigError("Network error while connecting to email server.");
     }
   };
 
@@ -3849,8 +3907,9 @@ export default function App() {
 
   // Initialize and load persistent user-edited leads + Backend Data
   useEffect(() => {
-    // 1. Fetch users from central backend
+    // 1. Fetch users and email status from central backend
     loadUsersFromBackend();
+    loadEmailConfigStatus();
 
     // 2. Fetch leads with role-based filtering from central backend
     loadLeadsFromBackend(currentUser);
@@ -17013,49 +17072,80 @@ export default function App() {
             {/* Content Body */}
             <div style={{ padding: "14px 20px 20px 20px", display: "flex", flexDirection: "column", gap: "12px", overflowY: "auto", flex: 1, minHeight: 0 }}>
               
-              {/* Summary Stats & Add Button */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: "10px", alignItems: "center" }}>
-                <div style={{ padding: "10px 14px", backgroundColor: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#64748b" }}>TOTAL ACTIVE USERS</span>
-                  <div style={{ fontSize: "18px", fontWeight: "850", color: "#0f172a" }}>{allUsersList.length || 4}</div>
-                </div>
+              {/* Summary Stats & Actions */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                  <div style={{ padding: "10px 14px", backgroundColor: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                    <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#64748b" }}>TOTAL ACTIVE USERS</span>
+                    <div style={{ fontSize: "18px", fontWeight: "850", color: "#0f172a" }}>{allUsersList.length || 4}</div>
+                  </div>
 
-                <div style={{ padding: "10px 14px", backgroundColor: "#fffbeb", borderRadius: "10px", border: "1px solid #fef3c7" }}>
-                  <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#b45309" }}>SUPER ADMINS (FULL DATA)</span>
-                  <div style={{ fontSize: "18px", fontWeight: "850", color: "#d97706" }}>
-                    {(allUsersList.filter(u => u.role === "admin").length) || 1}
+                  <div style={{ padding: "10px 14px", backgroundColor: "#fffbeb", borderRadius: "10px", border: "1px solid #fef3c7" }}>
+                    <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#b45309" }}>SUPER ADMINS (FULL DATA)</span>
+                    <div style={{ fontSize: "18px", fontWeight: "850", color: "#d97706" }}>
+                      {(allUsersList.filter(u => u.role === "admin").length) || 1}
+                    </div>
+                  </div>
+
+                  <div style={{ padding: "10px 14px", backgroundColor: "#eff6ff", borderRadius: "10px", border: "1px solid #dbeafe" }}>
+                    <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#1d4ed8" }}>SALES REPS (ISOLATED)</span>
+                    <div style={{ fontSize: "18px", fontWeight: "850", color: "#2563eb" }}>
+                      {(allUsersList.filter(u => u.role === "sales_rep").length) || 3}
+                    </div>
                   </div>
                 </div>
 
-                <div style={{ padding: "10px 14px", backgroundColor: "#eff6ff", borderRadius: "10px", border: "1px solid #dbeafe" }}>
-                  <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#1d4ed8" }}>SALES REPS (ISOLATED)</span>
-                  <div style={{ fontSize: "18px", fontWeight: "850", color: "#2563eb" }}>
-                    {(allUsersList.filter(u => u.role === "sales_rep").length) || 3}
-                  </div>
-                </div>
+                <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                  {/* Auto-Email Connection Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmailConfigError("");
+                      setShowEmailConfigModal(true);
+                    }}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "10px 14px",
+                      backgroundColor: emailConfigStatus.configured ? "#ecfdf5" : "#fff7ed",
+                      color: emailConfigStatus.configured ? "#047857" : "#c2410c",
+                      border: emailConfigStatus.configured ? "1.5px solid #a7f3d0" : "1.5px solid #fdba74",
+                      borderRadius: "10px",
+                      fontSize: "12px",
+                      fontWeight: "750",
+                      cursor: "pointer",
+                      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)"
+                    }}
+                    title="Setup Gmail SMTP for 100% automated email delivery to user inboxes"
+                  >
+                    <Mail size={15} color={emailConfigStatus.configured ? "#059669" : "#ea580c"} />
+                    <span>{emailConfigStatus.configured ? `⚡ Auto-Email: Connected (${emailConfigStatus.senderEmail})` : "⚡ Setup Auto-Email (Gmail)"}</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => setShowAddUserSubModal(!showAddUserSubModal)}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    padding: "10px 16px",
-                    backgroundColor: showAddUserSubModal ? "#64748b" : "#2563eb",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "10px",
-                    fontSize: "12px",
-                    fontWeight: "750",
-                    cursor: "pointer",
-                    boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)",
-                    height: "100%"
-                  }}
-                >
-                  <UserPlus size={15} />
-                  <span>{showAddUserSubModal ? "Close Form" : "+ Invite Member by Email"}</span>
-                </button>
+                  {/* Invite Member Button */}
+                  <button
+                    type="button"
+                    onClick={() => setShowAddUserSubModal(!showAddUserSubModal)}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "10px 16px",
+                      backgroundColor: showAddUserSubModal ? "#64748b" : "#2563eb",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "10px",
+                      fontSize: "12px",
+                      fontWeight: "750",
+                      cursor: "pointer",
+                      boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)"
+                    }}
+                  >
+                    <UserPlus size={15} />
+                    <span>{showAddUserSubModal ? "Close Form" : "+ Invite Member by Email"}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Add / Invite New User Sub-Form (Collapsible) */}
@@ -17339,13 +17429,26 @@ export default function App() {
               {/* ✉️ INVITATION SUCCESS / SHARE POPUP */}
               {createdInviteInfo && (
                 <div style={{ backgroundColor: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: "12px", padding: "14px 16px", display: "flex", flexDirection: "column", gap: "10px", marginTop: "4px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "6px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <Send size={16} color="#16a34a" />
                       <strong style={{ fontSize: "12.5px", color: "#166534" }}>
-                        🎉 Invitation Generated for: {createdInviteInfo.user?.email}
+                        🎉 Invitation Created for: {createdInviteInfo.user?.email}
                       </strong>
                     </div>
+                    {createdInviteInfo.emailSent ? (
+                      <span style={{ fontSize: "11px", backgroundColor: "#bbf7d0", color: "#14532d", padding: "3px 8px", borderRadius: "6px", fontWeight: "750", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                        ✅ Auto-Email Sent to Inbox!
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setShowEmailConfigModal(true)}
+                        style={{ fontSize: "11px", backgroundColor: "#fef3c7", color: "#92400e", border: "1px solid #fde68a", padding: "3px 8px", borderRadius: "6px", fontWeight: "700", cursor: "pointer" }}
+                      >
+                        ⚡ Connect Gmail to Send Automatically
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => setCreatedInviteInfo(null)}
@@ -17355,12 +17458,22 @@ export default function App() {
                     </button>
                   </div>
 
-                  <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                  {createdInviteInfo.emailSent ? (
+                    <div style={{ fontSize: "11px", color: "#166534" }}>
+                      📨 The recipient will receive the activation link and login PIN directly in their inbox. You can also share the link manually below if needed:
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "11px", color: "#854d0e", backgroundColor: "#fffbeb", padding: "6px 10px", borderRadius: "6px", border: "1px solid #fef3c7" }}>
+                      💡 Automatic email was not sent because Gmail is not connected yet. You can share the link using WhatsApp/Email buttons below, or click <strong>Setup Auto-Email</strong> above to send automatically next time!
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
                     <input 
                       type="text" 
                       readOnly 
                       value={createdInviteInfo.inviteUrl} 
-                      style={{ flex: 1, padding: "6px 10px", fontSize: "11px", backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "6px", color: "#166534" }}
+                      style={{ flex: 1, minWidth: "220px", padding: "6px 10px", fontSize: "11px", backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "6px", color: "#166534" }}
                     />
                     <button
                       type="button"
@@ -17409,6 +17522,193 @@ export default function App() {
                 Close Window
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ⚡ MODAL: GMAIL / SMTP AUTO-EMAIL SETUP */}
+      {showEmailConfigModal && (
+        <div 
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 99999,
+            backgroundColor: "rgba(15, 23, 42, 0.65)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "16px"
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !emailConfigSaving) setShowEmailConfigModal(false);
+          }}
+        >
+          <div 
+            style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "16px",
+              width: "100%",
+              maxWidth: "520px",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+              overflow: "hidden",
+              border: "1px solid #e2e8f0"
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{ padding: "16px 20px", background: "linear-gradient(135deg, #1e293b, #0f172a)", color: "#ffffff", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "34px", height: "34px", borderRadius: "10px", backgroundColor: "rgba(255, 255, 255, 0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Mail size={18} color="#38bdf8" />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "750", letterSpacing: "-0.01em" }}>
+                    ⚡ Automatic Email Dispatch Setup
+                  </h3>
+                  <p style={{ margin: 0, fontSize: "11px", color: "#94a3b8" }}>
+                    Deliver CRM invitation emails automatically to user inboxes
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEmailConfigModal(false)}
+                disabled={emailConfigSaving}
+                style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px" }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Form Content */}
+            <form onSubmit={handleSaveEmailConfig} style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+              
+              {/* Current Status Indicator */}
+              {emailConfigStatus.configured ? (
+                <div style={{ padding: "10px 14px", backgroundColor: "#ecfdf5", border: "1px solid #a7f3d0", borderRadius: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+                  <CheckCircle2 size={18} color="#059669" />
+                  <div style={{ fontSize: "12px", color: "#065f46" }}>
+                    <strong>Auto-Email is currently Connected & Active!</strong><br />
+                    Sender: <span style={{ fontFamily: "monospace" }}>{emailConfigStatus.senderEmail}</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: "10px 14px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "10px", display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                  <Sparkles size={18} color="#2563eb" style={{ flexShrink: 0, marginTop: "2px" }} />
+                  <div style={{ fontSize: "12px", color: "#1e40af", lineHeight: "1.5" }}>
+                    Gmail connect karne ke baad jab bhi aap naye member ko invite karenge, unhe <strong>automatic email inbox</strong> mein invite link aur PIN chala jayega!
+                  </div>
+                </div>
+              )}
+
+              {/* Instructions on how to get Google App Password */}
+              <div style={{ padding: "12px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", fontSize: "11.5px", color: "#475569" }}>
+                <div style={{ fontWeight: "750", color: "#1e293b", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <span>📋 2 Simple Steps to connect Gmail:</span>
+                </div>
+                <ol style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  <li>
+                    Google App Passwords page open kare:{" "}
+                    <a 
+                      href="https://myaccount.google.com/apppasswords" 
+                      target="_blank" 
+                      rel="noreferrer"
+                      style={{ color: "#2563eb", fontWeight: "700", textDecoration: "underline" }}
+                    >
+                      myaccount.google.com/apppasswords <ExternalLink size={11} style={{ display: "inline" }} />
+                    </a>
+                  </li>
+                  <li>
+                    App Name mein <strong>ApexSales CRM</strong> likhe aur <strong>Create</strong> kare. Jo 16-letter password milega, use yaha paste kare.
+                  </li>
+                </ol>
+              </div>
+
+              {/* Input: Gmail Address */}
+              <div>
+                <label style={{ display: "block", fontSize: "11.5px", fontWeight: "750", color: "#334155", marginBottom: "5px" }}>
+                  Sender Gmail Address *
+                </label>
+                <input
+                  type="email"
+                  placeholder="e.g. yourcompany@gmail.com"
+                  value={emailConfigForm.user}
+                  onChange={(e) => setEmailConfigForm(prev => ({ ...prev, user: e.target.value }))}
+                  required
+                  disabled={emailConfigSaving}
+                  style={{ width: "100%", padding: "9px 12px", fontSize: "12.5px", border: "1.5px solid #cbd5e1", borderRadius: "8px", boxSizing: "border-box" }}
+                />
+              </div>
+
+              {/* Input: 16-digit App Password */}
+              <div>
+                <label style={{ display: "block", fontSize: "11.5px", fontWeight: "750", color: "#334155", marginBottom: "5px" }}>
+                  16-digit Google App Password *
+                </label>
+                <input
+                  type="password"
+                  placeholder="e.g. abcd efgh ijkl mnop"
+                  value={emailConfigForm.pass}
+                  onChange={(e) => setEmailConfigForm(prev => ({ ...prev, pass: e.target.value }))}
+                  required
+                  disabled={emailConfigSaving}
+                  style={{ width: "100%", padding: "9px 12px", fontSize: "12.5px", border: "1.5px solid #cbd5e1", borderRadius: "8px", boxSizing: "border-box", letterSpacing: "1px" }}
+                />
+                <div style={{ fontSize: "10.5px", color: "#64748b", marginTop: "4px" }}>
+                  🔒 Regular Gmail password kaam nahi karega, sirf 16-letter App Password hi secure email sending ke liye use hota hai.
+                </div>
+              </div>
+
+              {/* Error Alert */}
+              {emailConfigError && (
+                <div style={{ padding: "10px 12px", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", fontSize: "11.5px", color: "#b91c1c", display: "flex", alignItems: "flex-start", gap: "8px" }}>
+                  <AlertCircle size={15} style={{ flexShrink: 0, marginTop: "2px" }} />
+                  <span>{emailConfigError}</span>
+                </div>
+              )}
+
+              {/* Modal Buttons */}
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "6px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowEmailConfigModal(false)}
+                  disabled={emailConfigSaving}
+                  style={{ padding: "8px 16px", backgroundColor: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "12px", fontWeight: "650", cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={emailConfigSaving}
+                  style={{
+                    padding: "8px 20px",
+                    backgroundColor: emailConfigSaving ? "#94a3b8" : "#2563eb",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontSize: "12px",
+                    fontWeight: "750",
+                    cursor: emailConfigSaving ? "not-allowed" : "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}
+                >
+                  {emailConfigSaving ? (
+                    <>
+                      <RotateCw size={14} className="animate-spin" />
+                      <span>Verifying & Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check size={14} />
+                      <span>Verify & Connect Gmail</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+            </form>
           </div>
         </div>
       )}
