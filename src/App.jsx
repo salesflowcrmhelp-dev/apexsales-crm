@@ -1205,13 +1205,6 @@ export default function App() {
   // Email Login & Created Invite Sharing States
   const [loginEmail, setLoginEmail] = useState("");
   const [createdInviteInfo, setCreatedInviteInfo] = useState(null);
-
-  // Automatic Email Dispatch (API / SMTP) States
-  const [emailConfigStatus, setEmailConfigStatus] = useState({ configured: false, provider: "", senderEmail: "" });
-  const [showEmailConfigModal, setShowEmailConfigModal] = useState(false);
-  const [emailConfigForm, setEmailConfigForm] = useState({ type: "resend", apiKey: "", user: "", pass: "", senderEmail: "" });
-  const [emailConfigSaving, setEmailConfigSaving] = useState(false);
-  const [emailConfigError, setEmailConfigError] = useState("");
   const [customFields, setCustomFields] = useState(() => {
     try {
       const saved = localStorage.getItem("crm_custom_fields");
@@ -2192,59 +2185,6 @@ export default function App() {
       }
     } catch(err) {
       showToast("Network error creating invitation.", "error");
-    }
-  };
-
-  const loadEmailConfigStatus = async () => {
-    try {
-      const res = await fetch("/api/settings/email");
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.success) {
-          setEmailConfigStatus(data);
-          if (data.senderEmail) {
-            setEmailConfigForm(prev => ({ ...prev, user: data.senderEmail }));
-          }
-        }
-      }
-    } catch(e) {}
-  };
-
-  const handleSaveEmailConfig = async (e) => {
-    if (e) e.preventDefault();
-    const isApi = emailConfigForm.type === "resend" || emailConfigForm.type === "brevo";
-    if (isApi && !emailConfigForm.apiKey.trim()) {
-      setEmailConfigError(`Please provide your ${emailConfigForm.type === "resend" ? "Resend" : "Brevo"} API Key.`);
-      return;
-    }
-    if (!isApi && (!emailConfigForm.user.trim() || !emailConfigForm.pass.trim())) {
-      setEmailConfigError("Please provide your Gmail address and 16-character App Password.");
-      return;
-    }
-    setEmailConfigSaving(true);
-    setEmailConfigError("");
-    try {
-      const res = await fetch("/api/settings/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-role": currentUser?.role || "admin",
-          "x-user-name": currentUser?.name || "Admin User"
-        },
-        body: JSON.stringify(emailConfigForm)
-      });
-      const data = await res.json();
-      setEmailConfigSaving(false);
-      if (res.ok && data.success) {
-        showToast("🎉 " + data.message, "success");
-        setEmailConfigStatus({ configured: true, provider: data.provider, senderEmail: data.senderEmail });
-        setShowEmailConfigModal(false);
-      } else {
-        setEmailConfigError(data.message || "Failed to verify email credentials.");
-      }
-    } catch(err) {
-      setEmailConfigSaving(false);
-      setEmailConfigError("Network error while connecting to email server.");
     }
   };
 
@@ -3913,9 +3853,8 @@ export default function App() {
 
   // Initialize and load persistent user-edited leads + Backend Data
   useEffect(() => {
-    // 1. Fetch users and email status from central backend
+    // 1. Fetch users from central backend
     loadUsersFromBackend();
-    loadEmailConfigStatus();
 
     // 2. Fetch leads with role-based filtering from central backend
     loadLeadsFromBackend(currentUser);
@@ -17101,35 +17040,8 @@ export default function App() {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-                  {/* Auto-Email Connection Button */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmailConfigError("");
-                      setShowEmailConfigModal(true);
-                    }}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      padding: "10px 14px",
-                      backgroundColor: emailConfigStatus.configured ? "#ecfdf5" : "#fff7ed",
-                      color: emailConfigStatus.configured ? "#047857" : "#c2410c",
-                      border: emailConfigStatus.configured ? "1.5px solid #a7f3d0" : "1.5px solid #fdba74",
-                      borderRadius: "10px",
-                      fontSize: "12px",
-                      fontWeight: "750",
-                      cursor: "pointer",
-                      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.05)"
-                    }}
-                    title="Setup Gmail SMTP for 100% automated email delivery to user inboxes"
-                  >
-                    <Mail size={15} color={emailConfigStatus.configured ? "#059669" : "#ea580c"} />
-                    <span>{emailConfigStatus.configured ? `⚡ Auto-Email: Connected (${emailConfigStatus.senderEmail})` : "⚡ Setup Auto-Email (Gmail)"}</span>
-                  </button>
-
-                  {/* Invite Member Button */}
+                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  {/* Add Team Member Button */}
                   <button
                     type="button"
                     onClick={() => {
@@ -17451,18 +17363,10 @@ export default function App() {
                         🎉 Invitation Created for: {createdInviteInfo.user?.email}
                       </strong>
                     </div>
-                    {createdInviteInfo.emailSent ? (
+                    {createdInviteInfo.emailSent && (
                       <span style={{ fontSize: "11px", backgroundColor: "#bbf7d0", color: "#14532d", padding: "3px 8px", borderRadius: "6px", fontWeight: "750", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                        ✅ Auto-Email Sent to Inbox!
+                        ✅ Credentials Email Dispatched to Inbox!
                       </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setShowEmailConfigModal(true)}
-                        style={{ fontSize: "11px", backgroundColor: "#fef3c7", color: "#92400e", border: "1px solid #fde68a", padding: "3px 8px", borderRadius: "6px", fontWeight: "700", cursor: "pointer" }}
-                      >
-                        ⚡ Connect Gmail to Send Automatically
-                      </button>
                     )}
                     <button
                       type="button"
@@ -17473,15 +17377,9 @@ export default function App() {
                     </button>
                   </div>
 
-                  {createdInviteInfo.emailSent ? (
-                    <div style={{ fontSize: "11px", color: "#166534" }}>
-                      📨 The recipient will receive the activation link and login PIN directly in their inbox. You can also share the link manually below if needed:
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: "11px", color: "#854d0e", backgroundColor: "#fffbeb", padding: "6px 10px", borderRadius: "6px", border: "1px solid #fef3c7" }}>
-                      💡 Automatic email was not sent because Gmail is not connected yet. You can share the link using WhatsApp/Email buttons below, or click <strong>Setup Auto-Email</strong> above to send automatically next time!
-                    </div>
-                  )}
+                  <div style={{ fontSize: "11.5px", color: "#166534" }}>
+                    Login Password / PIN: <strong style={{ letterSpacing: "2px", color: "#0f172a", backgroundColor: "#ffffff", padding: "3px 8px", borderRadius: "5px", border: "1px solid #bbf7d0", fontFamily: "monospace", fontSize: "12.5px" }}>{createdInviteInfo.user?.pin}</strong>. Credentials ready to share:
+                  </div>
 
                   <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
                     <input 
@@ -17546,274 +17444,6 @@ export default function App() {
                 Close Window
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* ⚡ MODAL: GMAIL / SMTP AUTO-EMAIL SETUP */}
-      {showEmailConfigModal && (
-        <div 
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 99999,
-            backgroundColor: "rgba(15, 23, 42, 0.65)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "16px"
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget && !emailConfigSaving) setShowEmailConfigModal(false);
-          }}
-        >
-          <div 
-            style={{
-              backgroundColor: "#ffffff",
-              borderRadius: "16px",
-              width: "100%",
-              maxWidth: "540px",
-              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-              overflow: "hidden",
-              border: "1px solid #e2e8f0"
-            }}
-          >
-            {/* Modal Header */}
-            <div style={{ padding: "16px 20px", background: "linear-gradient(135deg, #1e293b, #0f172a)", color: "#ffffff", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div style={{ width: "34px", height: "34px", borderRadius: "10px", backgroundColor: "rgba(255, 255, 255, 0.12)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Zap size={18} color="#38bdf8" />
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "750", letterSpacing: "-0.01em" }}>
-                    ⚡ Auto-Email Setup (API & SMTP)
-                  </h3>
-                  <p style={{ margin: 0, fontSize: "11px", color: "#94a3b8" }}>
-                    Deliver CRM invitation emails automatically to user inboxes
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowEmailConfigModal(false)}
-                disabled={emailConfigSaving}
-                style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px" }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Provider Tabs */}
-            <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", backgroundColor: "#f8fafc" }}>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmailConfigForm(prev => ({ ...prev, type: "resend" }));
-                  setEmailConfigError("");
-                }}
-                style={{
-                  flex: 1,
-                  padding: "10px 14px",
-                  fontSize: "12px",
-                  fontWeight: emailConfigForm.type === "resend" ? "750" : "600",
-                  color: emailConfigForm.type === "resend" ? "#2563eb" : "#64748b",
-                  backgroundColor: emailConfigForm.type === "resend" ? "#ffffff" : "transparent",
-                  border: "none",
-                  borderBottom: emailConfigForm.type === "resend" ? "2.5px solid #2563eb" : "2.5px solid transparent",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px"
-                }}
-              >
-                <Zap size={14} color={emailConfigForm.type === "resend" ? "#2563eb" : "#94a3b8"} />
-                <span>Resend API (Recommended)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setEmailConfigForm(prev => ({ ...prev, type: "smtp" }));
-                  setEmailConfigError("");
-                }}
-                style={{
-                  flex: 1,
-                  padding: "10px 14px",
-                  fontSize: "12px",
-                  fontWeight: emailConfigForm.type === "smtp" ? "750" : "600",
-                  color: emailConfigForm.type === "smtp" ? "#2563eb" : "#64748b",
-                  backgroundColor: emailConfigForm.type === "smtp" ? "#ffffff" : "transparent",
-                  border: "none",
-                  borderBottom: emailConfigForm.type === "smtp" ? "2.5px solid #2563eb" : "2.5px solid transparent",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px"
-                }}
-              >
-                <Mail size={14} color={emailConfigForm.type === "smtp" ? "#2563eb" : "#94a3b8"} />
-                <span>Gmail SMTP</span>
-              </button>
-            </div>
-
-            {/* Modal Form Content */}
-            <form onSubmit={handleSaveEmailConfig} style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: "12px" }}>
-              
-              {/* Current Status Indicator */}
-              {emailConfigStatus.configured ? (
-                <div style={{ padding: "10px 14px", backgroundColor: "#ecfdf5", border: "1px solid #a7f3d0", borderRadius: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
-                  <CheckCircle2 size={18} color="#059669" />
-                  <div style={{ fontSize: "12px", color: "#065f46" }}>
-                    <strong>Auto-Email is currently Connected & Active!</strong><br />
-                    Provider: <span style={{ textTransform: "capitalize", fontWeight: "700" }}>{emailConfigStatus.provider || "Active"}</span> ({emailConfigStatus.senderEmail})
-                  </div>
-                </div>
-              ) : null}
-
-              {/* TAB 1: RESEND EMAIL API */}
-              {emailConfigForm.type === "resend" && (
-                <>
-                  <div style={{ padding: "12px 14px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "10px", fontSize: "11.5px", color: "#1e40af" }}>
-                    <div style={{ fontWeight: "750", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span>🚀 3 Simple Steps via Resend API (No Google Password Needed):</span>
-                    </div>
-                    <ol style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "4px" }}>
-                      <li>
-                        Open Resend:{" "}
-                        <a 
-                          href="https://resend.com" 
-                          target="_blank" 
-                          rel="noreferrer"
-                          style={{ color: "#2563eb", fontWeight: "700", textDecoration: "underline" }}
-                        >
-                          resend.com <ExternalLink size={11} style={{ display: "inline" }} />
-                        </a>{" "}
-                        and click <strong>"Sign in with GitHub"</strong> (1 click).
-                      </li>
-                      <li>
-                        Menu mein <strong>API Keys</strong> par jayein aur <strong>Create API Key</strong> dabayein.
-                      </li>
-                      <li>
-                        Jo key milegi (jaise <code style={{ backgroundColor: "#dbeafe", padding: "1px 4px", borderRadius: "4px" }}>re_123456...</code>), use yaha paste karein!
-                      </li>
-                    </ol>
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: "750", color: "#334155", marginBottom: "5px" }}>
-                      Resend API Key *
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="e.g. re_12345678_abcdef"
-                      value={emailConfigForm.apiKey}
-                      onChange={(e) => setEmailConfigForm(prev => ({ ...prev, apiKey: e.target.value }))}
-                      required
-                      disabled={emailConfigSaving}
-                      style={{ width: "100%", padding: "9px 12px", fontSize: "12.5px", border: "1.5px solid #cbd5e1", borderRadius: "8px", boxSizing: "border-box", fontFamily: "monospace" }}
-                    />
-                    <div style={{ fontSize: "10.5px", color: "#64748b", marginTop: "4px" }}>
-                      💡 Resend API is 100% free and sends emails straight to inboxes in 0.1 seconds.
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* TAB 2: GMAIL SMTP */}
-              {emailConfigForm.type === "smtp" && (
-                <>
-                  <div style={{ padding: "12px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", fontSize: "11.5px", color: "#475569" }}>
-                    <div style={{ fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
-                      📋 Gmail App Password Connection:
-                    </div>
-                    <div>
-                      Google Account par <strong>2-Step Verification ON</strong> hona zaroori hai. Phir Google Security mein jakar 16-letter App Password banayein.
-                    </div>
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: "750", color: "#334155", marginBottom: "5px" }}>
-                      Sender Gmail Address *
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="e.g. yourcompany@gmail.com"
-                      value={emailConfigForm.user}
-                      onChange={(e) => setEmailConfigForm(prev => ({ ...prev, user: e.target.value }))}
-                      disabled={emailConfigSaving}
-                      style={{ width: "100%", padding: "9px 12px", fontSize: "12.5px", border: "1.5px solid #cbd5e1", borderRadius: "8px", boxSizing: "border-box" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", fontSize: "11.5px", fontWeight: "750", color: "#334155", marginBottom: "5px" }}>
-                      16-digit Google App Password *
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="e.g. abcd efgh ijkl mnop"
-                      value={emailConfigForm.pass}
-                      onChange={(e) => setEmailConfigForm(prev => ({ ...prev, pass: e.target.value }))}
-                      disabled={emailConfigSaving}
-                      style={{ width: "100%", padding: "9px 12px", fontSize: "12.5px", border: "1.5px solid #cbd5e1", borderRadius: "8px", boxSizing: "border-box", letterSpacing: "1px" }}
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* Error Alert */}
-              {emailConfigError && (
-                <div style={{ padding: "10px 12px", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "8px", fontSize: "11.5px", color: "#b91c1c", display: "flex", alignItems: "flex-start", gap: "8px" }}>
-                  <AlertCircle size={15} style={{ flexShrink: 0, marginTop: "2px" }} />
-                  <span>{emailConfigError}</span>
-                </div>
-              )}
-
-              {/* Modal Buttons */}
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "4px" }}>
-                <button
-                  type="button"
-                  onClick={() => setShowEmailConfigModal(false)}
-                  disabled={emailConfigSaving}
-                  style={{ padding: "8px 16px", backgroundColor: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "12px", fontWeight: "650", cursor: "pointer" }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={emailConfigSaving}
-                  style={{
-                    padding: "8px 20px",
-                    backgroundColor: emailConfigSaving ? "#94a3b8" : "#2563eb",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontSize: "12px",
-                    fontWeight: "750",
-                    cursor: emailConfigSaving ? "not-allowed" : "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px"
-                  }}
-                >
-                  {emailConfigSaving ? (
-                    <>
-                      <RotateCw size={14} className="animate-spin" />
-                      <span>Verifying & Connecting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check size={14} />
-                      <span>Verify & Connect {emailConfigForm.type === "resend" ? "Resend API" : "Gmail"}</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-            </form>
           </div>
         </div>
       )}
