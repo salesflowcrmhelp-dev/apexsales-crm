@@ -2174,7 +2174,7 @@ export default function App() {
         if (data.emailSent) {
           showToast(`🎉 User created! Branded email with login password sent to ${newUserData.email}`, "success");
         } else {
-          showToast(`User created! Login PIN: ${data.user?.pin || newUserData.pin}`, "success");
+          showToast(`User created! Click "1-Click Gmail" below to send credentials to ${newUserData.email}`, "info");
         }
         setCreatedInviteInfo(data);
         setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", email: "", phone: "" });
@@ -17363,9 +17363,13 @@ export default function App() {
                         🎉 Invitation Created for: {createdInviteInfo.user?.email}
                       </strong>
                     </div>
-                    {createdInviteInfo.emailSent && (
+                    {createdInviteInfo.emailSent ? (
                       <span style={{ fontSize: "11px", backgroundColor: "#bbf7d0", color: "#14532d", padding: "3px 8px", borderRadius: "6px", fontWeight: "750", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                         ✅ Credentials Email Dispatched to Inbox!
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: "11px", backgroundColor: "#fef3c7", color: "#92400e", padding: "3px 8px", borderRadius: "6px", fontWeight: "700", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                        ⚠️ Resend sandbox blocks external emails. Click "1-Click Gmail" below!
                       </span>
                     )}
                     <button
