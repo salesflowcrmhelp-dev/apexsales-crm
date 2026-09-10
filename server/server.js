@@ -64,7 +64,7 @@ async function getEmailConfig() {
     return { type: 'smtp', ...local.settings.smtp };
   }
   if (ENV_RESEND_KEY) {
-    return { type: 'resend', apiKey: ENV_RESEND_KEY, fromEmail: 'ApexSales CRM <onboarding@resend.dev>' };
+    return { type: 'resend', apiKey: ENV_RESEND_KEY, fromEmail: 'ApexSales CRM <welcome@salesflowhub.cloud>' };
   }
   if (ENV_BREVO_KEY) {
     return { type: 'brevo', apiKey: ENV_BREVO_KEY };
@@ -183,7 +183,7 @@ async function sendInvitationEmail({ toEmail, recipientName, role, inviteUrl, in
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: cfg.fromEmail || 'ApexSales CRM <onboarding@resend.dev>',
+          from: cfg.fromEmail || 'ApexSales CRM <welcome@salesflowhub.cloud>',
           to: [toEmail],
           subject: `🎉 Welcome to ApexSales CRM - Your Account & Login Password`,
           html: emailHtml

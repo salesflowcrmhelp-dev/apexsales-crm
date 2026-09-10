@@ -17325,11 +17325,11 @@ export default function App() {
                     </div>
                     {createdInviteInfo.emailSent ? (
                       <span style={{ fontSize: "11px", backgroundColor: "#bbf7d0", color: "#14532d", padding: "3px 8px", borderRadius: "6px", fontWeight: "750", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                        ✅ Credentials Email Dispatched to Inbox!
+                        ✅ Official Email Dispatched from @salesflowhub.cloud!
                       </span>
                     ) : (
                       <span style={{ fontSize: "11px", backgroundColor: "#fef3c7", color: "#92400e", padding: "3px 8px", borderRadius: "6px", fontWeight: "700", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                        ⚠️ Resend sandbox blocks external emails. Click "1-Click Gmail" below!
+                        ⚠️ Click "1-Click Gmail" or "WhatsApp" below to share!
                       </span>
                     )}
                     <button
