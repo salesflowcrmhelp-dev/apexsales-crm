@@ -123,7 +123,7 @@
       "id": "lead_juned",
       "name": "Juned Malkani",
       "company": "",
-      "status": "Negotiation",
+      "status": "Won",
       "value": 20000,
       "email": "sumalkani@gmail.com",
       "phone": "9428730989",
@@ -131,7 +131,9 @@
       "score": "Warm",
       "next_follow_up": "2026-09-10",
       "notes": "",
-      "owner": "Rohan Sharma"
+      "owner": "Rohan Sharma",
+      "won_date": "2026-09-10",
+      "updatedAt": "2026-09-10T12:14:04.927Z"
     },
     {
       "id": "lead_chetan",
