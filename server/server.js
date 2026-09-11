@@ -389,16 +389,38 @@ let mongoClient = null;
 let mongoDb = null;
 let isMongoConnected = false;
 
-// Helper: Read local JSON database safely
+// Helper: Read local JSON database safely with auto-healing from db_backup.json
 function readLocalDB() {
+  const BACKUP_FILE = path.join(__dirname, 'data', 'db_backup.json');
   try {
     if (!fs.existsSync(DB_FILE)) {
+      if (fs.existsSync(BACKUP_FILE)) {
+        console.log('🛡️ Auto-healing: Restoring db.json from server/data/db_backup.json');
+        const b = JSON.parse(fs.readFileSync(BACKUP_FILE, 'utf8'));
+        writeLocalDB(b);
+        return b;
+      }
       return { users: [], leads: [] };
     }
     const raw = fs.readFileSync(DB_FILE, 'utf8');
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if ((!parsed.leads || parsed.leads.length === 0) && fs.existsSync(BACKUP_FILE)) {
+      console.log('🛡️ Zero leads in db.json: Auto-healing from db_backup.json');
+      const b = JSON.parse(fs.readFileSync(BACKUP_FILE, 'utf8'));
+      if (b.leads && b.leads.length > 0) {
+        parsed.leads = b.leads;
+        if (!parsed.users || parsed.users.length === 0) parsed.users = b.users || [];
+        writeLocalDB(parsed);
+      }
+    }
+    return parsed;
   } catch (err) {
     console.error('Error reading db.json:', err);
+    if (fs.existsSync(BACKUP_FILE)) {
+      try {
+        return JSON.parse(fs.readFileSync(BACKUP_FILE, 'utf8'));
+      } catch(e) {}
+    }
     return { users: [], leads: [] };
   }
 }
@@ -506,10 +528,23 @@ async function getLeads() {
   if (isMongoConnected && mongoDb) {
     try {
       const docs = await mongoDb.collection('leads').find({}).toArray();
-      return docs.map(d => {
-        const { _id, ...rest } = d;
-        return rest;
-      });
+      if (docs && docs.length > 0) {
+        return docs.map(d => {
+          const { _id, ...rest } = d;
+          return rest;
+        });
+      }
+      // If MongoDB connected but has 0 leads, auto-heal from local backup and re-seed
+      console.warn('⚠️ MongoDB Atlas returned 0 leads. Auto-recovering from local data vault...');
+      const local = readLocalDB();
+      if (local.leads && local.leads.length > 0) {
+        for (const lead of local.leads) {
+          const { _id, ...clean } = lead;
+          await mongoDb.collection('leads').updateOne({ id: String(clean.id) }, { $set: clean }, { upsert: true });
+        }
+        console.log(`🛡️ Auto-recovered ${local.leads.length} leads into MongoDB Atlas.`);
+        return local.leads;
+      }
     } catch (e) {
       console.error('MongoDB getLeads error:', e);
     }
@@ -615,7 +650,26 @@ async function syncBulkData(leads, users) {
     });
   }
   writeLocalDB(local);
+  if (Array.isArray(local.leads) && local.leads.length >= 15) {
+    try {
+      const backupFile = path.join(__dirname, 'data', 'db_backup.json');
+      fs.writeFileSync(backupFile, JSON.stringify({
+        timestamp: new Date().toISOString(),
+        updatedBy: 'auto_sync',
+        users: local.users,
+        leads: local.leads
+      }, null, 2), 'utf8');
+    } catch(e) {}
+  }
 }
+
+// Helper to check super admin status across all routes
+export const isSuperAdminEmailOrName = (u) => {
+  if (!u) return false;
+  const email = (u.email || '').toLowerCase().trim();
+  const name = (u.name || '').toLowerCase().trim();
+  return email === 'harsh.accomation@gmail.com' || email === 'salesflowcrmhelp@gmail.com' || email === 'admin@apexsales.com' || name === 'harsh' || name === 'harsh goyal' || name === 'admin user' || name === 'admin';
+};
 
 // --- AUTHENTICATION & ROLE RESOLUTION MIDDLEWARE ---
 app.use(async (req, res, next) => {
@@ -634,6 +688,9 @@ app.use(async (req, res, next) => {
       const uId = parts.slice(1, -1).join('_');
       const user = allUsers.find(u => u.id === uId && u.active !== false);
       if (user) {
+        if (isSuperAdminEmailOrName(user)) {
+          user.role = 'admin';
+        }
         req.user = user;
         return next();
       }
@@ -644,12 +701,16 @@ app.use(async (req, res, next) => {
   if (userHeaderRole && userHeaderName) {
     const matchedUser = allUsers.find(u => (u.id === userHeaderId || u.name === userHeaderName) && u.active !== false);
     if (matchedUser) {
+      if (isSuperAdminEmailOrName(matchedUser)) {
+        matchedUser.role = 'admin';
+      }
       req.user = matchedUser;
     } else {
+      const isSuper = isSuperAdminEmailOrName({ name: userHeaderName });
       req.user = {
         id: userHeaderId || 'usr_guest',
         name: userHeaderName,
-        role: userHeaderRole === 'admin' ? 'admin' : 'sales_rep'
+        role: (userHeaderRole === 'admin' || isSuper) ? 'admin' : 'sales_rep'
       };
     }
     return next();
@@ -1440,8 +1501,13 @@ app.get('/api/leads', async (req, res) => {
   const user = req.user;
   const { owner } = req.query;
 
+  // Helper to check super admin status
+  const isSuperAdmin = !user || user.role === 'admin' || 
+    (user.email && ['harsh.accomation@gmail.com', 'salesflowcrmhelp@gmail.com', 'admin@apexsales.com'].includes(user.email.toLowerCase())) ||
+    ['harsh', 'harsh goyal', 'admin user'].includes((user.name || '').trim().toLowerCase());
+
   // 1. If user is Sales Rep: STRICT DATA ISOLATION (No Admin or peer leads leak)
-  if (user && user.role === 'sales_rep') {
+  if (!isSuperAdmin && user && user.role === 'sales_rep') {
     const userLeads = allLeads.filter(l => (l.owner || '').trim().toLowerCase() === user.name.trim().toLowerCase());
     return res.json({
       success: true,
@@ -1465,6 +1531,78 @@ app.get('/api/leads', async (req, res) => {
     count: resultLeads.length,
     leads: resultLeads
   });
+});
+
+// Admin-Only Backup & Vault Endpoints
+app.get('/api/admin/backup', async (req, res) => {
+  const isSuper = isSuperAdminEmailOrName(req.user) || req.user?.role === 'admin';
+  if (!isSuper) {
+    return res.status(403).json({ success: false, message: 'Forbidden: Admin access required.' });
+  }
+  const backupFile = path.join(__dirname, 'data', 'db_backup.json');
+  if (fs.existsSync(backupFile)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
+      return res.json({ success: true, backup: data });
+    } catch(e) {}
+  }
+  const current = readLocalDB();
+  res.json({ success: true, backup: current });
+});
+
+app.post('/api/admin/backup/restore', async (req, res) => {
+  const isSuper = isSuperAdminEmailOrName(req.user) || req.user?.role === 'admin';
+  if (!isSuper) {
+    return res.status(403).json({ success: false, message: 'Forbidden: Admin access required.' });
+  }
+  const backupFile = path.join(__dirname, 'data', 'db_backup.json');
+  if (!fs.existsSync(backupFile)) {
+    return res.status(404).json({ success: false, message: 'Backup file not found on server.' });
+  }
+  try {
+    const backup = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
+    writeLocalDB(backup);
+
+    // Sync to MongoDB Atlas
+    if (isMongoConnected && mongoDb && Array.isArray(backup.leads)) {
+      for (const lead of backup.leads) {
+        const { _id, ...clean } = lead;
+        await mongoDb.collection('leads').updateOne(
+          { id: String(clean.id) },
+          { $set: clean },
+          { upsert: true }
+        );
+      }
+    }
+    console.log(`🛡️ Admin restored database backup successfully: ${backup.leads?.length || 0} leads.`);
+    res.json({ success: true, message: 'Backup restored successfully!', leads: backup.leads });
+  } catch(err) {
+    console.error('Error restoring backup:', err);
+    res.status(500).json({ success: false, message: 'Failed to restore backup: ' + err.message });
+  }
+});
+
+app.post('/api/admin/backup/save', async (req, res) => {
+  const isSuper = isSuperAdminEmailOrName(req.user) || req.user?.role === 'admin';
+  if (!isSuper) {
+    return res.status(403).json({ success: false, message: 'Forbidden: Admin access required.' });
+  }
+  try {
+    const allLeads = await getLeads();
+    const allUsers = await getUsers();
+    const snapshot = {
+      timestamp: new Date().toISOString(),
+      updatedBy: req.user?.email || 'admin',
+      users: allUsers,
+      leads: allLeads
+    };
+    const backupFile = path.join(__dirname, 'data', 'db_backup.json');
+    fs.writeFileSync(backupFile, JSON.stringify(snapshot, null, 2), 'utf8');
+    console.log(`💾 Admin saved snapshot to db_backup.json: ${allLeads.length} leads.`);
+    res.json({ success: true, message: 'Snapshot saved to server backup vault!', count: allLeads.length });
+  } catch(err) {
+    res.status(500).json({ success: false, message: 'Failed to save snapshot: ' + err.message });
+  }
 });
 
 // Create Lead

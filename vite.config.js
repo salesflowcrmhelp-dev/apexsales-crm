@@ -169,6 +169,7 @@ export default defineConfig({
     host: true,
     port: 5173,
     proxy: {
+      '/api/admin': 'http://127.0.0.1:5000',
       '/api/auth': 'http://127.0.0.1:5000',
       '/api/leads': 'http://127.0.0.1:5000',
       '/api/users': 'http://127.0.0.1:5000',
