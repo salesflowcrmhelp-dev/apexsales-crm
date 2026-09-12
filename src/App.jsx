@@ -562,12 +562,12 @@ const INITIAL_LEADS = [
   { id: "lead_vinay_shridhar", name: "Vinay Shridhar", company: "Matins Healthcare", status: "Won", value: 11000, email: "matinshealthcare@gmail.com", phone: "9810121951", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-05", notes: "Annual plan won", owner: "Harsh Goyal" },
   { id: "lead_lingraj", name: "Lingraj R N", company: "Lingaraj RN & Co", status: "Won", value: 8000, email: "lingarajrn.co@gmail.com", phone: "7795743411", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-08", notes: "Single company license", owner: "Harsh Goyal" },
   { id: "lead_sanjeev_mali", name: "Sanjeev Mali", company: "Direct Individual", status: "Won", value: 10000, email: "sanjeevmali1971@gmail.com", phone: "9886871546", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-08", notes: "Closed won deal", owner: "Harsh Goyal" },
-  { id: "lead_hetul", name: "Hetul sanghvi", company: "Direct Individual", status: "Won", value: 15000, email: "hetuljsanghvi@gmail.com", phone: "9898113331", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-09-02", notes: "15k+GST", owner: "Rohan Sharma" },
-  { id: "lead_modi", name: "Kalpesh Modi", company: "DK Modi & Co", status: "Renewal Won", value: 15000, email: "dkmodico@gmail.com", phone: "9925004405", source: "Manual", score: "Warm", next_follow_up: "2026-09-20", won_date: "2026-09-09", notes: "20 ko payment kre ga", owner: "Amit Patel" },
-  { id: "lead_anubhav", name: "Anubhav Agarwal", company: "Direct Individual", status: "Won", value: 15000, email: "anubhavagrawal82@gmail.com", phone: "+91 98189 30423", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-28", notes: "15k+GST for 5 co. | 9910158681 Santosh", owner: "Rohan Sharma" },
+  { id: "lead_hetul", name: "Hetul sanghvi", company: "Direct Individual", status: "Won", value: 15000, email: "hetuljsanghvi@gmail.com", phone: "9898113331", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-09-02", notes: "15k+GST", owner: "Harsh Goyal" },
+  { id: "lead_modi", name: "Kalpesh Modi", company: "DK Modi & Co", status: "Renewal Won", value: 15000, email: "dkmodico@gmail.com", phone: "9925004405", source: "Manual", score: "Warm", next_follow_up: "2026-09-20", won_date: "2026-09-09", notes: "20 ko payment kre ga", owner: "Harsh Goyal" },
+  { id: "lead_anubhav", name: "Anubhav Agarwal", company: "Direct Individual", status: "Won", value: 15000, email: "anubhavagrawal82@gmail.com", phone: "+91 98189 30423", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-28", notes: "15k+GST for 5 co. | 9910158681 Santosh", owner: "Harsh Goyal" },
   { id: "lead_sanjjay", name: "Sanjjay Bablani", company: "UGPL", status: "Won", value: 15000, email: "ugpl2011@gmail.com", phone: "+91 99101 75554", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-20", notes: "15k+GST for unlimited co.", owner: "Harsh Goyal" },
   { id: "lead_ramnath", name: "Ramnath Kumar", company: "Direct Individual", status: "Won", value: 8000, email: "ramkumar31555@gmail.com", phone: "919615222555", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-19", notes: "1-2 days mai batye ga offer k liye puch rha tha", owner: "Harsh Goyal" },
-  { id: "lead_prashant", name: "Prashant Gautam", company: "Direct Individual", status: "Won", value: 10000, email: "prashantgautam903@gmail.com", phone: "+919887554903", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-09-08", notes: "10k+GST 5 co. 15k+GST unlimited co.", owner: "Priya Verma" },
+  { id: "lead_prashant", name: "Prashant Gautam", company: "Direct Individual", status: "Won", value: 10000, email: "prashantgautam903@gmail.com", phone: "+919887554903", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-09-08", notes: "10k+GST 5 co. 15k+GST unlimited co.", owner: "Harsh Goyal" },
 
   // 14 ACTIVE PIPELINE DEALS
   { id: "lead_amit_miglani", name: "Amit Miglani", company: "Direct Individual", status: "Payment Follow Up", value: 15000, email: "miglanikamit@gmail.com", phone: "98120 69041", source: "Manual", score: "Warm", next_follow_up: "2026-09-01", notes: "Payment follow-up pending. Review invoice terms for ₹10,000-₹15,000.", owner: "Harsh Goyal" },
@@ -575,14 +575,14 @@ const INITIAL_LEADS = [
   { id: "lead_surabhi", name: "Surabhi", company: "Direct Individual", status: "Payment Follow Up", value: 7000, email: "", phone: "", source: "Manual", score: "Warm", next_follow_up: "2026-08-26", notes: "Payment follow up pending", owner: "Harsh Goyal" },
   { id: "lead_ssivaa", name: "SSivaa Kumaarr", company: "Direct Individual", status: "Demo Done", value: 15000, email: "msivak99@gmail.com", phone: "+91 97032 92929", source: "Manual", score: "Warm", next_follow_up: "2026-08-23", notes: "Demo completed. Awaiting final decision.", owner: "Harsh Goyal" },
   { id: "lead_suman_saha", name: "SUMAN SAHA", company: "Maxx Solutions", status: "Demo Done", value: 5000, email: "sumanmaxx@gmail.com", phone: "9831094835", source: "Manual", score: "Warm", next_follow_up: "2026-09-01", notes: "Demo finished. Commercial discussion in progress.", owner: "Harsh Goyal" },
-  { id: "lead_juned", name: "Juned Malkani", company: "Direct Individual", status: "Negotiation", value: 20000, email: "sumalkani@gmail.com", phone: "9428730989", source: "Referral", score: "Warm", next_follow_up: "2026-09-10", notes: "Commercial quote shared, in negotiation", owner: "Rohan Sharma", updatedAt: "2026-09-10T12:14:04.927Z" },
-  { id: "lead_chetan", name: "Chetan Agarwal", company: "Direct Individual", status: "Qualified", value: 15000, email: "chetanlko1@gmail.com", phone: "7275061154", source: "Manual", score: "Hot", next_follow_up: "2026-09-11", notes: "Qualified lead", owner: "Priya Verma" },
-  { id: "lead_kalpesh_p", name: "Kalpesh Panchal", company: "Direct Individual", status: "Contacted", value: 10000, email: "kalpeshpanchal47@gmail.com", phone: "9898818993", source: "Manual", score: "Warm", next_follow_up: "2026-09-12", notes: "Initial pitch completed", owner: "Amit Patel" },
+  { id: "lead_juned", name: "Juned Malkani", company: "Direct Individual", status: "Negotiation", value: 20000, email: "sumalkani@gmail.com", phone: "9428730989", source: "Referral", score: "Warm", next_follow_up: "2026-09-10", notes: "Commercial quote shared, in negotiation", owner: "Harsh Goyal", updatedAt: "2026-09-10T12:14:04.927Z" },
+  { id: "lead_chetan", name: "Chetan Agarwal", company: "Direct Individual", status: "Qualified", value: 15000, email: "chetanlko1@gmail.com", phone: "7275061154", source: "Manual", score: "Hot", next_follow_up: "2026-09-11", notes: "Qualified lead", owner: "Harsh Goyal" },
+  { id: "lead_kalpesh_p", name: "Kalpesh Panchal", company: "Direct Individual", status: "Contacted", value: 10000, email: "kalpeshpanchal47@gmail.com", phone: "9898818993", source: "Manual", score: "Warm", next_follow_up: "2026-09-12", notes: "Initial pitch completed", owner: "Harsh Goyal" },
   { id: "lead_dipti", name: "Dipti Shah", company: "Direct Individual", status: "Renewal", value: 12000, email: "diptishah567@rediffmail.com", phone: "9687604578", source: "Manual", score: "Warm", next_follow_up: "2026-09-14", notes: "Renewal upcoming", owner: "Harsh Goyal" },
-  { id: "lead_alok", name: "Alok Kumar Gothi", company: "IMP Details", status: "Proposal Sent", value: 18000, email: "impgothidetails@gmail.com", phone: "+91 96254 52224", source: "Manual", score: "Hot", next_follow_up: "2026-09-10", notes: "Proposal dispatched", owner: "Priya Verma" },
-  { id: "lead_nitin", name: "Nitin Jain", company: "Direct Individual", status: "Contacted", value: 10000, email: "", phone: "9646541244", source: "Manual", score: "Hot", next_follow_up: "2026-09-10", notes: "Follow up scheduled", owner: "Rohan Sharma" },
-  { id: "lead_ansari", name: "Ansari Nurul Huda", company: "Direct Individual", status: "Qualified", value: 12000, email: "annu24aug@yahoo.com", phone: "919837450608", source: "Manual", score: "Warm", next_follow_up: "2026-09-11", notes: "Requirements gathering", owner: "Amit Patel" },
-  { id: "lead_ashok", name: "Ashok Kumar", company: "Direct Individual", status: "Proposal Sent", value: 15000, email: "ak80980@gmail.com", phone: "+91 96900 14241", source: "Manual", score: "Warm", next_follow_up: "2026-09-12", notes: "Proposal sent", owner: "Priya Verma" },
+  { id: "lead_alok", name: "Alok Kumar Gothi", company: "IMP Details", status: "Proposal Sent", value: 18000, email: "impgothidetails@gmail.com", phone: "+91 96254 52224", source: "Manual", score: "Hot", next_follow_up: "2026-09-10", notes: "Proposal dispatched", owner: "Harsh Goyal" },
+  { id: "lead_nitin", name: "Nitin Jain", company: "Direct Individual", status: "Contacted", value: 10000, email: "", phone: "9646541244", source: "Manual", score: "Hot", next_follow_up: "2026-09-10", notes: "Follow up scheduled", owner: "Harsh Goyal" },
+  { id: "lead_ansari", name: "Ansari Nurul Huda", company: "Direct Individual", status: "Qualified", value: 12000, email: "annu24aug@yahoo.com", phone: "919837450608", source: "Manual", score: "Warm", next_follow_up: "2026-09-11", notes: "Requirements gathering", owner: "Harsh Goyal" },
+  { id: "lead_ashok", name: "Ashok Kumar", company: "Direct Individual", status: "Proposal Sent", value: 15000, email: "ak80980@gmail.com", phone: "+91 96900 14241", source: "Manual", score: "Warm", next_follow_up: "2026-09-12", notes: "Proposal sent", owner: "Harsh Goyal" },
   { id: "lead_import_1789038270816_0_3qso", name: "Rajesh Sharma Test", company: "TechCorp Solutions", status: "New", value: 25000, email: "rajesh@techcorp.in", phone: "9876543210", source: "Website", score: "Hot", next_follow_up: "", notes: "Sample lead import test", owner: "Harsh Goyal", createdAt: "2026-09-10T11:04:30.816Z" },
 
   // 2 LOST DEALS
@@ -1185,9 +1185,14 @@ export default function App() {
   const [teamMembers, setTeamMembers] = useState(() => {
     try {
       const saved = localStorage.getItem("crm_team_members");
-      return saved ? JSON.parse(saved) : ["Admin User", "Rohan Sharma", "Priya Verma", "Amit Patel"];
+      let list = saved ? JSON.parse(saved) : ["Harsh Goyal", "Rohan Sharma", "Priya Verma", "Amit Patel"];
+      list = list.map(m => (m === "Admin User" || m === "Admin") ? "Harsh Goyal" : m);
+      if (!list.includes("Harsh Goyal")) {
+        list.unshift("Harsh Goyal");
+      }
+      return list;
     } catch(e) {
-      return ["Admin User", "Rohan Sharma", "Priya Verma", "Amit Patel"];
+      return ["Harsh Goyal", "Rohan Sharma", "Priya Verma", "Amit Patel"];
     }
   });
   // Multi-User & Role-Based Access Control (RBAC) States
@@ -1196,6 +1201,12 @@ export default function App() {
       const saved = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
       if (saved) {
         const u = JSON.parse(saved);
+        if (u.name === "Admin User" || u.name === "Admin") {
+          u.name = "Harsh Goyal";
+          u.displayName = "Harsh Goyal (Admin)";
+          sessionStorage.setItem("crm_auth_user", JSON.stringify(u));
+          localStorage.setItem("crm_auth_user", JSON.stringify(u));
+        }
         if (checkIsSuperAdmin(u)) {
           u.role = "admin";
           sessionStorage.setItem("crm_auth_user", JSON.stringify(u));
@@ -1335,7 +1346,7 @@ export default function App() {
     status: "New",
     source: "Manual",
     score: "Warm",
-    owner: "Admin User",
+    owner: "Harsh Goyal",
     next_follow_up: "",
     next_follow_up_time: "11:00 AM",
     notes: "",
@@ -1518,15 +1529,24 @@ export default function App() {
   const [userProfile, setUserProfile] = useState(() => {
     try {
       const saved = localStorage.getItem("crm_user_profile");
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const p = JSON.parse(saved);
+        if (p.fullName === "Admin User" || p.fullName === "Admin") {
+          p.fullName = "Harsh Goyal";
+          p.displayName = "Harsh Goyal (Admin)";
+          p.email = "salesflowcrmhelp@gmail.com";
+          localStorage.setItem("crm_user_profile", JSON.stringify(p));
+        }
+        return p;
+      }
     } catch(e) {}
     return {
-      fullName: "Admin User",
-      displayName: "Admin",
-      email: "admin@pipeline.crm",
-      phone: "+91 98208 92128",
-      whatsappNumber: "+91 98208 92128",
-      designation: "Super Administrator / Sales Head",
+      fullName: "Harsh Goyal",
+      displayName: "Harsh Goyal (Admin)",
+      email: "salesflowcrmhelp@gmail.com",
+      phone: "+91 97842 13450",
+      whatsappNumber: "+91 97842 13450",
+      designation: "Founder / Sales Head",
       department: "Sales & Revenue Operations",
       employeeId: "SF-ADMIN-01",
       organization: "SalesFlow CRM Workspace",
@@ -2149,7 +2169,7 @@ export default function App() {
       const res = await fetch("/api/users", {
         headers: {
           "x-user-role": currentUser?.role || "admin",
-          "x-user-name": currentUser?.name || "Admin User"
+          "x-user-name": currentUser?.name || "Harsh Goyal"
         }
       });
       if (res.ok) {
@@ -2295,7 +2315,7 @@ export default function App() {
       if (token) headers["Authorization"] = `Bearer ${token}`;
       if (currentUser) {
         headers["x-user-role"] = "admin";
-        headers["x-user-name"] = currentUser.name || "Admin User";
+        headers["x-user-name"] = currentUser.name || "Harsh Goyal";
         headers["x-user-id"] = currentUser.id || "";
       }
 
@@ -2374,7 +2394,7 @@ export default function App() {
 
       if (activeUser) {
         headers["x-user-role"] = activeUser.role || "admin";
-        headers["x-user-name"] = activeUser.name || "Admin User";
+        headers["x-user-name"] = activeUser.name || "Harsh Goyal";
         headers["x-user-id"] = activeUser.id || "";
       }
 
@@ -2403,7 +2423,7 @@ export default function App() {
 
       if (activeUser) {
         headers["x-user-role"] = activeUser.role || "admin";
-        headers["x-user-name"] = activeUser.name || "Admin User";
+        headers["x-user-name"] = activeUser.name || "Harsh Goyal";
         headers["x-user-id"] = activeUser.id || "";
       }
 
@@ -2477,12 +2497,12 @@ export default function App() {
       setIsLoggingIn(false);
       console.warn("Server login fallback:", err);
       if (pinToVerify === "482910" || pinToVerify === "123456") {
-        const adminUser = { id: "usr_admin", name: "Admin User", displayName: "Harsh Goyal (Admin)", username: "admin", role: "admin", email: emailToSubmit || "admin@apexsales.com" };
+        const adminUser = { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal (Admin)", username: "admin", role: "admin", email: emailToSubmit || "salesflowcrmhelp@gmail.com" };
         setIsLoggedIn(true);
         setLoginError("");
         setPasswordInput("");
         setCurrentUser(adminUser);
-        setCurrentLoggedInUser("Admin User");
+        setCurrentLoggedInUser("Harsh Goyal");
         setCurrentUserRole("admin");
         try {
           sessionStorage.setItem("crm_auth_user", JSON.stringify(adminUser));
@@ -2618,7 +2638,7 @@ export default function App() {
         headers: {
           "Content-Type": "application/json",
           "x-user-role": currentUser?.role || "admin",
-          "x-user-name": currentUser?.name || "Admin User"
+          "x-user-name": currentUser?.name || "Harsh Goyal"
         },
         body: JSON.stringify(newUserData)
       });
@@ -2654,7 +2674,7 @@ export default function App() {
         headers: {
           "Content-Type": "application/json",
           "x-user-role": currentUser?.role || "admin",
-          "x-user-name": currentUser?.name || "Admin User"
+          "x-user-name": currentUser?.name || "Harsh Goyal"
         },
         body: JSON.stringify(newUserData)
       });
@@ -2694,7 +2714,7 @@ export default function App() {
             method: "DELETE",
             headers: {
               "x-user-role": currentUser?.role || "admin",
-              "x-user-name": currentUser?.name || "Admin User"
+              "x-user-name": currentUser?.name || "Harsh Goyal"
             }
           });
           const data = await res.json();
@@ -3684,11 +3704,11 @@ export default function App() {
     }
     if (filterOwner) {
       if (filterOwner === "__my_leads__") {
-        baseLeads = baseLeads.filter(l => (l.owner || "Admin User") === currentLoggedInUser);
+        baseLeads = baseLeads.filter(l => (l.owner || "Harsh Goyal") === currentLoggedInUser);
       } else if (filterOwner === "__unassigned__") {
         baseLeads = baseLeads.filter(l => !l.owner || l.owner === "Unassigned");
       } else {
-        baseLeads = baseLeads.filter(l => (l.owner || "Admin User") === filterOwner);
+        baseLeads = baseLeads.filter(l => (l.owner || "Harsh Goyal") === filterOwner);
       }
     }
 
@@ -4093,7 +4113,7 @@ export default function App() {
 
   // 3. Sales Rep Performance Leaderboard Data (Filtered)
   const repLeaderboardData = useMemo(() => {
-    const reps = teamMembers && teamMembers.length > 0 ? teamMembers : ["Rohan Sharma", "Priya Verma", "Amit Patel", "Admin User"];
+    const reps = teamMembers && teamMembers.length > 0 ? teamMembers : ["Harsh Goyal", "Rohan Sharma", "Priya Verma", "Amit Patel"];
     
     let targetMultiplier = 1;
     if (reportTimeframe === "today" || reportTimeframe === "yesterday") targetMultiplier = 1 / 24;
@@ -4623,7 +4643,7 @@ export default function App() {
       status: "New",
       source: "Manual",
       score: "Warm",
-      owner: currentLoggedInUser || "Admin User",
+      owner: currentLoggedInUser || "Harsh Goyal",
       next_follow_up: "",
       next_follow_up_time: "11:00 AM",
       notes: "",
@@ -4645,7 +4665,7 @@ export default function App() {
     }
 
     const leadId = "lead_" + Date.now();
-    const assignedOwner = newLeadData.owner || currentLoggedInUser || "Admin User";
+    const assignedOwner = newLeadData.owner || currentLoggedInUser || "Harsh Goyal";
     const dealVal = parseFloat(newLeadData.value) || 0;
 
     const createdLead = {
@@ -4669,7 +4689,7 @@ export default function App() {
           title: "Lead Created",
           desc: `Lead added to pipeline and assigned to ${assignedOwner}.`,
           timestamp: new Date().toISOString(),
-          performedBy: currentLoggedInUser || "Admin User"
+          performedBy: currentLoggedInUser || "Harsh Goyal"
         }
       ],
       notes: newLeadData.notes && newLeadData.notes.trim() 
@@ -4684,7 +4704,7 @@ export default function App() {
         title: "Initial Note Added",
         desc: newLeadData.notes.trim(),
         timestamp: new Date().toISOString(),
-        performedBy: currentLoggedInUser || "Admin User"
+        performedBy: currentLoggedInUser || "Harsh Goyal"
       });
     }
 
@@ -4924,7 +4944,7 @@ export default function App() {
     const ownerIdx = findIdx(["owner", "rep", "assigned"]);
 
     const isSuper = checkIsSuperAdmin(currentUser);
-    const defaultOwner = (!isSuper && currentUser?.role === "sales_rep") ? currentUser.name : (currentUser?.name || "Admin User");
+    const defaultOwner = (!isSuper && currentUser?.role === "sales_rep") ? currentUser.name : (currentUser?.name || "Harsh Goyal");
 
     for (let i = 1; i < lines.length; i++) {
       const cells = parseCSVLine(lines[i]);
@@ -9158,7 +9178,7 @@ export default function App() {
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                       <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
-                        {userProfile.fullName || "Admin User"}
+                        {userProfile.fullName || "Harsh Goyal"}
                       </h3>
                       <span style={{ fontSize: "9.5px", fontWeight: "700", color: "#9333ea", backgroundColor: "#f3e8ff", border: "1px solid #e9d5ff", padding: "1px 6px", borderRadius: "4px" }}>
                         Super Admin
@@ -9207,7 +9227,7 @@ export default function App() {
                             type="text" 
                             value={userProfile.fullName}
                             onChange={(e) => setUserProfile({ ...userProfile, fullName: e.target.value })}
-                            placeholder="e.g. Admin User"
+                            placeholder="e.g. Harsh Goyal"
                             style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
                           />
                         </div>
@@ -9708,7 +9728,7 @@ export default function App() {
                   </thead>
                   <tbody>
                     {(allUsersList.length > 0 ? allUsersList : [
-                      { id: "usr_admin", name: "Admin User", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", phone: "9876543210" },
+                      { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", phone: "9876543210" },
                       { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", pin: "112233", role: "sales_rep", phone: "9898000001" },
                       { id: "usr_priya", name: "Priya Verma", displayName: "Priya Verma", username: "priya", pin: "223344", role: "sales_rep", phone: "9898000002" },
                       { id: "usr_amit", name: "Amit Patel", displayName: "Amit Patel", username: "amit", pin: "334455", role: "sales_rep", phone: "9898000003" }
@@ -10829,7 +10849,7 @@ export default function App() {
                                     {(lead.owner || "Admin").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                   </div>
                                   <select
-                                    value={lead.owner || "Admin User"}
+                                    value={lead.owner || "Harsh Goyal"}
                                     onChange={(e) => reassignLeadOwner(lead.id, e.target.value)}
                                     onClick={(e) => e.stopPropagation()}
                                     style={{
@@ -17590,7 +17610,7 @@ export default function App() {
                   headers: {
                     "Content-Type": "application/json",
                     "x-user-role": currentUser?.role || "admin",
-                    "x-user-name": currentUser?.name || "Admin User"
+                    "x-user-name": currentUser?.name || "Harsh Goyal"
                   },
                   body: JSON.stringify({ pin: trimmed })
                 });
@@ -18480,7 +18500,7 @@ export default function App() {
                 <div style={{ backgroundColor: "#f8fafc", borderRadius: "6px", padding: "8px 10px", border: "1px solid #e2e8f0", marginBottom: "10px" }}>
                   <strong style={{ display: "block", marginBottom: "4px", color: "#0f172a" }}>Key Sprint Highlights:</strong>
                   <ul style={{ margin: 0, paddingLeft: "16px", display: "flex", flexDirection: "column", gap: "3px", color: "#334155", fontSize: "10.5px" }}>
-                    <li><strong>Top Sales Closer:</strong> Rohan Sharma closed ₹1,80,000 (28 deals, 115% target achievement).</li>
+                    <li><strong>Top Sales Closer:</strong> Harsh Goyal closed ₹1,80,000 (28 deals, 115% target achievement).</li>
                     <li><strong>Pipeline Distribution:</strong> 42 active qualified leads totaling ₹6.20L across Negotiation (35%) & Proposal Sent (28%).</li>
                     <li><strong>Client Renewal Health:</strong> ₹1,24,000 ARR secured in renewals with 100% on-time retention.</li>
                     <li><strong>Pace vs Target:</strong> Trending +14.2% ahead of last month's velocity pace.</li>
@@ -18499,7 +18519,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => {
-                    const text = `📊 *[ApexSales] Weekly Executive Revenue Digest*\n\n💰 *Realized Revenue (M-T-D):* ₹4,85,000 (inc. 18% GST)\n📈 *Expected Month-End:* ₹6,20,000 (Weighted Forecast)\n🎯 *Team Win Rate:* 68% (Target: 65%)\n⚡ *Avg Closing Velocity:* 3.2 Days\n🥇 *Top Performer:* Rohan Sharma (₹1,80,000 | 115% Quota)\n🔄 *Client Renewal ARR:* ₹1,24,000 Protected\n\n_Auto-dispatched via ApexSales CRM Intelligence_`;
+                    const text = `📊 *[ApexSales] Weekly Executive Revenue Digest*\n\n💰 *Realized Revenue (M-T-D):* ₹4,85,000 (inc. 18% GST)\n📈 *Expected Month-End:* ₹6,20,000 (Weighted Forecast)\n🎯 *Team Win Rate:* 68% (Target: 65%)\n⚡ *Avg Closing Velocity:* 3.2 Days\n🥇 *Top Performer:* Harsh Goyal (₹1,80,000 | 115% Quota)\n🔄 *Client Renewal ARR:* ₹1,24,000 Protected\n\n_Auto-dispatched via ApexSales CRM Intelligence_`;
                     navigator.clipboard.writeText(text);
                     showToast("Copied digest for WhatsApp broadcast! 🚀");
                   }}
@@ -18517,7 +18537,7 @@ export default function App() {
                       "- Realized Revenue (M-T-D): ₹4,85,000 (inc. 18% GST)\n" +
                       "- Expected Month-End: ₹6,20,000 (Weighted Forecast)\n" +
                       "- Team Win Rate: 68% (Target: 65%)\n" +
-                      "- Top Performer: Rohan Sharma (₹1,80,000 | 115% Quota)\n" +
+                      "- Top Performer: Harsh Goyal (₹1,80,000 | 115% Quota)\n" +
                       "- Retention & Renewal ARR: ₹1,24,000 Protected\n\n" +
                       "Regards,\nApexSales Intelligence Cockpit"
                     );
@@ -18820,7 +18840,7 @@ export default function App() {
                   </thead>
                   <tbody>
                     {(allUsersList.length > 0 ? allUsersList : [
-                      { id: "usr_admin", name: "Admin User", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", email: "admin@apexsales.com", status: "active" },
+                      { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", email: "salesflowcrmhelp@gmail.com", status: "active" },
                       { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", pin: "112233", role: "sales_rep", email: "rohan@apexsales.com", status: "active" },
                       { id: "usr_priya", name: "Priya Verma", displayName: "Priya Verma", username: "priya", pin: "223344", role: "sales_rep", email: "priya@apexsales.com", status: "active" },
                       { id: "usr_amit", name: "Amit Patel", displayName: "Amit Patel", username: "amit", pin: "334455", role: "sales_rep", email: "amit@apexsales.com", status: "active" }

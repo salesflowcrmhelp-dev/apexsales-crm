@@ -776,7 +776,7 @@ app.post('/api/auth/login', async (req, res) => {
   if (!user && (cleanPin === '482910' || cleanPin === '123456')) {
     user = allUsers.find(u => u.role === 'admin') || {
       id: 'usr_admin',
-      name: 'Admin User',
+      name: 'Harsh Goyal',
       displayName: 'Harsh Goyal (Admin)',
       username: 'admin',
       role: 'admin',
@@ -1615,7 +1615,7 @@ app.post('/api/leads', async (req, res) => {
   }
 
   // Security enforcement: If sales rep creates a lead, it MUST be owned by that rep
-  let assignedOwner = leadData.owner || 'Admin User';
+  let assignedOwner = leadData.owner || 'Harsh Goyal';
   if (user && user.role === 'sales_rep') {
     assignedOwner = user.name;
   }
