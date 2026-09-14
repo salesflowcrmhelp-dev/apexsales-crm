@@ -672,47 +672,63 @@ function CircularProgress({ percentage, color = "#ea580c", size = 52, strokeWidt
   );
 }
 
-// Global Super Admin check helper
+// Global Super Admin check helper (Harsh Goyal only)
 function checkIsSuperAdmin(u) {
   if (!u) return false;
-  if (u.role === "admin") return true;
   const email = (u.email || "").toLowerCase().trim();
-  if (email === "harsh.accomation@gmail.com" || email === "salesflowcrmhelp@gmail.com" || email === "admin@apexsales.com") return true;
   const name = (u.name || "").toLowerCase().trim();
-  if (name === "harsh" || name === "harsh goyal" || name === "admin user" || name === "admin") return true;
-  return false;
+  const username = (u.username || "").toLowerCase().trim();
+  const id = (u.id || "").toLowerCase().trim();
+
+  const isHarshEmail = email === "harsh.accomation@gmail.com" || 
+                       email === "salesflowcrmhelp@gmail.com" || 
+                       email === "admin@apexsales.com";
+  const isHarshName = name === "harsh" || 
+                      name === "harsh goyal" || 
+                      name === "admin user" || 
+                      name === "admin";
+  const isHarshUsername = username === "admin" || 
+                          username === "harsh" || 
+                          username === "salesflowcrmhelp";
+  const isHarshId = id === "usr_admin";
+
+  return isHarshEmail || isHarshName || isHarshUsername || isHarshId;
 }
 
 export default function App() {
   const [leads, setLeads] = useState(() => {
     try {
       const savedUser = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
-      if (savedUser) {
-        const u = JSON.parse(savedUser);
-        const isSuper = checkIsSuperAdmin(u);
-        if (isSuper) {
-          u.role = "admin";
-          try { 
-            sessionStorage.setItem("crm_auth_user", JSON.stringify(u)); 
-            localStorage.setItem("crm_auth_user", JSON.stringify(u)); 
-          } catch(e) {}
-        }
-        if (!isSuper && u.role === "sales_rep") {
-          const userNameLower = (u.name || "").trim().toLowerCase();
-          const repLeads = INITIAL_LEADS.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
-          return repLeads.map(sanitizeLeadObject);
-        }
+      const savedToken = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
+      if (!savedUser || !savedToken) {
+        return []; // Strict isolation: Not logged in = ZERO leads in memory!
       }
-      const localVault = localStorage.getItem("salesflow_admin_vault_backup") || localStorage.getItem("salesflow_standalone_leads");
-      if (localVault) {
-        const parsed = JSON.parse(localVault);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map(sanitizeLeadObject);
+      const u = JSON.parse(savedUser);
+      const isSuper = checkIsSuperAdmin(u);
+      if (isSuper) {
+        u.role = "admin";
+        try { 
+          sessionStorage.setItem("crm_auth_user", JSON.stringify(u)); 
+          localStorage.setItem("crm_auth_user", JSON.stringify(u)); 
+        } catch(e) {}
+        const localVault = localStorage.getItem("salesflow_admin_vault_backup") || localStorage.getItem("salesflow_standalone_leads");
+        if (localVault) {
+          const parsed = JSON.parse(localVault);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.map(sanitizeLeadObject);
+          }
         }
+        return INITIAL_LEADS.map(sanitizeLeadObject);
       }
-      return INITIAL_LEADS.map(sanitizeLeadObject);
+      // Sales rep: Strict zero-leakage isolation!
+      const cachedRepLeads = sessionStorage.getItem(`salesflow_rep_leads_${u.id || u.name}`);
+      if (cachedRepLeads) {
+        const parsed = JSON.parse(cachedRepLeads);
+        if (Array.isArray(parsed)) return parsed.map(sanitizeLeadObject);
+      }
+      return [];
     } catch(e) {
-      return INITIAL_LEADS.map(sanitizeLeadObject);
+      return [];
     }
   });
   const [selectedCell, setSelectedCell] = useState(null); // { rowIndex, colIndex }
@@ -1204,50 +1220,36 @@ export default function App() {
       const saved = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
       if (saved) {
         const u = JSON.parse(saved);
-        if (u.name === "Admin User" || u.name === "Admin") {
-          u.name = "Harsh Goyal";
-          u.displayName = "Harsh Goyal (Admin)";
-          sessionStorage.setItem("crm_auth_user", JSON.stringify(u));
-          localStorage.setItem("crm_auth_user", JSON.stringify(u));
-        }
         if (checkIsSuperAdmin(u)) {
           u.role = "admin";
+          if (u.name === "Admin User" || u.name === "Admin") {
+            u.name = "Harsh Goyal";
+            u.displayName = "Harsh Goyal (Admin)";
+          }
+          try {
+            sessionStorage.setItem("crm_auth_user", JSON.stringify(u));
+            localStorage.setItem("crm_auth_user", JSON.stringify(u));
+          } catch(e) {}
+          return u;
+        }
+        // Non-super admin is strictly sales_rep
+        u.role = "sales_rep";
+        try {
           sessionStorage.setItem("crm_auth_user", JSON.stringify(u));
           localStorage.setItem("crm_auth_user", JSON.stringify(u));
-        }
+        } catch(e) {}
         return u;
       }
-      const defaultAdmin = {
-        id: "usr_admin",
-        name: "Harsh Goyal",
-        displayName: "Harsh Goyal (Admin)",
-        username: "admin",
-        role: "admin",
-        email: "salesflowcrmhelp@gmail.com"
-      };
-      try {
-        sessionStorage.setItem("crm_auth_user", JSON.stringify(defaultAdmin));
-        sessionStorage.setItem("crm_auth_token", "admin_session_token");
-        localStorage.setItem("crm_auth_user", JSON.stringify(defaultAdmin));
-        localStorage.setItem("crm_auth_token", "admin_session_token");
-      } catch(e) {}
-      return defaultAdmin;
+      return null;
     } catch(e) {
-      return {
-        id: "usr_admin",
-        name: "Harsh Goyal",
-        displayName: "Harsh Goyal (Admin)",
-        username: "admin",
-        role: "admin",
-        email: "salesflowcrmhelp@gmail.com"
-      };
+      return null;
     }
   });
   const [currentUserRole, setCurrentUserRole] = useState(() => {
     if (checkIsSuperAdmin(currentUser)) {
       return "admin";
     }
-    return currentUser?.role || "admin";
+    return currentUser?.role || "sales_rep";
   });
   const [currentLoggedInUser, setCurrentLoggedInUser] = useState(() => currentUser?.name || "");
   const [allUsersList, setAllUsersList] = useState([]);
@@ -1981,10 +1983,13 @@ export default function App() {
       if (new URLSearchParams(window.location.search).get("lock") === "true") return false;
       const savedUser = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
       const savedToken = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
-      if (savedUser && savedToken) return true;
-      return true; // Default workspace access unlocked as Admin
+      if (savedUser && savedToken) {
+        const u = JSON.parse(savedUser);
+        if (u && (u.id || u.name)) return true;
+      }
+      return false; // Strict privacy: Workspace locked until valid login/PIN verification!
     } catch(e) {
-      return true;
+      return false;
     }
   });
   const [savedPassword, setSavedPassword] = useState("");
@@ -2225,20 +2230,20 @@ export default function App() {
       let activeUser = userToUse || currentUser;
       if (!activeUser) {
         try {
-          const saved = sessionStorage.getItem("crm_auth_user");
+          const saved = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
           if (saved) activeUser = JSON.parse(saved);
         } catch(e) {}
       }
-      const isSuper = checkIsSuperAdmin(activeUser);
-      if (isSuper && activeUser) {
-        activeUser = { ...activeUser, role: "admin" };
-      }
       if (!activeUser) return [];
+
+      const isSuper = checkIsSuperAdmin(activeUser);
+      activeUser = { ...activeUser, role: isSuper ? "admin" : "sales_rep" };
+
       const headers = {};
-      headers["x-user-role"] = (isSuper || activeUser.role === "admin") ? "admin" : (activeUser.role || "sales_rep");
+      headers["x-user-role"] = isSuper ? "admin" : "sales_rep";
       headers["x-user-name"] = activeUser.name || "";
       headers["x-user-id"] = activeUser.id || "";
-      const token = sessionStorage.getItem("crm_auth_token");
+      const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
       const res = await fetch("/api/leads", { headers });
@@ -2246,10 +2251,10 @@ export default function App() {
         const data = await res.json();
         if (data && data.success && Array.isArray(data.leads)) {
           let sanitized = data.leads.map(sanitizeLeadObject);
-          // 🛡️ ADMIN VAULT AUTO-PROTECTION:
-          // If Admin logs in and backend leads are empty, immediately auto-restore from local backup vault!
+
+          // 🛡️ SUPER ADMIN VAULT AUTO-PROTECTION (Harsh Goyal ONLY):
           if (isSuper && sanitized.length === 0) {
-            console.log("🛡️ Admin vault auto-protection activated: Restoring 15 verified leads!");
+            console.log("🛡️ Super Admin vault auto-protection activated: Restoring master pipeline leads!");
             const localBackup = localStorage.getItem("salesflow_admin_vault_backup") || localStorage.getItem("salesflow_standalone_leads");
             if (localBackup) {
               try {
@@ -2264,18 +2269,23 @@ export default function App() {
             }
             syncLeadsToBackend(sanitized);
           }
-          if (!isSuper && activeUser.role === "sales_rep") {
+
+          // 🛡️ STRICT SALES REP ISOLATION: NEVER leak Harsh Goyal or peer data to non-admin users
+          if (!isSuper) {
             const userNameLower = (activeUser.name || "").trim().toLowerCase();
             sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
-          }
-          setLeads(sanitized);
-          if (activeUser.role === "admin" || isSuper) {
+            try {
+              sessionStorage.setItem(`salesflow_rep_leads_${activeUser.id || activeUser.name}`, JSON.stringify(sanitized));
+            } catch(e) {}
+          } else {
             try {
               localStorage.setItem("salesflow_standalone_leads", JSON.stringify(sanitized));
               localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(sanitized));
               localStorage.setItem("salesflow_admin_vault_backup", JSON.stringify(sanitized));
             } catch(e) {}
           }
+
+          setLeads(sanitized);
           return sanitized;
         }
       }
@@ -2308,10 +2318,12 @@ export default function App() {
   }, []);
 
   // 🛡️ ZERO-DATA-LOSS CONTINUOUS AUTO-RECOVERY GUARD:
-  // If leads array ever becomes 0 in UI memory, immediately recover from local vault backup or 32 INITIAL_LEADS!
+  // ONLY activates for authenticated Super Admin Harsh Goyal!
+  // Sales reps with 0 assigned leads must remain at 0 leads (zero data leak).
   useEffect(() => {
+    if (!isLoggedIn || !checkIsSuperAdmin(currentUser)) return;
     if (Array.isArray(leads) && leads.length === 0) {
-      console.log("🛡️ Zero leads in memory. Auto-activating local backup vault...");
+      console.log("🛡️ Zero leads in memory for Super Admin. Auto-activating local backup vault...");
       const local = localStorage.getItem("salesflow_admin_vault_backup") || localStorage.getItem("salesflow_standalone_leads");
       if (local) {
         try {
@@ -2324,7 +2336,7 @@ export default function App() {
       }
       setLeads(INITIAL_LEADS.map(sanitizeLeadObject));
     }
-  }, [leads, currentUser]);
+  }, [leads, currentUser, isLoggedIn]);
 
   const restoreAdminVaultBackup = async () => {
     setIsAdminRestoring(true);
@@ -2403,20 +2415,21 @@ export default function App() {
   const syncLeadsToBackend = async (leadsToSync) => {
     try {
       const headers = { "Content-Type": "application/json" };
-      const token = sessionStorage.getItem("crm_auth_token");
+      const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const savedUserStr = sessionStorage.getItem("crm_auth_user");
+      const savedUserStr = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
       let activeUser = currentUser;
       if (!activeUser && savedUserStr) {
         try { activeUser = JSON.parse(savedUserStr); } catch(e) {}
       }
 
-      if (activeUser) {
-        headers["x-user-role"] = activeUser.role || "admin";
-        headers["x-user-name"] = activeUser.name || "Harsh Goyal";
-        headers["x-user-id"] = activeUser.id || "";
-      }
+      if (!activeUser) return;
+
+      const isSuper = checkIsSuperAdmin(activeUser);
+      headers["x-user-role"] = isSuper ? "admin" : "sales_rep";
+      headers["x-user-name"] = activeUser.name || "";
+      headers["x-user-id"] = activeUser.id || "";
 
       await fetch("/api/sync/bulk", {
         method: "POST",
@@ -2432,20 +2445,21 @@ export default function App() {
     if (!lead || !lead.id) return;
     try {
       const headers = { "Content-Type": "application/json" };
-      const token = sessionStorage.getItem("crm_auth_token");
+      const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const savedUserStr = sessionStorage.getItem("crm_auth_user");
+      const savedUserStr = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
       let activeUser = currentUser;
       if (!activeUser && savedUserStr) {
         try { activeUser = JSON.parse(savedUserStr); } catch(e) {}
       }
 
-      if (activeUser) {
-        headers["x-user-role"] = activeUser.role || "admin";
-        headers["x-user-name"] = activeUser.name || "Harsh Goyal";
-        headers["x-user-id"] = activeUser.id || "";
-      }
+      if (!activeUser) return;
+
+      const isSuper = checkIsSuperAdmin(activeUser);
+      headers["x-user-role"] = isSuper ? "admin" : "sales_rep";
+      headers["x-user-name"] = activeUser.name || "";
+      headers["x-user-id"] = activeUser.id || "";
 
       await fetch(`/api/leads/${encodeURIComponent(lead.id)}`, {
         method: "PUT",
@@ -2636,6 +2650,10 @@ export default function App() {
     setPinDigits(["", "", "", "", "", ""]);
     setSelectedLoginUser(null);
     setLoginEmail("");
+    setCurrentUser(null);
+    setCurrentLoggedInUser("");
+    setCurrentUserRole("sales_rep");
+    setLeads([]);
     try {
       sessionStorage.removeItem("crm_auth_user");
       sessionStorage.removeItem("crm_auth_token");
@@ -3635,11 +3653,15 @@ export default function App() {
 
   // Filter leads based on current active tab and dashboard filter criteria
   const filteredLeads = useMemo(() => {
-    let baseLeads = leads;
+    if (!isLoggedIn || !currentUser) {
+      return [];
+    }
+
     const isSuper = checkIsSuperAdmin(currentUser);
+    let baseLeads = leads;
 
     // Strict Role-Based Privacy: Sales Reps ONLY see their own assigned deals
-    if (!isSuper && currentUser?.role === "sales_rep") {
+    if (!isSuper) {
       const repName = (currentUser.name || "").trim().toLowerCase();
       baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === repName);
     }
@@ -3736,20 +3758,24 @@ export default function App() {
     }
 
     // Strict Role-Based Privacy: Sales Reps can NEVER see other users' data
-    if (!isSuper && currentUser?.role === "sales_rep") {
+    if (!isSuper) {
       const repName = (currentUser.name || "").trim().toLowerCase();
       baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === repName);
     }
 
     return baseLeads;
-  }, [leads, currentTab, searchQuery, filterStage, selectedFilterStages, filterScore, filterSource, filterMinVal, filterOwner, currentLoggedInUser, currentUser, sheetFilterCriteria]);
+  }, [leads, currentTab, searchQuery, filterStage, selectedFilterStages, filterScore, filterSource, filterMinVal, filterOwner, currentLoggedInUser, currentUser, sheetFilterCriteria, isLoggedIn]);
 
   // Dynamic Real-Time Filtered Report Leads Calculation (Advanced Multi-Criteria Engine)
   const filteredReportLeads = useMemo(() => {
+    if (!isLoggedIn || !currentUser) {
+      return [];
+    }
+
     const isSuper = checkIsSuperAdmin(currentUser);
     return leads.filter(l => {
       // 0. Strict Role Isolation: Sales Reps ONLY see their own deals in Reports
-      if (!isSuper && currentUser?.role === "sales_rep") {
+      if (!isSuper) {
         const repName = (currentUser.name || "").trim().toLowerCase();
         if ((l.owner || "").trim().toLowerCase() !== repName) return false;
       }
@@ -3847,7 +3873,7 @@ export default function App() {
 
       return true;
     });
-  }, [leads, reportTimeframe, reportDateType, reportStartDate, reportEndDate, reportStatusFilter, reportSelectedStages, reportSourceFilter, reportScoreFilter, reportMinValue, reportMaxValue, reportSearchQuery]);
+  }, [leads, reportTimeframe, reportDateType, reportStartDate, reportEndDate, reportStatusFilter, reportSelectedStages, reportSourceFilter, reportScoreFilter, reportMinValue, reportMaxValue, reportSearchQuery, currentUser, isLoggedIn]);
 
   const reportTotalPages = useMemo(() => {
     if (reportPageSize === "all") return 1;
@@ -10486,7 +10512,7 @@ export default function App() {
 
                   {/* 👤 Lead Owner Filter */}
                   {(() => {
-                    const isRepOnly = !checkIsSuperAdmin(currentUser) && currentUser?.role === "sales_rep";
+                    const isRepOnly = !checkIsSuperAdmin(currentUser);
                     return (
                       <div style={{ position: "relative" }}>
                         <select 
@@ -10806,7 +10832,7 @@ export default function App() {
                     <div style={{ padding: "40px 16px", textAlign: "center", color: "#94a3b8" }}>
                       <FileSpreadsheet size={32} color="#cbd5e1" style={{ margin: "0 auto 8px auto" }} />
                       <p style={{ margin: 0, fontWeight: "600", fontSize: "12.5px", color: "#475569" }}>
-                        {searchQuery ? `No leads found matching "${searchQuery}".` : "No leads in this category."}
+                        {searchQuery ? `No leads found matching "${searchQuery}".` : (!checkIsSuperAdmin(currentUser) ? "No leads assigned to you yet. Leads assigned by Admin will appear here." : "No leads in this category.")}
                       </p>
                     </div>
                   ) : (
@@ -11130,29 +11156,35 @@ export default function App() {
                                   <div style={{ width: "18px", height: "18px", borderRadius: "50%", backgroundColor: "#eef2ff", color: "#4338ca", border: "1px solid #c7d2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "8px", fontWeight: "800", flexShrink: 0 }}>
                                     {(lead.owner || "Admin").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                   </div>
-                                  <select
-                                    value={lead.owner || "Harsh Goyal"}
-                                    onChange={(e) => reassignLeadOwner(lead.id, e.target.value)}
-                                    onClick={(e) => e.stopPropagation()}
-                                    style={{
-                                      padding: "1.5px 3px",
-                                      borderRadius: "4px",
-                                      fontSize: "9.5px",
-                                      fontWeight: "600",
-                                      color: "#334155",
-                                      backgroundColor: "#ffffff",
-                                      border: "1px solid #e2e8f0",
-                                      cursor: "pointer",
-                                      outline: "none",
-                                      maxWidth: "76px",
-                                      textOverflow: "ellipsis"
-                                    }}
-                                    title="Click to reassign owner"
-                                  >
-                                    {teamMembers.map(m => (
-                                      <option key={m} value={m}>{m}</option>
-                                    ))}
-                                  </select>
+                                  {checkIsSuperAdmin(currentUser) ? (
+                                    <select
+                                      value={lead.owner || "Harsh Goyal"}
+                                      onChange={(e) => reassignLeadOwner(lead.id, e.target.value)}
+                                      onClick={(e) => e.stopPropagation()}
+                                      style={{
+                                        padding: "1.5px 3px",
+                                        borderRadius: "4px",
+                                        fontSize: "9.5px",
+                                        fontWeight: "600",
+                                        color: "#334155",
+                                        backgroundColor: "#ffffff",
+                                        border: "1px solid #e2e8f0",
+                                        cursor: "pointer",
+                                        outline: "none",
+                                        maxWidth: "76px",
+                                        textOverflow: "ellipsis"
+                                      }}
+                                      title="Click to reassign owner"
+                                    >
+                                      {teamMembers.map(m => (
+                                        <option key={m} value={m}>{m}</option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <span style={{ fontSize: "10px", fontWeight: "600", color: "#334155" }}>
+                                      {lead.owner || currentUser?.name || "You"}
+                                    </span>
+                                  )}
                                 </div>
                               </td>
 
@@ -18314,7 +18346,7 @@ export default function App() {
                       Assigned Owner
                     </label>
                     {(() => {
-                      const isRepOnly = !checkIsSuperAdmin(currentUser) && currentUser?.role === "sales_rep";
+                      const isRepOnly = !checkIsSuperAdmin(currentUser);
                       return (
                         <select
                           value={isRepOnly ? currentUser.name : newLeadData.owner}

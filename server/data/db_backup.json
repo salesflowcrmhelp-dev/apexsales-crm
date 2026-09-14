@@ -1,4 +1,6 @@
 {
+  "timestamp": "2026-09-14T06:36:34.322Z",
+  "updatedBy": "auto_sync",
   "users": [
     {
       "id": "usr_admin",
@@ -257,7 +259,7 @@
       "name": "Hetul sanghvi",
       "company": "Direct Individual",
       "status": "Won",
-      "value": 15000,
+      "value": 10000,
       "email": "hetuljsanghvi@gmail.com",
       "phone": "9898113331",
       "source": "Manual",
@@ -271,7 +273,7 @@
       "id": "lead_modi",
       "name": "Kalpesh Modi",
       "company": "DK Modi & Co",
-      "status": "Renewal Won",
+      "status": "Lost",
       "value": 15000,
       "email": "dkmodico@gmail.com",
       "phone": "9925004405",
@@ -280,13 +282,14 @@
       "next_follow_up": "2026-09-20",
       "won_date": "2026-09-09",
       "notes": "20 ko payment kre ga",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "stageUpdatedAt": "2026-09-14T06:36:15.052Z"
     },
     {
       "id": "lead_anubhav",
       "name": "Anubhav Agarwal",
       "company": "Direct Individual",
-      "status": "Won",
+      "status": "Lost",
       "value": 15000,
       "email": "anubhavagrawal82@gmail.com",
       "phone": "+91 98189 30423",
@@ -295,13 +298,14 @@
       "next_follow_up": "",
       "won_date": "2026-08-28",
       "notes": "15k+GST for 5 co. | 9910158681 Santosh",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "stageUpdatedAt": "2026-09-14T06:36:09.412Z"
     },
     {
       "id": "lead_sanjjay",
       "name": "Sanjjay Bablani",
       "company": "UGPL",
-      "status": "Won",
+      "status": "Lost",
       "value": 15000,
       "email": "ugpl2011@gmail.com",
       "phone": "+91 99101 75554",
@@ -310,7 +314,8 @@
       "next_follow_up": "",
       "won_date": "2026-08-20",
       "notes": "15k+GST for unlimited co.",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "stageUpdatedAt": "2026-09-14T06:35:16.940Z"
     },
     {
       "id": "lead_ramnath",
