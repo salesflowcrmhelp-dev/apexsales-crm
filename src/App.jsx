@@ -1154,12 +1154,18 @@ export default function App() {
       return false;
     }
   });
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     try {
       localStorage.setItem("crm_sidebar_collapsed", isSidebarCollapsed ? "true" : "false");
     } catch (e) {}
   }, [isSidebarCollapsed]);
+
+  // Auto-close mobile sidebar drawer on workspace/tab changes
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [activeWorkspace, pipelineView, currentTab]);
 
   // Keyboard shortcut Ctrl+B or Ctrl+\ to toggle menu bar collapse
   useEffect(() => {
@@ -6234,8 +6240,16 @@ export default function App() {
 
   return (
     <div className="crm-app-shell">
+      {/* Mobile Drawer Backdrop */}
+      {isMobileSidebarOpen && (
+        <div 
+          className="sidebar-mobile-backdrop"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
       {/* 1. Slim Professional Left Navigation Sidebar */}
-      <aside className={`crm-sidebar ${isSidebarCollapsed ? "collapsed" : ""}`}>
+      <aside className={`crm-sidebar ${isSidebarCollapsed ? "collapsed" : ""} ${isMobileSidebarOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-brand">
           <div 
             onClick={() => {
@@ -6472,6 +6486,17 @@ export default function App() {
       {/* 2. Main Content Area */}
       <div className="crm-main-area">
         <header className="crm-top-header">
+          {/* Mobile Menu Hamburger Button */}
+          <button
+            type="button"
+            className="mobile-hamburger-btn"
+            onClick={() => setIsMobileSidebarOpen(prev => !prev)}
+            title="Toggle Menu"
+            aria-label="Toggle Navigation Menu"
+          >
+            <Menu size={18} />
+          </button>
+
           {/* Active Tab Indicator when Sidebar is collapsed ("jb sider bar ander ki side ho toh upper uss tab ka name aaye jo chalo hai") */}
           {isSidebarCollapsed ? (
             <div 
@@ -9836,7 +9861,7 @@ export default function App() {
               </div>
 
               {/* 4 Summary Stats Cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "10px" }}>
+              <div className="team-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "10px", marginBottom: "10px" }}>
                 <div style={{ padding: "8px 12px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
                   <span style={{ fontSize: "10px", fontWeight: "750", color: "#64748b", textTransform: "uppercase" }}>TOTAL ACTIVE USERS</span>
                   <div style={{ fontSize: "18px", fontWeight: "850", color: "#0f172a", marginTop: "2px" }}>{allUsersList.length || 4}</div>
@@ -9894,7 +9919,7 @@ export default function App() {
                     </span>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+                  <div className="team-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
                         Full Name *
@@ -9938,25 +9963,26 @@ export default function App() {
                         maxLength={6}
                         placeholder="e.g. 554433"
                         value={newUserData.pin}
-                        onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value.replace(/[^0-9]/g, '') }))}
+                        onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value }))}
                         required
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box", fontWeight: "800", letterSpacing: "2px" }}
+                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
                       />
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr", gap: "12px" }}>
+                  <div className="team-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
-                        Role & Access Level
+                        Access Privilege / Role
                       </label>
-                      <select
+                      <select 
                         value={newUserData.role}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, role: e.target.value }))}
                         style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                       >
-                        <option value="sales_rep">💼 Sales Rep (Only Sees Own Leads - Strict Privacy)</option>
-                        <option value="admin">👑 Super Admin (Full Access to All Leads & Reports)</option>
+                        <option value="sales_rep">💼 Sales Representative (Isolated: Own Leads Only)</option>
+                        <option value="manager">👔 Sales Manager (Manages Reporting Team)</option>
+                        <option value="admin">👑 Super Admin (Full Control: All Data & Export)</option>
                       </select>
                     </div>
 
@@ -10005,9 +10031,9 @@ export default function App() {
                 </form>
               )}
 
-              {/* Members List Table - Full Width, No Clipping */}
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", backgroundColor: "#ffffff" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "11.5px" }}>
+              {/* Members List Table - Full Width, Scrollable on mobile */}
+              <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
+                <table className="responsive-table" style={{ width: "100%", minWidth: "680px", borderCollapse: "collapse", textAlign: "left", fontSize: "11.5px" }}>
                   <thead>
                     <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#64748b", fontWeight: "700" }}>
                       <th style={{ padding: "7px 12px" }}>TEAM MEMBER</th>
@@ -19336,8 +19362,8 @@ export default function App() {
               )}
 
               {/* Members List Table */}
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: "12px", overflow: "hidden" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "11.5px" }}>
+              <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "12px", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                <table className="responsive-table" style={{ width: "100%", minWidth: "750px", borderCollapse: "collapse", textAlign: "left", fontSize: "11.5px" }}>
                   <thead>
                     <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#64748b", fontWeight: "700" }}>
                       <th style={{ padding: "8px 12px" }}>TEAM MEMBER</th>
