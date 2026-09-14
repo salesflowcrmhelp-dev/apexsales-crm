@@ -1201,7 +1201,7 @@ export default function App() {
   const [filterSource, setFilterSource] = useState("");
   const [filterMinVal, setFilterMinVal] = useState("");
   const [showActionsDropdown, setShowActionsDropdown] = useState(false);
-  const [filterOwner, setFilterOwner] = useState("");
+  const [filterOwner, setFilterOwner] = useState("__my_leads__");
   const [teamMembers, setTeamMembers] = useState(() => {
     try {
       const savedUser = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
@@ -1596,6 +1596,38 @@ export default function App() {
   const [profileCurrentPassword, setProfileCurrentPassword] = useState("");
   const [profileNewPassword, setProfileNewPassword] = useState("");
   const [profileConfirmPassword, setProfileConfirmPassword] = useState("");
+
+  // Synchronize User Profile with active logged-in user
+  useEffect(() => {
+    if (currentUser) {
+      const userKey = currentUser.id || currentUser.name || "usr_admin";
+      const isSuper = checkIsSuperAdmin(currentUser);
+      try {
+        const saved = localStorage.getItem(`crm_user_profile_${userKey}`);
+        if (saved) {
+          setUserProfile(JSON.parse(saved));
+          return;
+        }
+      } catch(e) {}
+      setUserProfile({
+        fullName: currentUser.name || (isSuper ? "Harsh Goyal" : "User"),
+        displayName: currentUser.displayName || currentUser.name || (isSuper ? "Harsh Goyal (Admin)" : "User"),
+        email: currentUser.email || (isSuper ? "salesflowcrmhelp@gmail.com" : ""),
+        phone: currentUser.phone || (isSuper ? "+91 97842 13450" : ""),
+        whatsappNumber: currentUser.phone || (isSuper ? "+91 97842 13450" : ""),
+        designation: isSuper ? "Founder / Sales Head" : (currentUser.role === "manager" ? "Sales Manager" : "Sales Representative"),
+        department: isSuper ? "Sales & Revenue Operations" : "Sales Team",
+        employeeId: currentUser.id || (isSuper ? "SF-ADMIN-01" : "SF-EMP-01"),
+        organization: "SalesFlow CRM Workspace",
+        timezone: "Asia/Kolkata (IST +5:30)",
+        currency: "INR (₹) - Indian Rupee",
+        language: "English (India)",
+        dateFormat: "DD MMM YYYY (e.g. 03 Sept 2026)",
+        status: "Active",
+        avatarUrl: currentUser.avatarUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250"
+      });
+    }
+  }, [currentUser]);
 
   // Delete Confirmation Modal State
   const [deleteConfirmData, setDeleteConfirmData] = useState(null); // { title, message, onConfirm, confirmLabel, icon }
@@ -3805,11 +3837,12 @@ export default function App() {
     }
     if (filterOwner) {
       if (filterOwner === "__my_leads__") {
-        baseLeads = baseLeads.filter(l => (l.owner || "") === currentLoggedInUser);
+        const myName = (currentLoggedInUser || currentUser?.name || "Harsh Goyal").trim().toLowerCase();
+        baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === myName);
       } else if (filterOwner === "__unassigned__") {
         baseLeads = baseLeads.filter(l => !l.owner || l.owner === "Unassigned");
       } else {
-        baseLeads = baseLeads.filter(l => (l.owner || "") === filterOwner);
+        baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === filterOwner.trim().toLowerCase());
       }
     }
 
@@ -9455,6 +9488,8 @@ export default function App() {
                 <div style={{ display: "flex", gap: "8px" }}>
                   <button 
                     onClick={() => {
+                      const userKey = currentUser?.id || currentUser?.name || "usr_admin";
+                      localStorage.setItem(`crm_user_profile_${userKey}`, JSON.stringify(userProfile));
                       localStorage.setItem("crm_user_profile", JSON.stringify(userProfile));
                       showToast("Saved profile information successfully!");
                       setActiveWorkspace("pipeline");
@@ -9801,6 +9836,8 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => {
+                    const userKey = currentUser?.id || currentUser?.name || "usr_admin";
+                    localStorage.setItem(`crm_user_profile_${userKey}`, JSON.stringify(userProfile));
                     localStorage.setItem("crm_user_profile", JSON.stringify(userProfile));
                     showToast("User Profile updated successfully!", "success");
                   }}
@@ -10648,6 +10685,13 @@ export default function App() {
                     const isManager = currentUser?.role === "manager";
                     const isRepOnly = !isSuper && !isManager;
 
+                    const myName = currentLoggedInUser || currentUser?.name || "Harsh Goyal";
+                    const otherOwners = Array.from(new Set([
+                      ...teamMembers,
+                      ...allUsersList.map(u => u.name),
+                      ...leads.map(l => l.owner).filter(Boolean)
+                    ])).filter(m => m && m.toLowerCase() !== myName.toLowerCase());
+
                     return (
                       <div style={{ position: "relative" }}>
                         <select 
@@ -10660,18 +10704,20 @@ export default function App() {
                             <option value={currentUser.name}>👤 My Leads ({currentUser.name})</option>
                           ) : isManager ? (
                             <>
-                              <option value="">Team: All Leads</option>
-                              <option value="__my_leads__">👤 My Leads ({currentLoggedInUser})</option>
-                              {teamMembers.filter(m => m !== currentLoggedInUser).map(m => (
-                                <option key={m} value={m}>{m}</option>
+                              <option value="__my_leads__">👤 My Leads ({myName}) - {leads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
+                              <option value="">👥 Team: All Leads ({leads.length})</option>
+                              {otherOwners.map(m => (
+                                <option key={m} value={m}>👤 {m} ({leads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
                               ))}
                             </>
                           ) : (
                             <>
-                              <option value="">Owner: All Reps</option>
-                              <option value="__my_leads__">👤 My Leads ({currentLoggedInUser})</option>
-                              <option value="__unassigned__">⚠️ Unassigned</option>
-                              {teamMembers.map(m => <option key={m} value={m}>{m}</option>)}
+                              <option value="__my_leads__">👤 My Leads ({myName}) - {leads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
+                              <option value="">👥 All Leads ({leads.length} Total)</option>
+                              <option value="__unassigned__">⚠️ Unassigned ({leads.filter(l => !l.owner || l.owner === "Unassigned").length})</option>
+                              {otherOwners.map(m => (
+                                <option key={m} value={m}>👤 {m} ({leads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
+                              ))}
                             </>
                           )}
                         </select>
