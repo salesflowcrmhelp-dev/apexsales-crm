@@ -3522,20 +3522,31 @@ export default function App() {
       }
     }
 
-    // Daily Sales Target Calculation (September 2026: 24 business working days)
+    // Daily Sales Target Calculation (Dynamic remaining working days from today to month end)
     let daysRemaining = 0;
     if (!isHistorical && selectedPeriodMonth !== "all") {
-      const today = new Date();
-      const year = 2026;
-      const month = 8; // September (0-indexed = 8)
-      const daysInMonth = 30;
-      const currentDay = 1;
+      const now = new Date();
+      const [pYear, pMonth] = (selectedPeriodMonth || "2026-09").split("-").map(Number);
+      const targetYear = pYear || 2026;
+      const targetMonthIndex = pMonth !== undefined && !isNaN(pMonth) ? pMonth - 1 : 8; // 0-indexed
       
-      for (let d = currentDay; d <= daysInMonth; d++) {
-        const dateObj = new Date(year, month, d);
+      const daysInMonth = new Date(targetYear, targetMonthIndex + 1, 0).getDate();
+      const isCurrentMonth = now.getFullYear() === targetYear && now.getMonth() === targetMonthIndex;
+      const isPastMonth = now.getFullYear() > targetYear || (now.getFullYear() === targetYear && now.getMonth() > targetMonthIndex);
+      
+      let startDay = 1;
+      if (isPastMonth) {
+        startDay = daysInMonth + 1;
+      } else if (isCurrentMonth) {
+        startDay = now.getDate(); // Start from today's real date (e.g. 14 on Sept 14)
+      } else {
+        startDay = 1; // Future month
+      }
+      
+      for (let d = startDay; d <= daysInMonth; d++) {
+        const dateObj = new Date(targetYear, targetMonthIndex, d);
         const dayOfWeek = dateObj.getDay(); // 0 = Sunday
-        if (dayOfWeek === 0) continue; // Skip Sundays
-        if (d === 26 || d === 27 || d === 28) continue; // Skip holidays
+        if (dayOfWeek === 0) continue; // Skip Sundays (weekly off)
         daysRemaining++;
       }
       daysRemaining = Math.max(1, daysRemaining);
