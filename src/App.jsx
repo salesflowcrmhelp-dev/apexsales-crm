@@ -6612,19 +6612,12 @@ export default function App() {
                 ) : (
                   <Archive size={13} color="#ea580c" />
                 )}
-                <span className="hide-on-mobile">
+                <span>
                   {selectedPeriodMonth === "2026-09" 
                     ? "September 2026 (Current)" 
                     : selectedPeriodMonth === "2026-08" 
                     ? "August 2026 (Archived)" 
                     : "All-Time Lifetime"}
-                </span>
-                <span className="show-on-mobile">
-                  {selectedPeriodMonth === "2026-09" 
-                    ? "Sep 2026" 
-                    : selectedPeriodMonth === "2026-08" 
-                    ? "Aug 2026" 
-                    : "All Time"}
                 </span>
                 <ChevronDown size={13} />
               </button>
@@ -6742,7 +6735,6 @@ export default function App() {
             {checkIsSuperAdmin(currentUser) && (
               <button
                 type="button"
-                className="admin-vault-btn hide-on-mobile"
                 onClick={() => setShowAdminVaultModal(true)}
                 style={{
                   display: "inline-flex",
@@ -6768,7 +6760,7 @@ export default function App() {
 
             <button 
               onClick={() => setShowStartMyDay(true)}
-              className="header-cta-orange hide-on-mobile"
+              className="header-cta-orange"
             >
               <Sun className="w-4 h-4" /> Start My Day
             </button>
@@ -10977,124 +10969,8 @@ export default function App() {
                   );
                 })()}
 
-                {/* 3A. Mobile Touch Cards View (Shown only on <= 768px via CSS) */}
-                <div className="mobile-only-lead-cards-list">
-                  {totalLeadsCount === 0 ? (
-                    <div style={{ padding: "30px 16px", textAlign: "center", color: "#94a3b8" }}>
-                      <p style={{ margin: 0, fontWeight: "600", fontSize: "12.5px", color: "#475569" }}>
-                        {searchQuery ? `No leads matching "${searchQuery}"` : "No leads found."}
-                      </p>
-                    </div>
-                  ) : (
-                    paginatedLeads.map((lead) => {
-                      const isWon = isWonStatus(lead.status);
-                      const stageStyle = getStageBadgeStyle(lead.status);
-                      const avatarPalette = getAvatarColor(lead.name);
-                      const initials = getAvatarInitials(lead.name);
-                      const cleanPhone = (lead.phone || "").replace(/[^0-9]/g, "");
-                      const waPhone = cleanPhone.length === 10 ? "91" + cleanPhone : cleanPhone;
-                      const isOverdue = lead.next_follow_up && lead.next_follow_up < new Date().toISOString().split('T')[0] && !isWon;
-
-                      return (
-                        <div key={lead.id} className="mobile-lead-card">
-                          <div className="mobile-lead-card-header">
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
-                              <div 
-                                style={{
-                                  width: "28px",
-                                  height: "28px",
-                                  borderRadius: "50%",
-                                  backgroundColor: avatarPalette.bg,
-                                  color: avatarPalette.text,
-                                  border: `1px solid ${avatarPalette.border}`,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  fontSize: "11px",
-                                  fontWeight: "750",
-                                  flexShrink: 0
-                                }}
-                              >
-                                {initials}
-                              </div>
-                              <div style={{ minWidth: 0 }}>
-                                <span 
-                                  onClick={() => setSelectedLeadForDetails(lead)} 
-                                  style={{ fontSize: "13px", fontWeight: "750", color: "#0f172a", display: "block", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                                >
-                                  {lead.name || "Lead"}
-                                </span>
-                                <span style={{ fontSize: "10px", color: "#64748b", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                  {lead.company ? `${lead.company} • ` : ""}{lead.source || "Direct"}
-                                </span>
-                              </div>
-                            </div>
-                            <div style={{ fontSize: "14px", fontWeight: "800", color: "#0f172a", flexShrink: 0 }}>
-                              ₹{(Number(lead.value) || 0).toLocaleString("en-IN")}
-                            </div>
-                          </div>
-
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "8px 0", gap: "6px" }}>
-                            <span style={{ fontSize: "10px", fontWeight: "700", padding: "2px 8px", borderRadius: "10px", backgroundColor: stageStyle.bg, color: stageStyle.color, border: `1px solid ${stageStyle.border}` }}>
-                              {lead.status || "New"}
-                            </span>
-                            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "10px", color: "#64748b" }}>
-                              {lead.score && <span style={{ fontWeight: "700", color: lead.score === "Hot" ? "#dc2626" : "#2563eb" }}>{lead.score === "Hot" ? "🔥 Hot" : lead.score}</span>}
-                              <span>•</span>
-                              <span>👤 {lead.owner || "Unassigned"}</span>
-                            </div>
-                          </div>
-
-                          {lead.next_follow_up && (
-                            <div style={{ fontSize: "10.5px", color: isOverdue ? "#dc2626" : "#64748b", fontWeight: isOverdue ? "700" : "500", display: "flex", alignItems: "center", gap: "4px", marginBottom: "8px" }}>
-                              <Clock size={11} />
-                              <span>Follow-up: {lead.next_follow_up}</span>
-                              {isOverdue && <span style={{ backgroundColor: "#fee2e2", padding: "1px 5px", borderRadius: "3px", fontSize: "9px" }}>OVERDUE</span>}
-                            </div>
-                          )}
-
-                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "6px", borderTop: "1px solid #f1f5f9", paddingTop: "8px" }}>
-                            {cleanPhone ? (
-                              <a href={`tel:${cleanPhone}`} className="mobile-touch-btn call-action" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", padding: "6px 0", backgroundColor: "#ecfdf5", color: "#059669", border: "1px solid #a7f3d0", borderRadius: "6px", fontSize: "11px", fontWeight: "700", textDecoration: "none" }}>
-                                <Phone size={12} /> Call
-                              </a>
-                            ) : (
-                              <button disabled style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", padding: "6px 0", backgroundColor: "#f8fafc", color: "#cbd5e1", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px" }}>
-                                <Phone size={12} /> Call
-                              </button>
-                            )}
-
-                            {cleanPhone ? (
-                              <a 
-                                href={`https://wa.me/${waPhone}?text=${encodeURIComponent(`Hi ${lead.name || ""}, reaching out from ApexSales CRM.`)}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", padding: "6px 0", backgroundColor: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: "6px", fontSize: "11px", fontWeight: "700", textDecoration: "none" }}
-                              >
-                                <MessageCircle size={12} /> WhatsApp
-                              </a>
-                            ) : (
-                              <button disabled style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", padding: "6px 0", backgroundColor: "#f8fafc", color: "#cbd5e1", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px" }}>
-                                <MessageCircle size={12} /> WA
-                              </button>
-                            )}
-
-                            <button 
-                              type="button" 
-                              onClick={() => setSelectedLeadForDetails(lead)} 
-                              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "6px 12px", backgroundColor: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "11px", fontWeight: "700", cursor: "pointer" }}
-                            >
-                              <Eye size={12} />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-
-                {/* 3. Compact High-Density Table Grid (Desktop) */}
-                <div className="leads-table-container" style={{ width: "100%", borderTop: "1px solid #edf2f7" }}>
+                {/* 3. Compact High-Density Table Grid */}
+                <div style={{ width: "100%", overflowX: "auto", WebkitOverflowScrolling: "touch", borderTop: "1px solid #edf2f7" }}>
                   {totalLeadsCount === 0 ? (
                     <div style={{ padding: "40px 16px", textAlign: "center", color: "#94a3b8" }}>
                       <FileSpreadsheet size={32} color="#cbd5e1" style={{ margin: "0 auto 8px auto" }} />
@@ -19923,53 +19799,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {/* 📱 Mobile Fixed Bottom Navigation Bar (Visible only on <= 768px) */}
-      <nav className="crm-mobile-bottom-nav">
-        <button 
-          type="button"
-          className={`mobile-bottom-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" ? "active" : ""}`}
-          onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("overview"); }}
-        >
-          <TrendingUp size={18} />
-          <span>Dashboard</span>
-        </button>
-        <button 
-          type="button"
-          className={`mobile-bottom-nav-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
-          onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); setCurrentTab("All Leads"); }}
-        >
-          <Users size={18} />
-          <span>Leads</span>
-        </button>
-        <button 
-          type="button"
-          className="mobile-bottom-nav-item add-lead-action"
-          onClick={() => addNewRow()}
-          title="Add New Lead"
-        >
-          <div className="mobile-add-btn-circle">
-            <Plus size={20} color="#ffffff" />
-          </div>
-          <span>+ Lead</span>
-        </button>
-        <button 
-          type="button"
-          className={`mobile-bottom-nav-item ${activeWorkspace === "calendar" ? "active" : ""}`}
-          onClick={() => setActiveWorkspace("calendar")}
-        >
-          <Calendar size={18} />
-          <span>Calendar</span>
-        </button>
-        <button 
-          type="button"
-          className="mobile-bottom-nav-item"
-          onClick={() => setIsMobileSidebarOpen(true)}
-        >
-          <Menu size={18} />
-          <span>Menu</span>
-        </button>
-      </nav>
 
     </div>
   );
