@@ -3735,6 +3735,27 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
     gap: 8px !important;
   }
 
+  /* Analytics KPI Quad Grid (Forecast Revenue, Pipeline Health, Hot Deals, Avg Conversion) */
+  .analytics-kpi-quad-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .analytics-charts-container-grid {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 12px !important;
+  }
+
+  .analytics-chart-box {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
   /* 7. Delete Confirmation Modal Touch-Friendly Controls */
   .modal-actions-grid {
     display: flex !important;
@@ -3776,6 +3797,11 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
   .analytics-metrics-row {
     grid-template-columns: 1fr !important;
+  }
+
+  .analytics-kpi-quad-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
   }
 
   .modal-content {

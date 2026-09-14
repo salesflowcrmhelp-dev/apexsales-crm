@@ -14061,7 +14061,7 @@ export default function App() {
                 <div className="analytics-charts-container-grid">
                   {/* Standard CRM KPI Metric Cards Row */}
                   <div className="analytics-chart-box full-width animate-fade-in" style={{ padding: 0, background: "transparent", border: "none", boxShadow: "none", marginBottom: "16px" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }}>
+                    <div className="analytics-kpi-quad-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }}>
                       
                       {/* Card 1: Forecast Revenue */}
                       <div style={{
@@ -14204,7 +14204,7 @@ export default function App() {
 
                   {/* Chart 2: Pipeline Activity & Hot Opportunities (Option 3 Design: Executive Metric Rings & Action Cards) */}
                   <div className="analytics-chart-box animate-fade-in" style={{ animationDelay: "0.05s" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
                         <h3 className="chart-box-title" style={{ margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
                           <Activity size={18} color="#2563eb" /> Pipeline Overview & Rings
                         </h3>
@@ -14280,8 +14280,8 @@ export default function App() {
                         return (
                           <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "4px", flex: 1, justifyContent: "space-between" }}>
                             {/* Executive Metric Rings Graphics (Dynamic Real-Time Data & Animated Offsets) */}
-                            <div style={{ position: "relative", width: "100%", height: "205px", backgroundColor: "#ffffff", borderRadius: "10px", border: "1px solid #f1f5f9", padding: "10px" }}>
-                              <svg viewBox="0 0 500 200" width="100%" height="100%">
+                            <div style={{ position: "relative", width: "100%", height: "205px", backgroundColor: "#ffffff", borderRadius: "10px", border: "1px solid #f1f5f9", padding: "10px", overflow: "hidden", boxSizing: "border-box" }}>
+                              <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
                                 {/* Center Main Donut Ring: Pipeline Value */}
                                 <circle cx="250" cy="90" r="46" fill="none" stroke="#f1f5f9" strokeWidth="10" />
                                 <circle 
@@ -14354,9 +14354,9 @@ export default function App() {
                             </div>
 
                             {/* Bottom Executive Summary Strip */}
-                            <div style={{ padding: "8px 12px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "10px", fontSize: "11px", fontWeight: "600", color: "#1e40af", display: "flex", alignItems: "center", gap: "6px" }}>
-                              <Sparkles size={14} color="#1d4ed8" />
-                              <span>
+                            <div style={{ padding: "8px 12px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "10px", fontSize: "11px", fontWeight: "600", color: "#1e40af", display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap", lineHeight: 1.4 }}>
+                              <Sparkles size={14} color="#1d4ed8" style={{ flexShrink: 0 }} />
+                              <span style={{ wordBreak: "break-word" }}>
                                 <strong>Executive Pipeline:</strong> {totalLeads} Total Leads | {dealsWon} Won Deals | Total Value ₹{(pipeValueSum).toLocaleString("en-IN")}!
                               </span>
                             </div>
