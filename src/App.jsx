@@ -1177,6 +1177,9 @@ export default function App() {
   // Search & Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStage, setFilterStage] = useState("");
+  const [selectedFilterStages, setSelectedFilterStages] = useState([]);
+  const [isSheetStageOpen, setIsSheetStageOpen] = useState(false);
+  const sheetStageDropdownRef = useRef(null);
   const [filterScore, setFilterScore] = useState("");
   const [filterSource, setFilterSource] = useState("");
   const [filterMinVal, setFilterMinVal] = useState("");
@@ -1355,7 +1358,7 @@ export default function App() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [currentTab, searchQuery, filterStage, filterScore, filterSource, filterMinVal, sheetFilterCriteria, filterOwner]);
+  }, [currentTab, searchQuery, filterStage, selectedFilterStages, filterScore, filterSource, filterMinVal, sheetFilterCriteria, filterOwner]);
   const [trendDays, setTrendDays] = useState(30);
   const [hoveredChartIdx, setHoveredChartIdx] = useState(null);
   const [growthTimeframe, setGrowthTimeframe] = useState("30 Days"); // "7 Days", "30 Days", "This Month"
@@ -1512,6 +1515,9 @@ export default function App() {
   const [reportStartDate, setReportStartDate] = useState("");
   const [reportEndDate, setReportEndDate] = useState("");
   const [reportStatusFilter, setReportStatusFilter] = useState("all");
+  const [reportSelectedStages, setReportSelectedStages] = useState([]);
+  const [isReportStageOpen, setIsReportStageOpen] = useState(false);
+  const reportStageDropdownRef = useRef(null);
   const [reportSourceFilter, setReportSourceFilter] = useState("all");
   const [reportScoreFilter, setReportScoreFilter] = useState("all");
   const [reportMinValue, setReportMinValue] = useState("");
@@ -1519,6 +1525,20 @@ export default function App() {
   const [reportSearchQuery, setReportSearchQuery] = useState("");
   const [reportPageSize, setReportPageSize] = useState(10); // 10 | 20 | 30 | 50 | "all"
   const [reportCurrentPage, setReportCurrentPage] = useState(1);
+
+  // Click-outside listener to close Stage Multi-Select Dropdowns cleanly
+  useEffect(() => {
+    const handleStageClickOutside = (e) => {
+      if (reportStageDropdownRef.current && !reportStageDropdownRef.current.contains(e.target)) {
+        setIsReportStageOpen(false);
+      }
+      if (sheetStageDropdownRef.current && !sheetStageDropdownRef.current.contains(e.target)) {
+        setIsSheetStageOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleStageClickOutside);
+    return () => document.removeEventListener("mousedown", handleStageClickOutside);
+  }, []);
 
   // Interactive Sales Calendar States
   const [calendarViewDate, setCalendarViewDate] = useState(new Date(2026, 8, 1));
@@ -3689,8 +3709,11 @@ export default function App() {
       }
     }
 
-    // Dropdown filters: Stage, Score, Source, Value
-    if (filterStage) {
+    // Dropdown filters: Stage (supports multi-select!), Score, Source, Value
+    if (selectedFilterStages.length > 0) {
+      const lowerSelected = selectedFilterStages.map(s => s.toLowerCase().trim());
+      baseLeads = baseLeads.filter(l => lowerSelected.includes((l.status || "").toLowerCase().trim()));
+    } else if (filterStage) {
       baseLeads = baseLeads.filter(l => (l.status || "").toLowerCase() === filterStage.toLowerCase());
     }
     if (filterScore) {
@@ -3719,7 +3742,7 @@ export default function App() {
     }
 
     return baseLeads;
-  }, [leads, currentTab, searchQuery, filterStage, filterScore, filterSource, filterMinVal, filterOwner, currentLoggedInUser, currentUser, sheetFilterCriteria]);
+  }, [leads, currentTab, searchQuery, filterStage, selectedFilterStages, filterScore, filterSource, filterMinVal, filterOwner, currentLoggedInUser, currentUser, sheetFilterCriteria]);
 
   // Dynamic Real-Time Filtered Report Leads Calculation (Advanced Multi-Criteria Engine)
   const filteredReportLeads = useMemo(() => {
@@ -3798,8 +3821,12 @@ export default function App() {
         }
       }
 
-      // 3. Status / Stage Filter
-      if (reportStatusFilter !== "all") {
+      // 3. Status / Stage Multi-Select Filter
+      if (reportSelectedStages.length > 0) {
+        const leadStatus = (l.status || "").toLowerCase().trim();
+        const matches = reportSelectedStages.some(st => st.toLowerCase().trim() === leadStatus);
+        if (!matches) return false;
+      } else if (reportStatusFilter !== "all") {
         if ((l.status || "").toLowerCase() !== reportStatusFilter.toLowerCase()) return false;
       }
 
@@ -3820,7 +3847,7 @@ export default function App() {
 
       return true;
     });
-  }, [leads, reportTimeframe, reportDateType, reportStartDate, reportEndDate, reportStatusFilter, reportSourceFilter, reportScoreFilter, reportMinValue, reportMaxValue, reportSearchQuery]);
+  }, [leads, reportTimeframe, reportDateType, reportStartDate, reportEndDate, reportStatusFilter, reportSelectedStages, reportSourceFilter, reportScoreFilter, reportMinValue, reportMaxValue, reportSearchQuery]);
 
   const reportTotalPages = useMemo(() => {
     if (reportPageSize === "all") return 1;
@@ -7350,6 +7377,7 @@ export default function App() {
                         setReportStartDate("");
                         setReportEndDate("");
                         setReportStatusFilter("all");
+                        setReportSelectedStages([]);
                         setReportSourceFilter("all");
                         setReportScoreFilter("all");
                         setReportMinValue("");
@@ -7477,16 +7505,142 @@ export default function App() {
 
                   {/* Row 3: Multi-Criteria Advanced Category Filters */}
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "6px", borderTop: "1px solid #f1f5f9", paddingTop: "5px" }}>
-                    <div>
-                      <label style={{ fontSize: "8.5px", fontWeight: "500", color: "#64748b", display: "block", marginBottom: "1px" }}>Stage</label>
-                      <select 
-                        value={reportStatusFilter}
-                        onChange={(e) => setReportStatusFilter(e.target.value)}
-                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                    <div style={{ position: "relative" }} ref={reportStageDropdownRef}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1px" }}>
+                        <label style={{ fontSize: "8.5px", fontWeight: "500", color: "#64748b" }}>Stage</label>
+                        {reportSelectedStages.length > 0 && (
+                          <span style={{ fontSize: "8px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "0 3px", borderRadius: "3px" }}>
+                            {reportSelectedStages.length} sel
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsReportStageOpen(prev => !prev)}
+                        style={{
+                          width: "100%",
+                          padding: "2px 5px",
+                          height: "22px",
+                          border: reportSelectedStages.length > 0 ? "1px solid #3b82f6" : "1px solid #cbd5e1",
+                          borderRadius: "4px",
+                          fontSize: "10px",
+                          fontWeight: reportSelectedStages.length > 0 ? "600" : "400",
+                          color: reportSelectedStages.length > 0 ? "#1d4ed8" : "#0f172a",
+                          backgroundColor: reportSelectedStages.length > 0 ? "#eff6ff" : "#ffffff",
+                          outline: "none",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          textAlign: "left"
+                        }}
+                        title="Click to select multiple stages"
                       >
-                        <option value="all">All Stages</option>
-                        {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                      </select>
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1, paddingRight: "3px" }}>
+                          {reportSelectedStages.length === 0
+                            ? "All Stages"
+                            : reportSelectedStages.length === 1
+                            ? reportSelectedStages[0]
+                            : `${reportSelectedStages.length} Stages sel`}
+                        </span>
+                        <ChevronDown size={10} color={reportSelectedStages.length > 0 ? "#2563eb" : "#64748b"} style={{ transform: isReportStageOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s", flexShrink: 0 }} />
+                      </button>
+
+                      {/* Floating Multi-Select Popover Menu */}
+                      {isReportStageOpen && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "calc(100% + 3px)",
+                            left: 0,
+                            zIndex: 1100,
+                            minWidth: "215px",
+                            backgroundColor: "#ffffff",
+                            border: "1px solid #cbd5e1",
+                            borderRadius: "6px",
+                            boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                            padding: "6px",
+                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: "5px", borderBottom: "1px solid #f1f5f9", marginBottom: "4px" }}>
+                            <span style={{ fontSize: "9px", fontWeight: "700", color: "#475569", textTransform: "uppercase" }}>Select Multiple Stages</span>
+                            <div style={{ display: "flex", gap: "5px" }}>
+                              <button
+                                type="button"
+                                onClick={() => setReportSelectedStages([])}
+                                style={{ border: "none", background: "none", color: "#ea580c", fontSize: "9px", fontWeight: "600", cursor: "pointer", padding: "1px 3px" }}
+                              >
+                                Clear
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setReportSelectedStages([...STATUS_OPTIONS])}
+                                style={{ border: "none", background: "none", color: "#2563eb", fontSize: "9px", fontWeight: "600", cursor: "pointer", padding: "1px 3px" }}
+                              >
+                                Select All
+                              </button>
+                            </div>
+                          </div>
+
+                          <div style={{ maxHeight: "230px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "1px" }}>
+                            {STATUS_OPTIONS.map(s => {
+                              const isChecked = reportSelectedStages.includes(s);
+                              const count = leads.filter(l => (l.status || "").toLowerCase() === s.toLowerCase()).length;
+                              return (
+                                <label
+                                  key={s}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "3px 6px",
+                                    borderRadius: "4px",
+                                    cursor: "pointer",
+                                    backgroundColor: isChecked ? "#eff6ff" : "transparent",
+                                    userSelect: "none",
+                                    transition: "background 0.1s"
+                                  }}
+                                  onMouseEnter={(e) => { if (!isChecked) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                                  onMouseLeave={(e) => { if (!isChecked) e.currentTarget.style.backgroundColor = "transparent"; }}
+                                >
+                                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <input
+                                      type="checkbox"
+                                      checked={isChecked}
+                                      onChange={() => {
+                                        setReportSelectedStages(prev =>
+                                          prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]
+                                        );
+                                      }}
+                                      style={{ cursor: "pointer", width: "13px", height: "13px", accentColor: "#2563eb", margin: 0 }}
+                                    />
+                                    <span style={{ fontSize: "10.5px", fontWeight: isChecked ? "700" : "500", color: isChecked ? "#1d4ed8" : "#1e293b" }}>
+                                      {s}
+                                    </span>
+                                  </div>
+                                  <span style={{ fontSize: "9px", fontWeight: "600", color: count > 0 ? (isChecked ? "#2563eb" : "#64748b") : "#cbd5e1", backgroundColor: isChecked ? "#dbeafe" : "#f1f5f9", padding: "1px 5px", borderRadius: "10px" }}>
+                                    {count}
+                                  </span>
+                                </label>
+                              );
+                            })}
+                          </div>
+
+                          <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "5px", marginTop: "4px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: "9px", color: "#64748b" }}>
+                              {reportSelectedStages.length === 0 ? "Showing All" : `${reportSelectedStages.length} selected`}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setIsReportStageOpen(false)}
+                              style={{ padding: "2px 10px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "9.5px", fontWeight: "600", cursor: "pointer" }}
+                            >
+                              Done ✓
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div>
@@ -7537,7 +7691,7 @@ export default function App() {
                   </div>
 
                   {/* Active Filter Chips Bar */}
-                  {(reportTimeframe !== "all" || reportStatusFilter !== "all" || reportSourceFilter !== "all" || reportScoreFilter !== "all" || reportMinValue || reportMaxValue || reportSearchQuery) && (
+                  {(reportTimeframe !== "all" || reportSelectedStages.length > 0 || (reportStatusFilter && reportStatusFilter !== "all") || reportSourceFilter !== "all" || reportScoreFilter !== "all" || reportMinValue || reportMaxValue || reportSearchQuery) && (
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc", padding: "4px 8px", borderRadius: "4px", border: "1px solid #e2e8f0", flexWrap: "wrap", gap: "4px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "4px", flexWrap: "wrap" }}>
                         <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", textTransform: "uppercase" }}>Active:</span>
@@ -7549,11 +7703,20 @@ export default function App() {
                           </span>
                         )}
 
-                        {reportStatusFilter !== "all" && (
-                          <span style={{ fontSize: "9px", fontWeight: "400", backgroundColor: "#eff6ff", color: "#1e40af", border: "1px solid #bfdbfe", padding: "1px 4px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
-                            {reportStatusFilter}
-                            <button onClick={() => setReportStatusFilter("all")} style={{ border: "none", background: "none", color: "#1e40af", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
-                          </span>
+                        {reportSelectedStages.length > 0 ? (
+                          reportSelectedStages.map(st => (
+                            <span key={st} style={{ fontSize: "9px", fontWeight: "500", backgroundColor: "#eff6ff", color: "#1e40af", border: "1px solid #bfdbfe", padding: "1px 4px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                              {st}
+                              <button onClick={() => setReportSelectedStages(prev => prev.filter(x => x !== st))} style={{ border: "none", background: "none", color: "#1e40af", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                            </span>
+                          ))
+                        ) : (
+                          reportStatusFilter !== "all" && (
+                            <span style={{ fontSize: "9px", fontWeight: "400", backgroundColor: "#eff6ff", color: "#1e40af", border: "1px solid #bfdbfe", padding: "1px 4px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                              {reportStatusFilter}
+                              <button onClick={() => setReportStatusFilter("all")} style={{ border: "none", background: "none", color: "#1e40af", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                            </span>
+                          )
                         )}
 
                         {reportSourceFilter !== "all" && (
@@ -10153,17 +10316,135 @@ export default function App() {
                     />
                   </div>
 
-                  {/* Stage Filter */}
-                  <div style={{ position: "relative" }}>
-                    <select 
-                      value={filterStage}
-                      onChange={(e) => setFilterStage(e.target.value)}
-                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "7px", fontSize: "11px", color: filterStage ? "#1d4ed8" : "#475569", backgroundColor: filterStage ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
+                  {/* Stage Filter (Multi-Select with Checkboxes) */}
+                  <div style={{ position: "relative" }} ref={sheetStageDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsSheetStageOpen(prev => !prev)}
+                      style={{
+                        appearance: "none",
+                        padding: "4px 26px 4px 10px",
+                        border: selectedFilterStages.length > 0 ? "1px solid #3b82f6" : "1px solid #e2e8f0",
+                        borderRadius: "7px",
+                        fontSize: "11px",
+                        color: selectedFilterStages.length > 0 ? "#1d4ed8" : "#475569",
+                        backgroundColor: selectedFilterStages.length > 0 ? "#eff6ff" : "#ffffff",
+                        outline: "none",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        height: "32px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                      title="Click to select multiple stages"
                     >
-                      <option value="">Stage: All</option>
-                      {STATUS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                    <ChevronDown size={12} style={{ position: "absolute", right: "7px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8", pointerEvents: "none" }} />
+                      <span>
+                        {selectedFilterStages.length === 0
+                          ? "Stage: All"
+                          : selectedFilterStages.length === 1
+                          ? `Stage: ${selectedFilterStages[0]}`
+                          : `Stage: ${selectedFilterStages.length} Selected`}
+                      </span>
+                      <ChevronDown size={12} style={{ position: "absolute", right: "8px", top: "50%", transform: isSheetStageOpen ? "translateY(-50%) rotate(180deg)" : "translateY(-50%)", color: selectedFilterStages.length > 0 ? "#2563eb" : "#94a3b8", transition: "transform 0.15s" }} />
+                    </button>
+
+                    {/* Popover for Spreadsheet Stage Multi-Select */}
+                    {isSheetStageOpen && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "calc(100% + 4px)",
+                          left: 0,
+                          zIndex: 1100,
+                          minWidth: "225px",
+                          backgroundColor: "#ffffff",
+                          border: "1px solid #cbd5e1",
+                          borderRadius: "8px",
+                          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                          padding: "6px",
+                          fontFamily: "'Plus Jakarta Sans', sans-serif"
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: "5px", borderBottom: "1px solid #f1f5f9", marginBottom: "4px" }}>
+                          <span style={{ fontSize: "9.5px", fontWeight: "700", color: "#475569", textTransform: "uppercase" }}>Filter Stages</span>
+                          <div style={{ display: "flex", gap: "6px" }}>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedFilterStages([])}
+                              style={{ border: "none", background: "none", color: "#ea580c", fontSize: "9.5px", fontWeight: "600", cursor: "pointer", padding: "1px 4px" }}
+                            >
+                              Clear (All)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedFilterStages([...STATUS_OPTIONS])}
+                              style={{ border: "none", background: "none", color: "#2563eb", fontSize: "9.5px", fontWeight: "600", cursor: "pointer", padding: "1px 4px" }}
+                            >
+                              Select All
+                            </button>
+                          </div>
+                        </div>
+
+                        <div style={{ maxHeight: "240px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
+                          {STATUS_OPTIONS.map(s => {
+                            const isChecked = selectedFilterStages.includes(s);
+                            const count = leads.filter(l => (l.status || "").toLowerCase() === s.toLowerCase()).length;
+                            return (
+                              <label
+                                key={s}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  padding: "4px 6px",
+                                  borderRadius: "5px",
+                                  cursor: "pointer",
+                                  backgroundColor: isChecked ? "#eff6ff" : "transparent",
+                                  userSelect: "none",
+                                  transition: "background 0.1s"
+                                }}
+                                onMouseEnter={(e) => { if (!isChecked) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                                onMouseLeave={(e) => { if (!isChecked) e.currentTarget.style.backgroundColor = "transparent"; }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => {
+                                      setSelectedFilterStages(prev =>
+                                        prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]
+                                      );
+                                    }}
+                                    style={{ cursor: "pointer", width: "13px", height: "13px", accentColor: "#2563eb", margin: 0 }}
+                                  />
+                                  <span style={{ fontSize: "11px", fontWeight: isChecked ? "700" : "500", color: isChecked ? "#1d4ed8" : "#1e293b" }}>
+                                    {s}
+                                  </span>
+                                </div>
+                                <span style={{ fontSize: "9.5px", fontWeight: "600", color: count > 0 ? (isChecked ? "#2563eb" : "#64748b") : "#cbd5e1", backgroundColor: isChecked ? "#dbeafe" : "#f1f5f9", padding: "1px 6px", borderRadius: "10px" }}>
+                                  {count}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+
+                        <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "5px", marginTop: "4px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: "9.5px", color: "#64748b" }}>
+                            {selectedFilterStages.length === 0 ? "Showing All" : `${selectedFilterStages.length} selected`}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setIsSheetStageOpen(false)}
+                            style={{ padding: "3px 10px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "5px", fontSize: "10px", fontWeight: "600", cursor: "pointer" }}
+                          >
+                            Done ✓
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Score Filter */}
@@ -10254,11 +10535,12 @@ export default function App() {
                     </span>
                   )}
 
-                  {(searchQuery || filterStage || filterScore || filterSource || filterMinVal || filterOwner || sheetFilterCriteria) && (
+                  {(searchQuery || filterStage || selectedFilterStages.length > 0 || filterScore || filterSource || filterMinVal || filterOwner || sheetFilterCriteria) && (
                     <button 
                       onClick={() => {
                         setSearchQuery("");
                         setFilterStage("");
+                        setSelectedFilterStages([]);
                         setFilterScore("");
                         setFilterSource("");
                         setFilterMinVal("");
