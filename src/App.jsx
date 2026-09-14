@@ -1556,6 +1556,7 @@ export default function App() {
   // Interactive Sales Calendar States
   const [calendarViewDate, setCalendarViewDate] = useState(new Date(2026, 8, 1));
   const [calendarFilterCategory, setCalendarFilterCategory] = useState("all");
+  const [calendarOwnerFilter, setCalendarOwnerFilter] = useState("");
   const [selectedCalendarDateStr, setSelectedCalendarDateStr] = useState("2026-09-01");
 
   // User Profile & Account Information State
@@ -4313,10 +4314,43 @@ export default function App() {
     return <Phone className={className} />;
   };
 
-  // Group scheduled leads by date YYYY-MM-DD for Calendar Hub
+  // Role-Isolated Leads for Sales Calendar
+  const calendarAllowedLeads = useMemo(() => {
+    if (!isLoggedIn || !currentUser) return [];
+    const isSuper = checkIsSuperAdmin(currentUser);
+    const isManager = currentUser?.role === "manager";
+
+    let base = leads;
+    if (!isSuper) {
+      if (isManager) {
+        const managerNameLower = (currentUser.name || "").trim().toLowerCase();
+        const reportingEmployees = allUsersList.filter(u => {
+          const repTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+          return repTo === managerNameLower || u.managerId === currentUser.id;
+        }).map(u => (u.name || '').trim().toLowerCase());
+        const allowedOwners = new Set([managerNameLower, ...reportingEmployees]);
+        base = base.filter(l => allowedOwners.has((l.owner || "").trim().toLowerCase()));
+      } else {
+        const repName = (currentUser.name || "").trim().toLowerCase();
+        base = base.filter(l => (l.owner || "").trim().toLowerCase() === repName);
+      }
+    }
+
+    if (calendarOwnerFilter) {
+      if (calendarOwnerFilter === "__my_events__") {
+        base = base.filter(l => (l.owner || "").trim().toLowerCase() === (currentUser.name || "").trim().toLowerCase());
+      } else {
+        base = base.filter(l => (l.owner || "").trim().toLowerCase() === calendarOwnerFilter.trim().toLowerCase());
+      }
+    }
+
+    return base;
+  }, [leads, isLoggedIn, currentUser, allUsersList, calendarOwnerFilter]);
+
+  // Group scheduled leads by date YYYY-MM-DD for Calendar Hub (Strictly real data, zero leaks)
   const calendarEventsByDate = useMemo(() => {
     const map = {};
-    leads.forEach(l => {
+    calendarAllowedLeads.forEach(l => {
       const dateKey = l.next_follow_up || (l.createdAt ? new Date(l.createdAt).toISOString().split('T')[0] : null);
       if (!dateKey) return;
       if (!map[dateKey]) map[dateKey] = [];
@@ -4327,12 +4361,12 @@ export default function App() {
       let badgeColor = "#c2410c";
       let badgeBg = "#ffedd5";
 
-      if (statusLower.includes("demo booked") || statusLower.includes("demo done")) {
+      if (statusLower.includes("demo booked") || statusLower.includes("demo done") || statusLower.includes("demo")) {
         eventType = "demo";
         eventIcon = "demo";
         badgeColor = "#15803d";
         badgeBg = "#dcfce7";
-      } else if (statusLower.includes("payment follow up") || statusLower.includes("proposal sent") || statusLower.includes("negotiation")) {
+      } else if (statusLower.includes("payment follow up") || statusLower.includes("proposal sent") || statusLower.includes("negotiation") || statusLower.includes("payment")) {
         eventType = "payment";
         eventIcon = "payment";
         badgeColor = "#7e22ce";
@@ -4352,14 +4386,15 @@ export default function App() {
       map[dateKey].push({
         id: l.id,
         lead: l,
-        name: l.name,
-        company: l.company ? l.company.trim() : "Lead Company Name",
-        value: Number(l.value) || 6000,
-        status: l.status || "Demo Scheduled",
+        name: l.name || "Untitled Lead",
+        company: l.company ? l.company.trim() : "",
+        value: Number(l.value) || 0,
+        status: l.status || "Follow-up",
         score: l.score || "Warm",
-        phone: l.phone || "9428730989",
+        phone: l.phone || "",
         email: l.email || "",
         notes: l.remarks || l.last_note || "",
+        owner: l.owner || "",
         type: eventType,
         icon: eventIcon,
         color: badgeColor,
@@ -4368,66 +4403,8 @@ export default function App() {
       });
     });
 
-    // Populate exact events from Option 2 Reference UI for September 2026
-    const option2Items = [
-      { date: "2026-09-01", name: "Sanjay Bablai", company: "Lead Company Name", val: 6000, type: "demo", status: "Demo Booked", time: "10:00 AM", phone: "+919428730989", notes: "Sanjay Bablai requested product demo walkthrough. Prepare core CRM pipeline highlights and pricing tier breakdown." },
-      { date: "2026-09-02", name: "SUMAN SAHA", company: "Lead Company Name", val: 7000, type: "payment", status: "Payment Follow-up", time: "10:00 AM", phone: "+919690014241", notes: "Suman Saha sent purchase order and requested payment milestone clearance terms." },
-      { date: "2026-09-03", name: "Ramesh Sharma", company: "Lead Company Name", val: 8500, type: "demo", status: "Demos", time: "11:00 AM", phone: "+919876543210", notes: "Product walkthrough for sales team onboarding." },
-      { date: "2026-09-04", name: "Pooja Reddy", company: "Lead Company Name", val: 9200, type: "demo", status: "Demos", time: "02:30 PM", phone: "+919848012345", notes: "Technical discussion regarding CRM workflow automations." },
-      { date: "2026-09-05", name: "Juned Malkani", company: "Lead Company Name", val: 6000, type: "renewal", status: "Renewals", time: "10:00 AM", phone: "+919428730989", notes: "Juned Malkani discussed annual subscription renewal terms and requested customized onboarding support." },
-      { date: "2026-09-05", name: "Ashok Kumar", company: "Lead Company Name", val: 7000, type: "payment", status: "Payment", time: "10:00 AM", phone: "+919690014241", notes: "Ashok Kumar requested proposal presentation for product team. Follow up on decision timeline." },
-      { date: "2026-09-06", name: "Vikram Das", company: "Lead Company Name", val: 5000, type: "general", status: "General", time: "04:00 PM", phone: "+919123456789", notes: "Quarterly review of transport lead flow and conversion metrics." },
-      { date: "2026-09-08", name: "Kunal Mehra", company: "Lead Company Name", val: 9000, type: "demo", status: "Demos", time: "10:00 AM", phone: "+919876501234", notes: "Sales demo for automobile CRM workflows." },
-      { date: "2026-09-08", name: "Anita Roy", company: "Lead Company Name", val: 4000, type: "general", status: "General", time: "01:00 PM", phone: "+919876509876", notes: "Follow up on creative agency discount package." },
-      { date: "2026-09-09", name: "Sunil Verma", company: "Lead Company Name", val: 14000, type: "demo", status: "Demos", time: "11:00 AM", phone: "+919811122233", notes: "Retail pipeline multi-store management demo." },
-      { date: "2026-09-10", name: "Naveen Chawla", company: "Lead Company Name", val: 18000, type: "payment", status: "Payment", time: "02:30 PM", phone: "+919822233344", notes: "Finalizing invoice clearance for Q3 deployment." },
-      { date: "2026-09-11", name: "Deepak Joshi", company: "Lead Company Name", val: 7500, type: "demo", status: "Demos", time: "10:30 AM", phone: "+919833344455", notes: "Live walkthrough of AI analytics module." },
-      { date: "2026-09-11", name: "Kavita Rao", company: "Lead Company Name", val: 6200, type: "payment", status: "Payment", time: "04:00 PM", phone: "+919844455566", notes: "Payment gateway integration milestone." },
-      { date: "2026-09-12", name: "Alok Gupta", company: "Lead Company Name", val: 22000, type: "payment", status: "Payment", time: "11:00 AM", phone: "+919855566677", notes: "Hospital chain licensing fee confirmation." },
-      { date: "2026-09-13", name: "Rohit Bansal", company: "Lead Company Name", val: 5500, type: "general", status: "General", time: "03:00 PM", phone: "+919866677788", notes: "Quarterly review of transport lead flow." },
-      { date: "2026-09-15", name: "Manish Nair", company: "Lead Company Name", val: 11000, type: "demo", status: "Demos", time: "10:00 AM", phone: "+919877788899", notes: "Product demo for cloud migration leads." },
-      { date: "2026-09-16", name: "Pooja Hegde", company: "Lead Company Name", val: 8500, type: "demo", status: "Demos", time: "11:30 AM", phone: "+919888899900", notes: "Marketing team lead tracking demo." },
-      { date: "2026-09-16", name: "Kiran Sethi", company: "Lead Company Name", val: 4800, type: "general", status: "General", time: "03:30 PM", phone: "+919899900011", notes: "Medical rep routing questions." },
-      { date: "2026-09-17", name: "Gaurav Sen", company: "Lead Company Name", val: 13500, type: "renewal", status: "Renewals", time: "02:00 PM", phone: "+919900011122", notes: "Annual renewal for enterprise analytics cluster." },
-      { date: "2026-09-18", name: "Harish Iyer", company: "Lead Company Name", val: 19000, type: "demo", status: "Demos", time: "10:00 AM", phone: "+919911122233", notes: "Financial services compliance & security demo." },
-      { date: "2026-09-19", name: "Suresh Jain", company: "Lead Company Name", val: 9500, type: "payment", status: "Payment", time: "01:30 PM", phone: "+919922233344", notes: "Wholesale CRM module advance payment." },
-      { date: "2026-09-20", name: "Dinesh Pillai", company: "Lead Company Name", val: 6000, type: "general", status: "General", time: "04:00 PM", phone: "+919933344455", notes: "General catch up on supply chain tracking." },
-      { date: "2026-09-22", name: "Tarun Bajaj", company: "Lead Company Name", val: 16000, type: "demo", status: "Demos", time: "10:30 AM", phone: "+919944455566", notes: "Portfolio management CRM trial setup." },
-      { date: "2026-09-23", name: "Ajay Dev", company: "Lead Company Name", val: 21000, type: "demo", status: "Demos", time: "02:30 PM", phone: "+919955566677", notes: "Construction lead pipeline pipeline setup." },
-      { date: "2026-09-24", name: "Brijesh Patel", company: "Lead Company Name", val: 12500, type: "renewal", status: "Renewals", time: "11:00 AM", phone: "+919966677788", notes: "Agro dealer management renewal terms." },
-      { date: "2026-09-25", name: "Neeraj Goel", company: "Lead Company Name", val: 17000, type: "payment", status: "Payment", time: "03:00 PM", phone: "+919977788899", notes: "Steel manufacturing ERP sync payment." },
-      { date: "2026-09-26", name: "Siddharth Roy", company: "Lead Company Name", val: 14500, type: "payment", status: "Payment", time: "12:00 PM", phone: "+919988899900", notes: "Invoice clearance before month-end closing." },
-      { date: "2026-09-27", name: "Chetan Bhagat", company: "Lead Company Name", val: 7000, type: "general", status: "General", time: "04:30 PM", phone: "+919999900011", notes: "Media publishing distribution inquiries." }
-    ];
-
-    option2Items.forEach(item => {
-      if (!map[item.date]) map[item.date] = [];
-      const isAlready = map[item.date].some(x => x.name === item.name);
-      if (!isAlready) {
-        const bg = item.type === "demo" ? "#dcfce7" : item.type === "payment" ? "#f3e8ff" : item.type === "renewal" ? "#e0f2fe" : "#ffedd5";
-        const color = item.type === "demo" ? "#15803d" : item.type === "payment" ? "#7e22ce" : item.type === "renewal" ? "#0369a1" : "#c2410c";
-        map[item.date].push({
-          id: `demo_${item.date}_${item.name}`,
-          lead: { id: `demo_${item.date}_${item.name}`, name: item.name, company: item.company, value: item.val, status: item.status, phone: item.phone, score: "Warm" },
-          name: item.name,
-          company: item.company,
-          value: item.val,
-          status: item.status,
-          score: "Warm",
-          phone: item.phone,
-          email: `${item.name.toLowerCase().replace(/[^a-z]/g, "")}@example.com`,
-          notes: item.notes,
-          type: item.type,
-          icon: item.type,
-          color,
-          bg,
-          time: item.time
-        });
-      }
-    });
-
     return map;
-  }, [leads]);
+  }, [calendarAllowedLeads]);
 
   // Reset selection on tab switch
   useEffect(() => {
@@ -6865,7 +6842,7 @@ export default function App() {
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: "9.5px", fontWeight: "500", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>Total Scheduled</div>
                     <div style={{ fontSize: "15px", fontWeight: "600", color: "#0f172a", lineHeight: "1.2", marginTop: "1px" }}>
-                      {leads.filter(l => Boolean(l.next_follow_up)).length || 24}
+                      {calendarAllowedLeads.filter(l => Boolean(l.next_follow_up)).length}
                     </div>
                   </div>
                 </div>
@@ -6878,7 +6855,7 @@ export default function App() {
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: "9.5px", fontWeight: "500", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>Today's Demos</div>
                     <div style={{ fontSize: "15px", fontWeight: "600", color: "#0f172a", lineHeight: "1.2", marginTop: "1px" }}>
-                      {leads.filter(l => l.status && l.status.toLowerCase().includes("demo")).length || 3}
+                      {calendarAllowedLeads.filter(l => l.next_follow_up === todayStr && (l.status || "").toLowerCase().includes("demo")).length}
                     </div>
                   </div>
                 </div>
@@ -6891,7 +6868,7 @@ export default function App() {
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: "9.5px", fontWeight: "500", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>Pipeline at Stake</div>
                     <div style={{ fontSize: "15px", fontWeight: "600", color: "#0f172a", lineHeight: "1.2", marginTop: "1px" }}>
-                      ₹{leads.filter(l => Boolean(l.next_follow_up)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN") || "1,45,000"}
+                      ₹{calendarAllowedLeads.filter(l => Boolean(l.next_follow_up)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN")}
                     </div>
                   </div>
                 </div>
@@ -6904,7 +6881,7 @@ export default function App() {
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: "9.5px", fontWeight: "500", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>Overdue Calls</div>
                     <div style={{ fontSize: "15px", fontWeight: "600", color: "#e11d48", lineHeight: "1.2", marginTop: "1px" }}>
-                      {leads.filter(l => l.next_follow_up && l.next_follow_up < todayStr && !isWonStatus(l.status)).length || 2}
+                      {calendarAllowedLeads.filter(l => l.next_follow_up && l.next_follow_up < todayStr && !isWonStatus(l.status)).length}
                     </div>
                   </div>
                 </div>
@@ -6920,14 +6897,26 @@ export default function App() {
                     <div>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                         <h2 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
-                          Interactive Sales & Meeting Calendar
+                          {checkIsSuperAdmin(currentUser) 
+                            ? "Enterprise Sales & Meeting Calendar" 
+                            : currentUser?.role === "manager" 
+                              ? "Team Sales & Follow-up Calendar" 
+                              : "My Sales & Follow-up Calendar"}
                         </h2>
                         <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#7c3aed", backgroundColor: "#faf5ff", padding: "1px 6px", borderRadius: "8px", border: "1px solid #ddd6fe" }}>
-                          DATE-WISE SCHEDULE
+                          {checkIsSuperAdmin(currentUser) 
+                            ? "MASTER SCHEDULE" 
+                            : currentUser?.role === "manager" 
+                              ? "TEAM SCHEDULE" 
+                              : "INDIVIDUAL SCHEDULE"}
                         </span>
                       </div>
                       <p style={{ fontSize: "10.5px", color: "#64748b", margin: "1px 0 0 0", fontWeight: "400" }}>
-                        Date-wise track Demo Bookings, Payment Follow-ups, Renewals, and Scheduled Meetings.
+                        {checkIsSuperAdmin(currentUser) 
+                          ? "Company-wide date-wise tracking of Demos, Payment Follow-ups, and Renewals." 
+                          : currentUser?.role === "manager" 
+                            ? "Date-wise follow-up calendar for yourself and direct reporting sales reps." 
+                            : "Your personal follow-up calendar: Only your assigned demos, calls, and follow-ups are visible."}
                       </p>
                     </div>
                   </div>
@@ -6973,38 +6962,90 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Event Category Filter Pills Bar */}
-                <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "8px", display: "flex", gap: "5px", alignItems: "center", flexWrap: "wrap" }}>
-                  <span style={{ fontSize: "10.5px", fontWeight: "500", color: "#64748b", marginRight: "3px" }}>Filter:</span>
-                  {[
-                    { id: "all", label: "All Scheduled Events", icon: <Calendar size={12} /> },
-                    { id: "demo", label: "Demos Booked", icon: <Target size={12} color="#7c3aed" /> },
-                    { id: "payment", label: "Payment Follow-ups", icon: <IndianRupee size={12} color="#059669" /> },
-                    { id: "renewal", label: "Renewals", icon: <RefreshCw size={12} color="#ea580c" /> },
-                    { id: "followup", label: "General Follow-ups", icon: <Phone size={12} color="#2563eb" /> }
-                  ].map(cat => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setCalendarFilterCategory(cat.id)}
-                      style={{
-                        padding: "3px 9px",
-                        borderRadius: "5px",
-                        fontSize: "10.5px",
-                        fontWeight: "500",
-                        border: calendarFilterCategory === cat.id ? "1.5px solid #2563eb" : "1px solid #e2e8f0",
-                        backgroundColor: calendarFilterCategory === cat.id ? "#eff6ff" : "#ffffff",
-                        color: calendarFilterCategory === cat.id ? "#2563eb" : "#475569",
-                        cursor: "pointer",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        transition: "all 0.15s ease"
-                      }}
-                    >
-                      {cat.icon}
-                      <span>{cat.label}</span>
-                    </button>
-                  ))}
+                {/* Event Category Filter Pills & Owner Filter Bar */}
+                <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+                  <div style={{ display: "flex", gap: "5px", alignItems: "center", flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "10.5px", fontWeight: "500", color: "#64748b", marginRight: "3px" }}>Filter:</span>
+                    {[
+                      { id: "all", label: "All Scheduled Events", icon: <Calendar size={12} /> },
+                      { id: "demo", label: "Demos Booked", icon: <Target size={12} color="#7c3aed" /> },
+                      { id: "payment", label: "Payment Follow-ups", icon: <IndianRupee size={12} color="#059669" /> },
+                      { id: "renewal", label: "Renewals", icon: <RefreshCw size={12} color="#ea580c" /> },
+                      { id: "followup", label: "General Follow-ups", icon: <Phone size={12} color="#2563eb" /> }
+                    ].map(cat => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setCalendarFilterCategory(cat.id)}
+                        style={{
+                          padding: "3px 9px",
+                          borderRadius: "5px",
+                          fontSize: "10.5px",
+                          fontWeight: "500",
+                          border: calendarFilterCategory === cat.id ? "1.5px solid #2563eb" : "1px solid #e2e8f0",
+                          backgroundColor: calendarFilterCategory === cat.id ? "#eff6ff" : "#ffffff",
+                          color: calendarFilterCategory === cat.id ? "#2563eb" : "#475569",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "5px",
+                          transition: "all 0.15s ease"
+                        }}
+                      >
+                        {cat.icon}
+                        <span>{cat.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* 👤 Calendar Owner Filter */}
+                  {(() => {
+                    const isSuper = checkIsSuperAdmin(currentUser);
+                    const isManager = currentUser?.role === "manager";
+                    const isRepOnly = !isSuper && !isManager;
+
+                    return (
+                      <div style={{ position: "relative" }}>
+                        <select
+                          value={isRepOnly ? currentUser?.name : calendarOwnerFilter}
+                          disabled={isRepOnly}
+                          onChange={(e) => setCalendarOwnerFilter(e.target.value)}
+                          style={{
+                            appearance: "none",
+                            padding: "3px 22px 3px 8px",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "6px",
+                            fontSize: "11px",
+                            color: calendarOwnerFilter ? "#7c3aed" : "#475569",
+                            backgroundColor: isRepOnly ? "#f8fafc" : (calendarOwnerFilter ? "#f5f3ff" : "#ffffff"),
+                            outline: "none",
+                            cursor: isRepOnly ? "default" : "pointer",
+                            fontWeight: "600",
+                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            height: "28px"
+                          }}
+                        >
+                          {isRepOnly ? (
+                            <option value={currentUser?.name}>👤 My Calendar ({currentUser?.name})</option>
+                          ) : isManager ? (
+                            <>
+                              <option value="">Team: All Scheduled</option>
+                              <option value="__my_events__">👤 My Follow-ups ({currentLoggedInUser})</option>
+                              {teamMembers.filter(m => m !== currentLoggedInUser).map(m => (
+                                <option key={m} value={m}>{m}</option>
+                              ))}
+                            </>
+                          ) : (
+                            <>
+                              <option value="">Owner: All Scheduled</option>
+                              <option value="__my_events__">👤 My Follow-ups ({currentLoggedInUser})</option>
+                              {teamMembers.map(m => <option key={m} value={m}>{m}</option>)}
+                            </>
+                          )}
+                        </select>
+                        <ChevronDown size={11} style={{ position: "absolute", right: "6px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8", pointerEvents: "none" }} />
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -7056,32 +7097,22 @@ export default function App() {
                         }
 
                         // Special styling matching Option 2 Mockup for Day 1, 2, 10
-                        const isDay1 = d === 1 && month === 8;
-                        const isDay2 = d === 2 && month === 8;
-                        const isDay10 = d === 10 && month === 8;
+                        const hasEvents = dayEvents.length > 0;
 
                         const cellBg = isSelected 
                           ? "#f0f9ff" 
-                          : isDay1 
-                          ? "#fff7ed" 
-                          : isDay2 
-                          ? "#f5f3ff" 
-                          : isDay10 
-                          ? "#f5f3ff" 
                           : isToday 
                           ? "#fff7ed" 
+                          : hasEvents 
+                          ? "#f8fafc" 
                           : "#ffffff";
 
                         const cellBorder = isSelected 
                           ? "1.5px solid #0284c7" 
-                          : isDay1 
-                          ? "1px solid #fed7aa" 
-                          : isDay2 
-                          ? "1px solid #ddd6fe" 
-                          : isDay10 
-                          ? "1px solid #ddd6fe" 
                           : isToday 
                           ? "1.5px solid #ea580c" 
+                          : hasEvents 
+                          ? "1px solid #cbd5e1" 
                           : "1px solid #e2e8f0";
 
                         cells.push(
@@ -7103,7 +7134,7 @@ export default function App() {
                             }}
                           >
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: "11px", fontWeight: isToday || isSelected || isDay1 || isDay2 ? "600" : "500", color: isToday || isDay1 ? "#c2410c" : isSelected ? "#0284c7" : isDay2 ? "#6b21a8" : "#0f172a" }}>
+                              <span style={{ fontSize: "11px", fontWeight: isToday || isSelected ? "600" : "500", color: isToday ? "#c2410c" : isSelected ? "#0284c7" : "#0f172a" }}>
                                 {d}
                               </span>
                               {dayEvents.length > 0 && (
@@ -7116,41 +7147,12 @@ export default function App() {
                             {/* Day Events Badges (Clean Soft Pastel Chips) */}
                             <div style={{ display: "flex", flexDirection: "column", gap: "2px", overflow: "hidden", marginTop: "1px" }}>
                               {dayEvents.slice(0, 2).map((ev, idx) => {
-                                const chipLabel = isDay1 
-                                  ? (ev.name ? ev.name.split(" ")[0] : "Sanjay") 
-                                  : isDay2 
-                                  ? (ev.name ? ev.name.split(" ")[0] : "Suman") 
-                                  : ev.type === "demo" 
-                                  ? "Demos" 
-                                  : ev.type === "payment" 
-                                  ? "Payment" 
-                                  : ev.type === "renewal" 
-                                  ? "Renewals" 
-                                  : "General";
+                                const chipLabel = ev.name 
+                                  ? ev.name.split(" ")[0] 
+                                  : (ev.type === "demo" ? "Demo" : ev.type === "payment" ? "Payment" : ev.type === "renewal" ? "Renewal" : "Follow-up");
 
-                                const chipBg = isDay1 
-                                  ? "#dcfce7" 
-                                  : isDay2 
-                                  ? "#f3e8ff" 
-                                  : ev.type === "demo" 
-                                  ? "#dcfce7" 
-                                  : ev.type === "payment" 
-                                  ? "#f3e8ff" 
-                                  : ev.type === "renewal" 
-                                  ? "#e0f2fe" 
-                                  : "#ffedd5";
-
-                                const chipColor = isDay1 
-                                  ? "#15803d" 
-                                  : isDay2 
-                                  ? "#7e22ce" 
-                                  : ev.type === "demo" 
-                                  ? "#15803d" 
-                                  : ev.type === "payment" 
-                                  ? "#7e22ce" 
-                                  : ev.type === "renewal" 
-                                  ? "#0369a1" 
-                                  : "#c2410c";
+                                const chipBg = ev.bg || (ev.type === "demo" ? "#dcfce7" : ev.type === "payment" ? "#f3e8ff" : ev.type === "renewal" ? "#e0f2fe" : "#ffedd5");
+                                const chipColor = ev.color || (ev.type === "demo" ? "#15803d" : ev.type === "payment" ? "#7e22ce" : ev.type === "renewal" ? "#0369a1" : "#c2410c");
 
                                 return (
                                   <div
@@ -7207,7 +7209,7 @@ export default function App() {
                     </div>
                     <span style={{ fontSize: "10px", fontWeight: "500", color: "#64748b", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 6px", borderRadius: "5px" }}>
                       {(calendarEventsByDate[selectedCalendarDateStr] || []).length > 0
-                        ? `${(calendarEventsByDate[selectedCalendarDateStr] || []).length} Meetings`
+                        ? `${(calendarEventsByDate[selectedCalendarDateStr] || []).length} Scheduled`
                         : "Active Pipeline Feed"}
                     </span>
                   </div>
@@ -7220,23 +7222,24 @@ export default function App() {
                         dayEvents = dayEvents.filter(ev => ev.type === calendarFilterCategory);
                       }
 
-                      // If selected day has no events, show upcoming meetings for this month
-                      const displayEvents = dayEvents.length > 0 ? dayEvents : Object.values(calendarEventsByDate).flat().slice(0, 4);
+                      // Show events scheduled on this specific selected date
+                      const displayEvents = dayEvents;
 
                       if (displayEvents.length === 0) {
                         return (
-                          <div style={{ textAlign: "center", padding: "30px 10px", color: "#94a3b8" }}>
-                            <Calendar size={24} color="#cbd5e1" style={{ margin: "0 auto 6px auto" }} />
-                            <span style={{ fontSize: "11.5px", fontWeight: "500", display: "block" }}>No events scheduled in pipeline.</span>
+                          <div style={{ textAlign: "center", padding: "35px 12px", color: "#94a3b8" }}>
+                            <Calendar size={28} color="#cbd5e1" style={{ margin: "0 auto 8px auto" }} />
+                            <strong style={{ fontSize: "12px", color: "#475569", display: "block" }}>No follow-ups scheduled for this date.</strong>
+                            <span style={{ fontSize: "10px", color: "#94a3b8", display: "block", marginTop: "2px" }}>Select another date on the calendar or schedule a new follow-up.</span>
                             <button
                               onClick={() => {
                                 setNewLeadName("");
                                 setShowAddModal(true);
                               }}
-                              style={{ marginTop: "8px", padding: "5px 12px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 3px rgba(234, 88, 12, 0.25)" }}
+                              style={{ marginTop: "12px", padding: "6px 14px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 3px rgba(234, 88, 12, 0.25)" }}
                             >
                               <Plus size={12} color="#ffffff" />
-                              <span>Schedule New Lead</span>
+                              <span>+ Schedule Follow-up</span>
                             </button>
                           </div>
                         );
@@ -7249,12 +7252,12 @@ export default function App() {
                         // Intelligent Smart AI Note preview text
                         const aiNoteText = ev.notes || (
                           ev.type === "demo" 
-                            ? `${ev.name} requested product demo walkthrough. Prepare core CRM pipeline highlights and pricing tier breakdown.`
+                            ? `${ev.name} scheduled for demo walkthrough.`
                             : ev.type === "payment"
-                            ? `Payment follow-up pending. Review invoice terms for ₹${ev.value.toLocaleString("en-IN")} and confirm bank transfer.`
+                            ? `Payment follow-up pending for ₹${ev.value.toLocaleString("en-IN")}.`
                             : ev.type === "renewal"
-                            ? `Annual subscription renewal discussion. Present upgrade incentive and confirm renewal date.`
-                            : `General follow-up call scheduled. Inquire about feature questions and decision timeline.`
+                            ? `Subscription renewal follow-up.`
+                            : `General follow-up call scheduled.`
                         );
 
                         return (
@@ -7275,14 +7278,19 @@ export default function App() {
                             {/* Top Row: Lead Name, Priority Indicator, and Value */}
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                               <div>
-                                <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
                                   <strong style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a" }}>
                                     {ev.name}
                                   </strong>
                                   <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: scoreDotColor }} title={`Priority: ${ev.score}`} />
+                                  {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && ev.owner && (
+                                    <span style={{ fontSize: "8.5px", backgroundColor: "#f1f5f9", color: "#475569", padding: "1px 5px", borderRadius: "3px", fontWeight: "600", border: "1px solid #e2e8f0" }}>
+                                      👤 {ev.owner}
+                                    </span>
+                                  )}
                                 </div>
                                 <div style={{ fontSize: "10.5px", color: "#64748b", marginTop: "1px", fontWeight: "400" }}>
-                                  {ev.company || "Enterprise Lead"} • <span style={{ color: "#475569", fontWeight: "500" }}>{ev.status}</span>
+                                  {ev.company || "Lead Company"} • <span style={{ color: "#475569", fontWeight: "500" }}>{ev.status}</span>
                                 </div>
                               </div>
 
