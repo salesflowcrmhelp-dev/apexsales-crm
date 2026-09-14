@@ -31,7 +31,9 @@
       "role": "sales_rep",
       "email": "priya@apexsales.com",
       "phone": "9898000002",
-      "active": true
+      "active": true,
+      "reportsTo": "Vikas Gupta",
+      "managerId": "usr_vikas"
     },
     {
       "id": "usr_amit",
@@ -99,6 +101,20 @@
       "role": "admin",
       "status": "invited",
       "username": "salesflowcrmhelp"
+    },
+    {
+      "id": "usr_1789370363289_ksyo",
+      "name": "Vikas Gupta",
+      "displayName": "Vikas Gupta",
+      "username": "vikas",
+      "pin": "556677",
+      "role": "manager",
+      "email": "vikas@apexsales.com",
+      "phone": "",
+      "reportsTo": "",
+      "managerId": "",
+      "active": true,
+      "createdAt": "2026-09-14T07:19:23.289Z"
     }
   ],
   "leads": [

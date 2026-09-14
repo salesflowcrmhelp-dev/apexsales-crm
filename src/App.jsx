@@ -1203,15 +1203,23 @@ export default function App() {
   const [filterOwner, setFilterOwner] = useState("");
   const [teamMembers, setTeamMembers] = useState(() => {
     try {
-      const saved = localStorage.getItem("crm_team_members");
-      let list = saved ? JSON.parse(saved) : ["Harsh Goyal", "Rohan Sharma", "Priya Verma", "Amit Patel"];
-      list = list.map(m => (m === "Admin User" || m === "Admin") ? "Harsh Goyal" : m);
-      if (!list.includes("Harsh Goyal")) {
-        list.unshift("Harsh Goyal");
+      const savedUser = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        if (checkIsSuperAdmin(u)) {
+          const saved = localStorage.getItem("crm_team_members");
+          let list = saved ? JSON.parse(saved) : ["Harsh Goyal"];
+          list = list.map(m => (m === "Admin User" || m === "Admin") ? "Harsh Goyal" : m);
+          if (!list.includes("Harsh Goyal")) {
+            list.unshift("Harsh Goyal");
+          }
+          return list;
+        }
+        return u.name ? [u.name] : [];
       }
-      return list;
+      return [];
     } catch(e) {
-      return ["Harsh Goyal", "Rohan Sharma", "Priya Verma", "Amit Patel"];
+      return [];
     }
   });
   // Multi-User & Role-Based Access Control (RBAC) States
@@ -1232,8 +1240,10 @@ export default function App() {
           } catch(e) {}
           return u;
         }
-        // Non-super admin is strictly sales_rep
-        u.role = "sales_rep";
+        // Preserve manager role if set, otherwise default to sales_rep
+        if (u.role !== "manager" && u.role !== "admin") {
+          u.role = "sales_rep";
+        }
         try {
           sessionStorage.setItem("crm_auth_user", JSON.stringify(u));
           localStorage.setItem("crm_auth_user", JSON.stringify(u));
@@ -1271,7 +1281,8 @@ export default function App() {
     pin: "",
     role: "sales_rep",
     email: "",
-    phone: ""
+    phone: "",
+    reportsTo: ""
   });
 
   // Email-Restricted Login & Invitation System States
@@ -2191,12 +2202,15 @@ export default function App() {
   // Central Backend Synchronizers & RBAC Loaders
   const loadUsersFromBackend = async () => {
     try {
-      const res = await fetch("/api/users", {
-        headers: {
-          "x-user-role": currentUser?.role || "admin",
-          "x-user-name": currentUser?.name || "Harsh Goyal"
-        }
-      });
+      const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
+      const headers = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      if (currentUser) {
+        headers["x-user-role"] = currentUser.role || (checkIsSuperAdmin(currentUser) ? "admin" : "sales_rep");
+        headers["x-user-name"] = currentUser.name || "";
+        headers["x-user-id"] = currentUser.id || "";
+      }
+      const res = await fetch("/api/users", { headers });
       if (res.ok) {
         const data = await res.json();
         if (data && data.success && Array.isArray(data.users)) {
@@ -2237,10 +2251,12 @@ export default function App() {
       if (!activeUser) return [];
 
       const isSuper = checkIsSuperAdmin(activeUser);
-      activeUser = { ...activeUser, role: isSuper ? "admin" : "sales_rep" };
+      const isManager = activeUser.role === "manager";
+      const effectiveRole = isSuper ? "admin" : (isManager ? "manager" : "sales_rep");
+      activeUser = { ...activeUser, role: effectiveRole };
 
       const headers = {};
-      headers["x-user-role"] = isSuper ? "admin" : "sales_rep";
+      headers["x-user-role"] = effectiveRole;
       headers["x-user-name"] = activeUser.name || "";
       headers["x-user-id"] = activeUser.id || "";
       const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
@@ -2270,10 +2286,12 @@ export default function App() {
             syncLeadsToBackend(sanitized);
           }
 
-          // 🛡️ STRICT SALES REP ISOLATION: NEVER leak Harsh Goyal or peer data to non-admin users
+          // 🛡️ STRICT REP / MANAGER CACHING:
           if (!isSuper) {
-            const userNameLower = (activeUser.name || "").trim().toLowerCase();
-            sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
+            if (!isManager) {
+              const userNameLower = (activeUser.name || "").trim().toLowerCase();
+              sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
+            }
             try {
               sessionStorage.setItem(`salesflow_rep_leads_${activeUser.id || activeUser.name}`, JSON.stringify(sanitized));
             } catch(e) {}
@@ -2427,7 +2445,8 @@ export default function App() {
       if (!activeUser) return;
 
       const isSuper = checkIsSuperAdmin(activeUser);
-      headers["x-user-role"] = isSuper ? "admin" : "sales_rep";
+      const isManager = activeUser.role === "manager";
+      headers["x-user-role"] = isSuper ? "admin" : (isManager ? "manager" : "sales_rep");
       headers["x-user-name"] = activeUser.name || "";
       headers["x-user-id"] = activeUser.id || "";
 
@@ -2457,7 +2476,8 @@ export default function App() {
       if (!activeUser) return;
 
       const isSuper = checkIsSuperAdmin(activeUser);
-      headers["x-user-role"] = isSuper ? "admin" : "sales_rep";
+      const isManager = activeUser.role === "manager";
+      headers["x-user-role"] = isSuper ? "admin" : (isManager ? "manager" : "sales_rep");
       headers["x-user-name"] = activeUser.name || "";
       headers["x-user-id"] = activeUser.id || "";
 
@@ -2688,7 +2708,7 @@ export default function App() {
           showToast(`User created! Click "1-Click Gmail" below to send credentials to ${newUserData.email}`, "info");
         }
         setCreatedInviteInfo(data);
-        setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", email: "", phone: "" });
+        setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", email: "", phone: "", reportsTo: "", managerId: "" });
         setShowAddUserSubModal(false);
         loadUsersFromBackend();
       } else {
@@ -2724,7 +2744,7 @@ export default function App() {
           showToast(`Team member "${data.user.name}" created! PIN: ${data.user.pin}`, "success");
         }
         setCreatedInviteInfo(data);
-        setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", email: "", phone: "" });
+        setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", email: "", phone: "", reportsTo: "", managerId: "" });
         setShowAddUserSubModal(false);
         loadUsersFromBackend();
       } else {
@@ -3658,12 +3678,26 @@ export default function App() {
     }
 
     const isSuper = checkIsSuperAdmin(currentUser);
+    const isManager = currentUser?.role === "manager";
     let baseLeads = leads;
 
-    // Strict Role-Based Privacy: Sales Reps ONLY see their own assigned deals
+    // Strict Role-Based Privacy:
+    // Super Admin: sees all leads
+    // Manager: sees own leads + reporting team's leads
+    // Sales Rep: strictly ONLY sees their own assigned leads
     if (!isSuper) {
-      const repName = (currentUser.name || "").trim().toLowerCase();
-      baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === repName);
+      if (isManager) {
+        const managerNameLower = (currentUser.name || "").trim().toLowerCase();
+        const reportingEmployees = allUsersList.filter(u => {
+          const repTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+          return repTo === managerNameLower || u.managerId === currentUser.id;
+        }).map(u => (u.name || '').trim().toLowerCase());
+        const allowedOwners = new Set([managerNameLower, ...reportingEmployees]);
+        baseLeads = baseLeads.filter(l => allowedOwners.has((l.owner || "").trim().toLowerCase()));
+      } else {
+        const repName = (currentUser.name || "").trim().toLowerCase();
+        baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === repName);
+      }
     }
 
     // Search query: filtered strictly within baseLeads
@@ -3749,22 +3783,16 @@ export default function App() {
     }
     if (filterOwner) {
       if (filterOwner === "__my_leads__") {
-        baseLeads = baseLeads.filter(l => (l.owner || "Harsh Goyal") === currentLoggedInUser);
+        baseLeads = baseLeads.filter(l => (l.owner || "") === currentLoggedInUser);
       } else if (filterOwner === "__unassigned__") {
         baseLeads = baseLeads.filter(l => !l.owner || l.owner === "Unassigned");
       } else {
-        baseLeads = baseLeads.filter(l => (l.owner || "Harsh Goyal") === filterOwner);
+        baseLeads = baseLeads.filter(l => (l.owner || "") === filterOwner);
       }
     }
 
-    // Strict Role-Based Privacy: Sales Reps can NEVER see other users' data
-    if (!isSuper) {
-      const repName = (currentUser.name || "").trim().toLowerCase();
-      baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === repName);
-    }
-
     return baseLeads;
-  }, [leads, currentTab, searchQuery, filterStage, selectedFilterStages, filterScore, filterSource, filterMinVal, filterOwner, currentLoggedInUser, currentUser, sheetFilterCriteria, isLoggedIn]);
+  }, [leads, currentTab, searchQuery, filterStage, selectedFilterStages, filterScore, filterSource, filterMinVal, filterOwner, currentLoggedInUser, currentUser, sheetFilterCriteria, isLoggedIn, allUsersList]);
 
   // Dynamic Real-Time Filtered Report Leads Calculation (Advanced Multi-Criteria Engine)
   const filteredReportLeads = useMemo(() => {
@@ -3773,11 +3801,24 @@ export default function App() {
     }
 
     const isSuper = checkIsSuperAdmin(currentUser);
+    const isManager = currentUser?.role === "manager";
+    const managerNameLower = (currentUser?.name || "").trim().toLowerCase();
+    const reportingEmployees = isManager ? allUsersList.filter(u => {
+      const repTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+      return repTo === managerNameLower || u.managerId === currentUser.id;
+    }).map(u => (u.name || '').trim().toLowerCase()) : [];
+    const managerAllowedOwners = new Set([managerNameLower, ...reportingEmployees]);
+
     return leads.filter(l => {
-      // 0. Strict Role Isolation: Sales Reps ONLY see their own deals in Reports
+      // 0. Strict Role Isolation: Sales Reps ONLY see their own deals; Managers see self + reporting team
       if (!isSuper) {
-        const repName = (currentUser.name || "").trim().toLowerCase();
-        if ((l.owner || "").trim().toLowerCase() !== repName) return false;
+        const leadOwnerLower = (l.owner || "").trim().toLowerCase();
+        if (isManager) {
+          if (!managerAllowedOwners.has(leadOwnerLower)) return false;
+        } else {
+          const repName = (currentUser.name || "").trim().toLowerCase();
+          if (leadOwnerLower !== repName) return false;
+        }
       }
       // 0. Search Query Filter (Name, Company, Phone, Email, Notes)
       if (reportSearchQuery.trim()) {
@@ -3930,6 +3971,7 @@ export default function App() {
 
   // 1. Dynamic Revenue Velocity Trend Data (Adapts to reportTimeframe & filteredReportLeads with visible, healthy target gap)
   const velocityTrendData = useMemo(() => {
+    const isSuper = checkIsSuperAdmin(currentUser);
     const wonLeads = filteredReportLeads.filter(l => isWonStatus(l.status));
 
     // A. September 2026 / This Month -> 4 Weeks of September 2026
@@ -3950,12 +3992,12 @@ export default function App() {
         });
         const liveBase = matches.reduce((sum, l) => sum + getEffectiveDealValue(l), 0);
         const liveActual = Math.round(liveBase * 1.18);
-        const actual = liveActual > 0 ? liveActual : w.baseDefault;
-        const count = matches.length > 0 ? matches.length : Math.max(1, Math.round(actual / 18000));
+        const actual = isSuper ? (liveActual > 0 ? liveActual : w.baseDefault) : liveActual;
+        const count = matches.length;
         return {
           key: w.key,
           label: w.label,
-          target: w.target,
+          target: isSuper ? w.target : Math.max(10000, Math.round(w.target / 4)),
           actual,
           count
         };
@@ -3980,12 +4022,12 @@ export default function App() {
         });
         const liveBase = matches.reduce((sum, l) => sum + getEffectiveDealValue(l), 0);
         const liveActual = Math.round(liveBase * 1.18);
-        const actual = liveActual > 0 ? liveActual : w.baseDefault;
-        const count = matches.length > 0 ? matches.length : Math.max(1, Math.round(actual / 18000));
+        const actual = isSuper ? (liveActual > 0 ? liveActual : w.baseDefault) : liveActual;
+        const count = matches.length;
         return {
           key: w.key,
           label: w.label,
-          target: w.target,
+          target: isSuper ? w.target : Math.max(10000, Math.round(w.target / 4)),
           actual,
           count
         };
@@ -4012,12 +4054,12 @@ export default function App() {
         });
         const liveBase = matches.reduce((sum, l) => sum + getEffectiveDealValue(l), 0);
         const liveActual = Math.round(liveBase * 1.18);
-        const actual = liveActual > 0 ? liveActual : d.def;
-        const count = matches.length > 0 ? matches.length : 1;
+        const actual = isSuper ? (liveActual > 0 ? liveActual : d.def) : liveActual;
+        const count = matches.length;
         return {
           key: d.label,
           label: d.label,
-          target: d.target,
+          target: isSuper ? d.target : Math.max(5000, Math.round(d.target / 4)),
           actual,
           count
         };
@@ -4050,9 +4092,9 @@ export default function App() {
       return slots.map(sl => ({
         key: sl.label,
         label: sl.label,
-        target: sl.target,
-        actual: sl.actual,
-        count: sl.count
+        target: isSuper ? sl.target : 10000,
+        actual: isSuper ? sl.actual : 0,
+        count: isSuper ? sl.count : 0
       }));
     }
 
@@ -4070,13 +4112,13 @@ export default function App() {
         });
         const liveBase = matches.reduce((sum, l) => sum + getEffectiveDealValue(l), 0);
         const liveActual = Math.round(liveBase * 1.18);
-        const actual = liveActual > 0 ? liveActual : m.defVal;
+        const actual = isSuper ? (liveActual > 0 ? liveActual : m.defVal) : liveActual;
         return {
           key: m.key,
           label: m.label,
-          target: m.target,
+          target: isSuper ? m.target : Math.max(20000, Math.round(m.target / 4)),
           actual,
-          count: matches.length > 0 ? matches.length : m.count
+          count: matches.length
         };
       });
     }
@@ -4098,31 +4140,36 @@ export default function App() {
       });
       const liveBase = monthLeads.reduce((sum, l) => sum + getEffectiveDealValue(l), 0);
       const withGst = Math.round(liveBase * 1.18);
-      const actualVal = m.key === "2026-09"
-        ? (withGst > 0 ? Math.max(withGst, 155000) : m.defaultVal)
-        : m.defaultVal;
-      const count = monthLeads.length > 0 ? Math.max(monthLeads.length, m.count) : m.count;
+      let actualVal = 0;
+      if (isSuper) {
+        actualVal = m.key === "2026-09"
+          ? (withGst > 0 ? Math.max(withGst, 155000) : m.defaultVal)
+          : m.defaultVal;
+      } else {
+        actualVal = withGst;
+      }
+      const count = isSuper ? (monthLeads.length > 0 ? Math.max(monthLeads.length, m.count) : m.count) : monthLeads.length;
       return {
         key: m.key,
         label: m.label,
-        target: m.target,
+        target: isSuper ? m.target : Math.max(15000, Math.round(m.target / 4)),
         actual: actualVal,
         count
       };
     });
-  }, [filteredReportLeads, reportTimeframe, monthlyTargets]);
+  }, [filteredReportLeads, reportTimeframe, monthlyTargets, currentUser]);
 
   // Backward compatibility alias
   const monthTrendData = velocityTrendData;
 
-  // 2. Pipeline Stage Donut Chart Distribution Data (Filtered)
+  // 2. Pipeline Stage Donut Chart Distribution Data (Filtered purely to user's real deals)
   const donutStageData = useMemo(() => {
     const activeLeads = filteredReportLeads.filter(l => !isLostStatus(l.status));
     const stages = [
-      { name: "Negotiation", color: "#ea580c", bg: "#fff7ed", prob: 0.8, defaultVal: 72000, defaultCount: 4 },
-      { name: "Proposal Sent", color: "#f97316", bg: "#ffedd5", prob: 0.5, defaultVal: 54000, defaultCount: 3 },
-      { name: "Demo Booked", color: "#f59e0b", bg: "#fef3c7", prob: 0.3, defaultVal: 45000, defaultCount: 3 },
-      { name: "Won", color: "#10b981", bg: "#ecfdf5", prob: 1.0, defaultVal: 35400, defaultCount: 2 }
+      { name: "Negotiation", color: "#ea580c", bg: "#fff7ed", prob: 0.8 },
+      { name: "Proposal Sent", color: "#f97316", bg: "#ffedd5", prob: 0.5 },
+      { name: "Demo Booked", color: "#f59e0b", bg: "#fef3c7", prob: 0.3 },
+      { name: "Won", color: "#10b981", bg: "#ecfdf5", prob: 1.0 }
     ];
 
     const results = stages.map(stg => {
@@ -4136,15 +4183,13 @@ export default function App() {
       });
       const base = matched.reduce((sum, l) => sum + getEffectiveDealValue(l), 0);
       const withGst = Math.round(base * 1.18);
-      const finalVal = withGst > 0 ? withGst : (activeLeads.length === 0 ? stg.defaultVal : 0);
-      const count = matched.length > 0 ? matched.length : (activeLeads.length === 0 ? stg.defaultCount : 0);
       return {
         name: stg.name,
         color: stg.color,
         bg: stg.bg,
         prob: stg.prob,
-        value: finalVal,
-        count
+        value: withGst,
+        count: matched.length
       };
     });
 
@@ -4164,31 +4209,45 @@ export default function App() {
     });
   }, [filteredReportLeads]);
 
-  // 3. Sales Rep Performance Leaderboard Data (Filtered)
+  // 3. Sales Rep Performance Leaderboard Data (Role-Aware & Isolated)
   const repLeaderboardData = useMemo(() => {
-    const reps = teamMembers && teamMembers.length > 0 ? teamMembers : ["Harsh Goyal", "Rohan Sharma", "Priya Verma", "Amit Patel"];
-    
+    const isSuper = checkIsSuperAdmin(currentUser);
+    const isManager = currentUser?.role === "manager";
+
+    let reps = [];
+    if (isSuper) {
+      reps = allUsersList.length > 0 
+        ? allUsersList.filter(u => u.active !== false).map(u => u.name)
+        : (teamMembers && teamMembers.length > 0 ? teamMembers : ["Harsh Goyal"]);
+    } else if (isManager) {
+      const managerNameLower = (currentUser.name || "").trim().toLowerCase();
+      reps = allUsersList.filter(u => {
+        if (u.active === false) return false;
+        const uNameLower = (u.name || "").trim().toLowerCase();
+        const uRepTo = (u.reportsTo || u.manager || "").trim().toLowerCase();
+        return uNameLower === managerNameLower || uRepTo === managerNameLower || u.managerId === currentUser.id;
+      }).map(u => u.name);
+      if (!reps.includes(currentUser.name)) reps.unshift(currentUser.name);
+    } else {
+      // Normal Sales Rep: STRICT PRIVACY! ONLY self is in leaderboard!
+      reps = [currentUser?.name || "My Performance"];
+    }
+
     let targetMultiplier = 1;
     if (reportTimeframe === "today" || reportTimeframe === "yesterday") targetMultiplier = 1 / 24;
     else if (reportTimeframe === "week") targetMultiplier = 7 / 30;
     else if (reportTimeframe === "quarter") targetMultiplier = 3;
 
     const baseTarget = Number(monthlyTargets["2026-09"] || 180000);
-    const targetPerRep = Math.max(5000, Math.round((baseTarget * targetMultiplier) / reps.length));
-
-    // Deterministic team distribution fallback
-    const getLeadRepOwner = (lead) => {
-      if (lead.owner && reps.some(r => r.toLowerCase() === lead.owner.toLowerCase())) {
-        return lead.owner;
-      }
-      let hash = 0;
-      const str = String(lead.id || lead.name || "");
-      for (let i = 0; i < str.length; i++) hash = (hash << 5) - hash + str.charCodeAt(i);
-      return reps[Math.abs(hash) % reps.length];
-    };
+    const targetPerRep = Math.max(5000, Math.round((baseTarget * targetMultiplier) / (isSuper ? Math.max(reps.length, 1) : 1)));
 
     const stats = reps.map((repName) => {
-      const repLeads = filteredReportLeads.filter(l => getLeadRepOwner(l).toLowerCase() === repName.toLowerCase());
+      const repNameLower = repName.toLowerCase().trim();
+      const repLeads = filteredReportLeads.filter(l => {
+        const leadOwner = (l.owner || "").trim().toLowerCase();
+        const leadAssigned = (l.assigned_to || "").trim().toLowerCase();
+        return leadOwner === repNameLower || leadAssigned === repNameLower;
+      });
       const repWon = repLeads.filter(l => isWonStatus(l.status));
       const base = repWon.reduce((sum, l) => sum + getEffectiveDealValue(l), 0);
       const withGst = Math.round(base * 1.18);
@@ -4205,7 +4264,7 @@ export default function App() {
 
     stats.sort((a, b) => b.revenue - a.revenue);
     return stats;
-  }, [filteredReportLeads, teamMembers, monthlyTargets, reportTimeframe]);
+  }, [filteredReportLeads, allUsersList, teamMembers, monthlyTargets, reportTimeframe, currentUser]);
 
   // 4. Weighted Revenue Forecasting Data (Filtered)
   const weightedForecastData = useMemo(() => {
@@ -7829,7 +7888,7 @@ export default function App() {
                 <div className="reports-kpi-card" style={{ borderLeft: "3px solid #10b981" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
                     <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>
-                      Team Win Rate
+                      {checkIsSuperAdmin(currentUser) ? "Team Win Rate" : currentUser?.role === "manager" ? "Team Win Rate" : "My Win Rate"}
                     </span>
                     <span style={{ fontSize: "8px", fontWeight: "700", color: "#166534", backgroundColor: "#f0fdf4", padding: "1px 4px", borderRadius: "3px", border: "1px solid #bbf7d0" }}>
                       {Number(reportStats.winRate) >= 50 ? "+ Above Target" : "Pace"}
@@ -8078,6 +8137,7 @@ export default function App() {
                     {/* SVG Donut */}
                     <div style={{ width: "120px", height: "120px", flexShrink: 0, position: "relative" }}>
                       <svg viewBox="0 0 150 150" style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}>
+                        <circle cx="75" cy="75" r="48" fill="none" stroke="#f1f5f9" strokeWidth="16" />
                         {(() => {
                           let accumulated = 0;
                           const C = 2 * Math.PI * 48; // ≈ 301.59
@@ -8170,9 +8230,23 @@ export default function App() {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                     <div>
                       <h3 style={{ fontSize: "11px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "5px" }}>
-                        <Trophy size={13} color="#f59e0b" /> Sales Rep Leaderboard
+                        <Trophy size={13} color="#f59e0b" /> {
+                          checkIsSuperAdmin(currentUser) 
+                            ? "Sales Rep Leaderboard" 
+                            : currentUser?.role === "manager" 
+                              ? "Team Performance Leaderboard" 
+                              : "My Performance & Quota Target"
+                        }
                       </h3>
-                      <span style={{ fontSize: "9px", color: "#64748b" }}>Ranked by closed revenue & quota</span>
+                      <span style={{ fontSize: "9px", color: "#64748b" }}>
+                        {
+                          checkIsSuperAdmin(currentUser) 
+                            ? "Ranked by closed revenue & quota" 
+                            : currentUser?.role === "manager" 
+                              ? "Direct reporting team quota & closed revenue" 
+                              : "Individual quota tracking & target progress"
+                        }
+                      </span>
                     </div>
                     <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#166534", backgroundColor: "#f0fdf4", padding: "1px 5px", borderRadius: "4px", border: "1px solid #bbf7d0" }}>
                       M-T-D Quota
@@ -8197,7 +8271,12 @@ export default function App() {
                               {getAvatarInitials(rep.name)}
                             </div>
                             <div>
-                              <div style={{ fontSize: "10px", fontWeight: "600", color: "#0f172a", lineHeight: 1.1 }}>{rep.name}</div>
+                              <div style={{ fontSize: "10px", fontWeight: "600", color: "#0f172a", lineHeight: 1.1, display: "flex", alignItems: "center", gap: "4px" }}>
+                                <span>{rep.name}</span>
+                                {rep.name === currentUser?.name && (
+                                  <span style={{ fontSize: "7.5px", backgroundColor: "#dbeafe", color: "#1d4ed8", padding: "0 3px", borderRadius: "3px", fontWeight: "700" }}>You</span>
+                                )}
+                              </div>
                               <span style={{ fontSize: "8.5px", color: "#64748b" }}>{rep.deals} deals won</span>
                             </div>
                           </div>
@@ -10512,7 +10591,10 @@ export default function App() {
 
                   {/* 👤 Lead Owner Filter */}
                   {(() => {
-                    const isRepOnly = !checkIsSuperAdmin(currentUser);
+                    const isSuper = checkIsSuperAdmin(currentUser);
+                    const isManager = currentUser?.role === "manager";
+                    const isRepOnly = !isSuper && !isManager;
+
                     return (
                       <div style={{ position: "relative" }}>
                         <select 
@@ -10523,6 +10605,14 @@ export default function App() {
                         >
                           {isRepOnly ? (
                             <option value={currentUser.name}>👤 My Leads ({currentUser.name})</option>
+                          ) : isManager ? (
+                            <>
+                              <option value="">Team: All Leads</option>
+                              <option value="__my_leads__">👤 My Leads ({currentLoggedInUser})</option>
+                              {teamMembers.filter(m => m !== currentLoggedInUser).map(m => (
+                                <option key={m} value={m}>{m}</option>
+                              ))}
+                            </>
                           ) : (
                             <>
                               <option value="">Owner: All Reps</option>
@@ -19091,7 +19181,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "10px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: newUserData.role === "sales_rep" ? "1.2fr 1fr 1fr" : "1.2fr 1fr", gap: "10px" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
                         Role & Access Level
@@ -19102,9 +19192,38 @@ export default function App() {
                         style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                       >
                         <option value="sales_rep">💼 Sales Rep (Strict Privacy: Only Sees Own Leads)</option>
+                        <option value="manager">👔 Sales Manager (Manages Direct Reporting Team)</option>
                         <option value="admin">👑 Super Admin (Full Access: All Deals & Reports)</option>
                       </select>
                     </div>
+
+                    {newUserData.role === "sales_rep" && (
+                      <div>
+                        <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
+                          Reports To (Manager / Admin)
+                        </label>
+                        <select
+                          value={newUserData.reportsTo || ""}
+                          onChange={(e) => {
+                            const selectedManagerName = e.target.value;
+                            const matchedMgr = allUsersList.find(u => u.name === selectedManagerName);
+                            setNewUserData(prev => ({ 
+                              ...prev, 
+                              reportsTo: selectedManagerName,
+                              managerId: matchedMgr ? (matchedMgr.id || matchedMgr._id) : ""
+                            }));
+                          }}
+                          style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1.5px solid #93c5fd", borderRadius: "7px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                        >
+                          <option value="">Direct to Admin (No Manager)</option>
+                          {allUsersList.filter(u => u.role === "manager" || u.role === "admin").map(mgr => (
+                            <option key={mgr.id || mgr._id || mgr.name} value={mgr.name}>
+                              {mgr.name} ({mgr.role === "manager" ? "Sales Manager" : "Admin"})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     <div>
                       <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#1e293b", marginBottom: "4px" }}>
@@ -19193,10 +19312,21 @@ export default function App() {
                               <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2.5px 7px", backgroundColor: "#fef3c7", color: "#92400e", borderRadius: "6px", fontSize: "10px", fontWeight: "750", border: "1px solid #fde68a" }}>
                                 👑 Super Admin
                               </span>
-                            ) : (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2.5px 7px", backgroundColor: "#eff6ff", color: "#1e40af", borderRadius: "6px", fontSize: "10px", fontWeight: "750", border: "1px solid #bfdbfe" }}>
-                                💼 Sales Rep
+                            ) : usr.role === "manager" ? (
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2.5px 7px", backgroundColor: "#f3e8ff", color: "#6b21a8", borderRadius: "6px", fontSize: "10px", fontWeight: "750", border: "1px solid #d8b4fe" }}>
+                                👔 Manager
                               </span>
+                            ) : (
+                              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2.5px 7px", backgroundColor: "#eff6ff", color: "#1e40af", borderRadius: "6px", fontSize: "10px", fontWeight: "750", border: "1px solid #bfdbfe", width: "fit-content" }}>
+                                  💼 Sales Rep
+                                </span>
+                                {usr.reportsTo && (
+                                  <span style={{ fontSize: "9.5px", color: "#64748b" }}>
+                                    Reports to: <strong style={{ color: "#334155" }}>{usr.reportsTo}</strong>
+                                  </span>
+                                )}
+                              </div>
                             )}
                           </td>
 

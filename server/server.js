@@ -712,7 +712,7 @@ app.use(async (req, res, next) => {
       const uId = parts.slice(1, -1).join('_');
       const user = allUsers.find(u => u.id === uId && u.active !== false);
       if (user) {
-        user.role = isSuperAdminEmailOrName(user) ? 'admin' : 'sales_rep';
+        user.role = isSuperAdminEmailOrName(user) ? 'admin' : (user.role === 'manager' ? 'manager' : 'sales_rep');
         req.user = user;
         return next();
       }
@@ -723,14 +723,14 @@ app.use(async (req, res, next) => {
   if (userHeaderName) {
     const matchedUser = allUsers.find(u => (u.id === userHeaderId || u.name?.toLowerCase() === userHeaderName.toLowerCase()) && u.active !== false);
     if (matchedUser) {
-      matchedUser.role = isSuperAdminEmailOrName(matchedUser) ? 'admin' : 'sales_rep';
+      matchedUser.role = isSuperAdminEmailOrName(matchedUser) ? 'admin' : (matchedUser.role === 'manager' ? 'manager' : 'sales_rep');
       req.user = matchedUser;
     } else {
       const isSuper = isSuperAdminEmailOrName({ name: userHeaderName, id: userHeaderId });
       req.user = {
         id: userHeaderId || 'usr_guest',
         name: userHeaderName,
-        role: isSuper ? 'admin' : 'sales_rep'
+        role: isSuper ? 'admin' : (userHeaderRole === 'manager' ? 'manager' : 'sales_rep')
       };
     }
     return next();
@@ -1089,26 +1089,57 @@ app.get('/api/auth/me', (req, res) => {
   res.json({ success: true, user: req.user });
 });
 
-// List Users (with invite status & email)
+// List Users (Role-aware: Super Admin sees all; Manager sees own team; Sales Rep sees ONLY self)
 app.get('/api/users', async (req, res) => {
   const allUsers = await getUsers();
-  const isAdmin = req.user?.role === 'admin';
+  const user = req.user;
 
-  const safeUsers = allUsers
-    .filter(u => u.active !== false)
-    .map(u => ({
-      id: u.id,
-      name: u.name,
-      displayName: u.displayName || u.name,
-      username: u.username,
-      role: u.role,
-      email: u.email || '',
-      phone: u.phone || '',
-      status: u.status || 'active',
-      invitedAt: u.invitedAt || null,
-      inviteToken: isAdmin ? u.inviteToken : undefined,
-      ...(isAdmin ? { pin: u.pin } : {})
-    }));
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.', users: [] });
+  }
+
+  const isSuper = isSuperAdminEmailOrName(user);
+  const isManager = user.role === 'manager';
+
+  let visibleUsers = [];
+
+  if (isSuper) {
+    // Super Admin sees all active users
+    visibleUsers = allUsers.filter(u => u.active !== false);
+  } else if (isManager) {
+    // Manager sees themselves + the employees who report under them
+    const managerNameLower = (user.name || '').trim().toLowerCase();
+    const managerId = user.id;
+
+    visibleUsers = allUsers.filter(u => {
+      if (u.active === false) return false;
+      if (u.id === managerId || (u.name || '').trim().toLowerCase() === managerNameLower) return true;
+      const uReportsTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+      const uManagerId = u.managerId || '';
+      return uReportsTo === managerNameLower || (uManagerId && uManagerId === managerId);
+    });
+  } else {
+    // Normal Employee (sales_rep): STRICT PRIVACY!
+    // They ONLY see themselves. No other employee's name is ever returned!
+    const userNameLower = (user.name || '').trim().toLowerCase();
+    visibleUsers = allUsers.filter(u => u.active !== false && (u.id === user.id || (u.name || '').trim().toLowerCase() === userNameLower));
+  }
+
+  const safeUsers = visibleUsers.map(u => ({
+    id: u.id,
+    name: u.name,
+    displayName: u.displayName || u.name,
+    username: u.username,
+    role: u.role || 'sales_rep',
+    email: isSuper ? (u.email || '') : (u.id === user.id ? u.email : ''),
+    phone: isSuper ? (u.phone || '') : (u.id === user.id ? u.phone : ''),
+    reportsTo: u.reportsTo || u.manager || '',
+    managerId: u.managerId || '',
+    status: u.status || 'active',
+    invitedAt: u.invitedAt || null,
+    inviteToken: isSuper ? u.inviteToken : undefined,
+    ...(isSuper ? { pin: u.pin } : {})
+  }));
 
   res.json({ success: true, users: safeUsers });
 });
@@ -1119,7 +1150,7 @@ app.post('/api/users/invite', async (req, res) => {
     return res.status(403).json({ success: false, message: 'Access denied. Only Admin can invite team members.' });
   }
 
-  const { email, name, role = 'sales_rep', pin, phone = '' } = req.body;
+  const { email, name, role = 'sales_rep', pin, phone = '', reportsTo = '' } = req.body;
   if (!email || !String(email).trim()) {
     return res.status(400).json({ success: false, message: 'Valid Email Address is required.' });
   }
@@ -1127,7 +1158,7 @@ app.post('/api/users/invite', async (req, res) => {
   const cleanEmail = String(email).trim().toLowerCase();
   const cleanName = (name && String(name).trim()) || cleanEmail.split('@')[0];
   const userPin = (pin && String(pin).trim()) || String(Math.floor(100000 + Math.random() * 900000));
-  const userRole = role === 'admin' ? 'admin' : 'sales_rep';
+  const userRole = role === 'admin' ? 'admin' : (role === 'manager' ? 'manager' : 'sales_rep');
 
   const allUsers = await getUsers();
   const existingUser = allUsers.find(u => u.email?.toLowerCase() === cleanEmail);
@@ -1146,6 +1177,7 @@ app.post('/api/users/invite', async (req, res) => {
     existingUser.invitedAt = new Date().toISOString();
     existingUser.invitedBy = req.user?.name || 'Admin';
     if (phone) existingUser.phone = phone.trim();
+    if (reportsTo) existingUser.reportsTo = reportsTo.trim();
     await saveUser(existingUser);
     savedUserRecord = existingUser;
   } else {
@@ -1159,6 +1191,7 @@ app.post('/api/users/invite', async (req, res) => {
       pin: userPin,
       role: userRole,
       phone: phone.trim(),
+      reportsTo: reportsTo.trim(),
       active: true,
       status: 'invited',
       inviteToken,
@@ -1383,7 +1416,7 @@ app.post('/api/users', async (req, res) => {
     return res.status(403).json({ success: false, message: 'Access denied. Only Admin can create users.' });
   }
 
-  const { name, username, pin, role = 'sales_rep', email = '', phone = '' } = req.body;
+  const { name, username, pin, role = 'sales_rep', email = '', phone = '', reportsTo = '', managerId = '' } = req.body;
   if (!name || !pin) {
     return res.status(400).json({ success: false, message: 'Name and PIN are required.' });
   }
@@ -1402,9 +1435,11 @@ app.post('/api/users', async (req, res) => {
     displayName: name.trim(),
     username: userSlug,
     pin: String(pin).trim(),
-    role: role === 'admin' ? 'admin' : 'sales_rep',
+    role: ['admin', 'manager'].includes(role) ? role : 'sales_rep',
     email: email.trim(),
     phone: phone.trim(),
+    reportsTo: reportsTo ? reportsTo.trim() : '',
+    managerId: managerId ? managerId.trim() : '',
     active: true,
     createdAt: new Date().toISOString()
   };
@@ -1463,7 +1498,7 @@ app.put('/api/users/:id', async (req, res) => {
   }
 
   const { id } = req.params;
-  const { name, pin, role, email, phone, active } = req.body;
+  const { name, pin, role, reportsTo, managerId, email, phone, active } = req.body;
 
   const allUsers = await getUsers();
   const targetUser = allUsers.find(u => u.id === id);
@@ -1480,8 +1515,10 @@ app.put('/api/users/:id', async (req, res) => {
     updated.pin = String(pin).trim();
   }
   if (role !== undefined) {
-    updated.role = role === 'admin' ? 'admin' : 'sales_rep';
+    updated.role = ['admin', 'manager'].includes(role) ? role : 'sales_rep';
   }
+  if (reportsTo !== undefined) updated.reportsTo = reportsTo.trim();
+  if (managerId !== undefined) updated.managerId = managerId.trim();
   if (email !== undefined) updated.email = email.trim();
   if (phone !== undefined) updated.phone = phone.trim();
   if (active !== undefined) updated.active = Boolean(active);
@@ -1515,7 +1552,7 @@ app.delete('/api/users/:id', async (req, res) => {
 
 // --- LEADS & PIPELINE API (WITH ROLE-BASED STRICT PRIVACY) ---
 
-// Get Leads: Admin gets all (or filtered by ?owner=); Sales Rep strictly gets ONLY their assigned leads
+// Get Leads: Admin gets all (or filtered by ?owner=); Manager gets self + reporting team; Sales Rep strictly gets ONLY their assigned leads
 app.get('/api/leads', async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -1527,49 +1564,95 @@ app.get('/api/leads', async (req, res) => {
   }
 
   const allLeads = await getLeads();
+  const allUsers = await getUsers();
   const { owner } = req.query;
 
   const isSuperAdmin = isSuperAdminEmailOrName(user);
+  const isManager = user.role === 'manager';
 
-  // 1. If user is Sales Rep: STRICT DATA ISOLATION (No Admin or peer leads leak)
-  if (!isSuperAdmin) {
-    const userNameLower = (user.name || '').trim().toLowerCase();
-    const userDisplayNameLower = (user.displayName || '').trim().toLowerCase();
-    const userEmailLower = (user.email || '').trim().toLowerCase();
-
-    const userLeads = allLeads.filter(l => {
-      const leadOwner = (l.owner || '').trim().toLowerCase();
-      const leadAssigned = (l.assigned_to || '').trim().toLowerCase();
-      return (
-        leadOwner === userNameLower ||
-        (userDisplayNameLower && leadOwner === userDisplayNameLower) ||
-        (userEmailLower && leadOwner === userEmailLower) ||
-        leadAssigned === userNameLower ||
-        (userDisplayNameLower && leadAssigned === userDisplayNameLower)
-      );
-    });
+  // 1. If user is Super Admin Harsh Goyal: Full Pipeline Access
+  if (isSuperAdmin) {
+    let resultLeads = allLeads;
+    if (owner && owner !== 'All' && owner !== 'all') {
+      resultLeads = resultLeads.filter(l => (l.owner || '').trim().toLowerCase() === owner.trim().toLowerCase());
+    }
 
     return res.json({
       success: true,
-      role: 'sales_rep',
-      count: userLeads.length,
-      leads: userLeads
+      role: 'admin',
+      count: resultLeads.length,
+      leads: resultLeads
     });
   }
 
-  // 2. If user is Super Admin Harsh Goyal: Full Pipeline Access
-  let resultLeads = allLeads;
+  // 2. If user is Sales Manager: Sees own leads + leads of team members reporting to them
+  if (isManager) {
+    const managerNameLower = (user.name || '').trim().toLowerCase();
+    const managerDisplayNameLower = (user.displayName || '').trim().toLowerCase();
+    const managerEmailLower = (user.email || '').trim().toLowerCase();
+    const managerId = user.id;
 
-  // If Admin specifically wants to view one Rep's data separately
-  if (owner && owner !== 'All' && owner !== 'all') {
-    resultLeads = resultLeads.filter(l => (l.owner || '').trim().toLowerCase() === owner.trim().toLowerCase());
+    // Find all users reporting to this manager
+    const reportingUsers = allUsers.filter(u => {
+      if (u.active === false) return false;
+      const uReportsTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+      const uManagerId = u.managerId || '';
+      return uReportsTo === managerNameLower || (managerDisplayNameLower && uReportsTo === managerDisplayNameLower) || (uManagerId && uManagerId === managerId);
+    });
+
+    const allowedOwners = new Set([
+      managerNameLower,
+      managerDisplayNameLower,
+      managerEmailLower,
+      ...reportingUsers.map(u => (u.name || '').trim().toLowerCase()),
+      ...reportingUsers.map(u => (u.displayName || '').trim().toLowerCase()),
+      ...reportingUsers.map(u => (u.email || '').trim().toLowerCase()),
+      ...reportingUsers.map(u => (u.username || '').trim().toLowerCase())
+    ].filter(Boolean));
+
+    let managerTeamLeads = allLeads.filter(l => {
+      const leadOwner = (l.owner || '').trim().toLowerCase();
+      const leadAssigned = (l.assigned_to || '').trim().toLowerCase();
+      return allowedOwners.has(leadOwner) || allowedOwners.has(leadAssigned);
+    });
+
+    if (owner && owner !== 'All' && owner !== 'all') {
+      const requestedOwnerLower = owner.trim().toLowerCase();
+      if (allowedOwners.has(requestedOwnerLower)) {
+        managerTeamLeads = managerTeamLeads.filter(l => (l.owner || '').trim().toLowerCase() === requestedOwnerLower || (l.assigned_to || '').trim().toLowerCase() === requestedOwnerLower);
+      }
+    }
+
+    return res.json({
+      success: true,
+      role: 'manager',
+      count: managerTeamLeads.length,
+      leads: managerTeamLeads
+    });
   }
 
-  res.json({
+  // 3. Normal Sales Rep (Employee): STRICT DATA ISOLATION (No Admin or peer leads leak)
+  const userNameLower = (user.name || '').trim().toLowerCase();
+  const userDisplayNameLower = (user.displayName || '').trim().toLowerCase();
+  const userEmailLower = (user.email || '').trim().toLowerCase();
+
+  const userLeads = allLeads.filter(l => {
+    const leadOwner = (l.owner || '').trim().toLowerCase();
+    const leadAssigned = (l.assigned_to || '').trim().toLowerCase();
+    return (
+      leadOwner === userNameLower ||
+      (userDisplayNameLower && leadOwner === userDisplayNameLower) ||
+      (userEmailLower && leadOwner === userEmailLower) ||
+      leadAssigned === userNameLower ||
+      (userDisplayNameLower && leadAssigned === userDisplayNameLower)
+    );
+  });
+
+  return res.json({
     success: true,
-    role: 'admin',
-    count: resultLeads.length,
-    leads: resultLeads
+    role: 'sales_rep',
+    count: userLeads.length,
+    leads: userLeads
   });
 });
 
