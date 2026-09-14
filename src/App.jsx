@@ -9020,7 +9020,7 @@ export default function App() {
               </div>
 
               {/* 2-Column Grid Layout for Categorized Settings */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div className="settings-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
 
                 {/* Left Column: Security, Automation & Google Sync */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -9503,7 +9503,7 @@ export default function App() {
                         ● Active
                       </span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "3px", fontSize: "10.5px", color: "#64748b" }}>
+                    <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px 12px", marginTop: "3px", fontSize: "10.5px", color: "#64748b" }}>
                       <span>✉️ {userProfile.email}</span>
                       <span>📞 {userProfile.phone}</span>
                       <span>🏢 {userProfile.organization}</span>
@@ -9522,7 +9522,7 @@ export default function App() {
               </div>
 
               {/* 2-Column Form Layout matching Settings */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div className="user-profile-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                 {/* Column 1 (Left): Personal Details & Organization */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   
@@ -9536,7 +9536,7 @@ export default function App() {
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                         <div>
                           <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Full Legal Name</label>
                           <input 
@@ -9570,7 +9570,7 @@ export default function App() {
                         />
                       </div>
 
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                         <div>
                           <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Direct Mobile Phone</label>
                           <input 
@@ -9605,7 +9605,7 @@ export default function App() {
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "8px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "8px" }}>
                         <div>
                           <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Company / Organization Name</label>
                           <input 
@@ -9628,7 +9628,7 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                         <div>
                           <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Job Title / Designation</label>
                           <input 
@@ -9671,7 +9671,7 @@ export default function App() {
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                         <div>
                           <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>New Security PIN / Passcode (6-Digits)</label>
                           <input 
@@ -9696,7 +9696,7 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "4px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", paddingTop: "4px" }}>
                         <span style={{ fontSize: "9.5px", color: "#64748b" }}>Biometric Face ID & Touch ID unlock is currently active.</span>
                         <button
                           type="button"
@@ -9737,7 +9737,7 @@ export default function App() {
                       </h3>
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                    <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                       <div>
                         <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Standard Timezone</label>
                         <select
