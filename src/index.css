@@ -3638,6 +3638,11 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
     gap: 6px !important;
   }
 
+  /* Hide bulky Vault Backup button on mobile top header */
+  .crm-top-header button[title*="Admin Data Vault"] {
+    display: none !important;
+  }
+
   .collapsed-active-tab-indicator {
     padding: 3px 8px 3px 4px !important;
     gap: 6px !important;
