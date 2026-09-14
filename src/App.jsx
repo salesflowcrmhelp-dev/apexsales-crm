@@ -6688,10 +6688,11 @@ export default function App() {
             <div style={{ position: "relative" }}>
               <button 
                 onClick={() => setIsPeriodDropdownOpen(!isPeriodDropdownOpen)}
+                className="header-period-btn"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "7px",
+                  gap: "6px",
                   backgroundColor: selectedPeriodMonth === "2026-09" ? "#f0fdf4" : selectedPeriodMonth === "all" ? "#eff6ff" : "#fff7ed",
                   border: selectedPeriodMonth === "2026-09" ? "1.5px solid #86efac" : selectedPeriodMonth === "all" ? "1.5px solid #bfdbfe" : "1.5px solid #fed7aa",
                   padding: "6px 12px",
@@ -6700,29 +6701,37 @@ export default function App() {
                   fontWeight: "750",
                   color: selectedPeriodMonth === "2026-09" ? "#166534" : selectedPeriodMonth === "all" ? "#1e40af" : "#9a3412",
                   cursor: "pointer",
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+                  whiteSpace: "nowrap"
                 }}
                 title="Switch Monthly Target & Historical Pipeline Snapshot"
               >
                 {selectedPeriodMonth === "2026-09" ? (
-                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#22c55e", display: "inline-block", boxShadow: "0 0 6px #22c55e" }} />
+                  <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#22c55e", display: "inline-block", boxShadow: "0 0 5px #22c55e", flexShrink: 0 }} />
                 ) : selectedPeriodMonth === "all" ? (
-                  <Globe size={13} color="#3b82f6" />
+                  <Globe size={12} color="#3b82f6" style={{ flexShrink: 0 }} />
                 ) : (
-                  <Archive size={13} color="#ea580c" />
+                  <Archive size={12} color="#ea580c" style={{ flexShrink: 0 }} />
                 )}
-                <span>
+                <span className="header-period-desktop-text">
                   {selectedPeriodMonth === "2026-09" 
                     ? "September 2026 (Current)" 
                     : selectedPeriodMonth === "2026-08" 
                     ? "August 2026 (Archived)" 
                     : "All-Time Lifetime"}
                 </span>
-                <ChevronDown size={13} />
+                <span className="header-period-mobile-text">
+                  {selectedPeriodMonth === "2026-09" 
+                    ? "Sep '26" 
+                    : selectedPeriodMonth === "2026-08" 
+                    ? "Aug '26" 
+                    : "All"}
+                </span>
+                <ChevronDown size={12} style={{ flexShrink: 0 }} />
               </button>
 
               {isPeriodDropdownOpen && (
-                <div style={{ position: "absolute", top: "100%", left: 0, marginTop: "6px", width: "260px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "6px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)", zIndex: 1000 }}>
+                <div style={{ position: "absolute", top: "100%", right: 0, marginTop: "6px", width: "260px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "6px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)", zIndex: 1000 }}>
                   <div style={{ fontSize: "10.5px", fontWeight: "800", color: "#64748b", textTransform: "uppercase", padding: "6px 10px 4px 10px" }}>
                     Select Pipeline Period
                   </div>
@@ -6834,6 +6843,7 @@ export default function App() {
             {checkIsSuperAdmin(currentUser) && (
               <button
                 type="button"
+                className="header-vault-btn"
                 onClick={() => setShowAdminVaultModal(true)}
                 style={{
                   display: "inline-flex",
@@ -6848,7 +6858,8 @@ export default function App() {
                   color: "#1d4ed8",
                   cursor: "pointer",
                   boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif"
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  whiteSpace: "nowrap"
                 }}
                 title="Admin Data Vault: 15 Verified Real Deals Safe"
               >
@@ -6861,7 +6872,9 @@ export default function App() {
               onClick={() => setShowStartMyDay(true)}
               className="header-cta-orange"
             >
-              <Sun className="w-4 h-4" /> Start My Day
+              <Sun className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="header-cta-desktop-text">Start My Day</span>
+              <span className="header-cta-mobile-text">My Day</span>
             </button>
 
             <div className="header-notification-btn" onClick={() => setShowStartMyDay(true)} title="3 Pending Follow-ups">
@@ -6871,6 +6884,7 @@ export default function App() {
 
             {/* Logged in User Badge */}
             <div 
+              className="header-user-badge-container"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -6879,7 +6893,8 @@ export default function App() {
                 backgroundColor: "#f8fafc",
                 border: "1px solid #e2e8f0",
                 borderRadius: "8px",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
+                boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
+                flexShrink: 0
               }}
               title={`Logged in as ${currentUser?.displayName || currentUser?.name || "Admin"} (${currentUser?.role === "admin" ? "Super Admin" : "Sales Representative"})`}
             >
@@ -6899,7 +6914,7 @@ export default function App() {
               >
                 {currentUser?.name ? currentUser.name[0].toUpperCase() : "U"}
               </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: "1.15" }}>
+              <div className="header-user-badge-text" style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: "1.15" }}>
                 <span style={{ fontSize: "11px", fontWeight: "750", color: "#0f172a", whiteSpace: "nowrap" }}>
                   {currentUser?.displayName || currentUser?.name || "Admin"}
                 </span>

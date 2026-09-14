@@ -443,6 +443,26 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   gap: 10px;
 }
 
+.header-period-btn {
+  white-space: nowrap;
+}
+
+.header-period-desktop-text {
+  display: inline;
+}
+
+.header-period-mobile-text {
+  display: none;
+}
+
+.header-cta-desktop-text {
+  display: inline;
+}
+
+.header-cta-mobile-text {
+  display: none;
+}
+
 .header-cta-orange {
   background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
   color: #ffffff;
@@ -3633,30 +3653,90 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   /* 3. Header on Mobile */
 
   .crm-top-header {
-    padding: 0 10px !important;
+    padding: 0 8px !important;
     height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
     gap: 6px !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+  }
+
+  /* Hide tab indicator on mobile to give room for quick action buttons */
+  .collapsed-active-tab-indicator {
+    display: none !important;
   }
 
   /* Hide bulky Vault Backup button on mobile top header */
+  .header-vault-btn,
   .crm-top-header button[title*="Admin Data Vault"] {
     display: none !important;
   }
 
-  .collapsed-active-tab-indicator {
-    padding: 3px 8px 3px 4px !important;
-    gap: 6px !important;
+  .header-action-row {
+    gap: 5px !important;
+    overflow: visible !important;
+    flex-shrink: 0 !important;
+    max-width: none !important;
+    white-space: nowrap !important;
+    align-items: center !important;
   }
 
-  .header-action-row {
-    gap: 6px !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
-    flex-shrink: 1 !important;
-    max-width: 60vw !important;
+  /* Mobile compact period switcher button */
+  .header-period-desktop-text {
+    display: none !important;
   }
-  .header-action-row::-webkit-scrollbar {
+  .header-period-mobile-text {
+    display: inline !important;
+    font-size: 11px !important;
+    font-weight: 750 !important;
+    white-space: nowrap !important;
+  }
+  .header-period-btn {
+    padding: 4px 7px !important;
+    font-size: 11px !important;
+    height: 30px !important;
+    gap: 4px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Mobile compact Start My Day CTA button */
+  .header-cta-desktop-text {
+    display: none !important;
+  }
+  .header-cta-mobile-text {
+    display: inline !important;
+    font-size: 11px !important;
+    font-weight: 750 !important;
+    white-space: nowrap !important;
+  }
+  .header-cta-orange {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    height: 30px !important;
+    gap: 4px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Mobile compact Notification Bell */
+  .header-notification-btn {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Mobile compact User Badge */
+  .header-user-badge-container {
+    padding: 3px !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+  }
+  .header-user-badge-text {
     display: none !important;
   }
 
