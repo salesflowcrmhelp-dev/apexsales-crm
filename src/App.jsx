@@ -643,7 +643,17 @@ const AnimatedNumber = ({ value, duration = 1000, isCurrency = false, isPercent 
 function CircularProgress({ percentage, color = "#ea580c", size = 52, strokeWidth = 5 }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  // Keep strokeDashoffset clean between 0 and circumference (ring stays fully closed 100% when percentage >= 100)
+  const progressRatio = Math.min(1, Math.max(0, percentage / 100));
+  const strokeDashoffset = circumference - progressRatio * circumference;
+
+  // Dynamically size text so 3-digit percentages (e.g. 102%, 125%) fit beautifully
+  const textLength = String(percentage).length;
+  const fontSize = textLength >= 4 
+    ? Math.max(6.5, Math.round(size * 0.20)) 
+    : textLength === 3 
+    ? Math.max(7.5, Math.round(size * 0.23)) 
+    : Math.max(8, Math.round(size * 0.26));
 
   return (
     <div style={{ position: "relative", width: size, height: size, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -666,14 +676,20 @@ function CircularProgress({ percentage, color = "#ea580c", size = 52, strokeWidt
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          style={{ transition: "stroke-dashoffset 0.5s ease" }}
+          style={{ transition: "stroke-dashoffset 0.5s ease, stroke 0.3s ease" }}
         />
       </svg>
-      <span style={{ position: "absolute", fontSize: `${Math.max(8, Math.round(size * 0.26))}px`, fontWeight: "700", color: "#0f172a", lineHeight: 1 }}>
+      <span style={{ 
+        position: "absolute", 
+        fontSize: `${fontSize}px`, 
+        fontWeight: "800", 
+        color: percentage >= 100 ? color : "#0f172a", 
+        lineHeight: 1, 
+        letterSpacing: textLength >= 4 ? "-0.5px" : "normal",
+        fontFamily: "'Plus Jakarta Sans', sans-serif" 
+      }}>
         {percentage}%
       </span>
-
-
     </div>
   );
 }
@@ -3525,8 +3541,32 @@ export default function App() {
       daysRemaining = Math.max(1, daysRemaining);
     }
     
-    const remainingTarget = Math.max(0, targetValue - wonVal);
-    const dailyRequired = isHistorical || selectedPeriodMonth === "all" ? 0 : Number((remainingTarget / (daysRemaining || 24)).toFixed(0));
+    let dailyRequired = 0;
+    let dailySubtitle = "";
+    let isStretchActive = false;
+
+    if (isHistorical || selectedPeriodMonth === "all") {
+      dailyRequired = 0;
+      dailySubtitle = selectedPeriodMonth === "2026-08" ? "August 2026 Closed" : "Lifetime Summary";
+    } else if (targetValue <= 0) {
+      dailyRequired = 0;
+      dailySubtitle = "Waiting for assignment";
+    } else if (wonVal < targetValue) {
+      // 100% Base target still in progress
+      const remainingBase = targetValue - wonVal;
+      dailyRequired = Number((remainingBase / (daysRemaining || 24)).toFixed(0));
+      dailySubtitle = `For remaining ${daysRemaining} days`;
+    } else if (wonVal < stretchTarget) {
+      // 100% Base target met! Continue driving daily run-rate up to the 125% stretch goal
+      isStretchActive = true;
+      const remainingStretch = stretchTarget - wonVal;
+      dailyRequired = Number((remainingStretch / (daysRemaining || 24)).toFixed(0));
+      dailySubtitle = `For 125% goal (${daysRemaining}d left)`;
+    } else {
+      // >= 125% Stretch goal successfully achieved!
+      dailyRequired = 0;
+      dailySubtitle = "125% Goal Conquered! 🔥";
+    }
 
     return { 
       baseProgress, 
@@ -3540,6 +3580,8 @@ export default function App() {
       baseIncentive,
       wonVal,
       dailyRequired, 
+      dailySubtitle,
+      isStretchActive,
       daysRemaining,
       nextMilestoneText,
       tierStatusBadge,
@@ -10318,12 +10360,23 @@ export default function App() {
                       <div style={{ fontSize: targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {targetValue > 0 ? <AnimatedNumber value={targetValue} isCurrency /> : "Pending ⏳"}
                       </div>
-                      <span style={{ fontSize: "8.5px", color: "#94a3b8", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        {targetValue > 0 ? `125% of ₹${(targetValue * 1.25).toLocaleString("en-IN")}` : "Goal not assigned yet"}
+                      <span style={{ fontSize: "8.5px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#94a3b8", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        {targetValue > 0 ? (
+                          targetStats.baseProgress >= 125
+                            ? `🔥 125% Conquered (₹${Math.round(targetStats.stretchTarget).toLocaleString("en-IN")})`
+                            : targetStats.baseProgress >= 100
+                            ? `🎉 100% Met! Goal 125%: ₹${Math.round(targetStats.stretchTarget).toLocaleString("en-IN")}`
+                            : `125% Stretch Goal: ₹${Math.round(targetStats.stretchTarget).toLocaleString("en-IN")}`
+                        ) : "Goal not assigned yet"}
                       </span>
                     </div>
                     <div style={{ marginLeft: "4px", flexShrink: 0 }}>
-                      <CircularProgress percentage={targetValue > 0 ? Math.min(100, Math.round((stats.wonPipeline / targetValue) * 100)) : 0} color="#ea580c" size={32} strokeWidth={3} />
+                      <CircularProgress 
+                        percentage={targetValue > 0 ? Math.round(targetStats.baseProgress) : 0} 
+                        color={targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#16a34a" : "#ea580c"} 
+                        size={32} 
+                        strokeWidth={3} 
+                      />
                     </div>
                   </div>
 
@@ -10343,15 +10396,20 @@ export default function App() {
                           DAILY TARGET
                         </span>
                       </div>
-                      <div style={{ fontSize: selectedPeriodMonth === "2026-08" ? "14.5px" : targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: selectedPeriodMonth === "2026-08" ? "#64748b" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontSize: selectedPeriodMonth === "2026-08" ? "14.5px" : targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: selectedPeriodMonth === "2026-08" ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {selectedPeriodMonth === "2026-08" ? "Month Ended" : targetValue > 0 ? <AnimatedNumber value={targetStats.dailyRequired} isCurrency /> : "-- / day"}
                       </div>
-                      <span style={{ fontSize: "8.5px", color: "#94a3b8", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        {selectedPeriodMonth === "2026-08" ? "August 2026 Closed" : targetValue > 0 ? `For remaining ${targetStats.daysRemaining} days` : "Waiting for assignment"}
+                      <span style={{ fontSize: "8.5px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        {targetStats.dailySubtitle || (selectedPeriodMonth === "2026-08" ? "August 2026 Closed" : targetValue > 0 ? `For remaining ${targetStats.daysRemaining} days` : "Waiting for assignment")}
                       </span>
                     </div>
                     <div style={{ marginLeft: "4px", flexShrink: 0 }}>
-                      <CircularProgress percentage={selectedPeriodMonth === "2026-08" ? 100 : (targetValue > 0 ? Math.min(100, Math.round((stats.wonPipeline / targetValue) * 100)) : 0)} color={selectedPeriodMonth === "2026-08" ? "#94a3b8" : "#2563eb"} size={32} strokeWidth={3} />
+                      <CircularProgress 
+                        percentage={selectedPeriodMonth === "2026-08" ? 100 : (targetValue > 0 ? Math.round(targetStats.baseProgress) : 0)} 
+                        color={selectedPeriodMonth === "2026-08" ? "#94a3b8" : targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#7c3aed" : "#2563eb"} 
+                        size={32} 
+                        strokeWidth={3} 
+                      />
                     </div>
                   </div>
 
