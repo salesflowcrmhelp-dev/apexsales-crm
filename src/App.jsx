@@ -7637,7 +7637,7 @@ export default function App() {
                   )}
 
                   {/* Row 3: Multi-Criteria Advanced Category Filters */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "6px", borderTop: "1px solid #f1f5f9", paddingTop: "5px" }}>
+                  <div className="reports-filter-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "6px", borderTop: "1px solid #f1f5f9", paddingTop: "5px" }}>
                     <div style={{ position: "relative" }} ref={reportStageDropdownRef}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1px" }}>
                         <label style={{ fontSize: "8.5px", fontWeight: "500", color: "#64748b" }}>Stage</label>
@@ -8455,7 +8455,7 @@ export default function App() {
               </div>
 
               {/* FILTERED EXECUTIVE SUMMARY KPIS (Granular Filter Slice) */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "6px", marginBottom: "8px" }}>
+              <div className="reports-filtered-kpis" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "6px", marginBottom: "8px" }}>
                 <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 9px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1px" }}>
                     <span style={{ fontSize: "8px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>Filtered Pipeline</span>
@@ -8524,7 +8524,7 @@ export default function App() {
               </div>
 
               {/* RENEWAL & CLIENT RETENTION HEALTH AUDIT CARD */}
-              <div style={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: "6px", padding: "6px 10px", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: "6px", padding: "6px 10px", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <div style={{ width: "22px", height: "22px", borderRadius: "5px", backgroundColor: "#ea580c", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <RefreshCw size={12} className="text-white" />
@@ -8573,7 +8573,7 @@ export default function App() {
               </div>
 
               {/* 2-COLUMN GRID OF AUDIT TABLES */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
+              <div className="reports-tables-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
                 
                 {/* Column 1: Stage-Wise Audit Table */}
                 <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 10px" }}>
@@ -8713,8 +8713,8 @@ export default function App() {
                   </div>
                 </div>
 
-                <div style={{ border: "1px solid #e2e8f0", borderRadius: "6px", overflowX: "auto" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "11px" }}>
+                <div style={{ border: "1px solid #e2e8f0", borderRadius: "6px", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                  <table style={{ width: "100%", minWidth: "750px", borderCollapse: "collapse", textAlign: "left", fontSize: "11px" }}>
                     <thead>
                       <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
                         <th style={{ padding: "6px 8px", color: "#64748b", fontWeight: "500", width: "35px" }}>#</th>
