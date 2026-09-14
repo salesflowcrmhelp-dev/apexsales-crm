@@ -10970,7 +10970,7 @@ export default function App() {
                 })()}
 
                 {/* 3. Compact High-Density Table Grid */}
-                <div style={{ width: "100%", overflowX: "hidden", borderTop: "1px solid #edf2f7" }}>
+                <div className="leads-table-container" style={{ width: "100%", borderTop: "1px solid #edf2f7" }}>
                   {totalLeadsCount === 0 ? (
                     <div style={{ padding: "40px 16px", textAlign: "center", color: "#94a3b8" }}>
                       <FileSpreadsheet size={32} color="#cbd5e1" style={{ margin: "0 auto 8px auto" }} />
@@ -10979,7 +10979,7 @@ export default function App() {
                       </p>
                     </div>
                   ) : (
-                    <table style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "11px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <table className="leads-data-table" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "11px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       <thead>
                         <tr style={{ backgroundColor: "#fcfdfe", borderBottom: "1px solid #edf2f7", color: "#475569", fontWeight: "650", height: "32px" }}>
                           <th style={{ width: "30px", padding: "4px 2px 4px 8px", textAlign: "center" }}>
@@ -13276,7 +13276,7 @@ export default function App() {
                             </div>
                           </div>
 
-                          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px" }}>
+                          <div className="sales-cockpit-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px" }}>
                             {/* Card 1: Follow-ups Due Today */}
                             <div 
                               onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "due_today", label: "Follow-ups Due Today" }); }}
@@ -13535,7 +13535,7 @@ export default function App() {
                       const displayActivities = dynamicActivities.slice(0, 3);
 
                       return (
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+                        <div className="recent-activity-signups-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
                           {/* RECENT ACTIVITY */}
                           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
@@ -13830,8 +13830,8 @@ export default function App() {
                       <span>No focus leads for today! Great job!</span>
                     </div>
                   ) : (
-                    <div style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", backgroundColor: "#ffffff" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontFamily: "'Plus Jakarta Sans', sans-serif", tableLayout: "auto" }}>
+                    <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
+                      <table className="responsive-table" style={{ width: "100%", minWidth: "680px", borderCollapse: "collapse", textAlign: "left", fontFamily: "'Plus Jakarta Sans', sans-serif", tableLayout: "auto" }}>
                         <thead>
                           <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
                             <th style={{ fontSize: "11.5px", fontWeight: "700", color: "#0f172a", padding: "10px 12px", whiteSpace: "nowrap" }}>Lead Name</th>
@@ -13968,8 +13968,8 @@ export default function App() {
                       </span>
                     </div>
 
-                    <div style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", backgroundColor: "#ffffff" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontFamily: "'Plus Jakarta Sans', sans-serif", tableLayout: "auto" }}>
+                    <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
+                      <table className="responsive-table" style={{ width: "100%", minWidth: "650px", borderCollapse: "collapse", textAlign: "left", fontFamily: "'Plus Jakarta Sans', sans-serif", tableLayout: "auto" }}>
                         <thead>
                           <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
                             <th style={{ fontSize: "11.5px", fontWeight: "700", color: "#0f172a", padding: "10px 12px", whiteSpace: "nowrap" }}>Lead Name</th>

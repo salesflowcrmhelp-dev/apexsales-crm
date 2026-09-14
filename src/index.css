@@ -3669,15 +3669,40 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
     gap: 10px !important;
   }
 
-  /* 6. Dashboard & KPI Cockpit on Mobile */
+  /* 6. Dashboard & KPI Cockpit on Mobile (<= 768px only) */
   .cockpit-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
   }
 
-  .kpi-row {
+  .kpi-row,
+  .kpi-row-clean {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    gap: 8px !important;
+  }
+
+  .sales-cockpit-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .recent-activity-signups-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .analytics-metrics-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Leads Table: Touch scrollable on mobile phones without squishing columns */
+  .leads-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+  .leads-data-table {
+    min-width: 860px !important;
   }
 
   /* 7. Delete Confirmation Modal Touch-Friendly Controls */
@@ -3708,7 +3733,16 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
     grid-template-columns: 1fr !important;
   }
 
-  .kpi-row {
+  .kpi-row,
+  .kpi-row-clean {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sales-cockpit-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .analytics-metrics-row {
     grid-template-columns: 1fr !important;
   }
 
