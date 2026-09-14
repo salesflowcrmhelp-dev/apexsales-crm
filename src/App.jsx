@@ -1162,11 +1162,6 @@ export default function App() {
     } catch (e) {}
   }, [isSidebarCollapsed]);
 
-  // Auto-close mobile sidebar drawer on workspace/tab changes
-  useEffect(() => {
-    setIsMobileSidebarOpen(false);
-  }, [activeWorkspace, pipelineView, currentTab]);
-
   // Keyboard shortcut Ctrl+B or Ctrl+\ to toggle menu bar collapse
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -1976,6 +1971,11 @@ export default function App() {
       return "analytics";
     }
   }); // "sheet", "analytics", "split", or "deals"
+
+  // Auto-close mobile sidebar drawer on workspace/tab changes
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+  }, [activeWorkspace, pipelineView, currentTab]);
   const [selectedSplitLeadId, setSelectedSplitLeadId] = useState(null);
   const [splitDossierTab, setSplitDossierTab] = useState("overview"); // "overview", "timeline", "ai", "payment"
   const [splitLeadSearch, setSplitLeadSearch] = useState("");
