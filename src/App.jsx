@@ -15059,7 +15059,7 @@ export default function App() {
           <div className="tasks-page-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             
             {/* TOP TASK STATS KPI SUMMARY ROW */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "14px" }}>
+            <div className="tasks-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "14px" }}>
               <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "9px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <span style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>Total Tasks</span>
@@ -15102,7 +15102,7 @@ export default function App() {
             </div>
 
             {/* 2-COLUMN MAIN TASK WORKSPACE */}
-            <div style={{ display: "grid", gridTemplateColumns: "310px 1fr", gap: "14px", alignItems: "start" }}>
+            <div className="tasks-main-grid" style={{ display: "grid", gridTemplateColumns: "310px 1fr", gap: "14px", alignItems: "start" }}>
               
               {/* Left Column: Create New Task Card */}
               <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>

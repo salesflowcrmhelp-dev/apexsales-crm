@@ -3767,6 +3767,17 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
     gap: 14px !important;
   }
 
+  /* Task Manager Mobile Responsive: 2x2 stats and stacked layout */
+  .tasks-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .tasks-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
   /* 7. Delete Confirmation Modal Touch-Friendly Controls */
   .modal-actions-grid {
     display: flex !important;
@@ -3821,6 +3832,16 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   }
 
   .calendar-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .tasks-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .tasks-main-grid {
     grid-template-columns: 1fr !important;
     gap: 12px !important;
   }
