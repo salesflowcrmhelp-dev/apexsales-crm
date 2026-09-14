@@ -3030,43 +3030,80 @@ export default function App() {
     }
   }, [leads, tasks]);
 
+  // 🛡️ Strict Owner-Scoped Leads: dynamically resolves leads based on active user role and filterOwner
+  // Ensures that when viewing "👤 My Leads", all Tabs, Cards, KPIs & Targets reflect ONLY the active user's personal deals!
+  const ownerScopedLeads = useMemo(() => {
+    if (!isLoggedIn || !currentUser) return [];
+    const isSuper = checkIsSuperAdmin(currentUser);
+    const isManager = currentUser?.role === "manager";
+    let scoped = leads;
+
+    if (!isSuper) {
+      if (isManager) {
+        const managerNameLower = (currentUser.name || "").trim().toLowerCase();
+        const reportingEmployees = allUsersList.filter(u => {
+          const repTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+          return repTo === managerNameLower || u.managerId === currentUser.id;
+        }).map(u => (u.name || '').trim().toLowerCase());
+        const allowedOwners = new Set([managerNameLower, ...reportingEmployees]);
+        scoped = scoped.filter(l => allowedOwners.has((l.owner || "").trim().toLowerCase()));
+      } else {
+        const repName = (currentUser.name || "").trim().toLowerCase();
+        scoped = scoped.filter(l => (l.owner || "").trim().toLowerCase() === repName);
+      }
+    }
+
+    if (filterOwner) {
+      if (filterOwner === "__my_leads__") {
+        const myName = (currentLoggedInUser || currentUser?.name || "Harsh Goyal").trim().toLowerCase();
+        scoped = scoped.filter(l => (l.owner || "").trim().toLowerCase() === myName);
+      } else if (filterOwner === "__unassigned__") {
+        scoped = scoped.filter(l => !l.owner || l.owner === "Unassigned");
+      } else if (filterOwner !== "") {
+        scoped = scoped.filter(l => (l.owner || "").trim().toLowerCase() === filterOwner.trim().toLowerCase());
+      }
+    }
+
+    return scoped;
+  }, [leads, filterOwner, currentLoggedInUser, currentUser, isLoggedIn, allUsersList]);
+
   // Visual Analytics Calculations Memo
   const analyticsData = useMemo(() => {
-    const totalCount = leads.length;
-    const wonCount = leads.filter(l => isWonStatus(l.status)).length;
-    const lostCount = leads.filter(l => isLostStatus(l.status)).length;
-    const activeCount = leads.filter(l => isActiveStatus(l.status)).length;
+    const totalCount = ownerScopedLeads.length;
+    const wonCount = ownerScopedLeads.filter(l => isWonStatus(l.status)).length;
+    const lostCount = ownerScopedLeads.filter(l => isLostStatus(l.status)).length;
+    const activeCount = ownerScopedLeads.filter(l => isActiveStatus(l.status)).length;
     
-    const wonValue = leads.filter(l => isWonStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0);
-    const activeValue = leads.filter(l => isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0);
-    const totalValue = leads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+    const wonValue = ownerScopedLeads.filter(l => isWonStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+    const activeValue = ownerScopedLeads.filter(l => isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+    const totalValue = ownerScopedLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
     
     const conversionRate = totalCount > 0 ? ((wonCount / totalCount) * 100).toFixed(1) : "0.0";
     const lostRate = totalCount > 0 ? ((lostCount / totalCount) * 100).toFixed(1) : "0.0";
     const averageValue = totalCount > 0 ? Math.round(totalValue / totalCount) : 0;
     
     // Top Source
-    const sources = leads.map(l => l.source || "Manual");
+    const sources = ownerScopedLeads.map(l => l.source || "Manual");
     const sourceCounts = sources.reduce((acc, s) => ({ ...acc, [s]: (acc[s] || 0) + 1 }), {});
     const sortedSources = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]);
     const topSource = sortedSources.length > 0 ? `${sortedSources[0][0]} (${((sortedSources[0][1] / totalCount) * 100).toFixed(0)}%)` : "None";
 
     // Status Distribution
     const statusGroups = {
-      Inflow: leads.filter(l => (l.status || "").toLowerCase() === "new").length,
-      Discovery: leads.filter(l => ["contacted", "qualified"].includes((l.status || "").toLowerCase())).length,
-      FollowUp: leads.filter(l => ["proposal sent", "renewal"].includes((l.status || "").toLowerCase())).length,
-      Demo: leads.filter(l => (l.status || "").toLowerCase() === "demo done").length,
-      Negotiation: leads.filter(l => ["negotiation", "payment follow up"].includes((l.status || "").toLowerCase())).length,
+      Inflow: ownerScopedLeads.filter(l => (l.status || "").toLowerCase() === "new").length,
+      Discovery: ownerScopedLeads.filter(l => ["contacted", "qualified"].includes((l.status || "").toLowerCase())).length,
+      FollowUp: ownerScopedLeads.filter(l => ["proposal sent", "renewal"].includes((l.status || "").toLowerCase())).length,
+      Demo: ownerScopedLeads.filter(l => (l.status || "").toLowerCase() === "demo done").length,
+      Negotiation: ownerScopedLeads.filter(l => ["negotiation", "payment follow up"].includes((l.status || "").toLowerCase())).length,
       Won: wonCount,
       Lost: lostCount
     };
 
     // Score distribution
     const scoreGroups = {
-      Hot: leads.filter(l => (l.score || "warm").toLowerCase() === "hot").length,
-      Warm: leads.filter(l => (l.score || "warm").toLowerCase() === "warm").length,
-      Cold: leads.filter(l => (l.score || "warm").toLowerCase() === "cold").length
+      Hot: ownerScopedLeads.filter(l => (l.score || "warm").toLowerCase() === "hot").length,
+      Warm: ownerScopedLeads.filter(l => (l.score || "warm").toLowerCase() === "warm").length,
+      Cold: ownerScopedLeads.filter(l => (l.score || "warm").toLowerCase() === "cold").length
     };
 
     // Source distribution
@@ -3078,7 +3115,7 @@ export default function App() {
 
     // Timeline Growth calculation based on selected growthTimeframe ("7 Days", "30 Days", "This Month")
     let timelinePoints = [];
-    const baseValue = leads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+    const baseValue = ownerScopedLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
 
     if (growthTimeframe === "7 Days") {
       // 7-day rolling window with daily progression
@@ -3091,7 +3128,7 @@ export default function App() {
       let cumSum = Math.round(baseValue * 0.35);
       timelinePoints = last7Days.map((d) => {
         const dateStr = d.toLocaleDateString("en-IN", { day: '2-digit', month: 'short' });
-        const dayLeadsVal = leads
+        const dayLeadsVal = ownerScopedLeads
           .filter(l => l.next_follow_up && new Date(l.next_follow_up).toDateString() === d.toDateString())
           .reduce((sum, l) => sum + (Number(l.value) || 0), 0);
         
@@ -3107,7 +3144,7 @@ export default function App() {
         d.setDate(d.getDate() - daysAgo);
         const dateStr = d.toLocaleDateString("en-IN", { day: '2-digit', month: 'short' });
         
-        const periodVal = leads
+        const periodVal = ownerScopedLeads
           .filter(l => {
             if (!l.next_follow_up) return false;
             const lD = new Date(l.next_follow_up);
@@ -3135,30 +3172,30 @@ export default function App() {
     }
 
     // Cumulative Sales Funnel logic with robust fuzzy status matching
-    const totalAllLeadsCount = leads.length;
+    const totalAllLeadsCount = ownerScopedLeads.length;
     const leadCountVal = totalAllLeadsCount; // Top of funnel represents TOTAL LEADS in the system!
 
-    const discCountVal = leads.filter(l => {
+    const discCountVal = ownerScopedLeads.filter(l => {
       const s = (l.status || "").toLowerCase().trim();
       return s.includes("discovery") || s.includes("qualification") || s.includes("contacted") || s.includes("qualified");
     }).length;
 
-    const followCountVal = leads.filter(l => {
+    const followCountVal = ownerScopedLeads.filter(l => {
       const s = (l.status || "").toLowerCase().trim();
       return s.includes("follow") || s.includes("proposal") || s.includes("renewal");
     }).length;
 
-    const demoCountVal = leads.filter(l => {
+    const demoCountVal = ownerScopedLeads.filter(l => {
       const s = (l.status || "").toLowerCase().trim();
       return s.includes("demo");
     }).length;
 
-    const negCountVal = leads.filter(l => {
+    const negCountVal = ownerScopedLeads.filter(l => {
       const s = (l.status || "").toLowerCase().trim();
       return s.includes("negotiat") || s.includes("payment");
     }).length;
 
-    const wonFunnel = leads.filter(l => isWonStatus(l.status)).length;
+    const wonFunnel = ownerScopedLeads.filter(l => isWonStatus(l.status)).length;
     const denominator = totalAllLeadsCount || 1;
 
     const funnelData = [
@@ -3188,14 +3225,14 @@ export default function App() {
       timelinePoints,
       funnelData
     };
-  }, [leads]);
+  }, [ownerScopedLeads, growthTimeframe]);
 
   // Recommended Next Best Actions (Rule-Based)
   const recommendedActions = useMemo(() => {
     const actions = [];
     const todayStr = new Date().toISOString().split('T')[0];
     
-    leads.forEach(lead => {
+    ownerScopedLeads.forEach(lead => {
       if (!isActiveStatus(lead.status)) return;
       
       const s = (lead.status || "").toLowerCase();
@@ -3247,19 +3284,19 @@ export default function App() {
     });
     
     return actions.slice(0, 3);
-  }, [leads]);
+  }, [ownerScopedLeads]);
 
   // Hot Leads / Closing Opportunities (Active, Hot Score First, Value Descending)
   const hotLeadsList = useMemo(() => {
-    return leads
+    return ownerScopedLeads
       .filter(l => isActiveStatus(l.status))
       .sort((a, b) => calculateFocusScore(b) - calculateFocusScore(a))
       .slice(0, 5);
-  }, [leads]);
+  }, [ownerScopedLeads]);
 
   // Today's Focus 5 Prioritized Leads hook
   const todayFocusLeads = useMemo(() => {
-    return leads
+    return ownerScopedLeads
       .filter(l => isActiveStatus(l.status))
       .map(lead => {
         const todayStr = new Date().toISOString().split('T')[0];
@@ -3297,18 +3334,18 @@ export default function App() {
       })
       .sort((a, b) => b.focusScore - a.focusScore)
       .slice(0, 5);
-  }, [leads]);
+  }, [ownerScopedLeads]);
 
   // Stuck Deals (15+ Days) hook
   const stuckLeads = useMemo(() => {
-    return leads
+    return ownerScopedLeads
       .filter(l => isLeadStuck(l) && isActiveStatus(l.status))
       .map(l => ({
         ...l,
         daysInStage: getStageDuration(l)
       }))
       .slice(0, 5);
-  }, [leads]);
+  }, [ownerScopedLeads]);
 
   // Multi-Month Targets & Historical Period States
   const [monthlyTargets, setMonthlyTargets] = useState(() => {
@@ -3410,16 +3447,16 @@ export default function App() {
     const activeSpotConfig = spotIncentives[currentMonthKey] || { amount: 0, note: "" };
     const customSpotBonus = Number(activeSpotConfig.amount) || 0;
     
-    // Pure dynamic calculation from user's actual leads
+    // Pure dynamic calculation from user's actual leads (scoped to active owner filter)
     let wonVal = 0;
     if (selectedPeriodMonth === "2026-08") {
-      const augWonLeads = leads.filter(l => isWonStatus(l.status) && (!l.won_date || l.won_date.startsWith("2026-08") || l.won_month === "2026-08"));
+      const augWonLeads = ownerScopedLeads.filter(l => isWonStatus(l.status) && (!l.won_date || l.won_date.startsWith("2026-08") || l.won_month === "2026-08"));
       wonVal = augWonLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
     } else if (selectedPeriodMonth === "all") {
-      wonVal = leads.filter(l => isWonStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+      wonVal = ownerScopedLeads.filter(l => isWonStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0);
     } else {
       // Current Month (September 2026) - Strictly only count deals won in September 2026
-      const septWonLeads = leads.filter(l => isWonStatus(l.status) && ((l.won_date && l.won_date.startsWith("2026-09")) || l.won_month === "2026-09"));
+      const septWonLeads = ownerScopedLeads.filter(l => isWonStatus(l.status) && ((l.won_date && l.won_date.startsWith("2026-09")) || l.won_month === "2026-09"));
       wonVal = septWonLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
     }
 
@@ -3502,7 +3539,7 @@ export default function App() {
       tierStatusBadge,
       isHistorical
     };
-  }, [leads, targetValue, selectedPeriodMonth, spotIncentives]);
+  }, [ownerScopedLeads, targetValue, selectedPeriodMonth, spotIncentives]);
 
   // Sales Intelligence Calculations Memo
   const intelData = useMemo(() => {
@@ -3517,7 +3554,7 @@ export default function App() {
       return diffDays <= intelTimeframe;
     };
 
-    const periodLeads = leads.filter(isInPeriod);
+    const periodLeads = ownerScopedLeads.filter(isInPeriod);
     const totalLeads = periodLeads.length;
     const wonLeads = periodLeads.filter(l => isWonStatus(l.status));
     const lostLeads = periodLeads.filter(l => isLostStatus(l.status));
@@ -3591,31 +3628,31 @@ export default function App() {
     sundayPrevWeek.setHours(23, 59, 59, 999);
 
     // This Calendar Week (Mon 10 Aug - Sun 16 Aug)
-    const thisWeekLeads = leads.filter(l => {
+    const thisWeekLeads = ownerScopedLeads.filter(l => {
       const cDate = getLeadCreationDate(l);
       return cDate >= mondayThisWeek && cDate <= sundayThisWeek;
     });
     const thisWeekAdded = thisWeekLeads.length;
 
-    const thisWeekWonLeads = leads.filter(l => {
+    const thisWeekWonLeads = ownerScopedLeads.filter(l => {
       if (!isWonStatus(l.status)) return false;
       const wonDate = getLeadWonDate(l);
       return wonDate >= mondayThisWeek && wonDate <= sundayThisWeek;
     });
     const thisWeekWon = thisWeekWonLeads.length;
     const thisWeekRevenue = thisWeekWonLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
-    const thisWeekLost = leads.filter(l => isLostStatus(l.status) && getLeadCreationDate(l) >= mondayThisWeek && getLeadCreationDate(l) <= sundayThisWeek).length;
+    const thisWeekLost = ownerScopedLeads.filter(l => isLostStatus(l.status) && getLeadCreationDate(l) >= mondayThisWeek && getLeadCreationDate(l) <= sundayThisWeek).length;
     const thisWeekFollowups = tasks.filter(t => t.completed && t.completedAt && new Date(t.completedAt) >= mondayThisWeek && new Date(t.completedAt) <= sundayThisWeek).length;
     const thisWeekConv = thisWeekAdded > 0 ? ((thisWeekWon / thisWeekAdded) * 100).toFixed(1) : "0.0";
 
     // Previous Calendar Week (Mon 03 Aug - Sun 09 Aug)
-    const prevWeekLeads = leads.filter(l => {
+    const prevWeekLeads = ownerScopedLeads.filter(l => {
       const cDate = getLeadCreationDate(l);
       return cDate >= mondayPrevWeek && cDate <= sundayPrevWeek;
     });
     const prevWeekAdded = prevWeekLeads.length;
 
-    const prevWeekWonLeads = leads.filter(l => {
+    const prevWeekWonLeads = ownerScopedLeads.filter(l => {
       if (!isWonStatus(l.status)) return false;
       const wonDate = getLeadWonDate(l);
       return wonDate >= mondayPrevWeek && wonDate <= sundayPrevWeek;
@@ -3633,19 +3670,20 @@ export default function App() {
     const revenueChangePct = prevWeekRevenue > 0 ? Math.round(((thisWeekRevenue - prevWeekRevenue) / prevWeekRevenue) * 100) : null;
 
     // Sources performance
-    const sourceCounts = periodLeads.reduce((acc, l) => {
-      const s = l.source || "Manual";
-      if (!acc[s]) acc[s] = { count: 0, won: 0, revenue: 0 };
-      acc[s].count++;
+    const sourcesMap = {};
+    ownerScopedLeads.forEach(l => {
+      const src = l.source || "Manual";
+      if (!sourcesMap[src]) sourcesMap[src] = { count: 0, won: 0, revenue: 0 };
+      sourcesMap[src].count++;
       if (isWonStatus(l.status)) {
-        acc[s].won++;
-        acc[s].revenue += (Number(l.value) || 0);
+        sourcesMap[src].won++;
+        sourcesMap[src].revenue += (Number(l.value) || 0);
       }
-      return acc;
-    }, {});
-    const bestSourcesList = Object.entries(sourceCounts).map(([name, data]) => ({
+    });
+
+    const bestSourcesList = Object.entries(sourcesMap).map(([name, data]) => ({
       name,
-      leads: data.count,
+      count: data.count,
       won: data.won,
       conv: data.count > 0 ? ((data.won / data.count) * 100).toFixed(1) : "0.0",
       revenue: data.revenue
@@ -3653,16 +3691,16 @@ export default function App() {
 
     // Stage conversions
     const stagesList = [
-      { name: "New", count: periodLeads.filter(l => (l.status || "").toLowerCase() === "new").length },
-      { name: "Contacted", count: periodLeads.filter(l => ["contacted", "qualified"].includes((l.status || "").toLowerCase())).length },
-      { name: "Proposal Sent", count: periodLeads.filter(l => (l.status || "").toLowerCase() === "proposal_sent" || (l.status || "").toLowerCase() === "proposal sent").length },
-      { name: "Negotiation", count: periodLeads.filter(l => ["negotiation", "payment follow up"].includes((l.status || "").toLowerCase())).length },
+      { name: "New", count: ownerScopedLeads.filter(l => (l.status || "").toLowerCase() === "new").length },
+      { name: "Contacted", count: ownerScopedLeads.filter(l => ["contacted", "qualified"].includes((l.status || "").toLowerCase())).length },
+      { name: "Proposal Sent", count: ownerScopedLeads.filter(l => (l.status || "").toLowerCase() === "proposal_sent" || (l.status || "").toLowerCase() === "proposal sent").length },
+      { name: "Negotiation", count: ownerScopedLeads.filter(l => ["negotiation", "payment follow up"].includes((l.status || "").toLowerCase())).length },
       { name: "Won", count: wonCount }
     ];
 
     // Activity correlation
-    const dealsWithActivity = periodLeads.filter(l => tasks.some(t => t.linkedLeadId === l.id));
-    const dealsNoActivity = periodLeads.filter(l => !tasks.some(t => t.linkedLeadId === l.id));
+    const dealsWithActivity = ownerScopedLeads.filter(l => tasks.some(t => t.linkedLeadId === l.id));
+    const dealsNoActivity = ownerScopedLeads.filter(l => !tasks.some(t => t.linkedLeadId === l.id));
     
     const wonWithActivity = dealsWithActivity.filter(l => isWonStatus(l.status)).length;
     const wonNoActivity = dealsNoActivity.filter(l => isWonStatus(l.status)).length;
@@ -3675,7 +3713,7 @@ export default function App() {
     if (bestSourcesList.length > 0 && Number(bestSourcesList[0].conv) > 30) {
       dynamicInsights.push(`“${bestSourcesList[0].name} leads have the highest conversion rate (${bestSourcesList[0].conv}%).”`);
     }
-    const inactiveCount = periodLeads.filter(l => isActiveStatus(l.status) && (!l.stageUpdatedAt || (Date.now() - new Date(l.stageUpdatedAt).getTime()) >= 15 * 24 * 60 * 60 * 1000)).length;
+    const inactiveCount = ownerScopedLeads.filter(l => isActiveStatus(l.status) && (!l.stageUpdatedAt || (Date.now() - new Date(l.stageUpdatedAt).getTime()) >= 15 * 24 * 60 * 60 * 1000)).length;
     if (inactiveCount > 0) {
       dynamicInsights.push(`“${inactiveCount} active leads have been inactive for 15+ days.”`);
     }
@@ -3723,7 +3761,7 @@ export default function App() {
       stagesList,
       dynamicInsights
     };
-  }, [leads, tasks, intelTimeframe, targetValue]);
+  }, [ownerScopedLeads, tasks, intelTimeframe, targetValue]);
 
   // Filter leads based on current active tab and dashboard filter criteria
   const filteredLeads = useMemo(() => {
@@ -3731,28 +3769,7 @@ export default function App() {
       return [];
     }
 
-    const isSuper = checkIsSuperAdmin(currentUser);
-    const isManager = currentUser?.role === "manager";
-    let baseLeads = leads;
-
-    // Strict Role-Based Privacy:
-    // Super Admin: sees all leads
-    // Manager: sees own leads + reporting team's leads
-    // Sales Rep: strictly ONLY sees their own assigned leads
-    if (!isSuper) {
-      if (isManager) {
-        const managerNameLower = (currentUser.name || "").trim().toLowerCase();
-        const reportingEmployees = allUsersList.filter(u => {
-          const repTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
-          return repTo === managerNameLower || u.managerId === currentUser.id;
-        }).map(u => (u.name || '').trim().toLowerCase());
-        const allowedOwners = new Set([managerNameLower, ...reportingEmployees]);
-        baseLeads = baseLeads.filter(l => allowedOwners.has((l.owner || "").trim().toLowerCase()));
-      } else {
-        const repName = (currentUser.name || "").trim().toLowerCase();
-        baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === repName);
-      }
-    }
+    let baseLeads = ownerScopedLeads;
 
     // Search query: filtered strictly within baseLeads
     if (searchQuery.trim()) {
@@ -3835,19 +3852,9 @@ export default function App() {
     if (filterMinVal) {
       baseLeads = baseLeads.filter(l => (Number(l.value) || 0) >= Number(filterMinVal));
     }
-    if (filterOwner) {
-      if (filterOwner === "__my_leads__") {
-        const myName = (currentLoggedInUser || currentUser?.name || "Harsh Goyal").trim().toLowerCase();
-        baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === myName);
-      } else if (filterOwner === "__unassigned__") {
-        baseLeads = baseLeads.filter(l => !l.owner || l.owner === "Unassigned");
-      } else {
-        baseLeads = baseLeads.filter(l => (l.owner || "").trim().toLowerCase() === filterOwner.trim().toLowerCase());
-      }
-    }
 
     return baseLeads;
-  }, [leads, currentTab, searchQuery, filterStage, selectedFilterStages, filterScore, filterSource, filterMinVal, filterOwner, currentLoggedInUser, currentUser, sheetFilterCriteria, isLoggedIn, allUsersList]);
+  }, [ownerScopedLeads, currentTab, searchQuery, filterStage, selectedFilterStages, filterScore, filterSource, filterMinVal, sheetFilterCriteria, isLoggedIn]);
 
   // Dynamic Real-Time Filtered Report Leads Calculation (Advanced Multi-Criteria Engine)
   const filteredReportLeads = useMemo(() => {
@@ -4521,39 +4528,39 @@ export default function App() {
     }, 4500);
   };
 
-  // Period-Aware KPI Calculations
+  // Period-Aware KPI Calculations (Scoped to active owner filter)
   const stats = useMemo(() => {
     let wonPipeline = 0;
     let totalPipeline = 0;
     let winRate = "0.0";
-    let totalLeads = leads.length;
+    let totalLeads = ownerScopedLeads.length;
 
     if (selectedPeriodMonth === "2026-08") {
       // Historical Snapshot: August 2026 (Computed purely from recorded leads)
-      const augWonLeads = leads.filter(l => isWonStatus(l.status) && (!l.won_date || l.won_date.startsWith("2026-08") || l.won_month === "2026-08"));
+      const augWonLeads = ownerScopedLeads.filter(l => isWonStatus(l.status) && (!l.won_date || l.won_date.startsWith("2026-08") || l.won_month === "2026-08"));
       wonPipeline = augWonLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
       
-      const augActiveLeads = leads.filter(l => isActiveStatus(l.status));
+      const augActiveLeads = ownerScopedLeads.filter(l => isActiveStatus(l.status));
       totalPipeline = augActiveLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
       
-      totalLeads = leads.length;
+      totalLeads = ownerScopedLeads.length;
       winRate = totalLeads > 0 ? ((augWonLeads.length / totalLeads) * 100).toFixed(1) : "0.0";
     } else if (selectedPeriodMonth === "all") {
-      const wonLeads = leads.filter(l => isWonStatus(l.status));
+      const wonLeads = ownerScopedLeads.filter(l => isWonStatus(l.status));
       wonPipeline = wonLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
-      const activeLeads = leads.filter(l => isActiveStatus(l.status));
+      const activeLeads = ownerScopedLeads.filter(l => isActiveStatus(l.status));
       totalPipeline = activeLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
-      totalLeads = leads.length;
+      totalLeads = ownerScopedLeads.length;
       winRate = totalLeads > 0 ? ((wonLeads.length / totalLeads) * 100).toFixed(1) : "0.0";
     } else {
       // Current Month (September 2026) - Strictly count only deals won/closed in September 2026
-      const currentWonLeads = leads.filter(l => isWonStatus(l.status) && ((l.won_date && l.won_date.startsWith("2026-09")) || l.won_month === "2026-09"));
+      const currentWonLeads = ownerScopedLeads.filter(l => isWonStatus(l.status) && ((l.won_date && l.won_date.startsWith("2026-09")) || l.won_month === "2026-09"));
       wonPipeline = currentWonLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
       
-      const activeLeads = leads.filter(l => isActiveStatus(l.status));
+      const activeLeads = ownerScopedLeads.filter(l => isActiveStatus(l.status));
       totalPipeline = activeLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
       
-      totalLeads = leads.length;
+      totalLeads = ownerScopedLeads.length;
       winRate = totalLeads > 0 ? ((currentWonLeads.length / totalLeads) * 100).toFixed(1) : "0.0";
     }
 
@@ -4563,7 +4570,7 @@ export default function App() {
       wonPipeline,
       winRate
     };
-  }, [leads, selectedPeriodMonth]);
+  }, [ownerScopedLeads, selectedPeriodMonth]);
 
   // Real-time synchronization post request to Apps Script webhook
   const syncWithGoogleSheetWebhook = async (leadData) => {
@@ -10414,10 +10421,10 @@ export default function App() {
                   {/* Pipeline Tabs */}
                   <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
                     {[
-                      { label: "Active Pipeline", count: leads.filter(l => isActiveStatus(l.status)).length },
-                      { label: "Won Deals", count: leads.filter(l => isWonStatus(l.status)).length },
-                      { label: "Lost Deals", count: leads.filter(l => isLostStatus(l.status)).length },
-                      { label: "All Leads", count: leads.length }
+                      { label: "Active Pipeline", count: ownerScopedLeads.filter(l => isActiveStatus(l.status)).length },
+                      { label: "Won Deals", count: ownerScopedLeads.filter(l => isWonStatus(l.status)).length },
+                      { label: "Lost Deals", count: ownerScopedLeads.filter(l => isLostStatus(l.status)).length },
+                      { label: "All Leads", count: ownerScopedLeads.length }
                     ].map(tab => {
                       const isActive = currentTab === tab.label;
                       return (
@@ -10961,7 +10968,7 @@ export default function App() {
 
                 {/* Won Deals Executive KPI Ribbon */}
                 {currentTab === "Won Deals" && (() => {
-                  const wonLeadsList = leads.filter(l => isWonStatus(l.status));
+                  const wonLeadsList = ownerScopedLeads.filter(l => isWonStatus(l.status));
                   const totalClosedVal = wonLeadsList.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
                   const avgDealVal = wonLeadsList.length > 0 ? Math.round(totalClosedVal / wonLeadsList.length) : 0;
                   
@@ -11630,11 +11637,11 @@ export default function App() {
 
                   {/* Center: Metric summary badges */}
                   <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", fontSize: "11px" }}>
-                    <span>Active: <strong style={{ color: "#2563eb" }}>₹{leads.filter(l => isActiveStatus(l.status)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
-                    <span>Won: <strong style={{ color: "#16a34a" }}>₹{leads.filter(l => isWonStatus(l.status)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
-                    {leads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && !isWonStatus(l.status)).length > 0 && (
+                    <span>Active: <strong style={{ color: "#2563eb" }}>₹{ownerScopedLeads.filter(l => isActiveStatus(l.status)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
+                    <span>Won: <strong style={{ color: "#16a34a" }}>₹{ownerScopedLeads.filter(l => isWonStatus(l.status)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
+                    {ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && !isWonStatus(l.status)).length > 0 && (
                       <span style={{ color: "#dc2626", fontWeight: "700" }}>
-                        Overdue: {leads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && !isWonStatus(l.status)).length}
+                        Overdue: {ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && !isWonStatus(l.status)).length}
                       </span>
                     )}
                   </div>
@@ -11896,7 +11903,7 @@ export default function App() {
 
                     {/* Won Deals Executive KPI Metric Ribbon (When Won deals filter is active) */}
                     {splitLeadFilterStage === "won" && (() => {
-                      const wonLeadsList = leads.filter(l => isWonStatus(l.status));
+                      const wonLeadsList = ownerScopedLeads.filter(l => isWonStatus(l.status));
                       const totalClosedVal = wonLeadsList.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
                       const avgDealVal = wonLeadsList.length > 0 ? Math.round(totalClosedVal / wonLeadsList.length) : 0;
                       
@@ -12615,7 +12622,7 @@ export default function App() {
               /* 🏆 DEALS & REVENUE HUB (HubSpot / LeadSquared Style Workspace)     */
               /* ================================================================ */
               (() => {
-                const wonLeadsList = leads.filter(l => isWonStatus(l.status));
+                const wonLeadsList = ownerScopedLeads.filter(l => isWonStatus(l.status));
 
                 // 1. Filter won leads first according to all active criteria (Search, Date, Amount, Type)
                 let filteredWonDeals = wonLeadsList.filter(deal => {
@@ -16721,14 +16728,14 @@ export default function App() {
                   <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#e11d48", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span>📞 Due & Overdue Follow-ups</span>
                     <span style={{ fontSize: "10px", backgroundColor: "#ffe4e6", color: "#e11d48", padding: "2px 8px", borderRadius: "4px" }}>
-                      {leads.filter(l => isActiveStatus(l.status) && l.next_follow_up && l.next_follow_up <= new Date().toISOString().split('T')[0]).length} Actionable
+                      {ownerScopedLeads.filter(l => isActiveStatus(l.status) && l.next_follow_up && l.next_follow_up <= new Date().toISOString().split('T')[0]).length} Actionable
                     </span>
                   </h4>
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "180px", overflowY: "auto" }}>
-                    {leads.filter(l => isActiveStatus(l.status) && l.next_follow_up && l.next_follow_up <= new Date().toISOString().split('T')[0]).length === 0 ? (
+                    {ownerScopedLeads.filter(l => isActiveStatus(l.status) && l.next_follow_up && l.next_follow_up <= new Date().toISOString().split('T')[0]).length === 0 ? (
                       <p style={{ fontSize: "11px", color: "#94a3b8", fontStyle: "italic", textAlign: "center", marginTop: "10px" }}>No due or overdue follow-ups! 🎉</p>
                     ) : (
-                      leads.filter(l => isActiveStatus(l.status) && l.next_follow_up && l.next_follow_up <= new Date().toISOString().split('T')[0])
+                      ownerScopedLeads.filter(l => isActiveStatus(l.status) && l.next_follow_up && l.next_follow_up <= new Date().toISOString().split('T')[0])
                         .sort((a, b) => (a.next_follow_up || "").localeCompare(b.next_follow_up || ""))
                         .map(l => (
                           <div 
@@ -16753,14 +16760,14 @@ export default function App() {
                   <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#ea580c", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span>🔥 Hot Opportunities</span>
                     <span style={{ fontSize: "10px", backgroundColor: "#ffedd5", color: "#ea580c", padding: "2px 8px", borderRadius: "4px" }}>
-                      {leads.filter(l => isActiveStatus(l.status) && (l.score || "").toLowerCase() === "hot").length} Total
+                      {ownerScopedLeads.filter(l => isActiveStatus(l.status) && (l.score || "").toLowerCase() === "hot").length} Total
                     </span>
                   </h4>
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "180px", overflowY: "auto" }}>
-                    {leads.filter(l => isActiveStatus(l.status) && (l.score || "").toLowerCase() === "hot").length === 0 ? (
+                    {ownerScopedLeads.filter(l => isActiveStatus(l.status) && (l.score || "").toLowerCase() === "hot").length === 0 ? (
                       <p style={{ fontSize: "11px", color: "#94a3b8", fontStyle: "italic", textAlign: "center", marginTop: "10px" }}>No active hot leads at the moment</p>
                     ) : (
-                      leads.filter(l => isActiveStatus(l.status) && (l.score || "").toLowerCase() === "hot")
+                      ownerScopedLeads.filter(l => isActiveStatus(l.status) && (l.score || "").toLowerCase() === "hot")
                         .sort((a, b) => (Number(b.value) || 0) - (Number(a.value) || 0))
                         .map(l => (
                           <div 
@@ -16784,14 +16791,14 @@ export default function App() {
                 <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#059669", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span>🎯 Deals Ready to Close</span>
                   <span style={{ fontSize: "10px", backgroundColor: "#d1fae5", color: "#059669", padding: "2px 8px", borderRadius: "4px" }}>
-                    {leads.filter(l => isActiveStatus(l.status) && ["negotiation", "payment follow up", "proposal sent"].includes((l.status || "").toLowerCase())).length} Active
+                    {ownerScopedLeads.filter(l => isActiveStatus(l.status) && ["negotiation", "payment follow up", "proposal sent"].includes((l.status || "").toLowerCase())).length} Active
                   </span>
                 </h4>
                 <div style={{ display: "flex", flexDirection: "row", gap: "8px", flexWrap: "wrap", maxHeight: "150px", overflowY: "auto" }}>
-                  {leads.filter(l => isActiveStatus(l.status) && ["negotiation", "payment follow up", "proposal sent"].includes((l.status || "").toLowerCase())).length === 0 ? (
+                  {ownerScopedLeads.filter(l => isActiveStatus(l.status) && ["negotiation", "payment follow up", "proposal sent"].includes((l.status || "").toLowerCase())).length === 0 ? (
                     <p style={{ fontSize: "11px", color: "#94a3b8", fontStyle: "italic", width: "100%", textAlign: "center", marginTop: "10px" }}>No active closing opportunities at this stage</p>
                   ) : (
-                    leads.filter(l => isActiveStatus(l.status) && ["negotiation", "payment follow up", "proposal sent"].includes((l.status || "").toLowerCase())).map(l => (
+                    ownerScopedLeads.filter(l => isActiveStatus(l.status) && ["negotiation", "payment follow up", "proposal sent"].includes((l.status || "").toLowerCase())).map(l => (
                       <div 
                         key={l.id} 
                         onClick={() => { setSelectedLeadForDetails(l); }}

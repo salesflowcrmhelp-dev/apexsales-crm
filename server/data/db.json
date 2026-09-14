@@ -167,7 +167,7 @@
       "id": "lead_hetul",
       "name": "Hetul sanghvi",
       "company": "Direct Individual",
-      "status": "Won",
+      "status": "Renewal Won",
       "value": 10000,
       "email": "hetuljsanghvi@gmail.com",
       "phone": "9898113331",
@@ -176,7 +176,10 @@
       "next_follow_up": "",
       "won_date": "2026-09-02",
       "notes": "15k+GST",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "deal_type": "new",
+      "previous_stage": "Won",
+      "stageUpdatedAt": "2026-09-14T12:02:19.064Z"
     },
     {
       "id": "lead_modi",
@@ -481,6 +484,404 @@
       "next_follow_up": "",
       "notes": "Went with competitor solution",
       "owner": "Harsh Goyal"
+    },
+    {
+      "id": "lead_1789383913646",
+      "activities": [
+        {
+          "id": "act_1789383913646",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-09-14T11:05:13.646Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "dipak3103@hotmail.com",
+      "name": "Dipak Thakkar",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Harsh Goyal",
+      "phone": "+91 97277 01626",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 5000,
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T11:07:53.940Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789381402327",
+      "activities": [
+        {
+          "id": "act_1789381507954_3ikm",
+          "type": "whatsapp",
+          "title": "WhatsApp Chat Opened",
+          "desc": "Initiated WhatsApp follow-up with Raj patel",
+          "timestamp": "2026-09-14T10:25:07.954Z",
+          "performedBy": "Kashish"
+        },
+        {
+          "id": "act_1789381502809_7uyp",
+          "type": "call",
+          "title": "Call Dialed",
+          "desc": "Dialed call to Raj patel (94287 11407)",
+          "timestamp": "2026-09-14T10:25:02.809Z",
+          "performedBy": "Kashish"
+        },
+        {
+          "id": "act_1789381492147_086x",
+          "type": "email",
+          "title": "Email Client Opened",
+          "desc": "Opened email to Raj patel (info@rpaca.in)",
+          "timestamp": "2026-09-14T10:24:52.147Z",
+          "performedBy": "Kashish"
+        },
+        {
+          "id": "act_1789381402327",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Kashish.",
+          "timestamp": "2026-09-14T10:23:22.327Z",
+          "performedBy": "Kashish"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "info@rpaca.in",
+      "name": "Raj patel",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Kashish",
+      "phone": "94287 11407",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 15000,
+      "lastActivityAt": "2026-09-14T10:25:07.954Z",
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T10:26:42.794Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789381475433",
+      "activities": [
+        {
+          "id": "act_1789381599139_jrj5",
+          "type": "stage_change",
+          "title": "Deal Stage Changed",
+          "desc": "Moved from \"Won\" to \"Demo Done\" (Deal Value: ₹15,000)",
+          "timestamp": "2026-09-14T10:26:39.140Z",
+          "performedBy": "Kashish"
+        },
+        {
+          "id": "act_1789381599137",
+          "type": "stage_update",
+          "text": "Moved from Won to Demo Done. Notes: \"payment lena hai bs, pricing shared 15k 25k 30k\"",
+          "createdAt": "2026-09-14T10:26:39.137Z"
+        },
+        {
+          "id": "act_1789381475433",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Kashish.",
+          "timestamp": "2026-09-14T10:24:35.433Z",
+          "performedBy": "Kashish"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "",
+      "name": "CA Anil Dantani",
+      "next_follow_up": "2026-09-14",
+      "next_follow_up_time": "",
+      "notes": "payment lena hai bs, pricing shared 15k 25k 30k\n---\nProduct demo completed. Client showed positive interest.",
+      "owner": "Kashish",
+      "phone": "93270 98589",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Demo Done",
+      "value": 15000,
+      "deal_type": "new",
+      "previous_stage": "Won",
+      "stageUpdatedAt": "2026-09-14T10:26:39.137Z",
+      "won_date": "2026-09-14",
+      "follow_up_time": "10:00",
+      "lastActivityAt": "2026-09-14T10:26:39.140Z",
+      "updatedAt": "2026-09-14T10:26:39.536Z"
+    },
+    {
+      "id": "lead_1789383775529",
+      "activities": [
+        {
+          "id": "act_1789383775529",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Kashish.",
+          "timestamp": "2026-09-14T11:02:55.529Z",
+          "performedBy": "Kashish"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "",
+      "name": "Deepak Khatri",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Kashish",
+      "phone": "94252 58247",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 8000,
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T11:08:24.112Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789383806401",
+      "activities": [
+        {
+          "id": "act_1789383806401",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Kashish.",
+          "timestamp": "2026-09-14T11:03:26.401Z",
+          "performedBy": "Kashish"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "",
+      "name": "Raghavendra",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Kashish",
+      "phone": "99647 67276",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 13000,
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T11:08:20.271Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789383996869",
+      "activities": [
+        {
+          "id": "act_1789383996869",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-09-14T11:06:36.869Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "knp.prashanth@gmail.com",
+      "name": "Prashanth",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Harsh Goyal",
+      "phone": "+91 97395 16001",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 18000,
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T11:07:50.183Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789384053622",
+      "activities": [
+        {
+          "id": "act_1789384053622",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-09-14T11:07:33.622Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "yogayogagro11@gmail.com",
+      "name": "Sandip Lokhande",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "New lead added to pipeline. Follow-up scheduled.",
+      "owner": "Harsh Goyal",
+      "phone": "+91 88052 55566",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 6000,
+      "deal_type": "new",
+      "previous_stage": "New",
+      "stageUpdatedAt": "2026-09-14T11:07:43.439Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789383835992",
+      "activities": [
+        {
+          "id": "act_1789383835992",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Kashish.",
+          "timestamp": "2026-09-14T11:03:55.992Z",
+          "performedBy": "Kashish"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "designculturenagpur@gmail.com",
+      "name": "sushil Batra",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Kashish",
+      "phone": "9893779000",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 5000,
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T11:08:17.312Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789383885425",
+      "activities": [
+        {
+          "id": "act_1789383885425",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Kashish.",
+          "timestamp": "2026-09-14T11:04:45.425Z",
+          "performedBy": "Kashish"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "ceo@yasaswifinserve.com",
+      "name": "Knvs Sarma",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Kashish",
+      "phone": "98482 58834",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 13000,
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T11:08:13.136Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789383953535",
+      "activities": [
+        {
+          "id": "act_1789383953535",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Kashish.",
+          "timestamp": "2026-09-14T11:05:53.535Z",
+          "performedBy": "Kashish"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "it@futurevalue.in",
+      "name": "Vivek Kumar",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Kashish",
+      "phone": "85953 37973",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 25000,
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T11:08:10.359Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789384011169",
+      "activities": [
+        {
+          "id": "act_1789384011169",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Kashish.",
+          "timestamp": "2026-09-14T11:06:51.169Z",
+          "performedBy": "Kashish"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "",
+      "name": "Jitendra ji â€”Delhi",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Kashish",
+      "phone": "93122 12305",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Won",
+      "value": 10000,
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T11:08:05.521Z",
+      "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789384066529",
+      "activities": [
+        {
+          "id": "act_1789384066529",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Kashish.",
+          "timestamp": "2026-09-14T11:07:46.529Z",
+          "performedBy": "Kashish"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "",
+      "name": "Gopikrishna Mallireddy",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "notes": "Product demo completed. Client showed positive interest.",
+      "owner": "Kashish",
+      "phone": "94825 12223",
+      "score": "Warm",
+      "source": "Manual",
+      "status": "Demo Done",
+      "value": 13000
     }
   ]
 }
