@@ -10979,7 +10979,7 @@ export default function App() {
                       </p>
                     </div>
                   ) : (
-                    <table className="leads-data-table" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "11px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <table className="leads-data-table" style={{ minWidth: "960px", width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "11px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       <thead>
                         <tr style={{ backgroundColor: "#fcfdfe", borderBottom: "1px solid #edf2f7", color: "#475569", fontWeight: "650", height: "32px" }}>
                           <th style={{ width: "30px", padding: "4px 2px 4px 8px", textAlign: "center" }}>
