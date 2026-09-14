@@ -3558,16 +3558,40 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 /* TABLET & MOBILE VIEWPORT (<= 768px) */
 @media screen and (max-width: 768px) {
-  /* 1. App Shell & Scaling */
+  /* 1. App Shell & Scaling on Mobile */
+  html, body, #root {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100% !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
   .crm-app-shell {
     zoom: 1 !important;
     width: 100vw !important;
     max-width: 100vw !important;
-    height: 100% !important;
+    height: auto !important;
     min-height: 100vh !important;
     min-height: 100dvh !important;
     position: relative !important;
     overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .crm-main-area {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    min-height: 100vh !important;
+  }
+
+  .crm-workspace-content {
+    padding: 10px 12px 60px 12px !important;
+    overflow-y: visible !important;
+    height: auto !important;
   }
 
   /* 2. Mobile Drawer Navigation */
@@ -3606,12 +3630,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
     animation: fadeIn 0.15s ease-out !important;
   }
 
-  /* 3. Main Area & Header */
-  .crm-main-area {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    overflow-x: hidden !important;
-  }
+  /* 3. Header on Mobile */
 
   .crm-top-header {
     padding: 0 10px !important;
@@ -3634,10 +3653,6 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   }
   .header-action-row::-webkit-scrollbar {
     display: none !important;
-  }
-
-  .crm-workspace-content {
-    padding: 10px 12px !important;
   }
 
   /* 4. Modals on Mobile */
