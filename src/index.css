@@ -539,6 +539,20 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   border-color: #cbd5e1;
 }
 
+.header-logout-btn {
+  white-space: nowrap;
+}
+
+.header-logout-btn:hover {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #dc2626 !important;
+}
+
+.header-logout-btn:hover svg {
+  color: #dc2626 !important;
+}
+
 .crm-workspace-content {
   flex: 1;
   padding: 20px 24px;
@@ -3738,6 +3752,17 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   }
   .header-user-badge-text {
     display: none !important;
+  }
+
+  /* Mobile compact Log Out Button */
+  .header-logout-btn {
+    padding: 0 8px !important;
+    height: 30px !important;
+    font-size: 11px !important;
+    gap: 4px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
   }
 
   /* 4. Modals on Mobile */

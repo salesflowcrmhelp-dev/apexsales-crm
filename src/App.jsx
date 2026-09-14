@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { 
   Download, Plus, Save, RefreshCw, FileSpreadsheet, 
   HelpCircle, X, Check, AlertCircle, TrendingUp, IndianRupee, Award, Grid, Upload, Trash2, Target, Pencil, Gift, Lock, Unlock, KeyRound, Calendar, Phone, AlertTriangle, Flame, CheckCircle2, MessageCircle, Clock, Bell, Sparkles, RotateCcw,
-  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2
+  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut
 } from "lucide-react";
 
 // Dropdown options
@@ -2741,7 +2741,7 @@ export default function App() {
       localStorage.removeItem("crm_auth_user");
       localStorage.removeItem("crm_auth_token");
     } catch(e) {}
-    showToast("Logged out. Workspace locked.", "info");
+    showToast("Logged out successfully.", "info");
   };
 
   const handleInviteUser = async (e) => {
@@ -6926,10 +6926,11 @@ export default function App() {
 
             <button 
               onClick={handleLogout}
-              className="header-icon-btn"
-              title="Lock Workspace"
+              className="header-icon-btn header-logout-btn"
+              title="Log Out"
             >
-              <Lock className="w-4 h-4 text-slate-600" /> Lock
+              <LogOut className="w-4 h-4 text-slate-600" />
+              <span>Log Out</span>
             </button>
           </div>
         </header>
