@@ -3756,6 +3756,17 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
     overflow: hidden !important;
   }
 
+  /* Calendar Mobile Responsive: 2x2 stats and vertically stacked Month Grid & Agenda Feed */
+  .calendar-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .calendar-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
   /* 7. Delete Confirmation Modal Touch-Friendly Controls */
   .modal-actions-grid {
     display: flex !important;
@@ -3802,6 +3813,16 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   .analytics-kpi-quad-grid {
     grid-template-columns: 1fr !important;
     gap: 8px !important;
+  }
+
+  .calendar-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .calendar-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
 
   .modal-content {

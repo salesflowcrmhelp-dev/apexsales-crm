@@ -6873,7 +6873,7 @@ export default function App() {
             <div className="calendar-page-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               {/* 1. TOP 4 EXECUTIVE METRIC CARDS */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "10px" }}>
+              <div className="calendar-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "10px" }}>
                 {/* Card 1: Total Scheduled */}
                 <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px 12px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                   <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#fff7ed", border: "1px solid #fed7aa", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -7090,7 +7090,7 @@ export default function App() {
               </div>
 
               {/* 3. MAIN 2-COLUMN GRID (CALENDAR GRID + EXECUTIVE AGENDA FEED WITH AI NOTES) */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "12px", alignItems: "start" }}>
+              <div className="calendar-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "12px", alignItems: "start" }}>
                 
                 {/* LEFT COLUMN: 7-DAY MONTH CALENDAR GRID */}
                 <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 12px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
