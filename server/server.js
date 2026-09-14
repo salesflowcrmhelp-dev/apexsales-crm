@@ -524,6 +524,33 @@ async function saveUser(user) {
   writeLocalDB(local);
 }
 
+async function deleteUser(userId, userName, userEmail) {
+  if (isMongoConnected && mongoDb) {
+    try {
+      const orFilters = [];
+      if (userId) orFilters.push({ id: userId });
+      if (userName) orFilters.push({ name: userName });
+      if (userEmail) orFilters.push({ email: userEmail });
+      if (orFilters.length > 0) {
+        await mongoDb.collection('users').deleteMany({ $or: orFilters });
+      }
+    } catch (e) {
+      console.error('MongoDB deleteUser error:', e);
+    }
+  }
+  // Keep local db in sync
+  const local = readLocalDB();
+  const uNameLower = (userName || '').toLowerCase().trim();
+  const uEmailLower = (userEmail || '').toLowerCase().trim();
+  local.users = (local.users || []).filter(u => {
+    if (userId && (u.id === userId || u._id === userId)) return false;
+    if (uNameLower && (u.name || '').toLowerCase().trim() === uNameLower) return false;
+    if (uEmailLower && (u.email || '').toLowerCase().trim() === uEmailLower) return false;
+    return true;
+  });
+  writeLocalDB(local);
+}
+
 async function getLeads() {
   if (isMongoConnected && mongoDb) {
     try {
@@ -1528,26 +1555,77 @@ app.put('/api/users/:id', async (req, res) => {
   res.json({ success: true, user: updated, message: 'User updated successfully!' });
 });
 
-// Admin: Deactivate User
+// Admin: Delete User Permanently
 app.delete('/api/users/:id', async (req, res) => {
-  if (req.user?.role !== 'admin') {
+  const isSuper = isSuperAdminEmailOrName(req.user);
+  if (req.user?.role !== 'admin' && !isSuper) {
     return res.status(403).json({ success: false, message: 'Access denied. Only Admin can delete users.' });
   }
 
   const { id } = req.params;
   const allUsers = await getUsers();
-  const targetUser = allUsers.find(u => u.id === id);
+  const targetUser = allUsers.find(u => 
+    u.id === id || 
+    u._id === id || 
+    (u.name && u.name.toLowerCase() === id.toLowerCase()) || 
+    (u.email && u.email.toLowerCase() === id.toLowerCase())
+  );
+
   if (!targetUser) {
     return res.status(404).json({ success: false, message: 'User not found.' });
   }
-  if (targetUser.role === 'admin' && allUsers.filter(u => u.role === 'admin' && u.active !== false).length <= 1) {
-    return res.status(400).json({ success: false, message: 'Cannot deactivate the primary Admin account.' });
+
+  // Strictly protect Root Admin account
+  if (targetUser.id === 'usr_admin') {
+    return res.status(400).json({ success: false, message: 'Security restriction: Primary Super Admin account (Harsh Goyal) cannot be deleted.' });
   }
 
-  targetUser.active = false;
-  await saveUser(targetUser);
+  // Prevent deleting currently logged-in account
+  if (req.user && (req.user.id === targetUser.id || (req.user.name && targetUser.name && req.user.name.toLowerCase() === targetUser.name.toLowerCase() && targetUser.id === req.user.id))) {
+    return res.status(400).json({ success: false, message: 'You cannot delete your own currently logged-in account.' });
+  }
 
-  res.json({ success: true, message: `User "${targetUser.name}" deactivated.` });
+  // Permanently delete user from MongoDB and db.json
+  await deleteUser(targetUser.id, targetUser.name, targetUser.email);
+
+  // Reassign any leads owned by this user to 'Unassigned' so pipeline records remain safe
+  try {
+    const allLeads = await getLeads();
+    const targetNameLower = (targetUser.name || '').toLowerCase().trim();
+    const leadsToReassign = allLeads.filter(l => 
+      l.owner && (
+        (targetNameLower && (l.owner || '').toLowerCase().trim() === targetNameLower) ||
+        l.owner === targetUser.id
+      )
+    );
+    for (const lead of leadsToReassign) {
+      lead.owner = 'Unassigned';
+      await saveLead(lead);
+    }
+  } catch (err) {
+    console.error('Error reassigning leads on user delete:', err);
+  }
+
+  // Update any employees reporting to this user to report to Harsh Goyal
+  try {
+    const remainingUsers = await getUsers();
+    const targetNameLower = (targetUser.name || '').toLowerCase().trim();
+    for (const u of remainingUsers) {
+      if (
+        (targetNameLower && (u.reportsTo || '').toLowerCase().trim() === targetNameLower) ||
+        (targetUser.id && u.managerId === targetUser.id)
+      ) {
+        u.reportsTo = 'Harsh Goyal';
+        u.managerId = 'usr_admin';
+        await saveUser(u);
+      }
+    }
+  } catch (err) {
+    console.error('Error updating reporting hierarchy on user delete:', err);
+  }
+
+  console.log(`🗑️ User permanently deleted: ${targetUser.name || targetUser.username} (${targetUser.id}) by Admin ${req.user?.name}`);
+  res.json({ success: true, message: `User "${targetUser.displayName || targetUser.name}" permanently deleted.` });
 });
 
 // --- LEADS & PIPELINE API (WITH ROLE-BASED STRICT PRIVACY) ---

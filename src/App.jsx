@@ -2760,35 +2760,44 @@ export default function App() {
     setPinModalData({ userId, userName, pin: "" });
   };
 
-  const handleDeactivateUser = (userId, userName) => {
+  const handleDeleteUser = (userId, userName) => {
     setDeleteConfirmData({
-      title: "Deactivate Team Member?",
-      message: `Are you sure you want to deactivate ${userName}? They will be marked as inactive and will immediately lose access to the CRM.`,
-      confirmLabel: "Yes, Deactivate",
+      title: "Permanently Delete User?",
+      message: `Are you sure you want to permanently delete "${userName}"? This will completely remove their account, credentials, and access from the database. Any leads assigned to them will be moved to Unassigned. This action cannot be undone.`,
+      confirmLabel: "Yes, Delete Permanently",
       icon: "user-x",
       onConfirm: async () => {
         setDeleteConfirmData(null);
         try {
+          const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
+          const headers = {
+            "Content-Type": "application/json",
+            "x-user-role": currentUser?.role || (checkIsSuperAdmin(currentUser) ? "admin" : "sales_rep"),
+            "x-user-name": currentUser?.name || "Harsh Goyal",
+            "x-user-id": currentUser?.id || "usr_admin"
+          };
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
           const res = await fetch(`/api/users/${encodeURIComponent(userId)}`, {
             method: "DELETE",
-            headers: {
-              "x-user-role": currentUser?.role || "admin",
-              "x-user-name": currentUser?.name || "Harsh Goyal"
-            }
+            headers
           });
           const data = await res.json();
           if (res.ok && data.success) {
-            showToast(`User ${userName} deactivated successfully.`, "info");
+            showToast(data.message || `User "${userName}" permanently deleted.`, "success");
             loadUsersFromBackend();
+            loadLeadsFromBackend();
           } else {
-            showToast(data.message || "Failed to deactivate user.", "error");
+            showToast(data.message || "Failed to delete user.", "error");
           }
         } catch(err) {
-          showToast("Error deactivating user.", "error");
+          showToast("Error deleting user.", "error");
         }
       }
     });
   };
+  const handleDeactivateUser = handleDeleteUser;
 
   const saveTasksToStorage = (updatedTasks) => {
     setTasks(updatedTasks);
@@ -10076,14 +10085,18 @@ export default function App() {
                               >
                                 🔑 Reset PIN
                               </button>
-                              {!isAdminRole && (
+                              {usr.id === "usr_admin" ? (
+                                <span style={{ padding: "4px 8px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "5px", fontSize: "10.5px", fontWeight: "700", color: "#94a3b8" }} title="Primary Super Admin cannot be deleted">
+                                  🔒 Protected
+                                </span>
+                              ) : (
                                 <button
                                   type="button"
-                                  onClick={() => handleDeactivateUser(usr.id, usr.name)}
-                                  style={{ padding: "4px 8px", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "5px", fontSize: "10.5px", fontWeight: "600", color: "#dc2626", cursor: "pointer" }}
-                                  title="Deactivate user"
+                                  onClick={() => handleDeleteUser(usr.id, usr.name)}
+                                  style={{ padding: "4px 8px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "5px", fontSize: "10.5px", fontWeight: "700", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                                  title={`Permanently delete ${usr.name}`}
                                 >
-                                  Deactivate
+                                  🗑️ Delete
                                 </button>
                               )}
                             </div>
@@ -19399,14 +19412,18 @@ export default function App() {
                               >
                                 🔑 PIN
                               </button>
-                              {!isAdminRole && (
+                              {usr.id === "usr_admin" ? (
+                                <span style={{ padding: "4px 6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "5px", fontSize: "10px", fontWeight: "700", color: "#94a3b8" }} title="Primary Super Admin cannot be deleted">
+                                  🔒 Protected
+                                </span>
+                              ) : (
                                 <button
                                   type="button"
-                                  onClick={() => handleDeactivateUser(usr.id, usr.name)}
-                                  style={{ padding: "4px 7px", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "5px", fontSize: "10px", fontWeight: "600", color: "#dc2626", cursor: "pointer" }}
-                                  title="Deactivate user"
+                                  onClick={() => handleDeleteUser(usr.id, usr.name)}
+                                  style={{ padding: "4px 7px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "5px", fontSize: "10px", fontWeight: "700", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                                  title={`Permanently delete ${usr.name}`}
                                 >
-                                  ✕
+                                  🗑️ Delete
                                 </button>
                               )}
                             </div>
