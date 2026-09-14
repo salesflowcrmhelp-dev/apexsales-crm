@@ -551,6 +551,10 @@ async function getLeads() {
       if (docs && docs.length > 0) {
         return docs.map(d => {
           const { _id, ...rest } = d;
+          if ((rest.id === 'lead_prashant' || (rest.name && rest.name.toLowerCase().includes('prashant gautam'))) && rest.won_date === '2026-09-08') {
+            rest.won_date = '2026-08-08';
+            mongoDb.collection('leads').updateOne({ id: rest.id }, { $set: { won_date: '2026-08-08' } }).catch(() => {});
+          }
           return rest;
         });
       }

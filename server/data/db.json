@@ -255,7 +255,7 @@
       "source": "Manual",
       "score": "Warm",
       "next_follow_up": "",
-      "won_date": "2026-09-08",
+      "won_date": "2026-08-08",
       "notes": "10k+GST 5 co. 15k+GST unlimited co.",
       "owner": "Harsh Goyal"
     },
@@ -882,6 +882,36 @@
       "source": "Manual",
       "status": "Demo Done",
       "value": 13000
+    },
+    {
+      "id": "lead_1789387993439",
+      "name": "Ashok Kumar",
+      "company": "",
+      "status": "Won",
+      "value": 7000,
+      "email": "ak80980@gmail.com",
+      "phone": "+91 96900 14241",
+      "source": "Manual",
+      "score": "Warm",
+      "owner": "Harsh Goyal",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "custom_fields": {},
+      "activities": [
+        {
+          "id": "act_1789387993439",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-09-14T12:13:13.439Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "notes": "Product demo completed. Client showed positive interest.",
+      "deal_type": "new",
+      "previous_stage": "Demo Done",
+      "stageUpdatedAt": "2026-09-14T12:13:26.493Z",
+      "won_date": "2026-09-14"
     }
   ]
 }

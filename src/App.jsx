@@ -303,6 +303,11 @@ export const sanitizeLeadObject = (lead) => {
   // Clean Notes
   let finalNotes = cleanJunkGoogleSheetsText(rawNotes);
 
+  let wonDate = lead.won_date;
+  if ((lead.id === 'lead_prashant' || (rawName && rawName.toLowerCase().includes('prashant gautam'))) && (!lead.isUserEditedWonDate && wonDate === '2026-09-08')) {
+    wonDate = '2026-08-08';
+  }
+
   return {
     ...lead,
     name: cleanJunkGoogleSheetsText(rawName),
@@ -310,6 +315,7 @@ export const sanitizeLeadObject = (lead) => {
     email: finalEmail,
     phone: finalPhone,
     notes: finalNotes,
+    won_date: wonDate,
     source: cleanJunkGoogleSheetsText(lead.source || "Manual")
   };
 };
@@ -567,7 +573,7 @@ const INITIAL_LEADS = [
   { id: "lead_anubhav", name: "Anubhav Agarwal", company: "Direct Individual", status: "Won", value: 15000, email: "anubhavagrawal82@gmail.com", phone: "+91 98189 30423", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-28", notes: "15k+GST for 5 co. | 9910158681 Santosh", owner: "Harsh Goyal" },
   { id: "lead_sanjjay", name: "Sanjjay Bablani", company: "UGPL", status: "Won", value: 15000, email: "ugpl2011@gmail.com", phone: "+91 99101 75554", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-20", notes: "15k+GST for unlimited co.", owner: "Harsh Goyal" },
   { id: "lead_ramnath", name: "Ramnath Kumar", company: "Direct Individual", status: "Won", value: 8000, email: "ramkumar31555@gmail.com", phone: "919615222555", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-19", notes: "1-2 days mai batye ga offer k liye puch rha tha", owner: "Harsh Goyal" },
-  { id: "lead_prashant", name: "Prashant Gautam", company: "Direct Individual", status: "Won", value: 10000, email: "prashantgautam903@gmail.com", phone: "+919887554903", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-09-08", notes: "10k+GST 5 co. 15k+GST unlimited co.", owner: "Harsh Goyal" },
+  { id: "lead_prashant", name: "Prashant Gautam", company: "Direct Individual", status: "Won", value: 10000, email: "prashantgautam903@gmail.com", phone: "+919887554903", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-08", notes: "10k+GST 5 co. 15k+GST unlimited co.", owner: "Harsh Goyal" },
 
   // 14 ACTIVE PIPELINE DEALS
   { id: "lead_amit_miglani", name: "Amit Miglani", company: "Direct Individual", status: "Payment Follow Up", value: 15000, email: "miglanikamit@gmail.com", phone: "98120 69041", source: "Manual", score: "Warm", next_follow_up: "2026-09-01", notes: "Payment follow-up pending. Review invoice terms for ₹10,000-₹15,000.", owner: "Harsh Goyal" },
@@ -15812,6 +15818,45 @@ export default function App() {
                         </button>
                       )}
                     </div>
+
+                    {isWonStatus(selectedLeadForDetails.status) && (
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "6px", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "4px 8px", borderRadius: "6px" }}>
+                        <span style={{ color: "#166534", fontWeight: "750", fontSize: "11px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                          🗓️ Won / Sale Date:
+                        </span>
+                        <input
+                          type="date"
+                          value={(selectedLeadForDetails.won_date || "").split("T")[0]}
+                          onChange={(e) => {
+                            const newDate = e.target.value;
+                            const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
+                            if (actualIndex !== -1) {
+                              const updatedLead = { ...selectedLeadForDetails, won_date: newDate, isUserEditedWonDate: true };
+                              setSelectedLeadForDetails(updatedLead);
+                              const updatedLeads = [...leads];
+                              updatedLeads[actualIndex] = updatedLead;
+                              setLeads(updatedLeads);
+                              saveLeadsToStorage(updatedLeads);
+                              if (webhookUrl) syncWithGoogleSheetWebhook(updatedLead);
+                              logLeadActivity(selectedLeadForDetails.id, "stage_change", "Won Date Changed", `Won date set to ${newDate}`);
+                              showToast(`Won date updated: ${newDate}`, "success");
+                            }
+                          }}
+                          style={{
+                            padding: "2px 6px",
+                            fontSize: "11px",
+                            border: "1px solid #86efac",
+                            borderRadius: "4px",
+                            backgroundColor: "#ffffff",
+                            color: "#166534",
+                            fontWeight: "700",
+                            outline: "none",
+                            cursor: "pointer"
+                          }}
+                          title="Click to edit the date this deal was won"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {/* Contact Section */}
