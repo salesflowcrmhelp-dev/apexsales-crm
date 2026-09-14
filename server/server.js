@@ -524,30 +524,23 @@ async function saveUser(user) {
   writeLocalDB(local);
 }
 
-async function deleteUser(userId, userName, userEmail) {
+async function deleteUser(userId) {
+  if (!userId || userId === 'usr_admin') return;
   if (isMongoConnected && mongoDb) {
     try {
-      const orFilters = [];
-      if (userId) orFilters.push({ id: userId });
-      if (userName) orFilters.push({ name: userName });
-      if (userEmail) orFilters.push({ email: userEmail });
-      if (orFilters.length > 0) {
-        await mongoDb.collection('users').deleteMany({ $or: orFilters });
-      }
+      await mongoDb.collection('users').deleteOne({
+        $and: [
+          { id: userId },
+          { id: { $ne: 'usr_admin' } }
+        ]
+      });
     } catch (e) {
       console.error('MongoDB deleteUser error:', e);
     }
   }
   // Keep local db in sync
   const local = readLocalDB();
-  const uNameLower = (userName || '').toLowerCase().trim();
-  const uEmailLower = (userEmail || '').toLowerCase().trim();
-  local.users = (local.users || []).filter(u => {
-    if (userId && (u.id === userId || u._id === userId)) return false;
-    if (uNameLower && (u.name || '').toLowerCase().trim() === uNameLower) return false;
-    if (uEmailLower && (u.email || '').toLowerCase().trim() === uEmailLower) return false;
-    return true;
-  });
+  local.users = (local.users || []).filter(u => u.id !== userId || u.id === 'usr_admin');
   writeLocalDB(local);
 }
 
@@ -1575,8 +1568,8 @@ app.delete('/api/users/:id', async (req, res) => {
     return res.status(404).json({ success: false, message: 'User not found.' });
   }
 
-  // Strictly protect Root Admin account
-  if (targetUser.id === 'usr_admin') {
+  // Strictly protect Super Admin account (Harsh Goyal)
+  if (targetUser.id === 'usr_admin' || isSuperAdminEmailOrName(targetUser)) {
     return res.status(400).json({ success: false, message: 'Security restriction: Primary Super Admin account (Harsh Goyal) cannot be deleted.' });
   }
 
@@ -1586,7 +1579,7 @@ app.delete('/api/users/:id', async (req, res) => {
   }
 
   // Permanently delete user from MongoDB and db.json
-  await deleteUser(targetUser.id, targetUser.name, targetUser.email);
+  await deleteUser(targetUser.id);
 
   // Reassign any leads owned by this user to 'Unassigned' so pipeline records remain safe
   try {

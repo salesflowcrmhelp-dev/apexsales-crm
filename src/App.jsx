@@ -2760,11 +2760,17 @@ export default function App() {
     setPinModalData({ userId, userName, pin: "" });
   };
 
-  const handleDeleteUser = (userId, userName) => {
+  const handleDeleteUser = (userId, userName, userEmail = "", userRole = "") => {
+    if (userId === "usr_admin" || checkIsSuperAdmin({ id: userId, name: userName, email: userEmail })) {
+      showToast("Primary Super Admin account (Harsh Goyal) cannot be deleted.", "error");
+      return;
+    }
     setDeleteConfirmData({
       title: "Permanently Delete User?",
-      message: `Are you sure you want to permanently delete "${userName}"? This will completely remove their account, credentials, and access from the database. Any leads assigned to them will be moved to Unassigned. This action cannot be undone.`,
-      confirmLabel: "Yes, Delete Permanently",
+      userName: userName || "User",
+      userEmail: userEmail || "",
+      userRole: userRole || "sales_rep",
+      confirmLabel: "Yes, Delete",
       icon: "user-x",
       onConfirm: async () => {
         setDeleteConfirmData(null);
@@ -10085,14 +10091,14 @@ export default function App() {
                               >
                                 🔑 Reset PIN
                               </button>
-                              {usr.id === "usr_admin" ? (
+                              {checkIsSuperAdmin(usr) || usr.id === "usr_admin" ? (
                                 <span style={{ padding: "4px 8px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "5px", fontSize: "10.5px", fontWeight: "700", color: "#94a3b8" }} title="Primary Super Admin cannot be deleted">
                                   🔒 Protected
                                 </span>
                               ) : (
                                 <button
                                   type="button"
-                                  onClick={() => handleDeleteUser(usr.id, usr.name)}
+                                  onClick={() => handleDeleteUser(usr.id, usr.name, usr.email, usr.role)}
                                   style={{ padding: "4px 8px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "5px", fontSize: "10.5px", fontWeight: "700", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
                                   title={`Permanently delete ${usr.name}`}
                                 >
@@ -17751,7 +17757,7 @@ export default function App() {
             className="modal-content animate-fade-in" 
             onClick={(e) => e.stopPropagation()} 
             style={{ 
-              maxWidth: "400px", 
+              maxWidth: "420px", 
               width: "100%",
               borderRadius: "18px", 
               padding: "26px 24px 22px 24px", 
@@ -17810,14 +17816,9 @@ export default function App() {
             </div>
 
             {/* Title & Subtitle */}
-            <h3 style={{ fontSize: "17px", fontWeight: "800", color: "#0f172a", margin: "0 0 6px 0", letterSpacing: "-0.2px" }}>
+            <h3 style={{ fontSize: "17.5px", fontWeight: "800", color: "#0f172a", margin: "0 0 6px 0", letterSpacing: "-0.2px" }}>
               {deleteConfirmData.title === "Delete Lead" ? "Delete Lead?" : deleteConfirmData.title || "Confirm Deletion"}
             </h3>
-            <p style={{ fontSize: "12.5px", color: "#64748b", margin: "0 0 16px 0", lineHeight: "1.5" }}>
-              {deleteConfirmData.title === "Delete Lead" 
-                ? "This lead will be permanently removed from your pipeline. This action cannot be undone." 
-                : deleteConfirmData.message}
-            </p>
 
             {/* Lead Details Card Preview (If deleting a lead) */}
             {deleteConfirmData.leadName && (
@@ -17826,7 +17827,7 @@ export default function App() {
                 border: "1px solid #e2e8f0", 
                 borderRadius: "12px", 
                 padding: "10px 14px", 
-                marginBottom: "20px",
+                marginBottom: "16px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -17882,19 +17883,71 @@ export default function App() {
               </div>
             )}
 
+            {/* User Details Card Preview (If deleting a user) */}
+            {deleteConfirmData.userName && (
+              <div style={{
+                backgroundColor: "#fff1f2",
+                border: "1px solid #ffe4e6",
+                borderRadius: "14px",
+                padding: "12px 14px",
+                margin: "12px 0 14px 0",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                textAlign: "left"
+              }}>
+                <div style={{
+                  width: "38px",
+                  height: "38px",
+                  borderRadius: "50%",
+                  backgroundColor: "#fee2e2",
+                  color: "#e11d48",
+                  fontWeight: "850",
+                  fontSize: "14.5px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  border: "1.5px solid #fca5a5"
+                }}>
+                  {(deleteConfirmData.userName || "U")[0].toUpperCase()}
+                </div>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ fontSize: "13.5px", fontWeight: "800", color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {deleteConfirmData.userName}
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <span style={{ fontWeight: "700", textTransform: "capitalize", color: "#e11d48" }}>
+                      {deleteConfirmData.userRole === "admin" ? "Super Admin" : deleteConfirmData.userRole === "manager" ? "Manager" : "Sales Representative"}
+                    </span>
+                    {deleteConfirmData.userEmail && <span> • {deleteConfirmData.userEmail}</span>}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <p style={{ fontSize: "12px", color: "#64748b", margin: "0 0 16px 0", lineHeight: "1.55" }}>
+              {deleteConfirmData.title === "Delete Lead" 
+                ? "This lead will be permanently removed from your pipeline. This action cannot be undone." 
+                : deleteConfirmData.userName
+                ? "All database records and login credentials will be permanently deleted. Any assigned leads will safely be moved to Unassigned."
+                : deleteConfirmData.message}
+            </p>
+
             {/* Actions Footer with Proportional 2-Button Grid */}
             <div style={{ display: "flex", gap: "10px" }}>
               <button 
+                type="button"
                 onClick={() => setDeleteConfirmData(null)}
                 style={{ 
                   flex: 1,
-                  height: "40px", 
+                  height: "42px", 
                   backgroundColor: "#ffffff", 
                   color: "#334155", 
                   border: "1px solid #cbd5e1", 
                   borderRadius: "10px", 
                   fontSize: "13px", 
-                  fontWeight: "600", 
+                  fontWeight: "650", 
                   cursor: "pointer",
                   transition: "all 0.15s ease",
                   fontFamily: "inherit",
@@ -17906,6 +17959,7 @@ export default function App() {
                 Cancel
               </button>
               <button 
+                type="button"
                 onClick={() => {
                   if (deleteConfirmData.onConfirm) {
                     deleteConfirmData.onConfirm();
@@ -17913,18 +17967,20 @@ export default function App() {
                 }}
                 style={{ 
                   flex: 1,
-                  height: "40px", 
+                  height: "42px", 
                   backgroundColor: "#e11d48", 
                   color: "#ffffff", 
                   border: "none", 
                   borderRadius: "10px", 
                   fontSize: "13px", 
-                  fontWeight: "700", 
+                  fontWeight: "750", 
                   cursor: "pointer", 
                   display: "inline-flex", 
                   alignItems: "center", 
                   justifyContent: "center",
                   gap: "6px", 
+                  whiteSpace: "nowrap",
+                  padding: "0 14px",
                   boxShadow: "0 2px 8px rgba(225, 29, 72, 0.3)",
                   transition: "all 0.15s ease",
                   fontFamily: "inherit"
@@ -17932,7 +17988,8 @@ export default function App() {
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#be123c"}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#e11d48"}
               >
-                {deleteConfirmData.icon === "user-x" ? <UserX size={14} /> : <Trash2 size={14} />} {deleteConfirmData.confirmLabel || "Delete Lead"}
+                {deleteConfirmData.icon === "user-x" ? <UserX size={15} /> : <Trash2 size={15} />}
+                <span>{deleteConfirmData.confirmLabel || "Delete"}</span>
               </button>
             </div>
           </div>
@@ -19412,14 +19469,14 @@ export default function App() {
                               >
                                 🔑 PIN
                               </button>
-                              {usr.id === "usr_admin" ? (
+                              {checkIsSuperAdmin(usr) || usr.id === "usr_admin" ? (
                                 <span style={{ padding: "4px 6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "5px", fontSize: "10px", fontWeight: "700", color: "#94a3b8" }} title="Primary Super Admin cannot be deleted">
                                   🔒 Protected
                                 </span>
                               ) : (
                                 <button
                                   type="button"
-                                  onClick={() => handleDeleteUser(usr.id, usr.name)}
+                                  onClick={() => handleDeleteUser(usr.id, usr.name, usr.email, usr.role)}
                                   style={{ padding: "4px 7px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "5px", fontSize: "10px", fontWeight: "700", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
                                   title={`Permanently delete ${usr.name}`}
                                 >
