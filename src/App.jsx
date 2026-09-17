@@ -10328,22 +10328,22 @@ export default function App() {
               {pipelineView === "analytics" && (
                 <div className="dashboard-greeting-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px", paddingBottom: "4px" }}>
                   <div>
-                    <h2 style={{ fontSize: "17px", fontWeight: "750", color: "#0f172a", margin: "0 0 3px 0", lineHeight: "1.3", letterSpacing: "-0.2px" }}>
+                    <h1 style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", margin: "0 0 3px 0", lineHeight: "1.3", letterSpacing: "-0.2px" }}>
                       {(() => {
                         const hr = new Date().getHours();
                         const greeting = hr < 12 ? "Good Morning" : hr < 17 ? "Good Afternoon" : "Good Evening";
                         const name = currentUser?.displayName || currentUser?.name || userProfile.displayName || "Admin";
                         return `${greeting}, ${name}! 👋`;
                       })()}
-                    </h2>
-                    <p style={{ fontSize: "11.5px", color: "#64748b", margin: 0, padding: "0 0 4px 0", fontWeight: "400", lineHeight: "1.5" }}>
+                    </h1>
+                    <p style={{ fontSize: "13px", color: "#64748b", margin: 0, padding: "0 0 4px 0", fontWeight: "400", lineHeight: "1.5" }}>
                       {currentUser?.role === "sales_rep" ? "Here's what's happening with your assigned pipeline today." : "Here's what's happening with your pipeline today."}
                     </p>
                   </div>
 
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", padding: "6px 12px", borderRadius: "8px", boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}>
                     <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#475569" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>
                       {new Date().toLocaleDateString("en-IN", { day: '2-digit', month: 'long', year: 'numeric', weekday: 'long' })}
                     </span>
                   </div>
@@ -10359,14 +10359,14 @@ export default function App() {
                       <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Bookmark size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", letterSpacing: "0.2px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        TOTAL PIPELINE VALUE
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        Total Pipeline Value
                       </span>
                     </div>
                     <div style={{ fontSize: "17px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       <AnimatedNumber value={stats.totalPipeline} isCurrency />
                     </div>
-                    <div style={{ fontSize: "8.5px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <div style={{ fontSize: "11px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       <span style={{ color: "#64748b", fontWeight: "600" }}>Active Open Pipeline</span>
                     </div>
                   </div>
@@ -10377,14 +10377,14 @@ export default function App() {
                       <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Award size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", letterSpacing: "0.2px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        CLOSED WON DEALS
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        Closed Won Deals
                       </span>
                     </div>
                     <div style={{ fontSize: "17px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       <AnimatedNumber value={stats.wonPipeline} isCurrency />
                     </div>
-                    <div style={{ fontSize: "8.5px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <div style={{ fontSize: "11px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       {stats.wonPipeline === 0 ? (
                         <span style={{ color: "#64748b", fontWeight: "600" }}>Fresh Month (0 Won)</span>
                       ) : (
@@ -10399,18 +10399,18 @@ export default function App() {
                       <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#ecfdf5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <TrendingUp size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", letterSpacing: "0.2px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        PIPELINE WIN RATE
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        Pipeline Win Rate
                       </span>
                     </div>
                     <div style={{ fontSize: "17px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       <AnimatedNumber value={Number(stats.winRate)} isPercent />
                     </div>
-                    <div style={{ fontSize: "8.5px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <div style={{ fontSize: "11px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       {Number(stats.winRate) === 0 ? (
                         <span style={{ color: "#64748b", fontWeight: "600" }}>0 Closed in Sept</span>
                       ) : (
-                        <span style={{ color: "#10b981", fontWeight: "700" }}>{stats.winRate}% Win Rate</span>
+                        <span style={{ color: "#10b981", fontWeight: "700" }}>✓ Won conversion rate</span>
                       )}
                     </div>
                   </div>
@@ -10428,11 +10428,11 @@ export default function App() {
                           <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                             <Target size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
                           </div>
-                          <span style={{ fontSize: "9px", fontWeight: "750", color: "#64748b", letterSpacing: "0.2px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                            SALES TARGET
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                            Sales Target
                           </span>
                         </div>
-                        <span style={{ fontSize: "8.5px", color: "#ea580c", fontWeight: "700", marginLeft: "4px" }}>
+                        <span style={{ fontSize: "11px", color: "#ea580c", fontWeight: "700", marginLeft: "4px" }}>
                           Edit ✎
                         </span>
                       </div>
@@ -10440,7 +10440,7 @@ export default function App() {
                       <div style={{ fontSize: targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {targetValue > 0 ? <AnimatedNumber value={targetValue} isCurrency /> : "Pending ⏳"}
                       </div>
-                      <span style={{ fontSize: "8.5px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#94a3b8", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      <span style={{ fontSize: "11px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#94a3b8", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                         {targetValue > 0 ? (
                           targetStats.baseProgress >= 125
                             ? `🔥 125% Conquered (₹${Math.round(targetStats.stretchTarget).toLocaleString("en-IN")})`
@@ -10472,14 +10472,14 @@ export default function App() {
                         <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <Clock size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
                         </div>
-                        <span style={{ fontSize: "9px", fontWeight: "750", color: "#64748b", letterSpacing: "0.2px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                          DAILY TARGET
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          Daily Target
                         </span>
                       </div>
                       <div style={{ fontSize: selectedPeriodMonth === "2026-08" ? "14.5px" : targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: selectedPeriodMonth === "2026-08" ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {selectedPeriodMonth === "2026-08" ? "Month Ended" : targetValue > 0 ? <AnimatedNumber value={targetStats.dailyRequired} isCurrency /> : "-- / day"}
                       </div>
-                      <span style={{ fontSize: "8.5px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      <span style={{ fontSize: "11px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                         {targetStats.dailySubtitle || (selectedPeriodMonth === "2026-08" ? "August 2026 Closed" : targetValue > 0 ? `For remaining ${targetStats.daysRemaining} days` : "Waiting for assignment")}
                       </span>
                     </div>
@@ -10505,16 +10505,19 @@ export default function App() {
                         <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fef2f2", color: "#e11d48", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <Gift size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                         </div>
-                        <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", letterSpacing: "0.2px", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                          MY INCENTIVE
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          My Incentive
                         </span>
                       </div>
-                      <Pencil size={11} color="#94a3b8" />
+                      <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "11px", color: "#ea580c", fontWeight: "700" }}>
+                        <Pencil size={11} color="#ea580c" />
+                        <span>Edit</span>
+                      </div>
                     </div>
                     <div style={{ fontSize: "17px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       <AnimatedNumber value={targetStats.incentiveAmount} isCurrency />
                     </div>
-                    <div style={{ fontSize: "8.5px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <div style={{ fontSize: "11px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       <span style={{ color: targetStats.incentiveAmount > 0 ? "#059669" : "#64748b", fontWeight: "800", backgroundColor: targetStats.incentiveAmount > 0 ? "#ecfdf5" : "#f1f5f9", padding: "1px 5px", borderRadius: "4px", border: targetStats.incentiveAmount > 0 ? "1px solid #a7f3d0" : "1px solid #e2e8f0", whiteSpace: "nowrap", flexShrink: 0 }}>
                         {targetStats.tierStatusBadge}
                       </span>
@@ -13464,16 +13467,16 @@ export default function App() {
                   <div className="overview-tab-wrapper">
                     {/* 2. Today's Sales Cockpit (Prominent Section) */}
                     <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px", marginBottom: "14px", overflow: "hidden" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                            <h3 style={{ fontSize: "11.5px", fontWeight: "700", color: "#1e293b", display: "flex", alignItems: "center", gap: "6px", margin: 0, letterSpacing: "0.3px" }}>
-                              ⚡ TODAYS SALES COCKPIT
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                            <h3 style={{ fontSize: "15px", fontWeight: "750", color: "#0f172a", display: "flex", alignItems: "center", gap: "6px", margin: 0, letterSpacing: "-0.2px" }}>
+                              ⚡ Today's Sales Cockpit
                             </h3>
-                            <div style={{ fontSize: "10.5px", color: "#475569", fontWeight: "500", border: "1px solid #e2e8f0", padding: "2px 7px", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#fff" }}>
+                            <div style={{ fontSize: "11px", color: "#475569", fontWeight: "600", border: "1px solid #e2e8f0", padding: "3px 9px", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#fff" }}>
                               📅 Today ▾
                             </div>
                           </div>
 
-                          <div className="sales-cockpit-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px" }}>
+                          <div className="sales-cockpit-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(185px, 1fr))", gap: "10px" }}>
                             {/* Card 1: Follow-ups Due Today */}
                             <div 
                               onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "due_today", label: "Follow-ups Due Today" }); }}
@@ -13486,25 +13489,31 @@ export default function App() {
                                 display: "flex",
                                 flexDirection: "column",
                                 justifyContent: "space-between",
-                                minHeight: "88px"
+                                minHeight: "92px"
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                 <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Phone size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
-                                <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                                  FOLLOW-UPS DUE TODAY
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                  Follow-ups Due Today
                                 </span>
                               </div>
 
-                              <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                                 {dueTodayLeads.length}
                               </div>
 
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "9.5px", color: "#94a3b8", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Pending follow-ups</span>
-                                <span style={{ fontSize: "9px", fontWeight: "700", color: "#7c3aed", backgroundColor: "#f3e8ff", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap", flexShrink: 0 }}>View →</span>
+                                <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Pending follow-ups</span>
+                                <button 
+                                  type="button"
+                                  aria-label="View Follow-ups Due Today"
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#7c3aed", backgroundColor: "#f3e8ff", border: "1px solid #ddd6fe", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                >
+                                  View →
+                                </button>
                               </div>
                             </div>
 
@@ -13520,25 +13529,31 @@ export default function App() {
                                 display: "flex",
                                 flexDirection: "column",
                                 justifyContent: "space-between",
-                                minHeight: "88px"
+                                minHeight: "92px"
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                 <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ffe4e6", color: "#e11d48", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <AlertTriangle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
-                                <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                                  OVERDUE FOLLOW-UPS
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                  Overdue Follow-ups
                                 </span>
                               </div>
 
-                              <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                                 {overdueLeads.length}
                               </div>
 
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "9.5px", color: "#e11d48", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Requires immediate attention</span>
-                                <span style={{ fontSize: "9px", fontWeight: "700", color: "#e11d48", backgroundColor: "#ffe4e6", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap", flexShrink: 0 }}>View →</span>
+                                <span style={{ fontSize: "12px", color: "#dc2626", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Requires immediate attention</span>
+                                <button 
+                                  type="button"
+                                  aria-label="View Overdue Follow-ups"
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#e11d48", backgroundColor: "#ffe4e6", border: "1px solid #fecdd3", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                >
+                                  View →
+                                </button>
                               </div>
                             </div>
 
@@ -13554,25 +13569,31 @@ export default function App() {
                                 display: "flex",
                                 flexDirection: "column",
                                 justifyContent: "space-between",
-                                minHeight: "88px"
+                                minHeight: "92px"
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                 <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ffedd5", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Flame size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
-                                <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                                  HOT PRIORITY DEALS
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                  Hot Priority Deals
                                 </span>
                               </div>
 
-                              <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                                 {hotLeads.length}
                               </div>
 
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "9.5px", color: "#94a3b8", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>High value opportunities</span>
-                                <span style={{ fontSize: "9px", fontWeight: "700", color: "#ea580c", backgroundColor: "#ffedd5", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap", flexShrink: 0 }}>View →</span>
+                                <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>High value opportunities</span>
+                                <button 
+                                  type="button"
+                                  aria-label="View Hot Priority Deals"
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#ea580c", backgroundColor: "#ffedd5", border: "1px solid #fed7aa", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                >
+                                  View →
+                                </button>
                               </div>
                             </div>
 
@@ -13588,25 +13609,31 @@ export default function App() {
                                 display: "flex",
                                 flexDirection: "column",
                                 justifyContent: "space-between",
-                                minHeight: "88px"
+                                minHeight: "92px"
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                 <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ecfdf5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
-                                <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                                  EXPECTED REVENUE
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                  Expected Revenue
                                 </span>
                               </div>
 
-                              <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                                 <AnimatedNumber value={expectedValueToday} isCurrency />
                               </div>
 
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "9.5px", color: "#94a3b8", fontWeight: "500", whiteSpace: "nowrap" }}>Today's target</span>
-                                <span style={{ fontSize: "9px", fontWeight: "700", color: "#059669", backgroundColor: "#ecfdf5", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap", flexShrink: 0 }}>View →</span>
+                                <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>Today's target</span>
+                                <button 
+                                  type="button"
+                                  aria-label="View Expected Revenue"
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#059669", backgroundColor: "#ecfdf5", border: "1px solid #a7f3d0", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                >
+                                  View →
+                                </button>
                               </div>
                             </div>
 
@@ -13622,25 +13649,31 @@ export default function App() {
                                 display: "flex",
                                 flexDirection: "column",
                                 justifyContent: "space-between",
-                                minHeight: "88px"
+                                minHeight: "92px"
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                 <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
-                                <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                                  READY TO CLOSE DEALS
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                  Ready to Close Deals
                                 </span>
                               </div>
 
-                              <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                                 {readyToCloseLeads.length}
                               </div>
 
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "9.5px", color: "#94a3b8", fontWeight: "500", whiteSpace: "nowrap" }}>Closing this week</span>
-                                <span style={{ fontSize: "9px", fontWeight: "700", color: "#7c3aed", backgroundColor: "#f3e8ff", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap", flexShrink: 0 }}>View →</span>
+                                <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>Closing this week</span>
+                                <button 
+                                  type="button"
+                                  aria-label="View Deals Ready to Close"
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#7c3aed", backgroundColor: "#f3e8ff", border: "1px solid #ddd6fe", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                >
+                                  View →
+                                </button>
                               </div>
                             </div>
 
@@ -13656,26 +13689,31 @@ export default function App() {
                                 display: "flex",
                                 flexDirection: "column",
                                 justifyContent: "space-between",
-                                minHeight: "88px",
-                                gridColumn: "1"
+                                minHeight: "92px"
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                 <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#e0e7ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <RefreshCw size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
-                                <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-                                  RENEWAL LEADS
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                  Renewal Leads
                                 </span>
                               </div>
 
-                              <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                                 {renewalLeads.length}
                               </div>
 
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "9.5px", color: "#94a3b8", fontWeight: "500", whiteSpace: "nowrap" }}>Up for renewal</span>
-                                <span style={{ fontSize: "9px", fontWeight: "700", color: "#2563eb", backgroundColor: "#e0e7ff", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap", flexShrink: 0 }}>View →</span>
+                                <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>Up for renewal</span>
+                                <button 
+                                  type="button"
+                                  aria-label="View Renewal Leads"
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#2563eb", backgroundColor: "#e0e7ff", border: "1px solid #bfdbfe", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                >
+                                  View →
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -13740,13 +13778,13 @@ export default function App() {
                                 <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Activity size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
-                                <h4 style={{ fontSize: "11px", fontWeight: "700", color: "#1e293b", margin: 0, letterSpacing: "0.4px", textTransform: "uppercase" }}>
-                                  RECENT ACTIVITY ({displayActivities.length})
+                                <h4 style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                                  Recent Activity ({displayActivities.length})
                                 </h4>
                               </div>
                               <span 
                                 onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); }}
-                                style={{ fontSize: "10px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "2px 8px", borderRadius: "4px", cursor: "pointer" }}
+                                style={{ fontSize: "11px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "2px 8px", borderRadius: "4px", cursor: "pointer" }}
                               >
                                 View All →
                               </span>
@@ -13770,7 +13808,7 @@ export default function App() {
                                         <strong style={{ color: "#1e293b", fontWeight: "600" }}>{act.leadName}</strong>
                                       </div>
                                     </div>
-                                    <span style={{ fontSize: "9.5px", fontWeight: "600", color: act.color, backgroundColor: act.bg, padding: "1.5px 7px", borderRadius: "4px", whiteSpace: "nowrap" }}>{act.badgeText}</span>
+                                    <span style={{ fontSize: "11px", fontWeight: "600", color: act.color, backgroundColor: act.bg, padding: "1.5px 7px", borderRadius: "4px", whiteSpace: "nowrap" }}>{act.badgeText}</span>
                                   </div>
                                 );
                               })}
@@ -13784,8 +13822,8 @@ export default function App() {
                                 <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <UserPlus size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
-                                <h4 style={{ fontSize: "11px", fontWeight: "700", color: "#1e293b", margin: 0, letterSpacing: "0.4px", textTransform: "uppercase" }}>
-                                  RECENT LEADS & SIGNUPS
+                                <h4 style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                                  Recent Leads & Signups
                                 </h4>
                               </div>
                               <span 
@@ -13943,8 +13981,8 @@ export default function App() {
                     <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#e0e7ff", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <Shuffle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                     </div>
-                    <h3 style={{ fontSize: "11px", fontWeight: "700", color: "#1e293b", margin: 0, letterSpacing: "0.5px", textTransform: "uppercase", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                      RECOMMENDED NEXT ACTIONS
+                    <h3 style={{ fontSize: "14px", fontWeight: "750", color: "#0f172a", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      Recommended Next Actions
                     </h3>
                   </div>
 
@@ -13984,16 +14022,17 @@ export default function App() {
                             <button 
                               onClick={() => createTaskFromAction(action.taskTitle, action.priority, action.dueDate, action.leadId)}
                               style={{
-                                backgroundColor: "#fff7ed",
-                                color: "#c2410c",
-                                border: "1px solid #fef08a",
+                                backgroundColor: "#ea580c",
+                                color: "#ffffff",
+                                border: "none",
                                 borderRadius: "6px",
-                                padding: "5px 14px",
-                                fontSize: "11px",
-                                fontWeight: "700",
+                                padding: "6px 14px",
+                                fontSize: "12px",
+                                fontWeight: "600",
                                 fontFamily: "'Plus Jakarta Sans', sans-serif",
                                 cursor: "pointer",
-                                whiteSpace: "nowrap"
+                                whiteSpace: "nowrap",
+                                boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)"
                               }}
                             >
                               {action.actionLabel}
@@ -14012,8 +14051,8 @@ export default function App() {
                       <div style={{ width: "32px", height: "32px", borderRadius: "8px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Target size={18} style={{ width: "18px", height: "18px", strokeWidth: 1.8 }} />
                       </div>
-                      <h3 style={{ fontSize: "14px", fontWeight: "800", color: "#0f172a", margin: 0, letterSpacing: "0.5px", textTransform: "uppercase", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        TODAY'S FOCUS
+                      <h3 style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        Today's Focus
                       </h3>
                     </div>
                     <span style={{ fontSize: "11.5px", fontWeight: "700", color: "#ea580c", backgroundColor: "#fff7ed", padding: "4px 12px", borderRadius: "12px", border: "1px solid #ffedd5" }}>
@@ -14124,16 +14163,16 @@ export default function App() {
                                   <button 
                                     onClick={() => createTaskFromAction(lead.actionTitle, "High", lead.next_follow_up, lead.id)}
                                     style={{
-                                      backgroundColor: "#2563eb",
+                                      backgroundColor: "#ea580c",
                                       color: "#ffffff",
                                       border: "none",
                                       borderRadius: "6px",
                                       padding: "6px 14px",
-                                      fontSize: "11px",
-                                      fontWeight: "700",
+                                      fontSize: "12px",
+                                      fontWeight: "600",
                                       cursor: "pointer",
                                       whiteSpace: "nowrap",
-                                      boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)"
+                                      boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)"
                                     }}
                                   >
                                     Follow Up
@@ -14156,8 +14195,8 @@ export default function App() {
                         <div style={{ width: "32px", height: "32px", borderRadius: "8px", backgroundColor: "#fef2f2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <AlertTriangle size={18} style={{ width: "18px", height: "18px", strokeWidth: 1.8 }} />
                         </div>
-                        <h3 style={{ fontSize: "14px", fontWeight: "800", color: "#0f172a", margin: 0, letterSpacing: "0.5px", textTransform: "uppercase", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                          DEALS STUCK TOO LONG
+                        <h3 style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          Deals Stuck in Pipeline
                         </h3>
                       </div>
                       <span style={{ fontSize: "11.5px", fontWeight: "700", color: "#dc2626", backgroundColor: "#fef2f2", padding: "4px 12px", borderRadius: "12px", border: "1px solid #fecaca" }}>
@@ -14236,8 +14275,8 @@ export default function App() {
                                       border: "none",
                                       borderRadius: "6px",
                                       padding: "6px 14px",
-                                      fontSize: "11px",
-                                      fontWeight: "700",
+                                      fontSize: "12px",
+                                      fontWeight: "600",
                                       cursor: "pointer",
                                       whiteSpace: "nowrap"
                                     }}
@@ -14615,7 +14654,7 @@ export default function App() {
                                 </div>
 
                                 {/* Right Value Pill + Action Buttons (Fixed Flex Shrink 0) */}
-                                <div style={{ display: "flex", alignItems: "center", gap: "7px", flexShrink: 0 }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
                                   <span style={{ fontSize: "11.5px", fontWeight: "800", color: "#15803d", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "3px 9px", borderRadius: "14px", whiteSpace: "nowrap" }}>
                                     ₹{(Number(lead.value) || 0).toLocaleString("en-IN")}
                                   </span>
@@ -14624,18 +14663,20 @@ export default function App() {
 
                                   <button 
                                     onClick={() => createTaskFromAction(`Call Hot Lead: ${lead.name}`, "High", lead.next_follow_up, lead.id)}
-                                    style={{ width: "28px", height: "28px", borderRadius: "50%", backgroundColor: "#dcfce7", color: "#15803d", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                                    style={{ width: "32px", height: "32px", borderRadius: "8px", backgroundColor: "#ecfdf5", border: "1px solid #a7f3d0", color: "#15803d", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
                                     title="Quick Call Lead"
+                                    aria-label={`Quick Call Lead ${lead.name}`}
                                   >
-                                    <MessageCircle size={14} color="#166534" />
+                                    <MessageCircle size={15} color="#166534" />
                                   </button>
 
-                          <button 
+                                  <button 
                                     onClick={() => setSelectedLeadForDetails(lead)}
-                                    style={{ width: "28px", height: "28px", borderRadius: "50%", backgroundColor: "#f1f5f9", color: "#334155", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                                    style={{ width: "32px", height: "32px", borderRadius: "8px", backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", color: "#334155", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
                                     title="View Details"
+                                    aria-label={`View Details for ${lead.name}`}
                                   >
-                                    <Eye size={14} color="#334155" />
+                                    <Eye size={15} color="#334155" />
                                   </button>
                                 </div>
                               </div>
