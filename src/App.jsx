@@ -5993,47 +5993,7 @@ export default function App() {
                   </div>
                 )}
 
-                {/* ⚡ 1-Click Fast Mobile Unlock as Harsh Goyal */}
-                <div style={{ backgroundColor: "rgba(234, 88, 12, 0.1)", border: "1.5px solid rgba(249, 115, 22, 0.4)", borderRadius: "14px", padding: "12px 14px", textAlign: "center" }}>
-                  <div style={{ fontSize: "11px", fontWeight: "750", color: "#fdba74", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
-                    <Zap size={13} color="#f97316" />
-                    <span>Instant Phone Access</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleQuickAdminLogin}
-                    disabled={isLoggingIn}
-                    style={{
-                      width: "100%",
-                      padding: "12px 16px",
-                      background: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
-                      color: "#ffffff",
-                      border: "none",
-                      borderRadius: "10px",
-                      fontSize: "13.5px",
-                      fontWeight: "800",
-                      cursor: isLoggingIn ? "not-allowed" : "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px",
-                      boxShadow: "0 4px 14px rgba(234, 88, 12, 0.35)",
-                      transition: "all 0.15s ease"
-                    }}
-                  >
-                    <Sparkles size={16} />
-                    <span>Open CRM as Harsh Goyal (Admin)</span>
-                  </button>
-                  <span style={{ display: "block", fontSize: "11px", color: "#94a3b8", marginTop: "6px", fontWeight: "500" }}>
-                    Single tap to unlock full dashboard on mobile phone
-                  </span>
-                </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "0" }}>
-                  <div style={{ flex: 1, height: "1px", backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
-                  <span style={{ fontSize: "10.5px", color: "#64748b", fontWeight: "700", letterSpacing: "0.5px" }}>OR LOGIN WITH EMAIL / PIN</span>
-                  <div style={{ flex: 1, height: "1px", backgroundColor: "rgba(255, 255, 255, 0.1)" }} />
-                </div>
 
                 {/* Login Form */}
                 <form onSubmit={handleEmailPasswordLogin} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
