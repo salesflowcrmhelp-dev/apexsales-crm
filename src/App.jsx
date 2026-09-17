@@ -5630,7 +5630,7 @@ export default function App() {
               flexDirection: "column",
               gap: "18px",
               zIndex: 10,
-              margin: "auto 0",
+              margin: "16px 0 40px 0",
               boxSizing: "border-box"
             }}
           >
