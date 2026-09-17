@@ -401,11 +401,11 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .brand-tag {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.6px;
   display: block;
   margin-top: 1px;
 }
@@ -413,33 +413,34 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .sidebar-nav-group {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  margin-bottom: 6px;
+  gap: 2px;
+  margin-bottom: 10px;
 }
 
 .nav-group-title {
-  font-size: 8px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: #94a3b8;
   letter-spacing: 0.5px;
-  padding: 0 6px 2px 6px;
+  padding: 6px 10px 4px 10px;
   text-transform: uppercase;
 }
 
 .sidebar-nav-list {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
 }
 
 .sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 4px 6px;
-  border-radius: 5px;
-  font-size: 11px;
-  font-weight: 500;
+  gap: 10px;
+  padding: 7px 12px;
+  min-height: 38px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
   color: #475569;
   background: transparent;
   border: none;
@@ -461,8 +462,8 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .sidebar-nav-item .nav-item-icon {
-  width: 13.5px;
-  height: 13.5px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
 }
 

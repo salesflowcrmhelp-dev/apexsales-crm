@@ -1500,6 +1500,7 @@ export default function App() {
   // Analytics sub-tabs
   const [analyticsSubTab, setAnalyticsSubTab] = useState("overview"); // "overview" or "intelligence"
   const [intelTimeframe, setIntelTimeframe] = useState("all"); // 7, 30, 90, or "all"
+  const [overviewSectionFilter, setOverviewSectionFilter] = useState("all"); // "all", "cockpit", "analytics"
 
   // Workspace Switcher
   const [activeWorkspace, setActiveWorkspace] = useState(() => {
@@ -3305,13 +3306,58 @@ export default function App() {
     };
   }, [ownerScopedLeads, growthTimeframe]);
 
-  // Recommended Next Best Actions (Rule-Based)
+  // Today's Focus 5 Prioritized Leads hook
+  const todayFocusLeads = useMemo(() => {
+    return ownerScopedLeads
+      .filter(l => isActiveStatus(l.status))
+      .map(lead => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const followUp = lead.next_follow_up || "";
+        let reason = "High-priority active deal";
+        let nextActionLabel = "Follow Up";
+        let actionTitle = `Follow up: ${lead.name}`;
+
+        if (followUp && followUp < todayStr) {
+          const daysOverdue = Math.floor((Date.now() - new Date(followUp).getTime()) / (24*60*60*1000));
+          reason = `Follow-up overdue by ${daysOverdue} days`;
+          nextActionLabel = "Follow Up";
+          actionTitle = `Urgent Follow Up: ${lead.name} (${lead.company || "No Company"})`;
+        } else if (followUp === todayStr) {
+          reason = "Follow-up due today";
+          nextActionLabel = "Follow Up";
+          actionTitle = `Payment Follow Up: ${lead.name} (${lead.company || "No Company"})`;
+        } else if (isLeadStuck(lead)) {
+          reason = `Stuck in stage for ${getStageDuration(lead)} days`;
+          nextActionLabel = "Reach Out";
+          actionTitle = `Re-engage stuck deal: ${lead.name} (${lead.company || "No Company"})`;
+        } else if ((lead.score || "").toLowerCase() === "hot" && !followUp) {
+          reason = "Hot lead, no follow-up scheduled";
+          nextActionLabel = "Schedule";
+          actionTitle = `Schedule follow-up: ${lead.name} (${lead.company || "No Company"})`;
+        }
+
+        return {
+          ...lead,
+          focusScore: calculateFocusScore(lead),
+          reason,
+          nextActionLabel,
+          actionTitle
+        };
+      })
+      .sort((a, b) => b.focusScore - a.focusScore)
+      .slice(0, 5);
+  }, [ownerScopedLeads]);
+
+  // Recommended Next Best Actions (Rule-Based, deduplicated against Today's Focus leads)
   const recommendedActions = useMemo(() => {
     const actions = [];
     const todayStr = new Date().toISOString().split('T')[0];
+    const focusLeadIds = new Set(todayFocusLeads.map(l => l.id));
     
     ownerScopedLeads.forEach(lead => {
       if (!isActiveStatus(lead.status)) return;
+      // Skip leads already shown in Today's Focus table to prevent redundancy (Issue 12)
+      if (focusLeadIds.has(lead.id)) return;
       
       const s = (lead.status || "").toLowerCase();
       const score = (lead.score || "").toLowerCase();
@@ -3362,55 +3408,13 @@ export default function App() {
     });
     
     return actions.slice(0, 3);
-  }, [ownerScopedLeads]);
+  }, [ownerScopedLeads, todayFocusLeads]);
 
   // Hot Leads / Closing Opportunities (Active, Hot Score First, Value Descending)
   const hotLeadsList = useMemo(() => {
     return ownerScopedLeads
       .filter(l => isActiveStatus(l.status))
       .sort((a, b) => calculateFocusScore(b) - calculateFocusScore(a))
-      .slice(0, 5);
-  }, [ownerScopedLeads]);
-
-  // Today's Focus 5 Prioritized Leads hook
-  const todayFocusLeads = useMemo(() => {
-    return ownerScopedLeads
-      .filter(l => isActiveStatus(l.status))
-      .map(lead => {
-        const todayStr = new Date().toISOString().split('T')[0];
-        const followUp = lead.next_follow_up || "";
-        let reason = "High-priority active deal";
-        let nextActionLabel = "Follow Up";
-        let actionTitle = `Follow up: ${lead.name}`;
-
-        if (followUp && followUp < todayStr) {
-          const daysOverdue = Math.floor((Date.now() - new Date(followUp).getTime()) / (24*60*60*1000));
-          reason = `Follow-up overdue by ${daysOverdue} days`;
-          nextActionLabel = "Follow Up";
-          actionTitle = `Urgent Follow Up: ${lead.name} (${lead.company || "No Company"})`;
-        } else if (followUp === todayStr) {
-          reason = "Follow-up due today";
-          nextActionLabel = "Follow Up";
-          actionTitle = `Payment Follow Up: ${lead.name} (${lead.company || "No Company"})`;
-        } else if (isLeadStuck(lead)) {
-          reason = `Stuck in stage for ${getStageDuration(lead)} days`;
-          nextActionLabel = "Reach Out";
-          actionTitle = `Re-engage stuck deal: ${lead.name} (${lead.company || "No Company"})`;
-        } else if ((lead.score || "").toLowerCase() === "hot" && !followUp) {
-          reason = "Hot lead, no follow-up scheduled";
-          nextActionLabel = "Schedule";
-          actionTitle = `Schedule follow-up: ${lead.name} (${lead.company || "No Company"})`;
-        }
-
-        return {
-          ...lead,
-          focusScore: calculateFocusScore(lead),
-          reason,
-          nextActionLabel,
-          actionTitle
-        };
-      })
-      .sort((a, b) => b.focusScore - a.focusScore)
       .slice(0, 5);
   }, [ownerScopedLeads]);
 
@@ -10440,14 +10444,12 @@ export default function App() {
                       <div style={{ fontSize: targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {targetValue > 0 ? <AnimatedNumber value={targetValue} isCurrency /> : "Pending ⏳"}
                       </div>
-                      <span style={{ fontSize: "11px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#94a3b8", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      <span style={{ fontSize: "11px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#64748b", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                         {targetValue > 0 ? (
-                          targetStats.baseProgress >= 125
-                            ? `🔥 125% Conquered (₹${Math.round(targetStats.stretchTarget).toLocaleString("en-IN")})`
-                            : targetStats.baseProgress >= 100
-                            ? `🎉 100% Met! Goal 125%: ₹${Math.round(targetStats.stretchTarget).toLocaleString("en-IN")}`
-                            : `125% Stretch Goal: ₹${Math.round(targetStats.stretchTarget).toLocaleString("en-IN")}`
-                        ) : "Goal not assigned yet"}
+                          targetStats.baseProgress >= 100
+                            ? `🎉 100% Goal Conquered!`
+                            : `Goal Progress: ${Math.round(targetStats.baseProgress)}%`
+                        ) : "Target Pending"}
                       </span>
                     </div>
                     <div style={{ marginLeft: "4px", flexShrink: 0 }}>
@@ -13465,12 +13467,49 @@ export default function App() {
               <div className="analytics-dashboard-grid animate-fade-in" style={{ marginTop: "8px" }}>
                 {analyticsSubTab === "overview" ? (
                   <div className="overview-tab-wrapper">
+                    {/* Dashboard View Section Filter Toggle (Issue 16: Excessive Scrolling Resolution) */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#f1f5f9", padding: "4px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                        {[
+                          { id: "all", label: "📋 All Sections" },
+                          { id: "cockpit", label: "⚡ Cockpit & Action Items" },
+                          { id: "analytics", label: "📊 Revenue Analytics & Charts" }
+                        ].map(sec => (
+                          <button
+                            key={sec.id}
+                            type="button"
+                            onClick={() => setOverviewSectionFilter(sec.id)}
+                            style={{
+                              border: "none",
+                              backgroundColor: overviewSectionFilter === sec.id ? "#ffffff" : "transparent",
+                              color: overviewSectionFilter === sec.id ? "#0f172a" : "#64748b",
+                              boxShadow: overviewSectionFilter === sec.id ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
+                              padding: "6px 14px",
+                              fontSize: "12px",
+                              fontWeight: "700",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              transition: "all 0.15s ease",
+                              fontFamily: "'Plus Jakarta Sans', sans-serif"
+                            }}
+                          >
+                            {sec.label}
+                          </button>
+                        ))}
+                      </div>
+                      <div style={{ fontSize: "11px", color: "#64748b", fontWeight: "600" }}>
+                        Active View: <strong style={{ color: "#0f172a" }}>{overviewSectionFilter === "all" ? "Complete Overview" : overviewSectionFilter === "cockpit" ? "Sales Cockpit & Tasks" : "Revenue Analytics"}</strong>
+                      </div>
+                    </div>
+
+                    {(overviewSectionFilter === "all" || overviewSectionFilter === "cockpit") && (
+                      <div className="cockpit-and-actions-block">
                     {/* 2. Today's Sales Cockpit (Prominent Section) */}
                     <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px", marginBottom: "14px", overflow: "hidden" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                            <h3 style={{ fontSize: "15px", fontWeight: "750", color: "#0f172a", display: "flex", alignItems: "center", gap: "6px", margin: 0, letterSpacing: "-0.2px" }}>
+                            <h2 style={{ fontSize: "16px", fontWeight: "750", color: "#0f172a", display: "flex", alignItems: "center", gap: "6px", margin: 0, letterSpacing: "-0.2px" }}>
                               ⚡ Today's Sales Cockpit
-                            </h3>
+                            </h2>
                             <div style={{ fontSize: "11px", color: "#475569", fontWeight: "600", border: "1px solid #e2e8f0", padding: "3px 9px", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#fff" }}>
                               📅 Today ▾
                             </div>
@@ -13482,7 +13521,7 @@ export default function App() {
                               onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "due_today", label: "Follow-ups Due Today" }); }}
                               style={{ 
                                 backgroundColor: "#ffffff", 
-                                border: "1px solid #f3e8ff", 
+                                border: "1px solid #e2e8f0", 
                                 borderRadius: "8px", 
                                 padding: "10px 12px", 
                                 cursor: "pointer",
@@ -13493,7 +13532,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Phone size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13510,19 +13549,19 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Follow-ups Due Today"
-                                  style={{ fontSize: "11px", fontWeight: "700", color: "#7c3aed", backgroundColor: "#f3e8ff", border: "1px solid #ddd6fe", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#334155", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
                                 >
                                   View →
                                 </button>
                               </div>
                             </div>
 
-                            {/* Card 2: Overdue Follow-ups */}
+                            {/* Card 2: Overdue Follow-ups (Urgent Alert Highlight) */}
                             <div 
                               onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "overdue", label: "Overdue Follow-ups" }); }}
                               style={{ 
                                 backgroundColor: "#ffffff", 
-                                border: "1px solid #ffe4e6", 
+                                border: "1px solid #fecaca", 
                                 borderRadius: "8px", 
                                 padding: "10px 12px", 
                                 cursor: "pointer",
@@ -13533,7 +13572,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ffe4e6", color: "#e11d48", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fee2e2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <AlertTriangle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13546,23 +13585,23 @@ export default function App() {
                               </div>
 
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", color: "#dc2626", fontWeight: "600", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Requires immediate attention</span>
+                                <span style={{ fontSize: "11px", color: "#dc2626", fontWeight: "600", whiteSpace: "nowrap" }}>Action needed</span>
                                 <button 
                                   type="button"
                                   aria-label="View Overdue Follow-ups"
-                                  style={{ fontSize: "11px", fontWeight: "700", color: "#e11d48", backgroundColor: "#ffe4e6", border: "1px solid #fecdd3", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#dc2626", backgroundColor: "#fee2e2", border: "1px solid #fecaca", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
                                 >
                                   View →
                                 </button>
                               </div>
                             </div>
 
-                            {/* Card 3: Hot Priority Deals */}
+                            {/* Card 3: Hot Priority Deals (Brand Priority Highlight) */}
                             <div 
                               onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "hot", label: "Hot Leads" }); }}
                               style={{ 
                                 backgroundColor: "#ffffff", 
-                                border: "1px solid #ffedd5", 
+                                border: "1px solid #fed7aa", 
                                 borderRadius: "8px", 
                                 padding: "10px 12px", 
                                 cursor: "pointer",
@@ -13573,7 +13612,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ffedd5", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Flame size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13586,11 +13625,11 @@ export default function App() {
                               </div>
 
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>High value opportunities</span>
+                                <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>High value deals</span>
                                 <button 
                                   type="button"
                                   aria-label="View Hot Priority Deals"
-                                  style={{ fontSize: "11px", fontWeight: "700", color: "#ea580c", backgroundColor: "#ffedd5", border: "1px solid #fed7aa", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#ea580c", backgroundColor: "#fff7ed", border: "1px solid #fed7aa", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
                                 >
                                   View →
                                 </button>
@@ -13613,7 +13652,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ecfdf5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13630,7 +13669,7 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Expected Revenue"
-                                  style={{ fontSize: "11px", fontWeight: "700", color: "#059669", backgroundColor: "#ecfdf5", border: "1px solid #a7f3d0", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#334155", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
                                 >
                                   View →
                                 </button>
@@ -13642,7 +13681,7 @@ export default function App() {
                               onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "ready_to_close", label: "Deals Ready to Close" }); }}
                               style={{ 
                                 backgroundColor: "#ffffff", 
-                                border: "1px solid #f3e8ff", 
+                                border: "1px solid #e2e8f0", 
                                 borderRadius: "8px", 
                                 padding: "10px 12px", 
                                 cursor: "pointer",
@@ -13653,7 +13692,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13670,7 +13709,7 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Deals Ready to Close"
-                                  style={{ fontSize: "11px", fontWeight: "700", color: "#7c3aed", backgroundColor: "#f3e8ff", border: "1px solid #ddd6fe", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#334155", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
                                 >
                                   View →
                                 </button>
@@ -13682,7 +13721,7 @@ export default function App() {
                               onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "renewal", label: "Renewal Leads" }); }}
                               style={{ 
                                 backgroundColor: "#ffffff", 
-                                border: "1px solid #e0e7ff", 
+                                border: "1px solid #e2e8f0", 
                                 borderRadius: "8px", 
                                 padding: "10px 12px", 
                                 cursor: "pointer",
@@ -13693,7 +13732,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#e0e7ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <RefreshCw size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13710,7 +13749,7 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Renewal Leads"
-                                  style={{ fontSize: "11px", fontWeight: "700", color: "#2563eb", backgroundColor: "#e0e7ff", border: "1px solid #bfdbfe", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
+                                  style={{ fontSize: "11px", fontWeight: "700", color: "#334155", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "2.5px 8px", borderRadius: "5px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer" }}
                                 >
                                   View →
                                 </button>
@@ -13875,90 +13914,90 @@ export default function App() {
                 <div className="analytics-metrics-row" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px", width: "100%", marginBottom: "16px" }}>
                   
                   {/* Metric Card 1: Total Sales Won */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #dcfce7", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#dcfce7", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Award size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "7.5px", fontWeight: "800", color: "#166534", backgroundColor: "#dcfce7", padding: "1px 5px", borderRadius: "3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>TOTAL WON</span>
+                      <span style={{ fontSize: "11px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Won</span>
                     </div>
                     <div>
                       <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={analyticsData.wonValue} isCurrency />
                       </div>
-                      <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", display: "block" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
                         Total Sales (Won)
                       </span>
                     </div>
                   </div>
 
                   {/* Metric Card 2: Deals Won */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e0e7ff", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#e0e7ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <CheckCircle2 size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "7.5px", fontWeight: "800", color: "#1e40af", backgroundColor: "#e0e7ff", padding: "1px 5px", borderRadius: "3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>DEALS</span>
+                      <span style={{ fontSize: "11px", fontWeight: "700", color: "#1e40af", backgroundColor: "#eff6ff", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Deals</span>
                     </div>
                     <div>
                       <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={analyticsData.wonCount} /> <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb" }}>Deals</span>
                       </div>
-                      <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", display: "block" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
                         Closed Won Deals
                       </span>
                     </div>
                   </div>
 
                   {/* Metric Card 3: Lead Conversion Rate */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #f3e8ff", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "7.5px", fontWeight: "800", color: "#6b21a8", backgroundColor: "#f3e8ff", padding: "1px 5px", borderRadius: "3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>CONVERSION</span>
+                      <span style={{ fontSize: "11px", fontWeight: "700", color: "#6b21a8", backgroundColor: "#f3e8ff", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Rate</span>
                     </div>
                     <div>
                       <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={Number(analyticsData.conversionRate)} isPercent />
                       </div>
-                      <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", display: "block" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
                         Lead Conversion Rate
                       </span>
                     </div>
                   </div>
 
                   {/* Metric Card 4: Average Deal Value */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #fef3c7", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fef3c7", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <IndianRupee size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "7.5px", fontWeight: "800", color: "#92400e", backgroundColor: "#fef3c7", padding: "1px 5px", borderRadius: "3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>AVG SIZE</span>
+                      <span style={{ fontSize: "11px", fontWeight: "700", color: "#92400e", backgroundColor: "#fff7ed", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Avg Size</span>
                     </div>
                     <div>
                       <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={analyticsData.averageValue} isCurrency />
                       </div>
-                      <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", display: "block" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
                         Average Deal Value
                       </span>
                     </div>
                   </div>
 
                   {/* Metric Card 5: Target Achievement */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #cffafe", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#cffafe", color: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ecfeff", color: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "7.5px", fontWeight: "800", color: "#155e75", backgroundColor: "#cffafe", padding: "1px 5px", borderRadius: "3px", textTransform: "uppercase", whiteSpace: "nowrap" }}>GOAL %</span>
+                      <span style={{ fontSize: "11px", fontWeight: "700", color: "#155e75", backgroundColor: "#ecfeff", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Goal</span>
                     </div>
                     <div>
                       <div style={{ fontSize: "17px", fontWeight: "700", color: "#1e293b", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={Number(targetStats.baseProgress)} isPercent />
                       </div>
-                      <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.3px", textTransform: "uppercase", display: "block" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
                         Target Achievement
                       </span>
                     </div>
@@ -14270,15 +14309,17 @@ export default function App() {
                                   <button 
                                     onClick={() => setSelectedLeadForDetails(lead)}
                                     style={{
-                                      backgroundColor: "#fee2e2",
-                                      color: "#dc2626",
+                                      backgroundColor: "#ea580c",
+                                      color: "#ffffff",
                                       border: "none",
                                       borderRadius: "6px",
                                       padding: "6px 14px",
                                       fontSize: "12px",
                                       fontWeight: "600",
+                                      fontFamily: "'Plus Jakarta Sans', sans-serif",
                                       cursor: "pointer",
-                                      whiteSpace: "nowrap"
+                                      whiteSpace: "nowrap",
+                                      boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)"
                                     }}
                                   >
                                     View Lead
@@ -14293,8 +14334,11 @@ export default function App() {
                   </div>
                 )}
 
-              {/* 2. Visual Charts Container Grid */}
-                <div className="analytics-charts-container-grid">
+              </div>
+                    )}
+
+                    {(overviewSectionFilter === "all" || overviewSectionFilter === "analytics") && (
+                      <div className="analytics-charts-container-grid">
                   {/* Standard CRM KPI Metric Cards Row */}
                   <div className="analytics-chart-box full-width animate-fade-in" style={{ padding: 0, background: "transparent", border: "none", boxShadow: "none", marginBottom: "16px" }}>
                     <div className="analytics-kpi-quad-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }}>
@@ -14976,8 +15020,9 @@ export default function App() {
                     )}
                   </div>
                 </div>
-              </div>
-            ) : (
+              )}
+            </div>
+          ) : (
               /* RENDER SALES INTELLIGENCE VIEW */
               <div className="sales-intelligence-container animate-fade-in" style={{ width: "100%", display: "flex", flexDirection: "column", gap: "16px" }}>
                 {/* 1. Timeframe Filter Selector Card */}
