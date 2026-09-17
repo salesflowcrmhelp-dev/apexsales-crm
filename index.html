@@ -35,17 +35,18 @@
         window.addEventListener('error', function(e) {
           var target = e.target || {};
           var isScriptErr = target.tagName === 'SCRIPT' || (e.message && e.message.toLowerCase().indexOf('module script') !== -1);
-          if (isScriptErr) {
-            console.warn('[ApexSales Recovery] Script load failure detected. Attempting cache-busting auto-reload...');
-            var reloadFlag = 'crm_auto_reload_ts';
-            var last = sessionStorage.getItem(reloadFlag);
-            var now = Date.now();
-            if (!last || (now - parseInt(last, 10)) > 8000) {
-              sessionStorage.setItem(reloadFlag, now.toString());
-              var base = window.location.pathname;
-              window.location.replace(base + '?_v=' + now);
+            try {
+              var reloadFlag = 'crm_auto_reload_ts';
+              var last = sessionStorage.getItem(reloadFlag);
+              var now = Date.now();
+              if (!last || (now - parseInt(last, 10)) > 8000) {
+                sessionStorage.setItem(reloadFlag, now.toString());
+                var base = window.location.pathname;
+                window.location.replace(base + '?_v=' + now);
+              }
+            } catch(storageErr) {
+              window.location.replace(window.location.pathname + '?_v=' + Date.now());
             }
-          }
         }, true);
       })();
     </script>
