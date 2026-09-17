@@ -6445,7 +6445,7 @@ export default function App() {
             </div>
             <div className="sidebar-brand-text" style={{ minWidth: 0 }}>
               <span className="brand-name" style={{ whiteSpace: "nowrap", letterSpacing: "-0.3px" }}>ApexSales</span>
-              <span className="brand-tag" style={{ fontSize: "12px", color: "#475569", fontWeight: "700", whiteSpace: "nowrap", letterSpacing: "0.6px" }}>REVENUE INTELLIGENCE</span>
+              <span className="brand-tag" style={{ fontSize: "12px", color: "#475569", fontWeight: "700", whiteSpace: "nowrap", letterSpacing: "0.2px" }}>Revenue Intelligence</span>
             </div>
           </div>
 
@@ -10647,26 +10647,221 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 2. Compact Search, Filter & Action Buttons Toolbar */}
-                <div style={{
-                  display: "flex",
-                  gap: "6px",
-                  alignItems: "center",
-                  padding: "8px 16px",
-                  backgroundColor: "#ffffff",
-                  flexWrap: "wrap"
-                }}>
-                  {/* Search Input */}
-                  <div style={{ position: "relative", flex: "1", minWidth: "190px" }}>
-                    <Search size={13} style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
-                    <input 
-                      type="text" 
-                      placeholder="Search leads by name, email, phone..." 
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      style={{ width: "100%", padding: "5px 10px 5px 30px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
-                    />
+                {/* 2. Structured Two-Tier Toolbar: Resolves Filter Bar Density (Issue 9) */}
+                <div style={{ display: "flex", flexDirection: "column", backgroundColor: "#ffffff" }}>
+                  {/* Tier 1: Search Bar & Primary Action Controls */}
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "8px 16px",
+                    gap: "12px",
+                    flexWrap: "wrap",
+                    borderBottom: "1px solid #f1f5f9"
+                  }}>
+                    {/* Search Input */}
+                    <div style={{ position: "relative", flex: "1", minWidth: "220px", maxWidth: "420px" }}>
+                      <Search size={13} style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                      <input 
+                        type="text" 
+                        placeholder="Search leads by name, email, phone..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        style={{ width: "100%", padding: "5px 10px 5px 30px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
+                      />
+                    </div>
+
+                    {/* Right Actions: 'Delete Lead' (if selected) + '+ Add Lead' + 'Import Leads' + 'Actions ▾' */}
+                    <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "6px", position: "relative" }}>
+                      {(selectedLeadIds.length > 0 || selectedCell !== null) && (
+                        <button 
+                          type="button"
+                          onClick={handleDeleteSelectedLeads}
+                          style={{ 
+                            display: "inline-flex", 
+                            alignItems: "center", 
+                            gap: "5px", 
+                            backgroundColor: "#fee2e2", 
+                            color: "#dc2626", 
+                            border: "1px solid #fca5a5", 
+                            borderRadius: "6px", 
+                            padding: "5px 12px", 
+                            fontSize: "11.5px", 
+                            fontWeight: "700", 
+                            cursor: "pointer", 
+                            boxShadow: "0 1px 2px rgba(220, 38, 38, 0.15)", 
+                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            height: "32px",
+                            transition: "all 0.15s ease"
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#fecaca"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#fee2e2"; }}
+                          title="Delete selected lead"
+                        >
+                          <Trash2 size={13} color="#dc2626" />
+                          <span>Delete Lead{selectedLeadIds.length > 1 ? ` (${selectedLeadIds.length})` : ""}</span>
+                        </button>
+                      )}
+                      <button 
+                        onClick={addNewRow} 
+                        style={{ 
+                          display: "inline-flex", 
+                          alignItems: "center", 
+                          gap: "5px", 
+                          backgroundColor: "#ea580c", 
+                          color: "#ffffff", 
+                          border: "none", 
+                          borderRadius: "6px", 
+                          padding: "6px 14px", 
+                          fontSize: "12px", 
+                          fontWeight: "600", 
+                          cursor: "pointer", 
+                          boxShadow: "0 1px 2px rgba(234, 88, 12, 0.25)", 
+                          fontFamily: "'Plus Jakarta Sans', sans-serif",
+                          height: "32px"
+                        }}
+                      >
+                        <Plus size={13} /> Add Lead
+                      </button>
+
+                      {/* Dedicated Import Leads Button */}
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setImportPreviewLeads([]);
+                          setImportFileName("");
+                          setImportError("");
+                          setShowImportLeadsModal(true);
+                        }}
+                        style={{ 
+                          display: "inline-flex", 
+                          alignItems: "center", 
+                          gap: "5px", 
+                          backgroundColor: "#ffffff", 
+                          color: "#1e293b", 
+                          border: "1px solid #cbd5e1", 
+                          borderRadius: "6px", 
+                          padding: "5px 12px", 
+                          fontSize: "11.5px", 
+                          fontWeight: "650", 
+                          cursor: "pointer", 
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)", 
+                          fontFamily: "'Plus Jakarta Sans', sans-serif",
+                          height: "32px",
+                          transition: "all 0.15s ease"
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#f8fafc"; e.currentTarget.style.borderColor = "#94a3b8"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#ffffff"; e.currentTarget.style.borderColor = "#cbd5e1"; }}
+                        title="Upload and bulk import leads from CSV"
+                      >
+                        <Upload size={13} color="#2563eb" />
+                        <span>Import Leads</span>
+                      </button>
+
+                      {/* Secondary Actions Dropdown */}
+                      <div style={{ position: "relative" }}>
+                        <button
+                          type="button"
+                          onClick={() => setShowActionsDropdown(!showActionsDropdown)}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            backgroundColor: "#ffffff",
+                            color: "#334155",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "6px",
+                            padding: "5px 10px",
+                            fontSize: "11.5px",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            height: "32px",
+                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                          }}
+                        >
+                          Actions <ChevronDown size={12} color="#64748b" />
+                        </button>
+
+                        {showActionsDropdown && (
+                          <div 
+                            style={{
+                              position: "absolute",
+                              right: 0,
+                              top: "36px",
+                              backgroundColor: "#ffffff",
+                              border: "1px solid #e2e8f0",
+                              borderRadius: "8px",
+                              boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                              zIndex: 50,
+                              minWidth: "175px",
+                              padding: "4px 0",
+                              display: "flex",
+                              flexDirection: "column"
+                            }}
+                            onMouseLeave={() => setShowActionsDropdown(false)}
+                          >
+                            <button
+                              onClick={() => { downloadSampleCSV(); setShowActionsDropdown(false); }}
+                              style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#2563eb", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "650" }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#eff6ff"}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                            >
+                              <FileSpreadsheet size={12} color="#2563eb" /> Download Sample CSV
+                            </button>
+                            <button
+                              onClick={() => {
+                                setImportPreviewLeads([]);
+                                setImportFileName("");
+                                setImportError("");
+                                setShowImportLeadsModal(true);
+                                setShowActionsDropdown(false);
+                              }}
+                              style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#334155", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                            >
+                              <Upload size={12} color="#64748b" /> Import Leads (CSV)
+                            </button>
+                            <button
+                              onClick={() => { exportToCSV(); setShowActionsDropdown(false); }}
+                              style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#334155", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                            >
+                              <Download size={12} color="#64748b" /> Export CSV
+                            </button>
+                            <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "3px 0" }} />
+                            <button
+                              onClick={() => { requestDeleteSelectedRow(); setShowActionsDropdown(false); }}
+                              style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#dc2626", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fef2f2"}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                            >
+                              <Trash2 size={12} color="#dc2626" /> Delete Row
+                            </button>
+                            <button
+                              onClick={() => { requestResetLeads(); setShowActionsDropdown(false); }}
+                              style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                            >
+                              <RotateCcw size={12} color="#64748b" /> Reset All Leads
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Tier 2: Refinement & Filter Strip with Visual Grouping */}
+                  <div style={{
+                    display: "flex",
+                    gap: "8px",
+                    alignItems: "center",
+                    padding: "7px 16px",
+                    backgroundColor: "#fafbfc",
+                    flexWrap: "wrap"
+                  }}>
 
                   {/* Stage Filter (Multi-Select with Checkboxes) */}
                   <div style={{ position: "relative" }} ref={sheetStageDropdownRef}>
@@ -10925,187 +11120,7 @@ export default function App() {
                       Reset
                     </button>
                   )}
-
-                  {/* Right Actions: 'Delete Lead' (if selected) + '+ Add Lead' + 'Actions ▾' */}
-                  <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "6px", position: "relative" }}>
-                    {(selectedLeadIds.length > 0 || selectedCell !== null) && (
-                      <button 
-                        type="button"
-                        onClick={handleDeleteSelectedLeads}
-                        style={{ 
-                          display: "inline-flex", 
-                          alignItems: "center", 
-                          gap: "5px", 
-                          backgroundColor: "#fee2e2", 
-                          color: "#dc2626", 
-                          border: "1px solid #fca5a5", 
-                          borderRadius: "6px", 
-                          padding: "5px 12px", 
-                          fontSize: "11.5px", 
-                          fontWeight: "700", 
-                          cursor: "pointer", 
-                          boxShadow: "0 1px 2px rgba(220, 38, 38, 0.15)",
-                          fontFamily: "'Plus Jakarta Sans', sans-serif",
-                          height: "32px",
-                          transition: "all 0.15s ease"
-                        }}
-                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#fecaca"; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#fee2e2"; }}
-                        title="Delete selected lead"
-                      >
-                        <Trash2 size={13} color="#dc2626" />
-                        <span>Delete Lead{selectedLeadIds.length > 1 ? ` (${selectedLeadIds.length})` : ""}</span>
-                      </button>
-                    )}
-                    <button 
-                      onClick={addNewRow} 
-                      style={{ 
-                        display: "inline-flex", 
-                        alignItems: "center", 
-                        gap: "5px", 
-                        backgroundColor: "#ea580c", 
-                        color: "#ffffff", 
-                        border: "none", 
-                        borderRadius: "6px", 
-                        padding: "6px 14px", 
-                        fontSize: "12px", 
-                        fontWeight: "600", 
-                        cursor: "pointer", 
-                        boxShadow: "0 1px 2px rgba(234, 88, 12, 0.25)", 
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        height: "32px"
-                      }}
-                    >
-                      <Plus size={13} /> Add Lead
-                    </button>
-
-                    {/* Dedicated Import Leads Button */}
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        setImportPreviewLeads([]);
-                        setImportFileName("");
-                        setImportError("");
-                        setShowImportLeadsModal(true);
-                      }}
-                      style={{ 
-                        display: "inline-flex", 
-                        alignItems: "center", 
-                        gap: "5px", 
-                        backgroundColor: "#ffffff", 
-                        color: "#1e293b", 
-                        border: "1px solid #cbd5e1", 
-                        borderRadius: "6px", 
-                        padding: "5px 12px", 
-                        fontSize: "11.5px", 
-                        fontWeight: "650", 
-                        cursor: "pointer", 
-                        boxShadow: "0 1px 2px rgba(0,0,0,0.04)", 
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        height: "32px",
-                        transition: "all 0.15s ease"
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#f8fafc"; e.currentTarget.style.borderColor = "#94a3b8"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#ffffff"; e.currentTarget.style.borderColor = "#cbd5e1"; }}
-                      title="Upload and bulk import leads from CSV"
-                    >
-                      <Upload size={13} color="#2563eb" />
-                      <span>Import Leads</span>
-                    </button>
-
-                    {/* Secondary Actions Dropdown */}
-                    <div style={{ position: "relative" }}>
-                      <button
-                        type="button"
-                        onClick={() => setShowActionsDropdown(!showActionsDropdown)}
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          backgroundColor: "#ffffff",
-                          color: "#334155",
-                          border: "1px solid #e2e8f0",
-                          borderRadius: "6px",
-                          padding: "5px 10px",
-                          fontSize: "11.5px",
-                          fontWeight: "600",
-                          cursor: "pointer",
-                          height: "32px",
-                          fontFamily: "'Plus Jakarta Sans', sans-serif"
-                        }}
-                      >
-                        Actions <ChevronDown size={12} color="#64748b" />
-                      </button>
-
-                      {showActionsDropdown && (
-                        <div 
-                          style={{
-                            position: "absolute",
-                            right: 0,
-                            top: "36px",
-                            backgroundColor: "#ffffff",
-                            border: "1px solid #e2e8f0",
-                            borderRadius: "8px",
-                            boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
-                            zIndex: 50,
-                            minWidth: "175px",
-                            padding: "4px 0",
-                            display: "flex",
-                            flexDirection: "column"
-                          }}
-                          onMouseLeave={() => setShowActionsDropdown(false)}
-                        >
-                          <button
-                            onClick={() => { downloadSampleCSV(); setShowActionsDropdown(false); }}
-                            style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#2563eb", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "650" }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#eff6ff"}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                          >
-                            <FileSpreadsheet size={12} color="#2563eb" /> Download Sample CSV
-                          </button>
-                          <button
-                            onClick={() => {
-                              setImportPreviewLeads([]);
-                              setImportFileName("");
-                              setImportError("");
-                              setShowImportLeadsModal(true);
-                              setShowActionsDropdown(false);
-                            }}
-                            style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#334155", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                          >
-                            <Upload size={12} color="#64748b" /> Import Leads (CSV)
-                          </button>
-                          <button
-                            onClick={() => { exportToCSV(); setShowActionsDropdown(false); }}
-                            style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#334155", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                          >
-                            <Download size={12} color="#64748b" /> Export CSV
-                          </button>
-                          <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "3px 0" }} />
-                          <button
-                            onClick={() => { requestDeleteSelectedRow(); setShowActionsDropdown(false); }}
-                            style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#dc2626", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fef2f2"}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                          >
-                            <Trash2 size={12} color="#dc2626" /> Delete Row
-                          </button>
-                          <button
-                            onClick={() => { requestResetLeads(); setShowActionsDropdown(false); }}
-                            style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "11.5px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                          >
-                            <RotateCcw size={12} color="#64748b" /> Reset All Leads
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                </div>
 
                   <input 
                     type="file" 
@@ -11182,10 +11197,10 @@ export default function App() {
                       </p>
                     </div>
                   ) : (
-                    <table className="leads-data-table" style={{ minWidth: "960px", width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "11px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <table className="leads-data-table" style={{ minWidth: "1120px", width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "11px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       <thead>
                         <tr style={{ backgroundColor: "#fcfdfe", borderBottom: "1px solid #edf2f7", color: "#475569", fontWeight: "650", height: "32px" }}>
-                          <th style={{ width: "30px", padding: "4px 2px 4px 8px", textAlign: "center" }}>
+                          <th style={{ width: "32px", padding: "4px 2px 4px 8px", textAlign: "center" }}>
                             <input 
                               type="checkbox" 
                               checked={paginatedLeads.length > 0 && paginatedLeads.every(l => selectedLeadIds.includes(l.id))}
@@ -11203,16 +11218,16 @@ export default function App() {
                               title="Select all leads on this page"
                             />
                           </th>
-                          <th style={{ width: "15%", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Lead Name</th>
-                          <th style={{ width: "16%", padding: "4px 10px 4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Deal Stage</th>
-                          <th style={{ width: "11%", padding: "4px 8px 4px 10px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Deal Value</th>
-                          <th style={{ width: "15%", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Contact</th>
-                          <th style={{ width: "13%", padding: "4px 14px 4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Owner</th>
+                          <th style={{ width: "14%", minWidth: "140px", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Lead Name</th>
+                          <th style={{ width: "14%", minWidth: "130px", padding: "4px 10px 4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Deal Stage</th>
+                          <th style={{ width: "10%", minWidth: "90px", padding: "4px 8px 4px 10px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Deal Value</th>
+                          <th style={{ width: "22%", minWidth: "220px", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Contact</th>
+                          <th style={{ width: "11%", minWidth: "100px", padding: "4px 14px 4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Owner</th>
                           {customFields.filter(cf => cf.showInTable).map(cf => (
-                            <th key={cf.id} style={{ width: "10%", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>{cf.name}</th>
+                            <th key={cf.id} style={{ width: "10%", minWidth: "90px", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>{cf.name}</th>
                           ))}
-                          <th style={{ width: "17%", padding: "4px 8px 4px 16px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Next Follow-up</th>
-                          <th style={{ width: "13%", padding: "4px 8px 4px 4px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px", textAlign: "right" }}>Actions</th>
+                          <th style={{ width: "16%", minWidth: "140px", padding: "4px 8px 4px 16px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Next Follow-up</th>
+                          <th style={{ width: "13%", minWidth: "110px", padding: "4px 8px 4px 4px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px", textAlign: "right" }}>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -11473,20 +11488,25 @@ export default function App() {
                                           startEditing(rIdx, 4);
                                         }}
                                         style={{
-                                          background: "none",
-                                          border: "none",
-                                          padding: 0,
-                                          margin: 0,
-                                          color: "#94a3b8",
-                                          fontSize: "9px",
-                                          fontWeight: "500",
+                                          background: "#eff6ff",
+                                          border: "1px dashed #bfdbfe",
+                                          borderRadius: "6px",
+                                          padding: "3px 8px",
+                                          marginTop: "2px",
+                                          color: "#2563eb",
+                                          fontSize: "11px",
+                                          fontWeight: "600",
                                           textAlign: "left",
                                           cursor: "pointer",
-                                          display: "inline-block",
-                                          whiteSpace: "nowrap"
+                                          display: "inline-flex",
+                                          alignItems: "center",
+                                          gap: "3px",
+                                          whiteSpace: "nowrap",
+                                          minHeight: "22px",
+                                          fontFamily: "'Plus Jakarta Sans', sans-serif"
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.color = "#475569"}
-                                        onMouseLeave={(e) => e.currentTarget.style.color = "#94a3b8"}
+                                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#dbeafe"; e.currentTarget.style.borderColor = "#93c5fd"; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#eff6ff"; e.currentTarget.style.borderColor = "#bfdbfe"; }}
                                         title="Click to add phone number"
                                       >
                                         + Add number
@@ -11805,19 +11825,27 @@ export default function App() {
                 </div>
 
                 {/* 4. Complete Page-Wise Pagination & Summary Footer */}
-                <div style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  borderTop: "1px solid #edf2f7",
-                  backgroundColor: "#fafbfc",
-                  padding: "8px 16px",
-                  fontSize: "11.5px",
-                  color: "#64748b",
-                  fontWeight: "500",
-                  flexWrap: "wrap",
-                  gap: "10px"
-                }}>
+                <nav 
+                  aria-label="Pagination Navigation"
+                  role="navigation"
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    borderTop: "1px solid #edf2f7",
+                    backgroundColor: "#fafbfc",
+                    padding: "8px 16px",
+                    fontSize: "11.5px",
+                    color: "#64748b",
+                    fontWeight: "500",
+                    flexWrap: "wrap",
+                    gap: "10px",
+                    position: "relative",
+                    isolation: "isolate",
+                    width: "100%",
+                    boxSizing: "border-box"
+                  }}
+                >
                   {/* Left: Showing entries info + Rows per page selector */}
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                     <div>
@@ -11989,7 +12017,7 @@ export default function App() {
                       <ChevronsRight size={13} />
                     </button>
                   </div>
-                </div>
+                </nav>
 
               </div>
               );
