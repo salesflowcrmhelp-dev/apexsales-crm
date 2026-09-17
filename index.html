@@ -30,11 +30,32 @@
       }
     </style>
     <script>
-      // Self-Healing Script for Stale Mobile Chrome Caches
+      // Global Error Telemetry & Stale Script Recovery
       (function() {
+        function reportError(data) {
+          try {
+            fetch('/api/client-error', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          } catch(e) {}
+        }
+
         window.addEventListener('error', function(e) {
           var target = e.target || {};
           var isScriptErr = target.tagName === 'SCRIPT' || (e.message && e.message.toLowerCase().indexOf('module script') !== -1);
+          reportError({
+            type: 'error',
+            message: e.message || 'Script load error',
+            filename: e.filename || target.src,
+            lineno: e.lineno,
+            colno: e.colno,
+            stack: e.error ? e.error.stack : null,
+            ua: navigator.userAgent
+          });
+
+          if (isScriptErr) {
             try {
               var reloadFlag = 'crm_auto_reload_ts';
               var last = sessionStorage.getItem(reloadFlag);
@@ -47,7 +68,17 @@
             } catch(storageErr) {
               window.location.replace(window.location.pathname + '?_v=' + Date.now());
             }
+          }
         }, true);
+
+        window.addEventListener('unhandledrejection', function(e) {
+          reportError({
+            type: 'unhandledrejection',
+            reason: e.reason ? (e.reason.message || String(e.reason)) : 'unknown',
+            stack: e.reason ? e.reason.stack : null,
+            ua: navigator.userAgent
+          });
+        });
       })();
     </script>
   </head>

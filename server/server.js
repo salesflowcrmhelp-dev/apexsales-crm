@@ -2140,6 +2140,20 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
+// Client-side telemetry & error reporting
+const clientErrorsList = [];
+app.post('/api/client-error', (req, res) => {
+  const errEntry = { ...req.body, time: new Date().toISOString() };
+  clientErrorsList.unshift(errEntry);
+  if (clientErrorsList.length > 50) clientErrorsList.pop();
+  console.error('🚨 [CLIENT BROWSER ERROR]:', JSON.stringify(errEntry));
+  res.json({ success: true });
+});
+
+app.get('/api/client-errors', (req, res) => {
+  res.json(clientErrorsList);
+});
+
 // --- PRODUCTION STATIC FILE SERVING WITH AUTOMATIC ASSET FALLBACK ---
 if (fs.existsSync(DIST_PATH)) {
   console.log(`📦 Serving static frontend from: ${DIST_PATH}`);

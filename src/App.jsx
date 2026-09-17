@@ -5592,45 +5592,34 @@ export default function App() {
     return (
         <div 
           style={{ 
-            position: "fixed", 
-            inset: 0, 
+            minHeight: "100vh",
+            width: "100%",
             backgroundColor: "#0b0f19", 
-            backgroundImage: "radial-gradient(ellipse at 50% 20%, #1e1b4b 0%, #0f172a 60%, #090d16 100%)",
             display: "flex", 
             flexDirection: "column",
             alignItems: "center", 
-            justifyContent: "flex-start", 
-            padding: "20px 14px 60px 14px", 
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            zIndex: 99999,
-            overflowY: "auto",
-            WebkitOverflowScrolling: "touch",
-            minHeight: "100%",
+            justifyContent: "center", 
+            padding: "24px 14px 48px 14px", 
+            fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
             boxSizing: "border-box"
           }}
         >
-          {/* Ambient Lighting Orbs */}
-          <div style={{ position: "absolute", width: "450px", height: "450px", borderRadius: "50%", background: "radial-gradient(circle, rgba(59, 130, 246, 0.14) 0%, transparent 70%)", top: "8%", left: "15%", pointerEvents: "none", filter: "blur(60px)" }} />
-          <div style={{ position: "absolute", width: "450px", height: "450px", borderRadius: "50%", background: "radial-gradient(circle, rgba(147, 51, 234, 0.12) 0%, transparent 70%)", bottom: "8%", right: "15%", pointerEvents: "none", filter: "blur(60px)" }} />
-
           {/* 🚀 Modern Enterprise SaaS Login Card */}
           <div 
             style={{ 
               position: "relative",
               width: "100%", 
-              maxWidth: "430px", 
-              backgroundColor: "rgba(15, 23, 42, 0.88)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
+              maxWidth: "420px", 
+              backgroundColor: "#1e293b",
               border: "1px solid rgba(255, 255, 255, 0.12)",
-              borderRadius: "24px",
-              boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.05)",
-              padding: "32px 24px",
+              borderRadius: "20px",
+              boxShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.6)",
+              padding: "28px 22px",
               display: "flex",
               flexDirection: "column",
               gap: "18px",
               zIndex: 10,
-              margin: "16px 0 40px 0",
+              margin: "0 auto",
               boxSizing: "border-box"
             }}
           >
