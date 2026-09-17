@@ -1501,6 +1501,7 @@ export default function App() {
   const [analyticsSubTab, setAnalyticsSubTab] = useState("overview"); // "overview" or "intelligence"
   const [intelTimeframe, setIntelTimeframe] = useState("all"); // 7, 30, 90, or "all"
   const [overviewSectionFilter, setOverviewSectionFilter] = useState("all"); // "all", "cockpit", "analytics"
+  const [activeRowMenuId, setActiveRowMenuId] = useState(null); // Table row kebab menu dropdown (Issue 9)
 
   // Workspace Switcher
   const [activeWorkspace, setActiveWorkspace] = useState(() => {
@@ -5465,7 +5466,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => window.location.href = "/"}
-                style={{ padding: "7px 16px", backgroundColor: "#ffffff", color: "#0f172a", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: "750", cursor: "pointer" }}
+                style={{ padding: "7px 16px", backgroundColor: "#ffffff", color: "#0f172a", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "750", cursor: "pointer" }}
               >
                 Go to Regular Login &rarr;
               </button>
@@ -6444,7 +6445,7 @@ export default function App() {
             </div>
             <div className="sidebar-brand-text" style={{ minWidth: 0 }}>
               <span className="brand-name" style={{ whiteSpace: "nowrap", letterSpacing: "-0.3px" }}>ApexSales</span>
-              <span className="brand-tag" style={{ whiteSpace: "nowrap", letterSpacing: "1.1px" }}>REVENUE INTELLIGENCE</span>
+              <span className="brand-tag" style={{ fontSize: "12px", color: "#475569", fontWeight: "700", whiteSpace: "nowrap", letterSpacing: "0.6px" }}>REVENUE INTELLIGENCE</span>
             </div>
           </div>
 
@@ -6929,7 +6930,7 @@ export default function App() {
               onClick={() => setShowStartMyDay(true)}
               className="header-cta-orange"
             >
-              <Sun className="w-3.5 h-3.5 flex-shrink-0" />
+              <Sun className="w-3.5 h-3.5 flex-shrink-0 text-amber-500" />
               <span className="header-cta-desktop-text">Start My Day</span>
               <span className="header-cta-mobile-text">My Day</span>
             </button>
@@ -7023,7 +7024,7 @@ export default function App() {
                     backgroundColor: "#ffffff",
                     color: "#9a3412",
                     border: "1.5px solid #fed7aa",
-                    borderRadius: "7px",
+                    borderRadius: "6px",
                     fontSize: "11.5px",
                     fontWeight: "750",
                     cursor: "pointer"
@@ -7033,7 +7034,7 @@ export default function App() {
                 </button>
                 <button 
                   onClick={() => { setSelectedPeriodMonth("2026-09"); setDealsDateFilter("this_month"); }}
-                  style={{ padding: "6px 14px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: "750", cursor: "pointer", boxShadow: "0 2px 4px rgba(234, 88, 12, 0.25)" }}
+                  style={{ padding: "6px 14px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "750", cursor: "pointer", boxShadow: "0 2px 4px rgba(234, 88, 12, 0.25)" }}
                 >
                   Switch to Current Month (Sept 2026) ➔
                 </button>
@@ -7103,7 +7104,7 @@ export default function App() {
               <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 14px", marginBottom: "10px", display: "flex", flexDirection: "column", gap: "9px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <div style={{ width: "30px", height: "30px", borderRadius: "7px", backgroundColor: "#0f172a", color: "#38bdf8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#0f172a", color: "#38bdf8", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <Calendar size={15} color="#38bdf8" />
                     </div>
                     <div>
@@ -7335,7 +7336,7 @@ export default function App() {
                               height: "68px",
                               backgroundColor: cellBg,
                               border: cellBorder,
-                              borderRadius: "7px",
+                              borderRadius: "6px",
                               padding: "4px 5px",
                               cursor: "pointer",
                               display: "flex",
@@ -9165,7 +9166,7 @@ export default function App() {
               {/* Page Title Header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "10px", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
-                  <div style={{ width: "30px", height: "30px", borderRadius: "7px", backgroundColor: "#0f172a", color: "#38bdf8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#0f172a", color: "#38bdf8", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Settings size={15} color="#38bdf8" />
                   </div>
                   <div>
@@ -9611,7 +9612,7 @@ export default function App() {
               {/* Page Title Header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "10px", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
-                  <div style={{ width: "30px", height: "30px", borderRadius: "7px", backgroundColor: "#0f172a", color: "#38bdf8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#0f172a", color: "#38bdf8", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <User size={15} color="#38bdf8" />
                   </div>
                   <div>
@@ -10023,7 +10024,7 @@ export default function App() {
                       backgroundColor: showAddUserSubModal ? "#475569" : "#2563eb",
                       color: "#ffffff",
                       border: "none",
-                      borderRadius: "7px",
+                      borderRadius: "6px",
                       fontSize: "11.5px",
                       fontWeight: "750",
                       cursor: "pointer",
@@ -10113,7 +10114,7 @@ export default function App() {
                           }));
                         }}
                         required
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
 
@@ -10126,7 +10127,7 @@ export default function App() {
                         placeholder="e.g. rahul"
                         value={newUserData.username}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, username: e.target.value.toLowerCase().trim() }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
 
@@ -10141,7 +10142,7 @@ export default function App() {
                         value={newUserData.pin}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value }))}
                         required
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
                   </div>
@@ -10154,7 +10155,7 @@ export default function App() {
                       <select 
                         value={newUserData.role}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, role: e.target.value }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                       >
                         <option value="sales_rep">💼 Sales Representative (Isolated: Own Leads Only)</option>
                         <option value="manager">👔 Sales Manager (Manages Reporting Team)</option>
@@ -10171,7 +10172,7 @@ export default function App() {
                         placeholder="e.g. 9898000005"
                         value={newUserData.phone}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, phone: e.target.value }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
 
@@ -10184,7 +10185,7 @@ export default function App() {
                         placeholder="e.g. rahul@apexsales.com"
                         value={newUserData.email}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
                   </div>
@@ -10193,13 +10194,13 @@ export default function App() {
                     <button 
                       type="button" 
                       onClick={() => setShowAddUserSubModal(false)}
-                      style={{ padding: "6px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "7px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
+                      style={{ padding: "6px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit"
-                      style={{ padding: "6px 16px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "11.5px", fontWeight: "750", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                      style={{ padding: "6px 16px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11.5px", fontWeight: "750", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
                     >
                       <Check size={14} /> Create Member & Enable Login
                     </button>
@@ -10613,35 +10614,35 @@ export default function App() {
                     })}
                   </div>
 
-                  {/* View Modes Switcher */}
-                  <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "7px", border: "1px solid #e2e8f0" }}>
+                  {/* View Modes Switcher (Issue 10: Standardized Button Height & Discoverability) */}
+                  <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "6px", border: "1px solid #e2e8f0", gap: "2px" }}>
                     <button
                       type="button"
                       onClick={() => setPipelineView("analytics")}
-                      style={{ padding: "3px 8px", fontSize: "10.5px", fontWeight: "600", color: "#64748b", border: "none", backgroundColor: "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#475569", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
                     >
-                      <TrendingUp size={11} /> Dashboard
+                      <TrendingUp size={14} /> Dashboard
                     </button>
                     <button
                       type="button"
                       onClick={() => setPipelineView("sheet")}
-                      style={{ padding: "3px 8px", fontSize: "10.5px", fontWeight: "700", color: "#2563eb", border: "none", backgroundColor: "#ffffff", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
+                      style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#2563eb" : "#475569", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
                     >
-                      <Grid size={11} /> Spreadsheet
+                      <Grid size={14} /> Spreadsheet
                     </button>
                     <button
                       type="button"
                       onClick={() => setPipelineView("split")}
-                      style={{ padding: "3px 8px", fontSize: "10.5px", fontWeight: "600", color: "#64748b", border: "none", backgroundColor: "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#475569", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
                     >
-                      <Layers size={11} /> Split 360°
+                      <Layers size={14} /> Split 360°
                     </button>
                     <button
                       type="button"
                       onClick={() => setPipelineView("deals")}
-                      style={{ padding: "3px 8px", fontSize: "10.5px", fontWeight: "600", color: "#16a34a", border: "none", backgroundColor: "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#16a34a" : "#475569", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
                     >
-                      <Award size={11} /> Deals Hub
+                      <Award size={14} /> Deals Hub
                     </button>
                   </div>
                 </div>
@@ -10663,7 +10664,7 @@ export default function App() {
                       placeholder="Search leads by name, email, phone..." 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      style={{ width: "100%", padding: "5px 10px 5px 30px", border: "1px solid #e2e8f0", borderRadius: "7px", fontSize: "11.5px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
+                      style={{ width: "100%", padding: "5px 10px 5px 30px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
                     />
                   </div>
 
@@ -10676,8 +10677,8 @@ export default function App() {
                         appearance: "none",
                         padding: "4px 26px 4px 10px",
                         border: selectedFilterStages.length > 0 ? "1px solid #3b82f6" : "1px solid #e2e8f0",
-                        borderRadius: "7px",
-                        fontSize: "11px",
+                        borderRadius: "6px",
+                        fontSize: "12px",
                         color: selectedFilterStages.length > 0 ? "#1d4ed8" : "#475569",
                         backgroundColor: selectedFilterStages.length > 0 ? "#eff6ff" : "#ffffff",
                         outline: "none",
@@ -10803,7 +10804,7 @@ export default function App() {
                     <select 
                       value={filterScore}
                       onChange={(e) => setFilterScore(e.target.value)}
-                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "7px", fontSize: "11px", color: filterScore ? "#1d4ed8" : "#475569", backgroundColor: filterScore ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
+                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px", color: filterScore ? "#1d4ed8" : "#475569", backgroundColor: filterScore ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
                     >
                       <option value="">Score: All</option>
                       {SCORE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -10816,7 +10817,7 @@ export default function App() {
                     <select 
                       value={filterSource}
                       onChange={(e) => setFilterSource(e.target.value)}
-                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "7px", fontSize: "11px", color: filterSource ? "#1d4ed8" : "#475569", backgroundColor: filterSource ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
+                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px", color: filterSource ? "#1d4ed8" : "#475569", backgroundColor: filterSource ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
                     >
                       <option value="">Source: All</option>
                       {SOURCE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -10831,7 +10832,7 @@ export default function App() {
                       placeholder="Value ₹..." 
                       value={filterMinVal}
                       onChange={(e) => setFilterMinVal(e.target.value)}
-                      style={{ width: "85px", padding: "4px 8px", border: "1px solid #e2e8f0", borderRadius: "7px", fontSize: "11px", color: "#1e293b", backgroundColor: filterMinVal ? "#eff6ff" : "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px", boxSizing: "border-box" }}
+                      style={{ width: "85px", padding: "4px 8px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px", color: "#1e293b", backgroundColor: filterMinVal ? "#eff6ff" : "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px", boxSizing: "border-box" }}
                     />
                   </div>
 
@@ -10854,7 +10855,7 @@ export default function App() {
                           value={isRepOnly ? currentUser.name : filterOwner}
                           disabled={isRepOnly}
                           onChange={(e) => setFilterOwner(e.target.value)}
-                          style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "7px", fontSize: "11px", color: filterOwner ? "#7c3aed" : "#475569", backgroundColor: isRepOnly ? "#f8fafc" : (filterOwner ? "#f5f3ff" : "#ffffff"), outline: "none", cursor: isRepOnly ? "default" : "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
+                          style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px", color: filterOwner ? "#7c3aed" : "#475569", backgroundColor: isRepOnly ? "#f8fafc" : (filterOwner ? "#f5f3ff" : "#ffffff"), outline: "none", cursor: isRepOnly ? "default" : "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
                         >
                           {isRepOnly ? (
                             <option value={currentUser.name}>👤 My Leads ({currentUser.name})</option>
@@ -10886,7 +10887,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setShowAddCustomFieldModal(true)}
-                    style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "4px 9px", backgroundColor: "#ffffff", border: "1px dashed #cbd5e1", borderRadius: "7px", fontSize: "11px", fontWeight: "600", color: "#475569", cursor: "pointer", height: "32px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "4px 9px", backgroundColor: "#ffffff", border: "1px dashed #cbd5e1", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#475569", cursor: "pointer", height: "32px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                     title="Add dynamic custom fields (City, Requirement, etc.)"
                   >
                     <Plus size={12} color="#64748b" /> Field
@@ -10919,7 +10920,7 @@ export default function App() {
                         setSheetFilterCriteria(null);
                         setCurrentPage(1);
                       }}
-                      style={{ padding: "4px 8px", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: "7px", fontSize: "11px", fontWeight: "600", color: "#475569", cursor: "pointer", height: "32px" }}
+                      style={{ padding: "4px 8px", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#475569", cursor: "pointer", height: "32px" }}
                     >
                       Reset
                     </button>
@@ -10938,7 +10939,7 @@ export default function App() {
                           backgroundColor: "#fee2e2", 
                           color: "#dc2626", 
                           border: "1px solid #fca5a5", 
-                          borderRadius: "7px", 
+                          borderRadius: "6px", 
                           padding: "5px 12px", 
                           fontSize: "11.5px", 
                           fontWeight: "700", 
@@ -10962,15 +10963,15 @@ export default function App() {
                         display: "inline-flex", 
                         alignItems: "center", 
                         gap: "5px", 
-                        backgroundColor: "#2563eb", 
+                        backgroundColor: "#ea580c", 
                         color: "#ffffff", 
                         border: "none", 
-                        borderRadius: "7px", 
-                        padding: "5px 12px", 
-                        fontSize: "11.5px", 
+                        borderRadius: "6px", 
+                        padding: "6px 14px", 
+                        fontSize: "12px", 
                         fontWeight: "600", 
                         cursor: "pointer", 
-                        boxShadow: "0 1px 2px rgba(37, 99, 235, 0.25)", 
+                        boxShadow: "0 1px 2px rgba(234, 88, 12, 0.25)", 
                         fontFamily: "'Plus Jakarta Sans', sans-serif",
                         height: "32px"
                       }}
@@ -10994,7 +10995,7 @@ export default function App() {
                         backgroundColor: "#ffffff", 
                         color: "#1e293b", 
                         border: "1px solid #cbd5e1", 
-                        borderRadius: "7px", 
+                        borderRadius: "6px", 
                         padding: "5px 12px", 
                         fontSize: "11.5px", 
                         fontWeight: "650", 
@@ -11024,7 +11025,7 @@ export default function App() {
                           backgroundColor: "#ffffff",
                           color: "#334155",
                           border: "1px solid #e2e8f0",
-                          borderRadius: "7px",
+                          borderRadius: "6px",
                           padding: "5px 10px",
                           fontSize: "11.5px",
                           fontWeight: "600",
@@ -11135,7 +11136,7 @@ export default function App() {
 
                   return (
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", padding: "0 16px 10px 16px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "7px", padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <div>
                           <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#166534", textTransform: "uppercase" }}>Total Closed Value</span>
                           <strong style={{ fontSize: "14px", fontWeight: "800", color: "#15803d", display: "block" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
@@ -11146,7 +11147,7 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "7px", padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <div>
                           <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase" }}>Average Deal Size</span>
                           <strong style={{ fontSize: "14px", fontWeight: "800", color: "#0f172a", display: "block" }}>₹{avgDealVal.toLocaleString("en-IN")}</strong>
@@ -11157,7 +11158,7 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "7px", padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <div>
                           <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#c2410c", textTransform: "uppercase" }}>Avg Closing Speed</span>
                           <strong style={{ fontSize: "14px", fontWeight: "800", color: "#c2410c", display: "block" }}>{avgClosingSpeed} Days</strong>
@@ -11327,13 +11328,13 @@ export default function App() {
                                     </div>
                                     <div style={{ minWidth: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
                                       <span 
-                                        style={{ color: "#0f172a", fontWeight: "650", fontSize: "11px", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                                        style={{ color: "#0f172a", fontWeight: "650", fontSize: "13px", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
                                         title="Double-click to edit name"
                                       >
                                         {lead.name || "New Lead"}
                                       </span>
                                       {lead.company && lead.company.trim() ? (
-                                        <span style={{ color: "#64748b", fontSize: "9px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                        <span style={{ color: "#475569", fontSize: "12px", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                           {lead.company}
                                         </span>
                                       ) : null}
@@ -11448,7 +11449,7 @@ export default function App() {
                                         e.stopPropagation();
                                         startEditing(rIdx, 3);
                                       }}
-                                      style={{ color: lead.email ? "#334155" : "#94a3b8", fontSize: "10px", fontWeight: "500", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "pointer" }}
+                                      style={{ color: lead.email ? "#0f172a" : "#94a3b8", fontSize: "12px", fontWeight: "500", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "pointer" }}
                                       title={lead.email ? "Double-click to edit email" : "Double-click to add email"}
                                     >
                                       {lead.email || "No email"}
@@ -11459,7 +11460,7 @@ export default function App() {
                                           e.stopPropagation();
                                           startEditing(rIdx, 4);
                                         }}
-                                        style={{ color: "#64748b", fontSize: "9px", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", cursor: "pointer" }}
+                                        style={{ color: "#475569", fontSize: "12px", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", cursor: "pointer" }}
                                         title="Double-click to edit phone number"
                                       >
                                         {lead.phone}
@@ -11609,122 +11610,190 @@ export default function App() {
                                 )}
                               </td>
 
-                              {/* Dedicated Actions Column (Always 1 clean horizontal row, right-aligned) */}
-                              <td style={{ padding: "3px 10px 3px 4px", verticalAlign: "middle", textAlign: "right", whiteSpace: "nowrap" }}>
-                                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: "2px", whiteSpace: "nowrap" }}>
+                              {/* Dedicated Actions Column (Issue 9: Primary 1-2 actions + Kebab More Menu) */}
+                              <td style={{ padding: "4px 8px", verticalAlign: "middle", textAlign: "right", whiteSpace: "nowrap", position: "relative" }}>
+                                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: "4px", whiteSpace: "nowrap" }}>
                                   {lead.phone && (
-                                    <>
-                                      <a
-                                        href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${lead.name || ""}, connecting regarding your inquiry.`)}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        style={{
-                                          display: "inline-flex",
-                                          alignItems: "center",
-                                          justifyContent: "center",
-                                          width: "20px",
-                                          height: "20px",
-                                          borderRadius: "4px",
-                                          backgroundColor: "#f0fdf4",
-                                          border: "1px solid #bbf7d0",
-                                          color: "#16a34a",
-                                          textDecoration: "none"
-                                        }}
-                                        title="WhatsApp"
-                                        onClick={() => {
-                                          logLeadActivity(lead.id, "whatsapp", "WhatsApp Chat Opened", `Initiated WhatsApp follow-up with ${lead.name}`);
-                                        }}
-                                      >
-                                        <MessageCircle size={11} />
-                                      </a>
-                                      <a
-                                        href={`tel:${lead.phone.replace(/[^0-9+]/g, "")}`}
-                                        style={{
-                                          display: "inline-flex",
-                                          alignItems: "center",
-                                          justifyContent: "center",
-                                          width: "20px",
-                                          height: "20px",
-                                          borderRadius: "4px",
-                                          backgroundColor: "#eff6ff",
-                                          border: "1px solid #bfdbfe",
-                                          color: "#2563eb",
-                                          textDecoration: "none"
-                                        }}
-                                        title="Call"
-                                        onClick={() => {
-                                          logLeadActivity(lead.id, "call", "Call Dialed", `Dialed call to ${lead.name} (${lead.phone || 'No phone'})`);
-                                        }}
-                                      >
-                                        <Phone size={11} />
-                                      </a>
-                                    </>
-                                  )}
-                                  {lead.email && (
                                     <a
-                                      href={`mailto:${lead.email}?subject=${encodeURIComponent("Follow up")}`}
+                                      href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${lead.name || ""}, connecting regarding your inquiry.`)}`}
+                                      target="_blank"
+                                      rel="noreferrer"
                                       style={{
                                         display: "inline-flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        width: "20px",
-                                        height: "20px",
-                                        borderRadius: "4px",
-                                        backgroundColor: "#f8fafc",
-                                        border: "1px solid #e2e8f0",
-                                        color: "#64748b",
+                                        width: "26px",
+                                        height: "26px",
+                                        borderRadius: "6px",
+                                        backgroundColor: "#f0fdf4",
+                                        border: "1px solid #bbf7d0",
+                                        color: "#16a34a",
                                         textDecoration: "none"
                                       }}
-                                      title="Email"
+                                      title="WhatsApp"
+                                      aria-label="WhatsApp"
                                       onClick={() => {
-                                        logLeadActivity(lead.id, "email", "Email Client Opened", `Opened email to ${lead.name} (${lead.email || 'No email'})`);
+                                        logLeadActivity(lead.id, "whatsapp", "WhatsApp Chat Opened", `Initiated WhatsApp follow-up with ${lead.name}`);
                                       }}
                                     >
-                                      <Mail size={11} />
+                                      <MessageCircle size={13} />
                                     </a>
                                   )}
-                                  <button 
-                                    onClick={(e) => { e.stopPropagation(); setSelectedLeadForDetails(lead); }}
-                                    style={{
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      width: "20px",
-                                      height: "20px",
-                                      borderRadius: "4px",
-                                      background: "none",
-                                      border: "1px solid transparent",
-                                      color: "#94a3b8",
-                                      cursor: "pointer"
-                                    }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#f1f5f9"; e.currentTarget.style.color = "#0f172a"; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "#94a3b8"; }}
-                                    title="Lead Details"
-                                  >
-                                    <MoreVertical size={11} />
-                                  </button>
-                                  <button 
-                                    type="button"
-                                    onClick={(e) => { e.stopPropagation(); handleDeleteLead(lead); }}
-                                    style={{
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      width: "20px",
-                                      height: "20px",
-                                      borderRadius: "4px",
-                                      background: "none",
-                                      border: "1px solid transparent",
-                                      color: "#94a3b8",
-                                      cursor: "pointer",
-                                      transition: "all 0.15s ease"
-                                    }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#fee2e2"; e.currentTarget.style.color = "#dc2626"; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = "#94a3b8"; }}
-                                    title={`Delete "${lead.name || 'Lead'}"`}
-                                  >
-                                    <Trash2 size={11} />
-                                  </button>
+                                  {lead.phone && (
+                                    <a
+                                      href={`tel:${lead.phone.replace(/[^0-9+]/g, "")}`}
+                                      style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        width: "26px",
+                                        height: "26px",
+                                        borderRadius: "6px",
+                                        backgroundColor: "#eff6ff",
+                                        border: "1px solid #bfdbfe",
+                                        color: "#2563eb",
+                                        textDecoration: "none"
+                                      }}
+                                      title="Call"
+                                      aria-label="Call"
+                                      onClick={() => {
+                                        logLeadActivity(lead.id, "call", "Call Dialed", `Dialed call to ${lead.name} (${lead.phone || 'No phone'})`);
+                                      }}
+                                    >
+                                      <Phone size={13} />
+                                    </a>
+                                  )}
+
+                                  {/* Kebab More Menu Dropdown */}
+                                  <div style={{ position: "relative", display: "inline-block" }}>
+                                    <button 
+                                      type="button"
+                                      onClick={(e) => { 
+                                        e.stopPropagation(); 
+                                        setActiveRowMenuId(prev => prev === lead.id ? null : lead.id); 
+                                      }}
+                                      style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        width: "26px",
+                                        height: "26px",
+                                        borderRadius: "6px",
+                                        backgroundColor: activeRowMenuId === lead.id ? "#f1f5f9" : "#ffffff",
+                                        border: "1px solid #e2e8f0",
+                                        color: "#475569",
+                                        cursor: "pointer"
+                                      }}
+                                      title="More Actions"
+                                      aria-label="More Actions"
+                                    >
+                                      <MoreVertical size={13} />
+                                    </button>
+
+                                    {activeRowMenuId === lead.id && (
+                                      <div
+                                        onClick={(e) => e.stopPropagation()}
+                                        style={{
+                                          position: "absolute",
+                                          top: "calc(100% + 4px)",
+                                          right: 0,
+                                          zIndex: 1200,
+                                          backgroundColor: "#ffffff",
+                                          border: "1px solid #e2e8f0",
+                                          borderRadius: "8px",
+                                          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)",
+                                          minWidth: "155px",
+                                          padding: "4px",
+                                          display: "flex",
+                                          flexDirection: "column",
+                                          gap: "2px",
+                                          textAlign: "left"
+                                        }}
+                                      >
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setSelectedLeadForDetails(lead);
+                                            setActiveRowMenuId(null);
+                                          }}
+                                          style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "8px",
+                                            padding: "6px 10px",
+                                            fontSize: "12px",
+                                            fontWeight: "500",
+                                            color: "#0f172a",
+                                            background: "transparent",
+                                            border: "none",
+                                            borderRadius: "6px",
+                                            cursor: "pointer",
+                                            width: "100%",
+                                            textAlign: "left"
+                                          }}
+                                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
+                                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                        >
+                                          <Eye size={13} color="#2563eb" /> View Details
+                                        </button>
+
+                                        {lead.email && (
+                                          <a
+                                            href={`mailto:${lead.email}?subject=${encodeURIComponent("Follow up")}`}
+                                            onClick={() => {
+                                              logLeadActivity(lead.id, "email", "Email Client Opened", `Opened email to ${lead.name}`);
+                                              setActiveRowMenuId(null);
+                                            }}
+                                            style={{
+                                              display: "flex",
+                                              alignItems: "center",
+                                              gap: "8px",
+                                              padding: "6px 10px",
+                                              fontSize: "12px",
+                                              fontWeight: "500",
+                                              color: "#0f172a",
+                                              textDecoration: "none",
+                                              borderRadius: "6px",
+                                              cursor: "pointer"
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f8fafc"}
+                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                          >
+                                            <Mail size={13} color="#64748b" /> Send Email
+                                          </a>
+                                        )}
+
+                                        <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "2px 0" }} />
+
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setActiveRowMenuId(null);
+                                            handleDeleteLead(lead);
+                                          }}
+                                          style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "8px",
+                                            padding: "6px 10px",
+                                            fontSize: "12px",
+                                            fontWeight: "600",
+                                            color: "#dc2626",
+                                            background: "transparent",
+                                            border: "none",
+                                            borderRadius: "6px",
+                                            cursor: "pointer",
+                                            width: "100%",
+                                            textAlign: "left"
+                                          }}
+                                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fef2f2"}
+                                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                        >
+                                          <Trash2 size={13} color="#dc2626" /> Delete Lead
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </td>
                             </tr>
@@ -13010,7 +13079,7 @@ export default function App() {
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
                       
                       {/* Card 1: Total Closed Value */}
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "7px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
                           <span style={{ fontSize: "8px", fontWeight: "750", color: "#166534", textTransform: "uppercase", letterSpacing: "0.2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Total Closed Value (Inc. GST)</span>
                           <strong style={{ fontSize: "14.5px", fontWeight: "800", color: "#15803d", display: "block", marginTop: "1px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
@@ -13024,7 +13093,7 @@ export default function App() {
                       </div>
 
                       {/* Card 2: Average Deal Size */}
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "7px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
                           <span style={{ fontSize: "8px", fontWeight: "750", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Average Deal Size (Inc. GST)</span>
                           <strong style={{ fontSize: "14.5px", fontWeight: "800", color: "#0f172a", display: "block", marginTop: "1px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{avgDealVal.toLocaleString("en-IN")}</strong>
@@ -13038,7 +13107,7 @@ export default function App() {
                       </div>
 
                       {/* Card 3: Closing Speed */}
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "7px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "6px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
                           <span style={{ fontSize: "8px", fontWeight: "750", color: "#c2410c", textTransform: "uppercase", letterSpacing: "0.2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Avg Closing Speed</span>
                           <strong style={{ fontSize: "14.5px", fontWeight: "800", color: "#c2410c", display: "block", marginTop: "1px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{avgClosingSpeed} Days</strong>
@@ -13050,7 +13119,7 @@ export default function App() {
                       </div>
 
                       {/* Card 4: New vs Renewal Split */}
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e9d5ff", borderRadius: "7px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e9d5ff", borderRadius: "6px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
                           <span style={{ fontSize: "8px", fontWeight: "750", color: "#7e22ce", textTransform: "uppercase", letterSpacing: "0.2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>New vs Renewal</span>
                           <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "1px" }}>
@@ -13532,7 +13601,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Phone size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13572,7 +13641,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fee2e2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fee2e2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <AlertTriangle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13612,7 +13681,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Flame size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13652,7 +13721,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13692,7 +13761,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13732,7 +13801,7 @@ export default function App() {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <RefreshCw size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -13814,7 +13883,7 @@ export default function App() {
                           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Activity size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <h4 style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
@@ -13839,7 +13908,7 @@ export default function App() {
                                     style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "11px", cursor: "pointer" }}
                                   >
                                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: act.bg, color: act.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: act.bg, color: act.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                         <IconComp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                       </div>
                                       <div>
@@ -13858,7 +13927,7 @@ export default function App() {
                           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <UserPlus size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <h4 style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
@@ -13888,7 +13957,7 @@ export default function App() {
                                     style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "11px", cursor: "pointer" }}
                                   >
                                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                         <Building2 size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                       </div>
                                       <div>
@@ -13916,7 +13985,7 @@ export default function App() {
                   {/* Metric Card 1: Total Sales Won */}
                   <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#dcfce7", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#dcfce7", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Award size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
                       <span style={{ fontSize: "11px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Won</span>
@@ -13934,7 +14003,7 @@ export default function App() {
                   {/* Metric Card 2: Deals Won */}
                   <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <CheckCircle2 size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
                       <span style={{ fontSize: "11px", fontWeight: "700", color: "#1e40af", backgroundColor: "#eff6ff", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Deals</span>
@@ -13952,7 +14021,7 @@ export default function App() {
                   {/* Metric Card 3: Lead Conversion Rate */}
                   <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
                       <span style={{ fontSize: "11px", fontWeight: "700", color: "#6b21a8", backgroundColor: "#f3e8ff", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Rate</span>
@@ -13970,7 +14039,7 @@ export default function App() {
                   {/* Metric Card 4: Average Deal Value */}
                   <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#d97706", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <IndianRupee size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
                       <span style={{ fontSize: "11px", fontWeight: "700", color: "#92400e", backgroundColor: "#fff7ed", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Avg Size</span>
@@ -13988,7 +14057,7 @@ export default function App() {
                   {/* Metric Card 5: Target Achievement */}
                   <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ecfeff", color: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#ecfeff", color: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
                       <span style={{ fontSize: "11px", fontWeight: "700", color: "#155e75", backgroundColor: "#ecfeff", padding: "1px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>Goal</span>
@@ -14017,7 +14086,7 @@ export default function App() {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
-                    <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#e0e7ff", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#e0e7ff", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <Shuffle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                     </div>
                     <h3 style={{ fontSize: "14px", fontWeight: "750", color: "#0f172a", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -15567,7 +15636,7 @@ export default function App() {
                             padding: "8px 12px",
                             backgroundColor: task.completed ? "#f8fafc" : "#ffffff",
                             border: task.completed ? "1px solid #f1f5f9" : "1px solid #e2e8f0",
-                            borderRadius: "7px",
+                            borderRadius: "6px",
                             transition: "all 0.15s ease",
                             opacity: task.completed ? 0.75 : 1
                           }}
@@ -17297,7 +17366,7 @@ export default function App() {
               <button 
                 onClick={handleSyncSheet}
                 disabled={syncingSheet}
-                style={{ padding: "8px 16px", backgroundColor: "#0284c7", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                style={{ padding: "8px 16px", backgroundColor: "#0284c7", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
               >
                 <RefreshCw className={`w-4 h-4 ${syncingSheet ? "animate-spin" : ""}`} /> {syncingSheet ? "Syncing..." : "Sync Sheet Now"}
               </button>
@@ -17370,14 +17439,14 @@ export default function App() {
             <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "12px", backgroundColor: "#ffffff", overflowY: "auto", flex: 1 }}>
               
               {/* Highlight Info Banner */}
-              <div style={{ backgroundColor: "#f0f9ff", border: "1px solid #bae6fd", padding: "8px 12px", borderRadius: "7px", fontSize: "11px", color: "#0369a1", display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ backgroundColor: "#f0f9ff", border: "1px solid #bae6fd", padding: "8px 12px", borderRadius: "6px", fontSize: "11px", color: "#0369a1", display: "flex", alignItems: "center", gap: "8px" }}>
                 <Info className="w-4 h-4 text-sky-600 flex-shrink-0" />
                 <span>Enter call outcome details: <strong>Discussed deal value</strong>, <strong>lead intent</strong>, <strong>promised date</strong>, and <strong>key remarks</strong>.</span>
               </div>
 
               {/* Validation Error Alert Box */}
               {stageModalError && (
-                <div style={{ backgroundColor: "#fef2f2", border: "1.5px solid #fecaca", padding: "8px 12px", borderRadius: "7px", fontSize: "11.5px", color: "#dc2626", fontWeight: "600", display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ backgroundColor: "#fef2f2", border: "1.5px solid #fecaca", padding: "8px 12px", borderRadius: "6px", fontSize: "11.5px", color: "#dc2626", fontWeight: "600", display: "flex", alignItems: "center", gap: "8px" }}>
                   <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600" />
                   <span>{stageModalError}</span>
                 </div>
@@ -17786,7 +17855,7 @@ export default function App() {
               <div style={{ display: "flex", gap: "10px" }}>
                 <button 
                   onClick={() => window.print()}
-                  style={{ padding: "9px 16px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                  style={{ padding: "9px 16px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
                 >
                   <Printer className="w-4 h-4 text-sky-400" /> Print / Save PDF Report
                 </button>
@@ -18067,14 +18136,14 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setShowTargetModal(false)}
-                style={{ padding: "8px 16px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "7px", fontSize: "12px", fontWeight: "700", color: "#475569", cursor: "pointer" }}
+                style={{ padding: "8px 16px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "700", color: "#475569", cursor: "pointer" }}
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={() => saveMonthlyTarget(targetModalMonth, targetModalInput, targetModalSpotInput, targetModalSpotNote)}
-                style={{ padding: "8px 18px", backgroundColor: "#7c3aed", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: "750", cursor: "pointer", boxShadow: "0 2px 4px rgba(124, 58, 237, 0.3)" }}
+                style={{ padding: "8px 18px", backgroundColor: "#7c3aed", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "750", cursor: "pointer", boxShadow: "0 2px 4px rgba(124, 58, 237, 0.3)" }}
               >
                 Save Target & Incentive for {targetModalMonth === "2026-09" ? "Sept" : targetModalMonth === "2026-08" ? "Aug" : "Oct"}
               </button>
@@ -18726,7 +18795,7 @@ export default function App() {
                       placeholder="e.g. Rahul Sharma"
                       value={newLeadData.name}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, name: e.target.value }))}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                     />
                   </div>
 
@@ -18739,7 +18808,7 @@ export default function App() {
                       placeholder="e.g. Apex Tech Pvt Ltd"
                       value={newLeadData.company}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, company: e.target.value }))}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                     />
                   </div>
                 </div>
@@ -18755,7 +18824,7 @@ export default function App() {
                       placeholder="e.g. 9876543210"
                       value={newLeadData.phone}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, phone: e.target.value }))}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                     />
                   </div>
 
@@ -18768,7 +18837,7 @@ export default function App() {
                       placeholder="e.g. rahul@example.com"
                       value={newLeadData.email}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, email: e.target.value }))}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                     />
                   </div>
                 </div>
@@ -18784,7 +18853,7 @@ export default function App() {
                       placeholder="e.g. 25000"
                       value={newLeadData.value}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, value: e.target.value }))}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                     />
                   </div>
 
@@ -18795,7 +18864,7 @@ export default function App() {
                     <select
                       value={newLeadData.status}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, status: e.target.value }))}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
+                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
                     >
                       {STATUS_OPTIONS.map(opt => (
                         <option key={opt} value={opt}>{opt}</option>
@@ -18810,7 +18879,7 @@ export default function App() {
                     <select
                       value={newLeadData.source}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, source: e.target.value }))}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
+                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
                     >
                       {SOURCE_OPTIONS.map(src => (
                         <option key={src} value={src}>{src}</option>
@@ -18868,7 +18937,7 @@ export default function App() {
                           value={isRepOnly ? currentUser.name : newLeadData.owner}
                           disabled={isRepOnly}
                           onChange={(e) => setNewLeadData(prev => ({ ...prev, owner: e.target.value }))}
-                          style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: isRepOnly ? "#f1f5f9" : "#ffffff", boxSizing: "border-box", cursor: isRepOnly ? "not-allowed" : "pointer" }}
+                          style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: isRepOnly ? "#f1f5f9" : "#ffffff", boxSizing: "border-box", cursor: isRepOnly ? "not-allowed" : "pointer" }}
                         >
                           {isRepOnly ? (
                             <option value={currentUser.name}>{currentUser.name} (You)</option>
@@ -18899,7 +18968,7 @@ export default function App() {
                             ...prev,
                             custom_fields: { ...(prev.custom_fields || {}), [cf.id]: e.target.value }
                           }))}
-                          style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                          style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                         />
                       </div>
                     ))}
@@ -18976,7 +19045,7 @@ export default function App() {
                     placeholder="Discussion points, requirements or client preferences..."
                     value={newLeadData.notes}
                     onChange={(e) => setNewLeadData(prev => ({ ...prev, notes: e.target.value }))}
-                    style={{ width: "100%", padding: "7px 10px", fontSize: "11.5px", border: "1px solid #cbd5e1", borderRadius: "7px", outline: "none", backgroundColor: "#ffffff", resize: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                    style={{ width: "100%", padding: "7px 10px", fontSize: "11.5px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", resize: "none", boxSizing: "border-box", fontFamily: "inherit" }}
                   />
                 </div>
 
@@ -18987,13 +19056,13 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setShowAddLeadModal(false)}
-                  style={{ padding: "6px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "7px", fontSize: "11.5px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
+                  style={{ padding: "6px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  style={{ padding: "6px 18px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "11.5px", fontWeight: "700", cursor: "pointer", boxShadow: "0 2px 4px rgba(37, 99, 235, 0.25)", display: "inline-flex", alignItems: "center", gap: "5px" }}
+                  style={{ padding: "6px 18px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11.5px", fontWeight: "700", cursor: "pointer", boxShadow: "0 2px 4px rgba(37, 99, 235, 0.25)", display: "inline-flex", alignItems: "center", gap: "5px" }}
                 >
                   <Plus size={14} />
                   <span>Save Lead</span>
@@ -19556,7 +19625,7 @@ export default function App() {
                           username: prev.username || e.target.value.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '_')
                         }))}
                         required
-                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1.5px solid #86efac", borderRadius: "7px", boxSizing: "border-box", fontWeight: "600" }}
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1.5px solid #86efac", borderRadius: "6px", boxSizing: "border-box", fontWeight: "600" }}
                       />
                     </div>
 
@@ -19577,7 +19646,7 @@ export default function App() {
                           }));
                         }}
                         required
-                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
 
@@ -19593,13 +19662,13 @@ export default function App() {
                           value={newUserData.pin}
                           onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value.replace(/[^0-9]/g, '') }))}
                           required
-                          style={{ flex: 1, padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box", fontWeight: "800", letterSpacing: "2px" }}
+                          style={{ flex: 1, padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box", fontWeight: "800", letterSpacing: "2px" }}
                         />
                         <button
                           type="button"
                           onClick={() => setNewUserData(prev => ({ ...prev, pin: String(Math.floor(100000 + Math.random() * 900000)) }))}
                           title="Generate Random PIN"
-                          style={{ padding: "0 8px", backgroundColor: "#e2e8f0", border: "1px solid #cbd5e1", borderRadius: "7px", fontSize: "11px", cursor: "pointer", fontWeight: "700" }}
+                          style={{ padding: "0 8px", backgroundColor: "#e2e8f0", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", cursor: "pointer", fontWeight: "700" }}
                         >
                           🎲
                         </button>
@@ -19615,7 +19684,7 @@ export default function App() {
                       <select
                         value={newUserData.role}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, role: e.target.value }))}
-                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                       >
                         <option value="sales_rep">💼 Sales Rep (Strict Privacy: Only Sees Own Leads)</option>
                         <option value="manager">👔 Sales Manager (Manages Direct Reporting Team)</option>
@@ -19639,7 +19708,7 @@ export default function App() {
                               managerId: matchedMgr ? (matchedMgr.id || matchedMgr._id) : ""
                             }));
                           }}
-                          style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1.5px solid #93c5fd", borderRadius: "7px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                          style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1.5px solid #93c5fd", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                         >
                           <option value="">Direct to Admin (No Manager)</option>
                           {allUsersList.filter(u => u.role === "manager" || u.role === "admin").map(mgr => (
@@ -19660,7 +19729,7 @@ export default function App() {
                         placeholder="e.g. 9898000005"
                         value={newUserData.phone}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, phone: e.target.value }))}
-                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "7px", boxSizing: "border-box" }}
+                        style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
                   </div>
@@ -19669,13 +19738,13 @@ export default function App() {
                     <button 
                       type="button" 
                       onClick={() => setShowAddUserSubModal(false)}
-                      style={{ padding: "7px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "7px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
+                      style={{ padding: "7px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit"
-                      style={{ padding: "7px 18px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "12px", fontWeight: "750", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 6px rgba(22, 163, 74, 0.3)" }}
+                      style={{ padding: "7px 18px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "750", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 6px rgba(22, 163, 74, 0.3)" }}
                     >
                       <Send size={14} /> ✨ Create User & Send Password to Email
                     </button>
@@ -19930,7 +19999,7 @@ export default function App() {
               <button 
                 type="button"
                 onClick={() => { setShowUserManagementModal(false); setShowAddUserSubModal(false); }}
-                style={{ padding: "6px 16px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
+                style={{ padding: "6px 16px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
               >
                 Close Window
               </button>
@@ -19981,7 +20050,7 @@ export default function App() {
               <button 
                 type="button"
                 onClick={() => setShowAdminVaultModal(false)}
-                style={{ width: "28px", height: "28px", borderRadius: "7px", border: "1px solid #e2e8f0", backgroundColor: "#f8fafc", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}
+                style={{ width: "28px", height: "28px", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: "#f8fafc", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}
               >
                 ✕
               </button>
@@ -20112,7 +20181,7 @@ export default function App() {
               <button 
                 type="button"
                 onClick={() => setShowAdminVaultModal(false)}
-                style={{ padding: "6px 16px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "7px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
+                style={{ padding: "6px 16px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
               >
                 Close Vault
               </button>

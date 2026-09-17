@@ -48,14 +48,15 @@
   --radius-full: 9999px;
 }
 
-/* Core Standardized Button Classes */
+/* Core Standardized Button Classes (Max 5 canonical button variants) */
 .btn-primary {
   background: var(--primary-color, #ea580c);
   color: #ffffff;
   border: 1px solid transparent;
-  border-radius: var(--radius-md, 8px);
-  padding: 8px 16px;
-  font-size: var(--text-sm, 13px);
+  border-radius: var(--radius-sm, 6px);
+  padding: 6px 14px;
+  height: 32px;
+  font-size: var(--text-xs, 12px);
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -71,20 +72,22 @@
 .btn-secondary {
   background: #ffffff;
   color: var(--color-text-primary, #0f172a);
-  border: 1px solid #cbd5e1;
-  border-radius: var(--radius-md, 8px);
-  padding: 8px 16px;
-  font-size: var(--text-sm, 13px);
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm, 6px);
+  padding: 6px 14px;
+  height: 32px;
+  font-size: var(--text-xs, 12px);
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
   transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 .btn-secondary:hover {
   background: #f8fafc;
-  border-color: #94a3b8;
+  border-color: #cbd5e1;
 }
 
 .btn-ghost {
@@ -93,6 +96,9 @@
   color: var(--color-text-secondary, #475569);
   border-radius: var(--radius-sm, 6px);
   padding: 6px 10px;
+  height: 32px;
+  font-size: var(--text-xs, 12px);
+  font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -104,11 +110,12 @@
 }
 
 .btn-danger {
-  background: #fef2f2;
+  background: #fee2e2;
   color: #dc2626;
   border: 1px solid #fecaca;
-  border-radius: var(--radius-md, 8px);
-  padding: 6px 12px;
+  border-radius: var(--radius-sm, 6px);
+  padding: 6px 14px;
+  height: 32px;
   font-size: var(--text-xs, 12px);
   font-weight: 600;
   cursor: pointer;
@@ -117,7 +124,25 @@
   gap: 4px;
 }
 .btn-danger:hover {
-  background: #fee2e2;
+  background: #fca5a5;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: var(--color-text-secondary, #475569);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-icon:hover {
+  background-color: #f1f5f9;
+  color: var(--color-text-primary, #0f172a);
 }
 
 *, *::before, *::after {
@@ -563,15 +588,16 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .header-cta-orange {
-  background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
-  color: #ffffff;
-  border: none;
-  padding: 7px 15px;
-  border-radius: 8px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  padding: 6px 14px;
+  height: 34px;
+  border-radius: 6px;
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 3px 10px rgba(234, 88, 12, 0.25);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -579,8 +605,9 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .header-cta-orange:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 14px rgba(234, 88, 12, 0.35);
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
 }
 
 .header-notification-btn {
