@@ -2140,15 +2140,76 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-// --- PRODUCTION STATIC FILE SERVING ---
-// In production or when dist/ exists, serve compiled React SPA from this single Node server
+// --- PRODUCTION STATIC FILE SERVING WITH AUTOMATIC ASSET FALLBACK ---
 if (fs.existsSync(DIST_PATH)) {
   console.log(`📦 Serving static frontend from: ${DIST_PATH}`);
-  app.use(express.static(DIST_PATH));
 
-  // Client-side routing fallback for React Single Page App (Express 5 compatible)
+  // 1. SMART ASSET HANDLER FOR /assets/*
+  // Resolves the "stale bundle hash -> HTML MIME type error -> white screen" bug:
+  // If Chrome cached an older index.html requesting a previous bundle hash (e.g. index-CY12DsHb.js),
+  // NEVER serve index.html with text/html!
+  // Instead, dynamically find and serve the current bundle matching the extension with correct MIME type.
+  app.use('/assets', (req, res, next) => {
+    const assetsDir = path.join(DIST_PATH, 'assets');
+    if (!fs.existsSync(assetsDir)) return next();
+
+    // Check if exact file requested exists (strip any query strings)
+    const cleanFileName = path.basename(req.path.split('?')[0]);
+    const exactFilePath = path.join(assetsDir, cleanFileName);
+
+    if (fs.existsSync(exactFilePath) && fs.statSync(exactFilePath).isFile()) {
+      // Set long-lived cache for verified current immutable assets
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      return res.sendFile(exactFilePath);
+    }
+
+    // Exact hashed file not found (e.g. user has cached HTML referencing old bundle)
+    try {
+      const files = fs.readdirSync(assetsDir);
+      if (cleanFileName.endsWith('.js')) {
+        const jsBundle = files.find(f => f.startsWith('index-') && f.endsWith('.js')) || files.find(f => f.endsWith('.js'));
+        if (jsBundle) {
+          console.warn(`[Asset Fallback] Serving current JS bundle (${jsBundle}) for stale request: ${req.path}`);
+          res.setHeader('Content-Type', 'text/javascript; charset=utf-8');
+          res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+          return res.sendFile(path.join(assetsDir, jsBundle));
+        }
+      } else if (cleanFileName.endsWith('.css')) {
+        const cssBundle = files.find(f => f.startsWith('index-') && f.endsWith('.css')) || files.find(f => f.endsWith('.css'));
+        if (cssBundle) {
+          console.warn(`[Asset Fallback] Serving current CSS bundle (${cssBundle}) for stale request: ${req.path}`);
+          res.setHeader('Content-Type', 'text/css; charset=utf-8');
+          res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+          return res.sendFile(path.join(assetsDir, cssBundle));
+        }
+      }
+    } catch (err) {
+      console.error('[Asset Fallback Error]:', err);
+    }
+
+    // If it's another non-existent asset, send 404 with proper status - NEVER send index.html as a script!
+    res.status(404).send('Asset not found');
+  });
+
+  // 2. Serve other static assets (favicon, icons, etc.)
+  app.use(express.static(DIST_PATH, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        // Enforce no-cache on HTML so browsers always fetch latest bundle references
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+    }
+  }));
+
+  // 3. Client-side routing fallback for React Single Page App
+  // Strictly applies ONLY to non-API and non-asset GET requests, with anti-caching headers
   app.use((req, res, next) => {
-    if (req.method === 'GET' && !req.path.startsWith('/api/')) {
+    if (req.method === 'GET' && !req.path.startsWith('/api/') && !req.path.startsWith('/assets/')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
       return res.sendFile(path.join(DIST_PATH, 'index.html'));
     }
     next();

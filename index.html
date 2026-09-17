@@ -3,14 +3,87 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>ApexSales - Revenue Intelligence CRM</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      /* Ensure background is never pure white during page load */
+      html, body {
+        background-color: #0b0f19;
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+        color: #f8fafc;
+        -webkit-font-smoothing: antialiased;
+      }
+      @keyframes apexSpin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes apexPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.85; transform: scale(0.97); }
+      }
+    </style>
+    <script>
+      // Self-Healing Script for Stale Mobile Chrome Caches
+      (function() {
+        window.addEventListener('error', function(e) {
+          var target = e.target || {};
+          var isScriptErr = target.tagName === 'SCRIPT' || (e.message && e.message.toLowerCase().indexOf('module script') !== -1);
+          if (isScriptErr) {
+            console.warn('[ApexSales Recovery] Script load failure detected. Attempting cache-busting auto-reload...');
+            var reloadFlag = 'crm_auto_reload_ts';
+            var last = sessionStorage.getItem(reloadFlag);
+            var now = Date.now();
+            if (!last || (now - parseInt(last, 10)) > 8000) {
+              sessionStorage.setItem(reloadFlag, now.toString());
+              var base = window.location.pathname;
+              window.location.replace(base + '?_v=' + now);
+            }
+          }
+        }, true);
+      })();
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Pre-rendered Dark Loader to prevent ANY blank white screen while bundles load -->
+      <div id="crm-initial-loader" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 20%, #1e1b4b 0%, #0f172a 60%, #090d16 100%); font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; color: #ffffff; padding: 24px; text-align: center; box-sizing: border-box;">
+        <div style="width: 58px; height: 58px; border-radius: 16px; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(37,99,235,0.45); margin-bottom: 20px; animation: apexPulse 2s ease-in-out infinite;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
+        <div style="font-size: 22px; font-weight: 850; letter-spacing: -0.5px; margin-bottom: 6px; color: #ffffff;">
+          ApexSales CRM
+        </div>
+        <div style="font-size: 13px; color: #94a3b8; font-weight: 500; margin-bottom: 24px;">
+          Starting secure workspace...
+        </div>
+        <div style="width: 38px; height: 38px; border: 3.5px solid rgba(255,255,255,0.12); border-top-color: #38bdf8; border-radius: 50%; animation: apexSpin 0.75s linear infinite;"></div>
+        
+        <!-- Auto-revealed after 3.5 seconds if network latency or stale cache delays mount -->
+        <div id="crm-delayed-recovery" style="display: none; margin-top: 28px; max-width: 320px;">
+          <p style="font-size: 12.5px; color: #cbd5e1; margin: 0 0 12px 0; line-height: 1.5;">
+            Workspace taking a moment to load?
+          </p>
+          <button onclick="window.location.replace(window.location.pathname + '?_bust=' + Date.now())" style="padding: 10px 22px; background: #2563eb; color: #ffffff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(37,99,235,0.4);">
+            🔄 Reload Workspace
+          </button>
+        </div>
+        <script>
+          setTimeout(function() {
+            var el = document.getElementById('crm-delayed-recovery');
+            if (el) el.style.display = 'block';
+          }, 3500);
+        </script>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
