@@ -6538,10 +6538,7 @@ export default function App() {
               title="Pipeline Board 360°"
             >
               <Layers className="nav-item-icon" />
-              <span>Pipeline Board</span>
-              <span className="sidebar-badge" style={{ fontSize: "9.5px", fontWeight: "700", color: "#475569", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "1.5px 6px", borderRadius: "5px", marginLeft: "auto", letterSpacing: "0.3px" }}>
-                360°
-              </span>
+              <span>Pipeline 360°</span>
             </button>
             <button onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); setCurrentTab("All Leads"); }} className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" && currentTab === "All Leads" ? "active" : ""}`} title="Leads">
               <Users className="nav-item-icon" />
@@ -6564,20 +6561,17 @@ export default function App() {
               title="Deals Hub"
             >
               <Award className="nav-item-icon" />
-              <span>Deals</span>
-              <span className="sidebar-badge" style={{ fontSize: "9.5px", fontWeight: "700", color: "#475569", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "1.5px 6px", borderRadius: "5px", marginLeft: "auto", letterSpacing: "0.3px" }}>
-                Hub
-              </span>
+              <span>Deals Hub</span>
             </button>
           </div>
         </div>
 
-        {/* Section 4: SETTINGS (Matching Mockup Image media_1787375101589.png) */}
+        {/* Section 4: SETTINGS */}
         <div className="sidebar-nav-group">
           <span className="nav-group-title" style={{ fontSize: "11px", fontWeight: "700", color: "#94a3b8", letterSpacing: "0.5px" }}>
             SETTINGS
           </span>
-          <div className="sidebar-nav-list" style={{ display: "flex", flexDirection: "column", gap: "2px", marginTop: "6px" }}>
+          <div className="sidebar-nav-list" style={{ marginTop: "6px" }}>
             <button 
               onClick={() => { setActiveWorkspace("reports"); setShowReportsModal(false); }} 
               className={`sidebar-nav-item ${activeWorkspace === "reports" ? "active" : ""}`}
@@ -6946,13 +6940,12 @@ export default function App() {
                 style={{ height: "32px", boxSizing: "border-box" }}
               >
                 <Sun className="w-3.5 h-3.5 flex-shrink-0 text-blue-600" />
-                <span className="header-cta-desktop-text">Start My Day</span>
-                <span className="header-cta-mobile-text">My Day</span>
+                <span>Start My Day</span>
               </button>
             </div>
 
-            {/* Visual Divider Separating Contextual Actions from User/System Actions */}
-            <div style={{ width: "1px", height: "22px", backgroundColor: "#e2e8f0", margin: "0 12px" }} />
+            {/* Visual Divider Separating Contextual Actions from User/System Actions with consistent 8px gutter */}
+            <div style={{ width: "1px", height: "22px", backgroundColor: "#e2e8f0", margin: "0 4px" }} />
 
             {/* Cluster 2: User Account & System Actions */}
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -12265,7 +12258,7 @@ export default function App() {
 
                                   {/* Middle Row: Company or Phone */}
                                   <div style={{ fontSize: "11.5px", color: "#475569", marginBottom: "6px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px" }}>{l.company || l.phone || "Direct Lead"}</span>
+                                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px", fontSize: "12.5px", color: "#475569", fontWeight: "500" }}>{l.company || l.phone || "Direct Lead"}</span>
                                     {l.score && (
                                       <span style={{ fontSize: "9.5px", fontWeight: "600", color: scoreColor, backgroundColor: scoreBg, padding: "1px 6px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
                                         {l.score === "Hot" ? <Flame size={9} color="#dc2626" /> : l.score === "Warm" ? <Clock size={9} color="#d97706" /> : <Sun size={9} color="#2563eb" />}
@@ -12297,34 +12290,89 @@ export default function App() {
                       {activeLead ? (
                         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                           
-                          {/* 1. HERO HEADER CARD */}
-                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                          {/* 1. HERO HEADER CARD - Structured into Identity, Actions, and Contact Info */}
+                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "16px 18px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", display: "flex", flexDirection: "column", gap: "14px" }}>
+                            
+                            {/* Tier 1: Primary Identity & Action Cluster */}
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
                               
-                              {/* Left Info: Avatar + Name + Company */}
-                              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                                <div style={{ width: "40px", height: "40px", borderRadius: "50%", backgroundColor: isWonStatus(activeLead.status) ? "#166534" : "#2563eb", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "700", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+                              {/* Functional Group 1: Identity */}
+                              <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                                <div style={{ width: "46px", height: "46px", borderRadius: "50%", backgroundColor: isWonStatus(activeLead.status) ? "#166534" : "#2563eb", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: "800", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flexShrink: 0 }}>
                                   {(activeLead.name || "Lead").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                 </div>
                                 <div>
-                                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                    <h2 style={{ fontSize: "15px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                    <h2 style={{ fontSize: "19px", fontWeight: "800", color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>
                                       {activeLead.name || "Untitled Lead"}
                                     </h2>
-                                    <span style={{ fontSize: "10px", fontWeight: "600", color: activeLead.score === "Hot" ? "#dc2626" : activeLead.score === "Warm" ? "#d97706" : "#2563eb", backgroundColor: activeLead.score === "Hot" ? "#fef2f2" : activeLead.score === "Warm" ? "#fffbeb" : "#eff6ff", border: "1px solid currentColor", padding: "2px 6px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                                      {activeLead.score === "Hot" ? <Flame size={10} color="#dc2626" /> : activeLead.score === "Warm" ? <Clock size={10} color="#d97706" /> : <Sun size={10} color="#2563eb" />}
+                                    <span style={{ fontSize: "11px", fontWeight: "600", color: activeLead.score === "Hot" ? "#dc2626" : activeLead.score === "Warm" ? "#d97706" : "#2563eb", backgroundColor: activeLead.score === "Hot" ? "#fef2f2" : activeLead.score === "Warm" ? "#fffbeb" : "#eff6ff", border: "1px solid currentColor", padding: "2px 8px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                      {activeLead.score === "Hot" ? <Flame size={11} color="#dc2626" /> : activeLead.score === "Warm" ? <Clock size={11} color="#d97706" /> : <Sun size={11} color="#2563eb" />}
                                       {activeLead.score || "Warm"} Lead
                                     </span>
-                                  </div>
-                                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "4px", fontSize: "12px", color: "#475569" }}>
-                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Building2 size={12} color="#475569" /> {activeLead.company || "Direct Lead"}</span>
-                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Phone size={12} color="#475569" /> {activeLead.phone || "No phone"}</span>
-                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Globe size={12} color="#475569" /> {activeLead.email || "No email"}</span>
+                                    {isWonStatus(activeLead.status) && (
+                                      <span style={{ fontSize: "11px", fontWeight: "600", color: "#166534", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "2px 8px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                        <Check size={12} color="#166534" /> Won
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
                               </div>
 
-                              {/* Center: Deal Amount + Stage Selector Dropdown */}
+                              {/* Functional Group 2: Primary Actions */}
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                {activeLead.phone && (
+                                  <a
+                                    href={`https://wa.me/${(activeLead.phone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${activeLead.name || ""}, regarding our discussion on your requirements...`)}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    style={{ padding: "0 12px", height: "32px", lineHeight: "32px", backgroundColor: "#166534", color: "#ffffff", borderRadius: "6px", fontSize: "12px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                  >
+                                    <MessageCircle size={14} /> WhatsApp
+                                  </a>
+                                )}
+
+                                {activeLead.phone && (
+                                  <a
+                                    href={`tel:${activeLead.phone}`}
+                                    style={{ padding: "0 12px", height: "32px", lineHeight: "32px", backgroundColor: "#0f172a", color: "#ffffff", borderRadius: "6px", fontSize: "12px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                  >
+                                    <Phone size={13} color="#ffffff" /> Call
+                                  </a>
+                                )}
+
+                                {!isWonStatus(activeLead.status) && (
+                                  <button
+                                    onClick={() => {
+                                      handleUpdateActiveLead("status", "Won");
+                                      handleUpdateActiveLead("won_date", new Date().toISOString().slice(0, 10));
+                                      showToast(`Deal marked as WON! Revenue: ₹${(Number(activeLead.value) || 0).toLocaleString("en-IN")}`, "success");
+                                    }}
+                                    style={{ padding: "0 14px", height: "32px", backgroundColor: "#166534", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                  >
+                                    <Award size={14} /> Mark Won
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Tier 2: Contact Info Metadata & Deal Commercial Terms */}
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", borderTop: "1px solid #f1f5f9", paddingTop: "10px" }}>
+                              
+                              {/* Functional Group 3: Contact Metadata */}
+                              <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px 16px", fontSize: "12.5px", color: "#475569" }}>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                                  <Building2 size={13} color="#2563eb" /> {activeLead.company || "Direct Lead"}
+                                </span>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                                  <Phone size={13} color="#2563eb" /> {activeLead.phone || "No phone"}
+                                </span>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                                  <Globe size={13} color="#2563eb" /> {activeLead.email || "No email"}
+                                </span>
+                              </div>
+
+                              {/* Functional Group 4: Deal Value & Stage Status */}
                               <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "#f8fafc", padding: "6px 12px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
                                 <div>
                                   <span style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", display: "block" }}>Deal Value</span>
@@ -12383,46 +12431,8 @@ export default function App() {
                                 </div>
                               </div>
 
-                              {/* Right: Quick Action CTAs */}
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                {activeLead.phone && (
-                                  <a
-                                    href={`https://wa.me/${(activeLead.phone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${activeLead.name || ""}, regarding our discussion on your requirements...`)}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    style={{ padding: "0 10px", height: "30px", backgroundColor: "#166534", color: "#ffffff", borderRadius: "6px", fontSize: "11px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                                  >
-                                    <MessageCircle size={13} /> WhatsApp
-                                  </a>
-                                )}
-
-                                {activeLead.phone && (
-                                  <a
-                                    href={`tel:${activeLead.phone}`}
-                                    style={{ padding: "0 10px", height: "30px", backgroundColor: "#0f172a", color: "#ffffff", borderRadius: "6px", fontSize: "11px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                                  >
-                                    <Phone size={12} color="#ffffff" /> Call
-                                  </a>
-                                )}
-
-                                {!isWonStatus(activeLead.status) ? (
-                                  <button
-                                    onClick={() => {
-                                      handleUpdateActiveLead("status", "Won");
-                                      handleUpdateActiveLead("won_date", new Date().toISOString().slice(0, 10));
-                                      showToast(`Deal marked as WON! Revenue: ₹${(Number(activeLead.value) || 0).toLocaleString("en-IN")}`, "success");
-                                    }}
-                                    style={{ padding: "0 10px", height: "30px", backgroundColor: "#166534", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                                  >
-                                    <Award size={13} /> Mark Won
-                                  </button>
-                                ) : (
-                                  <span style={{ fontSize: "11px", fontWeight: "600", color: "#166534", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "4px 9px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                                    <Check size={12} color="#166534" /> Won Deal
-                                  </span>
-                                )}
-                              </div>
                             </div>
+
                           </div>
 
                           {/* 2. TABBED SECTIONS NAVIGATION */}
@@ -12481,7 +12491,7 @@ export default function App() {
                                     <User size={14} color="#2563eb" /> Contact & Organization Details
                                   </h3>
 
-                                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                                     <div>
                                       <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Lead / Contact Person Name</label>
                                       <input 
@@ -12503,7 +12513,7 @@ export default function App() {
                                       />
                                     </div>
 
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                                       <div>
                                         <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Phone Number</label>
                                         <input 
@@ -12532,8 +12542,8 @@ export default function App() {
                                     <Calendar size={14} color="#166534" /> Deal Attributes & Next Follow-Up
                                   </h3>
 
-                                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                                       <div>
                                         <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Deal Value (₹)</label>
                                         <div style={{ position: "relative" }}>
@@ -12559,7 +12569,7 @@ export default function App() {
                                       </div>
                                     </div>
 
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                                       <div>
                                         <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Next Follow-Up Date</label>
                                         <input 
