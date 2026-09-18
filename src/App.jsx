@@ -6539,7 +6539,7 @@ export default function App() {
             >
               <Layers className="nav-item-icon" />
               <span>Pipeline Board</span>
-              <span className="sidebar-badge" style={{ fontSize: "8.5px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #dbeafe", padding: "1px 5px", borderRadius: "4px", marginLeft: "auto" }}>
+              <span className="sidebar-badge" style={{ fontSize: "9.5px", fontWeight: "700", color: "#475569", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "1.5px 6px", borderRadius: "5px", marginLeft: "auto", letterSpacing: "0.3px" }}>
                 360°
               </span>
             </button>
@@ -6565,7 +6565,7 @@ export default function App() {
             >
               <Award className="nav-item-icon" />
               <span>Deals</span>
-              <span className="sidebar-badge" style={{ fontSize: "8.5px", fontWeight: "700", color: "#16a34a", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "1px 5px", borderRadius: "4px", marginLeft: "auto" }}>
+              <span className="sidebar-badge" style={{ fontSize: "9.5px", fontWeight: "700", color: "#475569", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "1.5px 6px", borderRadius: "5px", marginLeft: "auto", letterSpacing: "0.3px" }}>
                 Hub
               </span>
             </button>
@@ -6617,7 +6617,7 @@ export default function App() {
               >
                 <ShieldCheck className="nav-item-icon" style={{ color: activeWorkspace === "team" ? "#1d4ed8" : "#2563eb" }} />
                 <span>Team & Roles</span>
-                <span className="sidebar-badge" style={{ fontSize: "8.5px", fontWeight: "800", color: "#2563eb", backgroundColor: "#dbeafe", border: "1px solid #bfdbfe", padding: "1px 5px", borderRadius: "4px", marginLeft: "auto" }}>
+                <span className="sidebar-badge" style={{ fontSize: "9.5px", fontWeight: "700", color: "#475569", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "1.5px 6px", borderRadius: "5px", marginLeft: "auto", letterSpacing: "0.3px" }}>
                   Admin
                 </span>
               </button>
@@ -15437,64 +15437,76 @@ export default function App() {
           /* Task Manager Panel Modern Luxury UI */
           <div className="tasks-page-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             
+            {/* Accessible Page Header with H1 */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+              <div>
+                <h1 style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>
+                  Task Manager & Follow-ups
+                </h1>
+                <p style={{ fontSize: "12px", color: "#475569", margin: "2px 0 0 0" }}>
+                  Track scheduled sales follow-ups, pending action items, and lead touchpoints.
+                </p>
+              </div>
+            </div>
+
             {/* TOP TASK STATS KPI SUMMARY ROW */}
-            <div className="tasks-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "14px" }}>
-              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "9px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div className="tasks-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "16px" }}>
+              <div style={{ backgroundColor: "#eff6ff", border: "1px solid #dbeafe", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <span style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>Total Tasks</span>
-                  <div style={{ fontSize: "16px", fontWeight: "600", color: "#0f172a", marginTop: "1px" }}>{tasks.length}</div>
+                  <span style={{ fontSize: "10.5px", fontWeight: "600", color: "#2563eb", textTransform: "uppercase", letterSpacing: "0.3px" }}>Total Tasks</span>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#1d4ed8", marginTop: "2px" }}>{tasks.length}</div>
                 </div>
-                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <ListTodo size={14} color="#475569" />
+                <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <ListTodo size={15} color="#2563eb" />
                 </div>
               </div>
 
-              <div style={{ backgroundColor: "#fff7ed", border: "1px solid #ffedd5", borderRadius: "8px", padding: "9px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ backgroundColor: "#fff7ed", border: "1px solid #ffedd5", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <span style={{ fontSize: "9.5px", fontWeight: "600", color: "#c2410c", textTransform: "uppercase", letterSpacing: "0.2px" }}>Pending Action</span>
-                  <div style={{ fontSize: "16px", fontWeight: "600", color: "#9a3412", marginTop: "1px" }}>{tasks.filter(t => !t.completed).length}</div>
+                  <span style={{ fontSize: "10.5px", fontWeight: "600", color: "#ea580c", textTransform: "uppercase", letterSpacing: "0.3px" }}>Pending Action</span>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#ea580c", marginTop: "2px" }}>{tasks.filter(t => !t.completed).length}</div>
                 </div>
-                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#ffedd5", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Clock size={14} color="#ea580c" />
+                <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#ffedd5", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Clock size={15} color="#ea580c" />
                 </div>
               </div>
 
-              <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: "8px", padding: "9px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <span style={{ fontSize: "9.5px", fontWeight: "600", color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.2px" }}>Completed</span>
-                  <div style={{ fontSize: "16px", fontWeight: "600", color: "#15803d", marginTop: "1px" }}>{tasks.filter(t => t.completed).length}</div>
+                  <span style={{ fontSize: "10.5px", fontWeight: "600", color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.3px" }}>Completed</span>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#16a34a", marginTop: "2px" }}>{tasks.filter(t => t.completed).length}</div>
                 </div>
-                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <CheckCircle2 size={14} color="#16a34a" />
+                <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <CheckCircle2 size={15} color="#16a34a" />
                 </div>
               </div>
 
-              <div style={{ backgroundColor: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "8px", padding: "9px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ backgroundColor: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <span style={{ fontSize: "9.5px", fontWeight: "600", color: "#b91c1c", textTransform: "uppercase", letterSpacing: "0.2px" }}>High Priority</span>
-                  <div style={{ fontSize: "16px", fontWeight: "600", color: "#991b1b", marginTop: "1px" }}>{tasks.filter(t => !t.completed && t.priority === "High").length}</div>
+                  <span style={{ fontSize: "10.5px", fontWeight: "600", color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.3px" }}>High Priority</span>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#dc2626", marginTop: "2px" }}>{tasks.filter(t => !t.completed && t.priority === "High").length}</div>
                 </div>
-                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Flame size={14} color="#dc2626" />
+                <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Flame size={15} color="#dc2626" />
                 </div>
               </div>
             </div>
 
             {/* 2-COLUMN MAIN TASK WORKSPACE */}
-            <div className="tasks-main-grid" style={{ display: "grid", gridTemplateColumns: "310px 1fr", gap: "14px", alignItems: "start" }}>
+            <div className="tasks-main-grid" style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: "16px", alignItems: "start" }}>
               
               {/* Left Column: Create New Task Card */}
-              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "12px", borderBottom: "1px solid #f1f5f9", paddingBottom: "8px" }}>
-                  <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <PlusCircle size={14} color="#2563eb" />
+              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px", borderBottom: "1px solid #f1f5f9", paddingBottom: "10px" }}>
+                  <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <PlusCircle size={15} color="#2563eb" />
                   </div>
-                  <h3 style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>Create New Task</h3>
+                  <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>Create New Task</h3>
                 </div>
 
-                <form onSubmit={handleAddTask} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <form onSubmit={handleAddTask} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   <div>
-                    <label style={{ fontSize: "10px", fontWeight: "500", color: "#64748b", display: "block", marginBottom: "3px" }}>
+                    <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "5px" }}>
                       Task Description <span style={{ color: "#dc2626" }}>*</span>
                     </label>
                     <input 
@@ -15502,17 +15514,17 @@ export default function App() {
                       placeholder="e.g. Follow up on agreed proposal terms"
                       value={taskTitle}
                       onChange={(e) => setTaskTitle(e.target.value)}
-                      style={{ width: "100%", height: "30px", padding: "4px 9px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", outline: "none" }}
+                      style={{ width: "100%", height: "34px", padding: "6px 10px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", outline: "none" }}
                     />
                   </div>
                   
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                     <div>
-                      <label style={{ fontSize: "10px", fontWeight: "500", color: "#64748b", display: "block", marginBottom: "3px" }}>Priority</label>
+                      <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "5px" }}>Priority</label>
                       <select 
                         value={taskPriority}
                         onChange={(e) => setTaskPriority(e.target.value)}
-                        style={{ width: "100%", height: "30px", padding: "4px 6px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                        style={{ width: "100%", height: "34px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
                       >
                         <option value="High">High (Urgent)</option>
                         <option value="Medium">Medium (Normal)</option>
@@ -15521,22 +15533,22 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label style={{ fontSize: "10px", fontWeight: "500", color: "#64748b", display: "block", marginBottom: "3px" }}>Due Date</label>
+                      <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "5px" }}>Due Date</label>
                       <input 
                         type="date" 
                         value={taskDueDate}
                         onChange={(e) => setTaskDueDate(e.target.value)}
-                        style={{ width: "100%", height: "30px", padding: "4px 6px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", fontWeight: "400", color: "#0f172a", outline: "none" }}
+                        style={{ width: "100%", height: "34px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", outline: "none" }}
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label style={{ fontSize: "10px", fontWeight: "500", color: "#64748b", display: "block", marginBottom: "3px" }}>Link to Lead (Optional)</label>
+                    <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "5px" }}>Link to Lead (Optional)</label>
                     <select 
                       value={taskLinkedLeadId}
                       onChange={(e) => setTaskLinkedLeadId(e.target.value)}
-                      style={{ width: "100%", height: "30px", padding: "4px 6px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                      style={{ width: "100%", height: "34px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
                     >
                       <option value="">-- No Lead Linked --</option>
                       {leads.map(lead => (
@@ -15549,45 +15561,51 @@ export default function App() {
 
                   <button 
                     type="submit" 
-                    style={{ marginTop: "4px", height: "32px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px", boxShadow: "0 2px 6px rgba(37, 99, 235, 0.25)" }}
+                    style={{ marginTop: "2px", height: "36px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12.5px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px", boxShadow: "0 1px 3px rgba(37, 99, 235, 0.25)" }}
                   >
-                    <Plus size={14} /> Create Task
+                    <Plus size={15} /> Create Task
                   </button>
                 </form>
               </div>
 
               {/* Right Column: Task List Hub */}
-              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px", display: "flex", flexDirection: "column", gap: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "14px 16px", display: "flex", flexDirection: "column", gap: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                 
                 {/* List Header + Search + Tabs */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", borderBottom: "1px solid #f1f5f9", paddingBottom: "10px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <div style={{ width: "24px", height: "24px", borderRadius: "5px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <CheckSquare size={13} color="#475569" />
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", borderBottom: "1px solid #f1f5f9", paddingBottom: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", height: "32px" }}>
+                    <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <CheckSquare size={14} color="#475569" />
                     </div>
-                    <h3 style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                    <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center" }}>
                       Action Items ({tasks.filter(t => !t.completed).length} Pending)
                     </h3>
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                     {/* Search Task */}
-                    <div style={{ position: "relative", width: "160px", display: "flex", alignItems: "center" }}>
-                      <Search size={12} color="#94a3b8" style={{ position: "absolute", left: "8px", pointerEvents: "none" }} />
+                    <div style={{ position: "relative", width: "170px", display: "flex", alignItems: "center", height: "32px" }}>
+                      <Search size={13} color="#94a3b8" style={{ position: "absolute", left: "9px", pointerEvents: "none" }} />
                       <input 
                         type="text" 
                         placeholder="Search task..."
                         value={taskSearchQuery}
                         onChange={(e) => setTaskSearchQuery(e.target.value)}
-                        style={{ width: "100%", height: "26px", padding: "2px 8px 2px 24px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "10.5px", color: "#0f172a", outline: "none" }}
+                        style={{ width: "100%", height: "32px", padding: "0 26px 0 28px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11.5px", color: "#0f172a", outline: "none" }}
                       />
                       {taskSearchQuery && (
-                        <button onClick={() => setTaskSearchQuery("")} style={{ position: "absolute", right: "5px", border: "none", background: "none", color: "#94a3b8", cursor: "pointer", fontSize: "10px", padding: 0 }}>✕</button>
+                        <button 
+                          onClick={() => setTaskSearchQuery("")} 
+                          title="Clear search"
+                          style={{ position: "absolute", right: "6px", width: "18px", height: "18px", border: "none", background: "#f1f5f9", borderRadius: "50%", color: "#64748b", cursor: "pointer", fontSize: "10px", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
+                        >
+                          ✕
+                        </button>
                       )}
                     </div>
 
                     {/* Filter Pills */}
-                    <div style={{ display: "flex", gap: "3px", backgroundColor: "#f8fafc", padding: "2px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ display: "flex", gap: "4px", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "7px", border: "1px solid #e2e8f0", height: "32px", alignItems: "center" }}>
                       {[
                         { id: "All", label: "All" },
                         { id: "Pending", label: "Pending" },
@@ -15600,15 +15618,18 @@ export default function App() {
                             key={f.id}
                             onClick={() => setTaskFilter(f.id)}
                             style={{
-                              padding: "3px 8px",
-                              borderRadius: "4px",
-                              fontSize: "10px",
+                              height: "26px",
+                              padding: "0 10px",
+                              borderRadius: "5px",
+                              fontSize: "11.5px",
                               fontWeight: isActive ? "600" : "500",
                               backgroundColor: isActive ? "#ffffff" : "transparent",
-                              color: isActive ? "#0f172a" : "#64748b",
-                              border: isActive ? "1px solid #cbd5e1" : "none",
+                              color: isActive ? "#0f172a" : "#475569",
+                              border: isActive ? "1px solid #cbd5e1" : "1px solid transparent",
                               boxShadow: isActive ? "0 1px 2px rgba(0,0,0,0.05)" : "none",
                               cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
                               transition: "all 0.15s ease"
                             }}
                           >
@@ -15621,7 +15642,7 @@ export default function App() {
                 </div>
 
                 {/* Task Cards List */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {(() => {
                     const filteredTasks = tasks.filter(t => {
                       if (taskFilter === "Pending" && t.completed) return false;
@@ -15639,10 +15660,10 @@ export default function App() {
 
                     if (filteredTasks.length === 0) {
                       return (
-                        <div style={{ padding: "30px 20px", textAlign: "center", color: "#94a3b8", border: "1px dashed #cbd5e1", borderRadius: "8px" }}>
-                          <CheckCircle2 size={24} color="#94a3b8" style={{ margin: "0 auto 6px" }} />
-                          <strong style={{ display: "block", color: "#64748b", fontSize: "12px", fontWeight: "600" }}>No tasks found in this view.</strong>
-                          <span style={{ fontSize: "10.5px" }}>All caught up! Add a new task on the left or change filters.</span>
+                        <div style={{ padding: "32px 20px", textAlign: "center", color: "#94a3b8", border: "1px dashed #cbd5e1", borderRadius: "8px" }}>
+                          <CheckCircle2 size={24} color="#94a3b8" style={{ margin: "0 auto 8px" }} />
+                          <strong style={{ display: "block", color: "#475569", fontSize: "13px", fontWeight: "600" }}>No tasks found in this view.</strong>
+                          <span style={{ fontSize: "11.5px", color: "#64748b" }}>All caught up! Add a new task on the left or change filters.</span>
                         </div>
                       );
                     }
@@ -15660,7 +15681,7 @@ export default function App() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
-                            padding: "8px 12px",
+                            padding: "9px 12px",
                             backgroundColor: task.completed ? "#f8fafc" : "#ffffff",
                             border: task.completed ? "1px solid #f1f5f9" : "1px solid #e2e8f0",
                             borderRadius: "6px",
@@ -15673,12 +15694,13 @@ export default function App() {
                             <button
                               onClick={() => handleToggleTask(task.id)}
                               title={task.completed ? "Mark Pending" : "Mark Completed"}
+                              aria-label={task.completed ? "Mark Pending" : "Mark Completed"}
                               style={{
                                 width: "18px",
                                 height: "18px",
                                 borderRadius: "5px",
                                 border: task.completed ? "none" : "1.5px solid #cbd5e1",
-                                backgroundColor: task.completed ? "#10b981" : "#ffffff",
+                                backgroundColor: task.completed ? "#16a34a" : "#ffffff",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
@@ -15693,8 +15715,8 @@ export default function App() {
 
                             <div style={{ minWidth: 0, flex: 1 }}>
                               <div style={{ 
-                                fontSize: "11.5px", 
-                                fontWeight: task.completed ? "400" : "500", 
+                                fontSize: "12.5px", 
+                                fontWeight: task.completed ? "400" : "600", 
                                 color: task.completed ? "#94a3b8" : "#0f172a",
                                 textDecoration: task.completed ? "line-through" : "none",
                                 whiteSpace: "nowrap",
@@ -15704,13 +15726,13 @@ export default function App() {
                                 {cleanTitle}
                               </div>
 
-                              <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "3px", flexWrap: "wrap" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "4px", flexWrap: "wrap" }}>
                                 {/* Priority Tag with SVG */}
                                 <span style={{
-                                  fontSize: "9px",
-                                  fontWeight: "500",
-                                  padding: "1px 5px",
-                                  borderRadius: "4px",
+                                  fontSize: "11px",
+                                  fontWeight: "600",
+                                  padding: "2px 7px",
+                                  borderRadius: "5px",
                                   display: "inline-flex",
                                   alignItems: "center",
                                   gap: "3px",
@@ -15718,14 +15740,14 @@ export default function App() {
                                   color: isHigh ? "#dc2626" : isMed ? "#ea580c" : "#2563eb",
                                   border: isHigh ? "1px solid #fecaca" : isMed ? "1px solid #fed7aa" : "1px solid #bfdbfe"
                                 }}>
-                                  {isHigh ? <Flame size={10} color="#dc2626" /> : isMed ? <AlertCircle size={10} color="#ea580c" /> : <Clock size={10} color="#2563eb" />}
+                                  {isHigh ? <Flame size={11} color="#dc2626" /> : isMed ? <AlertCircle size={11} color="#ea580c" /> : <Clock size={11} color="#2563eb" />}
                                   {task.priority}
                                 </span>
 
                                 {/* Due Date Tag */}
                                 {task.dueDate && (
-                                  <span style={{ fontSize: "9.5px", color: "#64748b", backgroundColor: "#f1f5f9", padding: "1px 5px", borderRadius: "4px", display: "inline-flex", alignItems: "center", gap: "3px", fontWeight: "400" }}>
-                                    <Calendar size={10} color="#64748b" />
+                                  <span style={{ fontSize: "11px", color: "#475569", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "2px 7px", borderRadius: "5px", display: "inline-flex", alignItems: "center", gap: "3px", fontWeight: "500" }}>
+                                    <Calendar size={11} color="#475569" />
                                     {new Date(task.dueDate).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}
                                   </span>
                                 )}
@@ -15735,21 +15757,24 @@ export default function App() {
                                   <span 
                                     onClick={() => setSelectedLeadForDetails(linkedLead)}
                                     title="Click to view lead details"
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSelectedLeadForDetails(linkedLead); }}
                                     style={{
-                                      fontSize: "9.5px",
-                                      color: "#0369a1",
-                                      backgroundColor: "#f0f9ff",
-                                      border: "1px solid #bae6fd",
-                                      padding: "1px 5px",
-                                      borderRadius: "4px",
+                                      fontSize: "11px",
+                                      color: "#2563eb",
+                                      backgroundColor: "#eff6ff",
+                                      border: "1px solid #bfdbfe",
+                                      padding: "2px 8px",
+                                      borderRadius: "5px",
                                       display: "inline-flex",
                                       alignItems: "center",
-                                      gap: "3px",
-                                      fontWeight: "500",
+                                      gap: "4px",
+                                      fontWeight: "600",
                                       cursor: "pointer"
                                     }}
                                   >
-                                    <User size={10} color="#0284c7" />
+                                    <User size={11} color="#2563eb" />
                                     {linkedLead.name}{linkedLead.company ? ` (${linkedLead.company})` : ""}
                                   </span>
                                 )}
@@ -15761,9 +15786,10 @@ export default function App() {
                           <button 
                             onClick={() => requestDeleteTask(task)}
                             title="Delete Task"
-                            style={{ backgroundColor: "transparent", border: "none", color: "#94a3b8", cursor: "pointer", padding: "4px", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            aria-label="Delete Task"
+                            style={{ width: "28px", height: "28px", backgroundColor: "transparent", border: "none", color: "#94a3b8", cursor: "pointer", padding: "0", borderRadius: "5px", display: "flex", alignItems: "center", justifyContent: "center" }}
                           >
-                            <Trash2 size={13} className="hover:text-red-600 transition-colors" />
+                            <Trash2 size={14} className="hover:text-red-600 transition-colors" />
                           </button>
                         </div>
                       );
