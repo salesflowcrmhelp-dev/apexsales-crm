@@ -591,16 +591,16 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .header-cta-orange {
-  background: #ea580c !important;
-  color: #ffffff !important;
-  border: 1px solid #c2410c !important;
+  background: #fff7ed !important;
+  color: #c2410c !important;
+  border: 1px solid #fed7aa !important;
   padding: 0 12px !important;
   height: 32px !important;
   border-radius: 6px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(234, 88, 12, 0.28);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -609,10 +609,10 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .header-cta-orange:hover {
-  background: #c2410c !important;
-  border-color: #9a3412 !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 5px rgba(234, 88, 12, 0.35);
+  background: #ffedd5 !important;
+  border-color: #fdba74 !important;
+  color: #9a3412 !important;
+  box-shadow: 0 1px 3px rgba(234, 88, 12, 0.12);
 }
 
 .header-notification-btn {
@@ -651,7 +651,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .header-vault-btn {
-  height: 34px !important;
+  height: 32px !important;
   border-radius: 6px !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -659,7 +659,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .header-user-badge-container {
-  height: 34px !important;
+  height: 32px !important;
   border-radius: 6px !important;
   display: flex !important;
   align-items: center !important;
@@ -667,7 +667,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .header-icon-btn {
-  height: 34px;
+  height: 32px !important;
   padding: 0 12px;
   border-radius: 6px;
   border: 1px solid #e2e8f0;

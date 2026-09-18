@@ -6952,7 +6952,7 @@ export default function App() {
                 className="header-cta-orange"
                 style={{ height: "32px", boxSizing: "border-box" }}
               >
-                <Sun className="w-3.5 h-3.5 flex-shrink-0 text-white" />
+                <Sun className="w-3.5 h-3.5 flex-shrink-0 text-orange-600" />
                 <span className="header-cta-desktop-text">Start My Day</span>
                 <span className="header-cta-mobile-text">My Day</span>
               </button>
@@ -9176,16 +9176,16 @@ export default function App() {
           ) : activeWorkspace === "settings" ? (
             <div className="settings-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "10px", border: "1px solid #e2e8f0", padding: "14px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {/* Page Title Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "10px", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
-                  <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#0f172a", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Settings size={15} color="#38bdf8" />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "12px", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "34px", height: "34px", borderRadius: "6px", backgroundColor: "#0f172a", color: "#38bdf8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Settings size={18} color="#38bdf8" />
                   </div>
                   <div>
-                    <h2 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                    <h1 style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>
                       System Control & Feature Preferences Center
-                    </h2>
-                    <p style={{ fontSize: "10.5px", color: "#64748b", margin: "1px 0 0 0", fontWeight: "400" }}>
+                    </h1>
+                    <p style={{ fontSize: "12.5px", color: "#475569", margin: "3px 0 0 0", fontWeight: "400", lineHeight: "1.4" }}>
                       Customize workspace security, automation triggers, notification sounds, and feature ON/OFF toggles.
                     </p>
                   </div>
@@ -9197,42 +9197,42 @@ export default function App() {
                       showToast("Saved all workspace preferences successfully!");
                       setActiveWorkspace("pipeline");
                     }}
-                    style={{ padding: "4px 12px", height: "28px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "5px", fontSize: "11px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 3px rgba(37, 99, 235, 0.2)" }}
+                    style={{ padding: "0 14px", height: "32px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 1px 3px rgba(37, 99, 235, 0.2)", boxSizing: "border-box" }}
                   >
-                    <Check size={13} /> Save & Go To Dashboard
+                    <Check size={14} /> Save & Go To Dashboard
                   </button>
                 </div>
               </div>
 
               {/* 2-Column Grid Layout for Categorized Settings */}
-              <div className="settings-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div className="settings-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
 
                 {/* Left Column: Security, Automation & Google Sync */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   
                   {/* Card 1: Security & Biometric Lock Screen */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-                      <Lock size={13} color="#4f46e5" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "10px" }}>
+                      <Lock size={15} color="#4f46e5" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         Security & Authentication Settings
                       </h3>
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
                       <div style={{ paddingRight: "10px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                          <Lock size={11} color="#4f46e5" />
-                          <span style={{ fontSize: "11.5px", fontWeight: "500", color: "#0f172a" }}>Face ID Biometric Unlock</span>
-                          <span style={{ fontSize: "8.5px", fontWeight: "600", padding: "1px 5px", borderRadius: "4px", backgroundColor: enableFaceId ? "#dcfce7" : "#f1f5f9", color: enableFaceId ? "#166534" : "#64748b" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <Lock size={13} color="#4f46e5" />
+                          <span style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a" }}>Face ID Biometric Unlock</span>
+                          <span style={{ fontSize: "10px", fontWeight: "700", padding: "2px 7px", borderRadius: "9999px", backgroundColor: enableFaceId ? "#dcfce7" : "#f1f5f9", color: enableFaceId ? "#166534" : "#64748b" }}>
                             {enableFaceId ? "ACTIVE" : "DISABLED"}
                           </span>
                         </div>
-                        <span style={{ fontSize: "10px", color: "#64748b", display: "block", marginTop: "2px", fontWeight: "400" }}>
+                        <span style={{ fontSize: "12px", color: "#64748b", display: "block", marginTop: "3px", fontWeight: "400", lineHeight: "1.4" }}>
                           When ON, displays the AI webcam Face ID scanner button on the Lock Screen for 1-click biometric login.
                         </span>
                       </div>
-                      <label style={{ position: "relative", display: "inline-block", width: "36px", height: "20px", cursor: "pointer", flexShrink: 0 }}>
+                      <label style={{ position: "relative", display: "inline-block", width: "38px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
                         <input 
                           type="checkbox" 
                           checked={enableFaceId}
@@ -9244,27 +9244,27 @@ export default function App() {
                           }}
                           style={{ opacity: 0, width: 0, height: 0 }} 
                         />
-                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableFaceId ? "#10b981" : "#cbd5e1", borderRadius: "20px", transition: "all 0.2s ease" }}>
-                          <span style={{ position: "absolute", top: "3px", left: enableFaceId ? "19px" : "3px", width: "14px", height: "14px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
+                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableFaceId ? "#10b981" : "#cbd5e1", borderRadius: "9999px", transition: "all 0.2s ease" }}>
+                          <span style={{ position: "absolute", top: "3px", left: enableFaceId ? "19px" : "3px", width: "16px", height: "16px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
                         </span>
                       </label>
                     </div>
 
                     {/* Toggle 2: 6-Digit OTP Authentication */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", marginTop: "6px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", marginTop: "8px" }}>
                       <div style={{ paddingRight: "10px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                          <PhoneCall size={11} color="#059669" />
-                          <span style={{ fontSize: "11.5px", fontWeight: "500", color: "#0f172a" }}>6-Digit OTP 2-Factor Auth</span>
-                          <span style={{ fontSize: "8.5px", fontWeight: "600", padding: "1px 5px", borderRadius: "4px", backgroundColor: enableOtp2fa ? "#dcfce7" : "#f1f5f9", color: enableOtp2fa ? "#166534" : "#64748b" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <PhoneCall size={13} color="#166534" />
+                          <span style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a" }}>6-Digit OTP 2-Factor Auth</span>
+                          <span style={{ fontSize: "10px", fontWeight: "700", padding: "2px 7px", borderRadius: "9999px", backgroundColor: enableOtp2fa ? "#dcfce7" : "#f1f5f9", color: enableOtp2fa ? "#166534" : "#64748b" }}>
                             {enableOtp2fa ? "ACTIVE" : "DISABLED"}
                           </span>
                         </div>
-                        <span style={{ fontSize: "10px", color: "#64748b", display: "block", marginTop: "2px", fontWeight: "400" }}>
+                        <span style={{ fontSize: "12px", color: "#64748b", display: "block", marginTop: "3px", fontWeight: "400", lineHeight: "1.4" }}>
                           Enable instant 6-digit SMS & WhatsApp OTP verification for mobile number ({otpPhone}).
                         </span>
                       </div>
-                      <label style={{ position: "relative", display: "inline-block", width: "36px", height: "20px", cursor: "pointer", flexShrink: 0 }}>
+                      <label style={{ position: "relative", display: "inline-block", width: "38px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
                         <input 
                           type="checkbox" 
                           checked={enableOtp2fa}
@@ -9276,16 +9276,16 @@ export default function App() {
                           }}
                           style={{ opacity: 0, width: 0, height: 0 }} 
                         />
-                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableOtp2fa ? "#10b981" : "#cbd5e1", borderRadius: "20px", transition: "all 0.2s ease" }}>
-                          <span style={{ position: "absolute", top: "3px", left: enableOtp2fa ? "19px" : "3px", width: "14px", height: "14px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
+                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableOtp2fa ? "#10b981" : "#cbd5e1", borderRadius: "9999px", transition: "all 0.2s ease" }}>
+                          <span style={{ position: "absolute", top: "3px", left: enableOtp2fa ? "19px" : "3px", width: "16px", height: "16px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
                         </span>
                       </label>
                     </div>
 
                     {/* SMS & WhatsApp OTP Gateway Configuration */}
-                    <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px dashed #e2e8f0" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                        <span style={{ fontSize: "10px", fontWeight: "600", color: "#334155" }}>Dispatch SMS Gateway:</span>
+                    <div style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px dashed #e2e8f0" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Dispatch SMS Gateway:</span>
                         <select
                           value={smsGateway}
                           onChange={(e) => {
@@ -9293,7 +9293,7 @@ export default function App() {
                             localStorage.setItem("crm_sms_gateway", e.target.value);
                             showToast(`Gateway set to: ${e.target.value}`);
                           }}
-                          style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "4px", border: "1px solid #cbd5e1", outline: "none", backgroundColor: "#ffffff", color: "#0f172a" }}
+                          style={{ fontSize: "12px", padding: "0 8px", height: "32px", borderRadius: "6px", border: "1px solid #cbd5e1", outline: "none", backgroundColor: "#ffffff", color: "#0f172a", boxSizing: "border-box" }}
                         >
                           <option value="msg91">MSG91 SMS / OTP Gateway</option>
                           <option value="fast2sms">Fast2SMS Gateway API</option>
@@ -9302,7 +9302,7 @@ export default function App() {
                         </select>
                       </div>
 
-                      <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                         <input
                           type="text"
                           placeholder={smsGateway === "msg91" ? "Enter MSG91 Auth Key" : smsGateway === "fast2sms" ? "Enter Fast2SMS API Key" : smsGateway === "greenapi" ? "https://api.green-api.com/waInstance..." : "Dispatches via Google Webhook URL"}
@@ -9311,14 +9311,14 @@ export default function App() {
                             setSmsApiKey(e.target.value);
                             localStorage.setItem("crm_sms_api_key", e.target.value);
                           }}
-                          style={{ flex: 1, height: "26px", padding: "2px 8px", fontSize: "10.5px", border: "1px solid #cbd5e1", borderRadius: "4px", outline: "none", color: "#0f172a" }}
+                          style={{ flex: 1, height: "32px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", color: "#0f172a", boxSizing: "border-box" }}
                         />
                         <button
                           type="button"
                           onClick={() => {
                             showToast("Saved SMS Gateway API Token!");
                           }}
-                          style={{ height: "26px", padding: "0 8px", backgroundColor: "#059669", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "10px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap" }}
+                          style={{ height: "32px", padding: "0 14px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" }}
                         >
                           Save
                         </button>
@@ -9331,7 +9331,7 @@ export default function App() {
                             }
                             handleSendOtp("sms");
                           }}
-                          style={{ height: "26px", padding: "0 8px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "10px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap" }}
+                          style={{ height: "32px", padding: "0 14px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" }}
                           title="Test send live OTP SMS to registered phone"
                         >
                           Test SMS
@@ -9340,7 +9340,7 @@ export default function App() {
 
                       {/* Optional MSG91 Template ID input */}
                       {smsGateway === "msg91" && (
-                        <div style={{ display: "flex", gap: "6px", alignItems: "center", marginTop: "5px" }}>
+                        <div style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "6px" }}>
                           <input
                             type="text"
                             placeholder="MSG91 Template ID (Optional e.g. 64e...)"
@@ -9349,7 +9349,7 @@ export default function App() {
                               setMsg91TemplateId(e.target.value);
                               localStorage.setItem("crm_msg91_template_id", e.target.value);
                             }}
-                            style={{ flex: 1, height: "24px", padding: "2px 8px", fontSize: "10px", border: "1px dashed #94a3b8", borderRadius: "4px", outline: "none", color: "#0f172a", backgroundColor: "#f8fafc" }}
+                            style={{ flex: 1, height: "30px", padding: "0 10px", fontSize: "11px", border: "1px dashed #94a3b8", borderRadius: "6px", outline: "none", color: "#0f172a", backgroundColor: "#f8fafc", boxSizing: "border-box" }}
                           />
                         </div>
                       )}
@@ -9357,10 +9357,10 @@ export default function App() {
                       {/* Live Fast2SMS Status Feedback */}
                       {smsStatusMessage && (
                         <div style={{
-                          marginTop: "6px",
-                          padding: "5px 8px",
-                          borderRadius: "4px",
-                          fontSize: "10px",
+                          marginTop: "8px",
+                          padding: "6px 10px",
+                          borderRadius: "6px",
+                          fontSize: "11.5px",
                           fontWeight: "500",
                           backgroundColor: smsStatusMessage.includes("✅") ? "#f0fdf4" : "#fef2f2",
                           color: smsStatusMessage.includes("✅") ? "#166534" : "#dc2626",
@@ -9373,28 +9373,28 @@ export default function App() {
                   </div>
 
                   {/* Card 2: 2-Way Google Sheets Webhook Sync */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                      <RefreshCw size={13} color="#0284c7" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
+                      <RefreshCw size={15} color="#2563eb" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         2-Way Google Sheets Webhook Integration
                       </h3>
                     </div>
-                    <p style={{ fontSize: "10px", color: "#64748b", margin: "0 0 8px 0", fontWeight: "400" }}>
+                    <p style={{ fontSize: "12px", color: "#475569", margin: "0 0 8px 0", fontWeight: "400", lineHeight: "1.4" }}>
                       Paste your Google Apps Script Webhook URL below to sync edits between browser CRM and Google Sheets in real-time.
                     </p>
-                    <div style={{ display: "flex", gap: "6px" }}>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                       <input 
                         type="text"
                         placeholder="https://script.google.com/macros/s/.../exec"
                         value={webhookUrl}
                         onChange={(e) => setWebhookUrl(e.target.value)}
-                        style={{ flex: 1, height: "28px", padding: "4px 8px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", fontWeight: "400", outline: "none", color: "#0f172a" }}
+                        style={{ flex: 1, height: "32px", padding: "0 10px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", outline: "none", color: "#0f172a", boxSizing: "border-box" }}
                       />
                       <button 
                         onClick={handleSyncSheet}
                         disabled={syncingSheet}
-                        style={{ height: "28px", padding: "4px 10px", backgroundColor: "#0284c7", color: "#ffffff", border: "none", borderRadius: "5px", fontSize: "11px", fontWeight: "500", cursor: "pointer", whiteSpace: "nowrap" }}
+                        style={{ height: "32px", padding: "0 14px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" }}
                       >
                         {syncingSheet ? "Syncing..." : "Sync Sheet Now"}
                       </button>
@@ -9403,31 +9403,31 @@ export default function App() {
                 </div>
 
                 {/* Right Column: AI Intelligence, Task Automation & Audio Alerts */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   
                   {/* Card 3: AI Sales Intelligence & Predictors */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-                      <Sparkles size={13} color="#7c3aed" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "10px" }}>
+                      <Sparkles size={15} color="#7c3aed" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         AI Sales Intelligence & Predictors
                       </h3>
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
                       <div style={{ paddingRight: "10px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                          <Sparkles size={11} color="#7c3aed" />
-                          <span style={{ fontSize: "11.5px", fontWeight: "500", color: "#0f172a" }}>AI Closing Probability Predictor</span>
-                          <span style={{ fontSize: "8.5px", fontWeight: "600", padding: "1px 5px", borderRadius: "4px", backgroundColor: enableAiPredictor ? "#dcfce7" : "#f1f5f9", color: enableAiPredictor ? "#166534" : "#64748b" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <Sparkles size={13} color="#7c3aed" />
+                          <span style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a" }}>AI Closing Probability Predictor</span>
+                          <span style={{ fontSize: "10px", fontWeight: "700", padding: "2px 7px", borderRadius: "9999px", backgroundColor: enableAiPredictor ? "#dcfce7" : "#f1f5f9", color: enableAiPredictor ? "#166534" : "#64748b" }}>
                             {enableAiPredictor ? "ACTIVE" : "DISABLED"}
                           </span>
                         </div>
-                        <span style={{ fontSize: "10px", color: "#64748b", display: "block", marginTop: "2px", fontWeight: "400" }}>
+                        <span style={{ fontSize: "12px", color: "#64748b", display: "block", marginTop: "3px", fontWeight: "400", lineHeight: "1.4" }}>
                           When ON, analyzes lead remarks & status to predict live closing win % with color-coded badges.
                         </span>
                       </div>
-                      <label style={{ position: "relative", display: "inline-block", width: "36px", height: "20px", cursor: "pointer", flexShrink: 0 }}>
+                      <label style={{ position: "relative", display: "inline-block", width: "38px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
                         <input 
                           type="checkbox" 
                           checked={enableAiPredictor}
@@ -9439,36 +9439,36 @@ export default function App() {
                           }}
                           style={{ opacity: 0, width: 0, height: 0 }} 
                         />
-                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableAiPredictor ? "#10b981" : "#cbd5e1", borderRadius: "20px", transition: "all 0.2s ease" }}>
-                          <span style={{ position: "absolute", top: "3px", left: enableAiPredictor ? "19px" : "3px", width: "14px", height: "14px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
+                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableAiPredictor ? "#10b981" : "#cbd5e1", borderRadius: "9999px", transition: "all 0.2s ease" }}>
+                          <span style={{ position: "absolute", top: "3px", left: enableAiPredictor ? "19px" : "3px", width: "16px", height: "16px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
                         </span>
                       </label>
                     </div>
                   </div>
 
                   {/* Card 4: Workflow Automation & Task Triggers */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-                      <CheckSquare size={13} color="#2563eb" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "10px" }}>
+                      <CheckSquare size={15} color="#2563eb" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         Workflow Automation & Task Triggers
                       </h3>
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
                       <div style={{ paddingRight: "10px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                          <Zap size={11} color="#ea580c" />
-                          <span style={{ fontSize: "11.5px", fontWeight: "500", color: "#0f172a" }}>Auto-Create Payment Follow-Up Tasks</span>
-                          <span style={{ fontSize: "8.5px", fontWeight: "600", padding: "1px 5px", borderRadius: "4px", backgroundColor: enableAutoTasks ? "#dcfce7" : "#f1f5f9", color: enableAutoTasks ? "#166534" : "#64748b" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <Zap size={13} color="#ea580c" />
+                          <span style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a" }}>Auto-Create Payment Follow-Up Tasks</span>
+                          <span style={{ fontSize: "10px", fontWeight: "700", padding: "2px 7px", borderRadius: "9999px", backgroundColor: enableAutoTasks ? "#dcfce7" : "#f1f5f9", color: enableAutoTasks ? "#166534" : "#64748b" }}>
                             {enableAutoTasks ? "ACTIVE" : "DISABLED"}
                           </span>
                         </div>
-                        <span style={{ fontSize: "10px", color: "#64748b", display: "block", marginTop: "2px", fontWeight: "400" }}>
+                        <span style={{ fontSize: "12px", color: "#64748b", display: "block", marginTop: "3px", fontWeight: "400", lineHeight: "1.4" }}>
                           When ON, automatically generates tasks in Task Manager when lead enters Payment Follow Up stage.
                         </span>
                       </div>
-                      <label style={{ position: "relative", display: "inline-block", width: "36px", height: "20px", cursor: "pointer", flexShrink: 0 }}>
+                      <label style={{ position: "relative", display: "inline-block", width: "38px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
                         <input 
                           type="checkbox" 
                           checked={enableAutoTasks}
@@ -9480,36 +9480,36 @@ export default function App() {
                           }}
                           style={{ opacity: 0, width: 0, height: 0 }} 
                         />
-                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableAutoTasks ? "#10b981" : "#cbd5e1", borderRadius: "20px", transition: "all 0.2s ease" }}>
-                          <span style={{ position: "absolute", top: "3px", left: enableAutoTasks ? "19px" : "3px", width: "14px", height: "14px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
+                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableAutoTasks ? "#10b981" : "#cbd5e1", borderRadius: "9999px", transition: "all 0.2s ease" }}>
+                          <span style={{ position: "absolute", top: "3px", left: enableAutoTasks ? "19px" : "3px", width: "16px", height: "16px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
                         </span>
                       </label>
                     </div>
                   </div>
 
                   {/* Card 5: Audio Alert Sound Chimes */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-                      <Bell size={13} color="#d97706" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px 14px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "10px" }}>
+                      <Bell size={15} color="#d97706" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         Sound & Audio Notification Chimes
                       </h3>
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px" }}>
                       <div style={{ paddingRight: "10px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                          <Bell size={11} color="#d97706" />
-                          <span style={{ fontSize: "11.5px", fontWeight: "500", color: "#0f172a" }}>Audio Alert Sound Chimes</span>
-                          <span style={{ fontSize: "8.5px", fontWeight: "600", padding: "1px 5px", borderRadius: "4px", backgroundColor: enableSoundAlerts ? "#dcfce7" : "#f1f5f9", color: enableSoundAlerts ? "#166534" : "#64748b" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <Bell size={13} color="#d97706" />
+                          <span style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a" }}>Audio Alert Sound Chimes</span>
+                          <span style={{ fontSize: "10px", fontWeight: "700", padding: "2px 7px", borderRadius: "9999px", backgroundColor: enableSoundAlerts ? "#dcfce7" : "#f1f5f9", color: enableSoundAlerts ? "#166534" : "#64748b" }}>
                             {enableSoundAlerts ? "ACTIVE" : "DISABLED"}
                           </span>
                         </div>
-                        <span style={{ fontSize: "10px", color: "#64748b", display: "block", marginTop: "2px", fontWeight: "400" }}>
+                        <span style={{ fontSize: "12px", color: "#64748b", display: "block", marginTop: "3px", fontWeight: "400", lineHeight: "1.4" }}>
                           When ON, plays pleasant audio sound chimes for alarm triggers, deal wins & login verifications.
                         </span>
                       </div>
-                      <label style={{ position: "relative", display: "inline-block", width: "36px", height: "20px", cursor: "pointer", flexShrink: 0 }}>
+                      <label style={{ position: "relative", display: "inline-block", width: "38px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
                         <input 
                           type="checkbox" 
                           checked={enableSoundAlerts}
@@ -9521,8 +9521,8 @@ export default function App() {
                           }}
                           style={{ opacity: 0, width: 0, height: 0 }} 
                         />
-                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableSoundAlerts ? "#10b981" : "#cbd5e1", borderRadius: "20px", transition: "all 0.2s ease" }}>
-                          <span style={{ position: "absolute", top: "3px", left: enableSoundAlerts ? "19px" : "3px", width: "14px", height: "14px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
+                        <span style={{ position: "absolute", inset: 0, backgroundColor: enableSoundAlerts ? "#10b981" : "#cbd5e1", borderRadius: "9999px", transition: "all 0.2s ease" }}>
+                          <span style={{ position: "absolute", top: "3px", left: enableSoundAlerts ? "19px" : "3px", width: "16px", height: "16px", backgroundColor: "#ffffff", borderRadius: "50%", transition: "all 0.2s ease", boxShadow: "0 1px 2px rgba(0,0,0,0.15)" }} />
                         </span>
                       </label>
                     </div>
@@ -9530,94 +9530,6 @@ export default function App() {
 
                 </div>
               </div>
-
-              {/* 🛡️ Full-Width Admin Local Backup & Cloud Vault (Strictly Admin Harsh Only) */}
-              {checkIsSuperAdmin(currentUser) && (
-                <div style={{ marginTop: "14px", backgroundColor: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: "10px", padding: "14px 16px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <div style={{ width: "36px", height: "36px", borderRadius: "8px", backgroundColor: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <Shield size={20} color="#16a34a" />
-                      </div>
-                      <div>
-                        <h4 style={{ fontSize: "12.5px", fontWeight: "800", color: "#16a34a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
-                          Admin Local Data Vault & Permanent Cloud Backup 👑
-                        </h4>
-                        <p style={{ fontSize: "10.5px", color: "#15803d", margin: "2px 0 0 0" }}>
-                          15 Verified Deals Safely Backed Up across 3 Layers: Local Browser Storage + Server Data File (db_backup.json) + MongoDB Atlas.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                      <button
-                        type="button"
-                        onClick={restoreAdminVaultBackup}
-                        disabled={isAdminRestoring}
-                        style={{
-                          padding: "6px 14px",
-                          backgroundColor: "#16a34a",
-                          color: "#ffffff",
-                          border: "none",
-                          borderRadius: "6px",
-                          fontSize: "11px",
-                          fontWeight: "750",
-                          cursor: isAdminRestoring ? "not-allowed" : "pointer",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          boxShadow: "0 1px 3px rgba(22, 163, 74, 0.3)"
-                        }}
-                      >
-                        <RotateCw size={12} className={isAdminRestoring ? "animate-spin" : ""} />
-                        <span>{isAdminRestoring ? "Restoring..." : "🔄 Restore Local Backup (15 Leads)"}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={downloadAdminVaultBackup}
-                        style={{
-                          padding: "6px 12px",
-                          backgroundColor: "#ffffff",
-                          color: "#16a34a",
-                          border: "1px solid #86efac",
-                          borderRadius: "6px",
-                          fontSize: "11px",
-                          fontWeight: "700",
-                          cursor: "pointer",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "5px"
-                        }}
-                      >
-                        <Download size={12} color="#166534" />
-                        <span>Download .json</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setShowAdminVaultModal(true)}
-                        style={{
-                          padding: "6px 12px",
-                          backgroundColor: "#eff6ff",
-                          color: "#2563eb",
-                          border: "1px solid #93c5fd",
-                          borderRadius: "6px",
-                          fontSize: "11px",
-                          fontWeight: "750",
-                          cursor: "pointer",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "5px"
-                        }}
-                      >
-                        <Shield size={12} color="#2563eb" />
-                        <span>Inspect Vault</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           ) : activeWorkspace === "users" ? (
             <div className="user-profile-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "10px", border: "1px solid #e2e8f0", padding: "14px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -20211,9 +20123,9 @@ export default function App() {
                     backgroundColor: "#2563eb",
                     color: "#ffffff",
                     border: "none",
-                    borderRadius: "8px",
+                    borderRadius: "6px",
                     fontSize: "12px",
-                    fontWeight: "800",
+                    fontWeight: "700",
                     cursor: isAdminRestoring ? "not-allowed" : "pointer",
                     display: "flex",
                     alignItems: "center",
@@ -20233,11 +20145,11 @@ export default function App() {
                     flex: 1,
                     padding: "10px 14px",
                     backgroundColor: "#ffffff",
-                    color: "#334155",
+                    color: "#475569",
                     border: "1px solid #cbd5e1",
-                    borderRadius: "8px",
-                    fontSize: "11px",
-                    fontWeight: "750",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: "600",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
@@ -20255,13 +20167,13 @@ export default function App() {
 
             {/* Footer */}
             <div style={{ borderTop: "1px solid #e2e8f0", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f8fafc" }}>
-              <div style={{ fontSize: "11px", color: "#64748b" }}>
+              <div style={{ fontSize: "12px", color: "#475569" }}>
                 🔒 Synced to MongoDB Atlas Cloud Cluster & local data vault.
               </div>
               <button 
                 type="button"
                 onClick={() => setShowAdminVaultModal(false)}
-                style={{ padding: "6px 16px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
+                style={{ padding: "6px 16px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}
               >
                 Close Vault
               </button>
