@@ -6744,258 +6744,267 @@ export default function App() {
 
           <div className="header-action-row" style={{ display: "flex", alignItems: "center", gap: "10px", marginLeft: "auto" }}>
             
-            {/* Global Monthly Period Selector Dropdown */}
-            <div style={{ position: "relative" }}>
-              <button 
-                onClick={() => setIsPeriodDropdownOpen(!isPeriodDropdownOpen)}
-                className="header-period-btn"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  backgroundColor: selectedPeriodMonth === "2026-09" ? "#f0fdf4" : selectedPeriodMonth === "all" ? "#eff6ff" : "#fff7ed",
-                  border: selectedPeriodMonth === "2026-09" ? "1.5px solid #86efac" : selectedPeriodMonth === "all" ? "1.5px solid #bfdbfe" : "1.5px solid #fed7aa",
-                  padding: "6px 12px",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                  fontWeight: "750",
-                  color: selectedPeriodMonth === "2026-09" ? "#166534" : selectedPeriodMonth === "all" ? "#1e40af" : "#9a3412",
-                  cursor: "pointer",
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
-                  whiteSpace: "nowrap"
-                }}
-                title="Switch Monthly Target & Historical Pipeline Snapshot"
-              >
-                {selectedPeriodMonth === "2026-09" ? (
-                  <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#22c55e", display: "inline-block", boxShadow: "0 0 5px #22c55e", flexShrink: 0 }} />
-                ) : selectedPeriodMonth === "all" ? (
-                  <Globe size={12} color="#3b82f6" style={{ flexShrink: 0 }} />
-                ) : (
-                  <Archive size={12} color="#ea580c" style={{ flexShrink: 0 }} />
-                )}
-                <span className="header-period-desktop-text">
-                  {selectedPeriodMonth === "2026-09" 
-                    ? "September 2026 (Current)" 
-                    : selectedPeriodMonth === "2026-08" 
-                    ? "August 2026 (Archived)" 
-                    : "All-Time Lifetime"}
-                </span>
-                <span className="header-period-mobile-text">
-                  {selectedPeriodMonth === "2026-09" 
-                    ? "Sep '26" 
-                    : selectedPeriodMonth === "2026-08" 
-                    ? "Aug '26" 
-                    : "All"}
-                </span>
-                <ChevronDown size={12} style={{ flexShrink: 0 }} />
-              </button>
+            {/* Cluster 1: Contextual Page Controls & Actions */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              {/* Global Monthly Period Selector Dropdown */}
+              <div style={{ position: "relative" }}>
+                <button 
+                  onClick={() => setIsPeriodDropdownOpen(!isPeriodDropdownOpen)}
+                  className="header-period-btn"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    backgroundColor: selectedPeriodMonth === "2026-09" ? "#f0fdf4" : selectedPeriodMonth === "all" ? "#eff6ff" : "#fff7ed",
+                    border: selectedPeriodMonth === "2026-09" ? "1.5px solid #86efac" : selectedPeriodMonth === "all" ? "1.5px solid #bfdbfe" : "1.5px solid #fed7aa",
+                    padding: "6px 12px",
+                    borderRadius: "8px",
+                    fontSize: "12px",
+                    fontWeight: "750",
+                    color: selectedPeriodMonth === "2026-09" ? "#166534" : selectedPeriodMonth === "all" ? "#1e40af" : "#9a3412",
+                    cursor: "pointer",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+                    whiteSpace: "nowrap"
+                  }}
+                  title="Switch Monthly Target & Historical Pipeline Snapshot"
+                >
+                  {selectedPeriodMonth === "2026-09" ? (
+                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#22c55e", display: "inline-block", boxShadow: "0 0 5px #22c55e", flexShrink: 0 }} />
+                  ) : selectedPeriodMonth === "all" ? (
+                    <Globe size={12} color="#3b82f6" style={{ flexShrink: 0 }} />
+                  ) : (
+                    <Archive size={12} color="#ea580c" style={{ flexShrink: 0 }} />
+                  )}
+                  <span className="header-period-desktop-text">
+                    {selectedPeriodMonth === "2026-09" 
+                      ? "September 2026 (Current)" 
+                      : selectedPeriodMonth === "2026-08" 
+                      ? "August 2026 (Archived)" 
+                      : "All-Time Lifetime"}
+                  </span>
+                  <span className="header-period-mobile-text">
+                    {selectedPeriodMonth === "2026-09" 
+                      ? "Sep '26" 
+                      : selectedPeriodMonth === "2026-08" 
+                      ? "Aug '26" 
+                      : "All"}
+                  </span>
+                  <ChevronDown size={12} style={{ flexShrink: 0 }} />
+                </button>
 
-              {isPeriodDropdownOpen && (
-                <div style={{ position: "absolute", top: "100%", right: 0, marginTop: "6px", width: "260px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "6px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)", zIndex: 1000 }}>
-                  <div style={{ fontSize: "10.5px", fontWeight: "800", color: "#64748b", textTransform: "uppercase", padding: "6px 10px 4px 10px" }}>
-                    Select Pipeline Period
+                {isPeriodDropdownOpen && (
+                  <div style={{ position: "absolute", top: "100%", right: 0, marginTop: "6px", width: "260px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "6px", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)", zIndex: 1000 }}>
+                    <div style={{ fontSize: "10.5px", fontWeight: "800", color: "#64748b", textTransform: "uppercase", padding: "6px 10px 4px 10px" }}>
+                      Select Pipeline Period
+                    </div>
+                    
+                    {/* Current Active Month */}
+                    <button
+                      onClick={() => { setSelectedPeriodMonth("2026-09"); setIsPeriodDropdownOpen(false); }}
+                      style={{
+                        width: "100%",
+                        textAlign: "left",
+                        padding: "8px 10px",
+                        borderRadius: "6px",
+                        backgroundColor: selectedPeriodMonth === "2026-09" ? "#f0fdf4" : "transparent",
+                        border: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        fontWeight: selectedPeriodMonth === "2026-09" ? "800" : "600",
+                        color: selectedPeriodMonth === "2026-09" ? "#166534" : "#1e293b"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
+                        <span>September 2026</span>
+                      </div>
+                      <span style={{ fontSize: "10px", fontWeight: "800", backgroundColor: "#dcfce7", color: "#16a34a", padding: "1px 6px", borderRadius: "8px" }}>Current</span>
+                    </button>
+
+                    {/* Historical: August 2026 */}
+                    <button
+                      onClick={() => { setSelectedPeriodMonth("2026-08"); setIsPeriodDropdownOpen(false); }}
+                      style={{
+                        width: "100%",
+                        textAlign: "left",
+                        padding: "8px 10px",
+                        borderRadius: "6px",
+                        backgroundColor: selectedPeriodMonth === "2026-08" ? "#fff7ed" : "transparent",
+                        border: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        fontWeight: selectedPeriodMonth === "2026-08" ? "800" : "600",
+                        color: selectedPeriodMonth === "2026-08" ? "#9a3412" : "#1e293b"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <Archive size={13} color="#ea580c" />
+                        <span>August 2026</span>
+                      </div>
+                      <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b" }}>Archived</span>
+                    </button>
+
+                    {/* All-Time */}
+                    <button
+                      onClick={() => { setSelectedPeriodMonth("all"); setIsPeriodDropdownOpen(false); }}
+                      style={{
+                        width: "100%",
+                        textAlign: "left",
+                        padding: "8px 10px",
+                        borderRadius: "6px",
+                        backgroundColor: selectedPeriodMonth === "all" ? "#eff6ff" : "transparent",
+                        border: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        fontWeight: selectedPeriodMonth === "all" ? "800" : "600",
+                        color: selectedPeriodMonth === "all" ? "#1e40af" : "#1e293b"
+                      }}
+                    >
+                      <Globe size={13} color="#3b82f6" />
+                      <span>All-Time (Lifetime Summary)</span>
+                    </button>
+
+                    <div style={{ borderTop: "1px solid #f1f5f9", margin: "4px 0" }} />
+
+                    {/* Manage Monthly Targets */}
+                    <button
+                      onClick={() => { setIsPeriodDropdownOpen(false); startEditingTarget(); }}
+                      style={{
+                        width: "100%",
+                        textAlign: "left",
+                        padding: "8px 10px",
+                        borderRadius: "6px",
+                        backgroundColor: "transparent",
+                        border: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        cursor: "pointer",
+                        fontSize: "11.5px",
+                        fontWeight: "750",
+                        color: "#2563eb"
+                      }}
+                    >
+                      <Target size={13} color="#7c3aed" />
+                      <span>Manage Monthly Targets...</span>
+                    </button>
                   </div>
-                  
-                  {/* Current Active Month */}
-                  <button
-                    onClick={() => { setSelectedPeriodMonth("2026-09"); setIsPeriodDropdownOpen(false); }}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "8px 10px",
-                      borderRadius: "6px",
-                      backgroundColor: selectedPeriodMonth === "2026-09" ? "#f0fdf4" : "transparent",
-                      border: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                      fontWeight: selectedPeriodMonth === "2026-09" ? "800" : "600",
-                      color: selectedPeriodMonth === "2026-09" ? "#166534" : "#1e293b"
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
-                      <span>September 2026</span>
-                    </div>
-                    <span style={{ fontSize: "10px", fontWeight: "800", backgroundColor: "#dcfce7", color: "#16a34a", padding: "1px 6px", borderRadius: "8px" }}>Current</span>
-                  </button>
+                )}
+              </div>
 
-                  {/* Historical: August 2026 */}
-                  <button
-                    onClick={() => { setSelectedPeriodMonth("2026-08"); setIsPeriodDropdownOpen(false); }}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "8px 10px",
-                      borderRadius: "6px",
-                      backgroundColor: selectedPeriodMonth === "2026-08" ? "#fff7ed" : "transparent",
-                      border: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                      fontWeight: selectedPeriodMonth === "2026-08" ? "800" : "600",
-                      color: selectedPeriodMonth === "2026-08" ? "#9a3412" : "#1e293b"
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <Archive size={13} color="#ea580c" />
-                      <span>August 2026</span>
-                    </div>
-                    <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b" }}>Archived</span>
-                  </button>
-
-                  {/* All-Time */}
-                  <button
-                    onClick={() => { setSelectedPeriodMonth("all"); setIsPeriodDropdownOpen(false); }}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "8px 10px",
-                      borderRadius: "6px",
-                      backgroundColor: selectedPeriodMonth === "all" ? "#eff6ff" : "transparent",
-                      border: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      cursor: "pointer",
-                      fontSize: "12px",
-                      fontWeight: selectedPeriodMonth === "all" ? "800" : "600",
-                      color: selectedPeriodMonth === "all" ? "#1e40af" : "#1e293b"
-                    }}
-                  >
-                    <Globe size={13} color="#3b82f6" />
-                    <span>All-Time (Lifetime Summary)</span>
-                  </button>
-
-                  <div style={{ borderTop: "1px solid #f1f5f9", margin: "4px 0" }} />
-
-                  {/* Manage Monthly Targets */}
-                  <button
-                    onClick={() => { setIsPeriodDropdownOpen(false); startEditingTarget(); }}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "8px 10px",
-                      borderRadius: "6px",
-                      backgroundColor: "transparent",
-                      border: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      cursor: "pointer",
-                      fontSize: "11.5px",
-                      fontWeight: "750",
-                      color: "#2563eb"
-                    }}
-                  >
-                    <Target size={13} color="#7c3aed" />
-                    <span>Manage Monthly Targets...</span>
-                  </button>
-                </div>
+              {/* 🛡️ ADMIN DATA VAULT & BACKUP (Strictly Visible to Admin Harsh) */}
+              {checkIsSuperAdmin(currentUser) && (
+                <button
+                  type="button"
+                  className="header-vault-btn"
+                  onClick={() => setShowAdminVaultModal(true)}
+                  style={{
+                    height: "34px",
+                    boxSizing: "border-box",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "5px 11px",
+                    backgroundColor: "#eff6ff",
+                    border: "1.5px solid #93c5fd",
+                    borderRadius: "8px",
+                    fontSize: "11.5px",
+                    fontWeight: "800",
+                    color: "#2563eb",
+                    cursor: "pointer",
+                    boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    whiteSpace: "nowrap"
+                  }}
+                  title="Admin Data Vault: 15 Verified Real Deals Safe"
+                >
+                  <Shield size={14} color="#2563eb" />
+                  <span>Vault Backup ({leads.length})</span>
+                </button>
               )}
+
+              <button 
+                onClick={() => setShowStartMyDay(true)}
+                className="header-cta-orange"
+              >
+                <Sun className="w-3.5 h-3.5 flex-shrink-0 text-amber-500" />
+                <span className="header-cta-desktop-text">Start My Day</span>
+                <span className="header-cta-mobile-text">My Day</span>
+              </button>
             </div>
 
-            {/* 🛡️ ADMIN DATA VAULT & BACKUP (Strictly Visible to Admin Harsh) */}
-            {checkIsSuperAdmin(currentUser) && (
-              <button
-                type="button"
-                className="header-vault-btn"
-                onClick={() => setShowAdminVaultModal(true)}
+            {/* Visual Divider Separating Contextual Actions from User/System Actions */}
+            <div style={{ width: "1px", height: "22px", backgroundColor: "#e2e8f0", margin: "0 2px" }} />
+
+            {/* Cluster 2: User Account & System Actions */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div className="header-notification-btn" onClick={() => setShowStartMyDay(true)} title="3 Pending Follow-ups">
+                <Bell className="w-4 h-4 text-slate-600" />
+                <span className="notification-badge-dot">3</span>
+              </div>
+
+              {/* Logged in User Badge */}
+              <div 
+                className="header-user-badge-container"
                 style={{
                   height: "34px",
                   boxSizing: "border-box",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  padding: "5px 11px",
-                  backgroundColor: "#eff6ff",
-                  border: "1.5px solid #93c5fd",
-                  borderRadius: "8px",
-                  fontSize: "11.5px",
-                  fontWeight: "800",
-                  color: "#2563eb",
-                  cursor: "pointer",
-                  boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  whiteSpace: "nowrap"
-                }}
-                title="Admin Data Vault: 15 Verified Real Deals Safe"
-              >
-                <Shield size={14} color="#2563eb" />
-                <span>Vault Backup ({leads.length})</span>
-              </button>
-            )}
-
-            <button 
-              onClick={() => setShowStartMyDay(true)}
-              className="header-cta-orange"
-            >
-              <Sun className="w-3.5 h-3.5 flex-shrink-0 text-amber-500" />
-              <span className="header-cta-desktop-text">Start My Day</span>
-              <span className="header-cta-mobile-text">My Day</span>
-            </button>
-
-            <div className="header-notification-btn" onClick={() => setShowStartMyDay(true)} title="3 Pending Follow-ups">
-              <Bell className="w-4 h-4 text-slate-600" />
-              <span className="notification-badge-dot">3</span>
-            </div>
-
-            {/* Logged in User Badge */}
-            <div 
-              className="header-user-badge-container"
-              style={{
-                height: "34px",
-                boxSizing: "border-box",
-                display: "flex",
-                alignItems: "center",
-                gap: "7px",
-                padding: "3px 9px 3px 6px",
-                backgroundColor: "#f8fafc",
-                border: "1px solid #e2e8f0",
-                borderRadius: "8px",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
-                flexShrink: 0
-              }}
-              title={`Logged in as ${currentUser?.displayName || currentUser?.name || "Admin"} (${currentUser?.role === "admin" ? "Super Admin" : "Sales Representative"})`}
-            >
-              <div 
-                style={{
-                  width: "22px",
-                  height: "22px",
-                  borderRadius: "50%",
-                  backgroundColor: currentUser?.role === "admin" ? "#fef3c7" : "#dbeafe",
-                  color: currentUser?.role === "admin" ? "#b45309" : "#1d4ed8",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "10.5px",
-                  fontWeight: "800"
+                  gap: "7px",
+                  padding: "3px 9px 3px 6px",
+                  backgroundColor: "#f8fafc",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
+                  flexShrink: 0
                 }}
+                title={`Logged in as ${currentUser?.displayName || currentUser?.name || "Admin"} (${currentUser?.role === "admin" ? "Super Admin" : "Sales Representative"})`}
               >
-                {currentUser?.name ? currentUser.name[0].toUpperCase() : "U"}
+                <div 
+                  style={{
+                    width: "22px",
+                    height: "22px",
+                    borderRadius: "50%",
+                    backgroundColor: currentUser?.role === "admin" ? "#fef3c7" : "#dbeafe",
+                    color: currentUser?.role === "admin" ? "#b45309" : "#1d4ed8",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "10.5px",
+                    fontWeight: "800"
+                  }}
+                >
+                  {currentUser?.name ? currentUser.name[0].toUpperCase() : "U"}
+                </div>
+                <div className="header-user-badge-text" style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: "1.15" }}>
+                  <span style={{ fontSize: "11px", fontWeight: "750", color: "#0f172a", whiteSpace: "nowrap" }}>
+                    {currentUser?.displayName || currentUser?.name || "Admin"}
+                  </span>
+                  <span style={{ fontSize: "8.5px", fontWeight: "800", color: currentUser?.role === "admin" ? "#b45309" : "#2563eb", textTransform: "uppercase" }}>
+                    {currentUser?.role === "admin" ? "👑 Admin" : "💼 Sales Rep"}
+                  </span>
+                </div>
               </div>
-              <div className="header-user-badge-text" style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: "1.15" }}>
-                <span style={{ fontSize: "11px", fontWeight: "750", color: "#0f172a", whiteSpace: "nowrap" }}>
-                  {currentUser?.displayName || currentUser?.name || "Admin"}
-                </span>
-                <span style={{ fontSize: "8.5px", fontWeight: "800", color: currentUser?.role === "admin" ? "#b45309" : "#2563eb", textTransform: "uppercase" }}>
-                  {currentUser?.role === "admin" ? "👑 Admin" : "💼 Sales Rep"}
-                </span>
-              </div>
-            </div>
 
-            <button 
-              onClick={handleLogout}
-              className="header-icon-btn header-logout-btn"
-              title="Log Out"
-            >
-              <LogOut className="w-4 h-4 text-slate-600" />
-              <span>Log Out</span>
-            </button>
+              <button 
+                onClick={handleLogout}
+                className="header-icon-btn header-logout-btn"
+                title="Log Out"
+              >
+                <LogOut className="w-4 h-4 text-slate-600" />
+                <span>Log Out</span>
+              </button>
+            </div>
           </div>
         </header>
 
@@ -12954,51 +12963,51 @@ export default function App() {
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     
                     {/* 1. COMPACT TOP HEADER & VIEW MODES TOOLBAR */}
-                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "7px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                       <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <h2 style={{ fontSize: "13px", fontWeight: "800", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                            <Award size={15} color="#16a34a" /> Deals & Revenue Hub
-                          </h2>
-                          <span style={{ fontSize: "8px", fontWeight: "750", color: "#16a34a", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "1px 5px", borderRadius: "3px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          <h1 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                            <Award size={16} color="#16a34a" /> Deals & Revenue Hub
+                          </h1>
+                          <span style={{ fontSize: "11px", fontWeight: "700", color: "#16a34a", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "2px 8px", borderRadius: "6px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                             CLOSED REVENUE LEDGER
                           </span>
                         </div>
-                        <p style={{ fontSize: "9.5px", color: "#64748b", margin: "1px 0 0 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <p style={{ fontSize: "12px", color: "#475569", margin: "4px 0 0 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                           Track closed won transactions, date-wise revenue ledger, and sales velocity metrics.
                         </p>
                       </div>
 
                       {/* Right View Switcher & Actions */}
-                      <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                        <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "1.5px", borderRadius: "5px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "6px", border: "1px solid #e2e8f0", gap: "2px" }}>
                           <button
                             type="button"
                             onClick={() => setPipelineView("analytics")}
-                            style={{ padding: "2.5px 7px", fontSize: "9.5px", fontWeight: "600", color: "#64748b", border: "none", backgroundColor: "transparent", borderRadius: "3.5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
-                            <TrendingUp size={10} /> Dashboard
+                            <TrendingUp size={13} /> Dashboard
                           </button>
                           <button
                             type="button"
                             onClick={() => setPipelineView("sheet")}
-                            style={{ padding: "2.5px 7px", fontSize: "9.5px", fontWeight: "600", color: "#64748b", border: "none", backgroundColor: "transparent", borderRadius: "3.5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
-                            <Grid size={10} /> Spreadsheet
+                            <Grid size={13} /> Spreadsheet
                           </button>
                           <button
                             type="button"
                             onClick={() => setPipelineView("split")}
-                            style={{ padding: "2.5px 7px", fontSize: "9.5px", fontWeight: "600", color: "#64748b", border: "none", backgroundColor: "transparent", borderRadius: "3.5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
-                            <Layers size={10} /> Split 360°
+                            <Layers size={13} /> Split 360°
                           </button>
                           <button
                             type="button"
                             onClick={() => setPipelineView("deals")}
-                            style={{ padding: "2.5px 7px", fontSize: "9.5px", fontWeight: "700", color: "#16a34a", border: "none", backgroundColor: "#ffffff", borderRadius: "3.5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: "600", color: "#16a34a", border: "none", backgroundColor: "#ffffff", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
-                            <Award size={10} /> Deals Hub
+                            <Award size={13} /> Deals Hub
                           </button>
                         </div>
 
@@ -13024,9 +13033,9 @@ export default function App() {
                             a.click();
                             showToast("Exported Won Deals Ledger CSV!", "success");
                           }}
-                          style={{ padding: "3px 8px", height: "22px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "9.5px", fontWeight: "600", color: "#334155", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                          style={{ height: "30px", padding: "4px 12px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                         >
-                          <Download size={10} /> Export
+                          <Download size={13} /> Export
                         </button>
                       </div>
                     </div>
@@ -13036,16 +13045,16 @@ export default function App() {
                       backgroundColor: "#f0fdf4",
                       border: "1px solid #bbf7d0",
                       borderRadius: "8px",
-                      padding: "8px 12px",
+                      padding: "10px 14px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      gap: "10px",
+                      gap: "12px",
                       flexWrap: "wrap",
                       boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
                     }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", color: "#16a34a" }}>
-                        <span style={{ fontSize: "14px" }}>💡</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#16a34a", lineHeight: "1.5" }}>
+                        <span style={{ fontSize: "15px" }}>💡</span>
                         <span>
                           <strong>Closed Revenue View:</strong> Currently showing <strong>{wonLeadsList.length} Won Deals</strong> (out of {leads.length} total leads). To view and manage all pipeline leads across all stages (New, Contacted, Follow-ups, etc.), open <strong>Spreadsheet</strong>.
                         </span>
@@ -13054,113 +13063,113 @@ export default function App() {
                         type="button"
                         onClick={() => setPipelineView("sheet")}
                         style={{
-                          padding: "4px 10px",
+                          height: "32px",
+                          padding: "0 12px",
                           backgroundColor: "#16a34a",
                           color: "#ffffff",
                           border: "none",
-                          borderRadius: "5px",
-                          fontSize: "10.5px",
-                          fontWeight: "750",
+                          borderRadius: "6px",
+                          fontSize: "12px",
+                          fontWeight: "600",
                           cursor: "pointer",
                           display: "inline-flex",
                           alignItems: "center",
-                          gap: "4px",
+                          gap: "5px",
                           fontFamily: "inherit",
                           boxShadow: "0 1px 3px rgba(22, 163, 74, 0.25)"
                         }}
                       >
-                        <Grid size={11} /> View All {leads.length} Leads in Spreadsheet →
+                        <Grid size={13} /> View All {leads.length} Leads in Spreadsheet →
                       </button>
                     </div>
 
                     {/* 2. COMPACT TOP 4 EXECUTIVE KPI SUMMARY CARDS */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
                       
                       {/* Card 1: Total Closed Value */}
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
-                          <span style={{ fontSize: "8px", fontWeight: "750", color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Total Closed Value (Inc. GST)</span>
-                          <strong style={{ fontSize: "14.5px", fontWeight: "800", color: "#15803d", display: "block", marginTop: "1px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
-                          <span style={{ fontSize: "8px", color: "#64748b", marginTop: "0.5px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Total Closed Value (Inc. GST)</span>
+                          <strong style={{ fontSize: "16px", fontWeight: "800", color: "#16a34a", display: "block", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
+                          <span style={{ fontSize: "11.5px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                             Base ₹{totalBaseVal.toLocaleString("en-IN")} + GST ₹{totalGstVal.toLocaleString("en-IN")}
                           </span>
                         </div>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#dcfce7", color: "#15803d", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <Award size={13} color="#15803d" />
+                        <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#dcfce7", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Award size={15} color="#16a34a" />
                         </div>
                       </div>
 
                       {/* Card 2: Average Deal Size */}
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
-                          <span style={{ fontSize: "8px", fontWeight: "750", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Average Deal Size (Inc. GST)</span>
-                          <strong style={{ fontSize: "14.5px", fontWeight: "800", color: "#0f172a", display: "block", marginTop: "1px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{avgDealVal.toLocaleString("en-IN")}</strong>
-                          <span style={{ fontSize: "8px", color: "#64748b", marginTop: "0.5px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Average Deal Size (Inc. GST)</span>
+                          <strong style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", display: "block", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{avgDealVal.toLocaleString("en-IN")}</strong>
+                          <span style={{ fontSize: "11.5px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                             {filteredWonDeals.length === wonLeadsList.length ? `${wonLeadsList.length} Deals Won` : `${filteredWonDeals.length} of ${wonLeadsList.length} Deals`}
                           </span>
                         </div>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <TrendingUp size={13} color="#2563eb" />
+                        <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <TrendingUp size={15} color="#2563eb" />
                         </div>
                       </div>
 
                       {/* Card 3: Closing Speed */}
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "6px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
-                          <span style={{ fontSize: "8px", fontWeight: "750", color: "#c2410c", textTransform: "uppercase", letterSpacing: "0.2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Avg Closing Speed</span>
-                          <strong style={{ fontSize: "14.5px", fontWeight: "800", color: "#c2410c", display: "block", marginTop: "1px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{avgClosingSpeed} Days</strong>
-                          <span style={{ fontSize: "8px", color: "#64748b", marginTop: "0.5px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Turnaround Time</span>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Avg Closing Speed</span>
+                          <strong style={{ fontSize: "16px", fontWeight: "800", color: "#ea580c", display: "block", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{avgClosingSpeed} Days</strong>
+                          <span style={{ fontSize: "11.5px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Turnaround Time</span>
                         </div>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <Clock size={13} color="#ea580c" />
+                        <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Clock size={15} color="#ea580c" />
                         </div>
                       </div>
 
                       {/* Card 4: New vs Renewal Split */}
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e9d5ff", borderRadius: "6px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
-                          <span style={{ fontSize: "8px", fontWeight: "750", color: "#7e22ce", textTransform: "uppercase", letterSpacing: "0.2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>New vs Renewal</span>
-                          <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "1px" }}>
-                            <strong style={{ fontSize: "12.5px", fontWeight: "800", color: "#15803d", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{newSalesVal.toLocaleString("en-IN")}</strong>
-                            <span style={{ color: "#94a3b8", fontSize: "9px" }}>/</span>
-                            <strong style={{ fontSize: "12.5px", fontWeight: "800", color: "#7e22ce", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{renewalVal.toLocaleString("en-IN")}</strong>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>New vs Renewal</span>
+                          <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "2px" }}>
+                            <strong style={{ fontSize: "14px", fontWeight: "800", color: "#16a34a", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{newSalesVal.toLocaleString("en-IN")}</strong>
+                            <span style={{ color: "#94a3b8", fontSize: "11px" }}>/</span>
+                            <strong style={{ fontSize: "14px", fontWeight: "800", color: "#2563eb", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{renewalVal.toLocaleString("en-IN")}</strong>
                           </div>
-                          <span style={{ fontSize: "8px", color: "#64748b", marginTop: "0.5px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>New / Renewals (Inc. GST)</span>
+                          <span style={{ fontSize: "11.5px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>New / Renewals (Inc. GST)</span>
                         </div>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#faf5ff", color: "#7e22ce", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <RotateCw size={13} color="#7e22ce" />
+                        <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <RotateCw size={15} color="#2563eb" />
                         </div>
                       </div>
 
                     </div>
 
                     {/* 3. MULTI-CRITERIA FILTERS BAR & DATE-WISE CONTROLS */}
-                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "6px 8px", display: "flex", flexDirection: "column", gap: "5px" }}>
+                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", display: "flex", flexDirection: "column", gap: "10px" }}>
                       
                       {/* Top Row: Search + Date Dropdown + Amount + Sort */}
-                      <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
                         {/* Search */}
-                        <div style={{ position: "relative", flex: 1, minWidth: "170px" }}>
-                          <Search size={11} color="#94a3b8" style={{ position: "absolute", left: "7px", top: "6px" }} />
+                        <div style={{ position: "relative", flex: 1, minWidth: "200px" }}>
+                          <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "10px" }} />
                           <input
                             type="text"
                             placeholder="Search deals by client, company, phone, email, amount..."
                             value={dealsSearchQuery}
                             onChange={(e) => setDealsSearchQuery(e.target.value)}
-                            style={{ width: "100%", height: "23px", padding: "1px 6px 1px 22px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "10px", outline: "none", color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ width: "100%", height: "34px", padding: "0 10px 0 32px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", outline: "none", color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           />
                           {dealsSearchQuery && (
-                            <button onClick={() => setDealsSearchQuery("")} style={{ position: "absolute", right: "5px", top: "4px", border: "none", background: "none", color: "#94a3b8", cursor: "pointer", fontSize: "10px" }}>✕</button>
+                            <button onClick={() => setDealsSearchQuery("")} style={{ position: "absolute", right: "8px", top: "7px", border: "none", background: "none", color: "#94a3b8", cursor: "pointer", fontSize: "12px" }}>✕</button>
                           )}
                         </div>
 
                         {/* Date Range Dropdown Filter */}
-                        <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                          <Calendar size={11} color="#2563eb" />
+                        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                           <select
                             value={dealsDateFilter}
                             onChange={(e) => setDealsDateFilter(e.target.value)}
-                            style={{ height: "23px", padding: "1px 5px", borderRadius: "4px", border: dealsDateFilter !== "all" ? "1.5px solid #2563eb" : "1px solid #cbd5e1", fontSize: "9.5px", fontWeight: "700", color: dealsDateFilter !== "all" ? "#2563eb" : "#0f172a", backgroundColor: dealsDateFilter !== "all" ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: dealsDateFilter !== "all" ? "1.5px solid #2563eb" : "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: dealsDateFilter !== "all" ? "#2563eb" : "#0f172a", backgroundColor: dealsDateFilter !== "all" ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
                             <option value="all">All Dates (All Time)</option>
                             <option value="today">Today's Won Deals</option>
@@ -13174,20 +13183,20 @@ export default function App() {
 
                         {/* Custom Date Pickers when Custom is selected */}
                         {dealsDateFilter === "custom" && (
-                          <div style={{ display: "inline-flex", alignItems: "center", gap: "3px", backgroundColor: "#f8fafc", padding: "1px 5px", borderRadius: "4px", border: "1px solid #cbd5e1" }}>
-                            <span style={{ fontSize: "8.5px", color: "#64748b", fontWeight: "600" }}>From:</span>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", backgroundColor: "#f8fafc", padding: "2px 8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
+                            <span style={{ fontSize: "12px", color: "#475569", fontWeight: "600" }}>From:</span>
                             <input
                               type="date"
                               value={dealsStartDate}
                               onChange={(e) => setDealsStartDate(e.target.value)}
-                              style={{ height: "19px", padding: "0 2px", fontSize: "9px", border: "1px solid #cbd5e1", borderRadius: "3px", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ height: "28px", padding: "0 4px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                             />
-                            <span style={{ fontSize: "8.5px", color: "#64748b", fontWeight: "600" }}>To:</span>
+                            <span style={{ fontSize: "12px", color: "#475569", fontWeight: "600" }}>To:</span>
                             <input
                               type="date"
                               value={dealsEndDate}
                               onChange={(e) => setDealsEndDate(e.target.value)}
-                              style={{ height: "19px", padding: "0 2px", fontSize: "9px", border: "1px solid #cbd5e1", borderRadius: "3px", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ height: "28px", padding: "0 4px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                             />
                           </div>
                         )}
@@ -13196,7 +13205,7 @@ export default function App() {
                         <select
                           value={dealsFilterAmount}
                           onChange={(e) => setDealsFilterAmount(e.target.value)}
-                          style={{ height: "23px", padding: "1px 5px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "9.5px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                          style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                         >
                           <option value="all">All Amounts</option>
                           <option value="high">High Value (&gt; ₹20k)</option>
@@ -13208,7 +13217,7 @@ export default function App() {
                         <select
                           value={dealsSortBy}
                           onChange={(e) => setDealsSortBy(e.target.value)}
-                          style={{ height: "23px", padding: "1px 5px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "9.5px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                          style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                         >
                           <option value="newest">Newest First</option>
                           <option value="highest">Highest Amount</option>
@@ -13226,7 +13235,7 @@ export default function App() {
                               setDealsEndDate("");
                               setDealsSortBy("newest");
                             }}
-                            style={{ height: "23px", padding: "1px 7px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "9.5px", fontWeight: "600", color: "#475569", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "34px", padding: "0 12px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
                             Reset
                           </button>
@@ -13234,8 +13243,8 @@ export default function App() {
                       </div>
 
                       {/* Bottom Row: Interactive Date & Category Quick Filter Pills */}
-                      <div style={{ display: "flex", alignItems: "center", gap: "4px", flexWrap: "wrap", paddingTop: "2px", borderTop: "1px dashed #f1f5f9" }}>
-                        <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px", marginRight: "2px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap", paddingTop: "8px", borderTop: "1px dashed #e2e8f0" }}>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginRight: "4px" }}>
                           Quick Filters:
                         </span>
                         {[
@@ -13268,13 +13277,16 @@ export default function App() {
                                 }
                               }}
                               style={{
-                                padding: "2px 8px",
-                                borderRadius: "12px",
-                                fontSize: "9.5px",
-                                fontWeight: isActive ? "750" : "550",
+                                height: "32px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                padding: "0 12px",
+                                borderRadius: "6px",
+                                fontSize: "12px",
+                                fontWeight: isActive ? "600" : "500",
                                 border: isActive ? (chip.type === "date" ? "1px solid #16a34a" : "1px solid #2563eb") : "1px solid #e2e8f0",
                                 backgroundColor: isActive ? (chip.type === "date" ? "#f0fdf4" : "#eff6ff") : "#ffffff",
-                                color: isActive ? (chip.type === "date" ? "#166534" : "#2563eb") : "#475569",
+                                color: isActive ? (chip.type === "date" ? "#16a34a" : "#2563eb") : "#475569",
                                 cursor: "pointer",
                                 transition: "all 0.15s ease",
                                 fontFamily: "'Plus Jakarta Sans', sans-serif"
@@ -13293,35 +13305,35 @@ export default function App() {
                       
                       {/* Active Filter Period Banner */}
                       {dealsDateFilter === "last_month" && (
-                        <div style={{ backgroundColor: "#fff7ed", borderBottom: "1px solid #fed7aa", padding: "6px 12px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: "#9a3412", fontWeight: "600" }}>
+                        <div style={{ backgroundColor: "#fff7ed", borderBottom: "1px solid #fed7aa", padding: "8px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", color: "#ea580c", fontWeight: "600" }}>
                           <span>⏮️ Showing <strong>August 2026 (Last Month)</strong> Won Deals: <strong>{filteredWonDeals.length} Deals</strong> (₹{totalClosedVal.toLocaleString("en-IN")})</span>
-                          <button onClick={() => setDealsDateFilter("all")} style={{ border: "none", backgroundColor: "#ea580c", color: "#ffffff", padding: "3px 9px", borderRadius: "5px", fontSize: "10px", fontWeight: "750", cursor: "pointer" }}>Show All Closed Deals ({wonLeadsList.length})</button>
+                          <button onClick={() => setDealsDateFilter("all")} style={{ border: "none", backgroundColor: "#ea580c", color: "#ffffff", height: "30px", padding: "0 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}>Show All Closed Deals ({wonLeadsList.length})</button>
                         </div>
                       )}
                       {dealsDateFilter === "this_month" && (
-                        <div style={{ backgroundColor: "#f0fdf4", borderBottom: "1px solid #bbf7d0", padding: "6px 12px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: "#16a34a", fontWeight: "600" }}>
+                        <div style={{ backgroundColor: "#f0fdf4", borderBottom: "1px solid #bbf7d0", padding: "8px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", color: "#16a34a", fontWeight: "600" }}>
                           <span>🗓️ Showing <strong>September 2026 (Current Month)</strong> Won Deals: <strong>{filteredWonDeals.length} Deals</strong> (₹{totalClosedVal.toLocaleString("en-IN")})</span>
-                          <button onClick={() => setDealsDateFilter("all")} style={{ border: "none", backgroundColor: "#16a34a", color: "#ffffff", padding: "3px 9px", borderRadius: "5px", fontSize: "10px", fontWeight: "750", cursor: "pointer" }}>Show All Closed Deals ({wonLeadsList.length})</button>
+                          <button onClick={() => setDealsDateFilter("all")} style={{ border: "none", backgroundColor: "#16a34a", color: "#ffffff", height: "30px", padding: "0 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}>Show All Closed Deals ({wonLeadsList.length})</button>
                         </div>
                       )}
 
                       {filteredWonDeals.length === 0 ? (
-                        <div style={{ padding: "26px 16px", textAlign: "center", color: "#94a3b8" }}>
-                          <Award size={24} color="#cbd5e1" style={{ margin: "0 auto 4px auto" }} />
-                          <h4 style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No closed deals found</h4>
-                          <p style={{ fontSize: "9.5px", margin: "1px 0 0 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Try changing search query or filters.</p>
+                        <div style={{ padding: "32px 16px", textAlign: "center", color: "#94a3b8" }}>
+                          <Award size={28} color="#cbd5e1" style={{ margin: "0 auto 6px auto" }} />
+                          <h4 style={{ fontSize: "13px", fontWeight: "700", color: "#475569", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No closed deals found</h4>
+                          <p style={{ fontSize: "12px", color: "#94a3b8", margin: "4px 0 0 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Try changing search query or filters.</p>
                         </div>
                       ) : (
                         <div style={{ overflowX: "auto" }}>
-                          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "10.5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                             <thead>
-                              <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#64748b", fontSize: "8.5px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.3px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                                <th style={{ padding: "6px 10px" }}>Client & Organization</th>
-                                <th style={{ padding: "6px 10px" }}>Deal Value (Inc. 18% GST)</th>
-                                <th style={{ padding: "6px 10px" }}>Stage / Type</th>
-                                <th style={{ padding: "6px 10px" }}>Closed Date</th>
-                                <th style={{ padding: "6px 10px" }}>Email Address</th>
-                                <th style={{ padding: "6px 10px" }}>Source</th>
+                              <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "12px", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                <th style={{ padding: "10px 14px" }}>Client & Organization</th>
+                                <th style={{ padding: "10px 14px" }}>Deal Value (Inc. 18% GST)</th>
+                                <th style={{ padding: "10px 14px" }}>Stage / Type</th>
+                                <th style={{ padding: "10px 14px" }}>Closed Date</th>
+                                <th style={{ padding: "10px 14px" }}>Email Address</th>
+                                <th style={{ padding: "10px 14px" }}>Source</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -13330,6 +13342,7 @@ export default function App() {
                                 const baseAmount = Number(deal.value) || 0;
                                 const gstAmount = Math.round(baseAmount * 0.18);
                                 const totalAmountWithGst = baseAmount + gstAmount;
+                                const formattedDate = deal.won_date ? new Date(deal.won_date + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "Recent";
 
                                 return (
                                   <tr
@@ -13342,17 +13355,17 @@ export default function App() {
                                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                                   >
                                     {/* Client & Organization */}
-                                    <td style={{ padding: "6px 10px" }}>
-                                      <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                                        <div style={{ width: "24px", height: "24px", borderRadius: "50%", backgroundColor: isRenewal ? "#7c3aed" : "#059669", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9.5px", fontWeight: "800", flexShrink: 0 }}>
+                                    <td style={{ padding: "10px 14px" }}>
+                                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                        <div style={{ width: "28px", height: "28px", borderRadius: "50%", backgroundColor: isRenewal ? "#2563eb" : "#16a34a", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "700", flexShrink: 0 }}>
                                           {(deal.name || "Deal").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                         </div>
                                         <div>
-                                          <strong style={{ fontSize: "10.5px", color: "#0f172a", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                          <strong style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                                             {deal.name || "Untitled Lead"}
                                           </strong>
-                                          <div style={{ fontSize: "9px", color: "#64748b", display: "flex", alignItems: "center", gap: "4px", marginTop: "1px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                                            <Building2 size={8.5} color="#64748b" />
+                                          <div style={{ fontSize: "12px", color: "#475569", display: "flex", alignItems: "center", gap: "5px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                            <Building2 size={12} color="#475569" />
                                             <span>{deal.company || "Direct Individual"}</span>
                                             {deal.phone && (
                                               <>
@@ -13366,54 +13379,53 @@ export default function App() {
                                     </td>
 
                                     {/* Deal Value (Total with GST) */}
-                                    <td style={{ padding: "6px 10px" }}>
+                                    <td style={{ padding: "10px 14px" }}>
                                       <div>
-                                        <strong style={{ fontSize: "11.5px", fontWeight: "800", color: "#0f172a", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                        <strong style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", display: "block", lineHeight: "1.3", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                                           ₹{totalAmountWithGst.toLocaleString("en-IN")}
                                         </strong>
-                                        <span style={{ fontSize: "8px", color: "#64748b", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                        <span style={{ fontSize: "11.5px", color: "#475569", display: "block", marginTop: "4px", lineHeight: "1.3", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                                           Base: ₹{baseAmount.toLocaleString("en-IN")} + GST (18%): ₹{gstAmount.toLocaleString("en-IN")}
                                         </span>
                                       </div>
                                     </td>
 
                                     {/* Stage / Type */}
-                                    <td style={{ padding: "6px 10px" }}>
+                                    <td style={{ padding: "10px 14px" }}>
                                       {isRenewal ? (
-                                        <span style={{ fontSize: "8.5px", fontWeight: "750", color: "#2563eb", backgroundColor: "#faf5ff", border: "1px solid #e9d5ff", padding: "1.5px 5px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                                          <RotateCw size={8} /> Renewal Won
+                                        <span style={{ fontSize: "11.5px", fontWeight: "600", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "3px 8px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                          <RotateCw size={11} /> Renewal Won
                                         </span>
                                       ) : (
-                                        <span style={{ fontSize: "8.5px", fontWeight: "750", color: "#16a34a", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "1.5px 5px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                                          <Check size={8} /> Closed Won
+                                        <span style={{ fontSize: "11.5px", fontWeight: "600", color: "#16a34a", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "3px 8px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                          <Check size={11} /> Closed Won
                                         </span>
                                       )}
                                     </td>
 
                                     {/* Closed Date */}
-                                    <td style={{ padding: "6px 10px", color: "#334155", fontSize: "9.5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                                      <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                                        <Calendar size={9} color={(deal.won_date || "").startsWith("2026-08") ? "#ea580c" : "#16a34a"} />
+                                    <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                      <div style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                                        <Calendar size={12} color={(deal.won_date || "").startsWith("2026-08") ? "#ea580c" : "#16a34a"} />
                                         <span style={{
-                                          padding: "1.5px 6px",
-                                          borderRadius: "4px",
-                                          fontWeight: "750",
-                                          fontSize: "9.5px",
+                                          padding: "3px 8px",
+                                          borderRadius: "6px",
+                                          fontWeight: "600",
+                                          fontSize: "12px",
                                           backgroundColor: (deal.won_date || "").startsWith("2026-08") ? "#fff7ed" : "#f0fdf4",
-                                          color: (deal.won_date || "").startsWith("2026-08") ? "#9a3412" : "#166534",
+                                          color: (deal.won_date || "").startsWith("2026-08") ? "#ea580c" : "#16a34a",
                                           border: (deal.won_date || "").startsWith("2026-08") ? "1px solid #fed7aa" : "1px solid #bbf7d0"
                                         }}>
-                                          {(deal.won_date || "").startsWith("2026-08") ? "🗓️ Aug '26: " : "🗓️ Sep '26: "}
-                                          {deal.won_date || "Recent"}
+                                          {formattedDate}
                                         </span>
                                       </div>
                                     </td>
 
                                     {/* Email Address */}
-                                    <td style={{ padding: "6px 10px", color: "#475569", fontSize: "9.5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                    <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                                       {deal.email ? (
-                                        <a href={`mailto:${deal.email}`} style={{ color: "#2563eb", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "3px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                                          <Globe size={9} color="#64748b" /> {deal.email}
+                                        <a href={`mailto:${deal.email}`} style={{ color: "#2563eb", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                          <Mail size={12} color="#2563eb" /> {deal.email}
                                         </a>
                                       ) : (
                                         <span style={{ color: "#94a3b8" }}>-</span>
@@ -13421,8 +13433,8 @@ export default function App() {
                                     </td>
 
                                     {/* Source */}
-                                    <td style={{ padding: "6px 10px", color: "#64748b", fontSize: "9px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                                      <span style={{ backgroundColor: "#f1f5f9", padding: "1px 4px", borderRadius: "3px" }}>
+                                    <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                      <span style={{ fontSize: "12px", color: "#475569" }}>
                                         {deal.source || "Direct"}
                                       </span>
                                     </td>

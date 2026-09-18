@@ -437,8 +437,8 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .sidebar-nav-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 12px;
 }
 
 .nav-group-title {
@@ -453,15 +453,15 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .sidebar-nav-list {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 6px;
 }
 
 .sidebar-nav-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 7px 12px;
-  min-height: 38px;
+  padding: 9px 12px;
+  min-height: 40px;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
