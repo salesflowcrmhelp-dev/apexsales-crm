@@ -6590,7 +6590,7 @@ export default function App() {
             <button 
               onClick={() => { setActiveWorkspace("users"); setShowReportsModal(false); }} 
               className={`sidebar-nav-item ${activeWorkspace === "users" ? "active" : ""}`}
-              title="User Profile"
+              title={isSidebarCollapsed ? "User Profile" : undefined}
             >
               <User className="nav-item-icon" />
               <span>User Profile</span>
@@ -6952,7 +6952,7 @@ export default function App() {
                 className="header-cta-orange"
                 style={{ height: "32px", boxSizing: "border-box" }}
               >
-                <Sun className="w-3.5 h-3.5 flex-shrink-0 text-orange-600" />
+                <Sun className="w-3.5 h-3.5 flex-shrink-0 text-blue-600" />
                 <span className="header-cta-desktop-text">Start My Day</span>
                 <span className="header-cta-mobile-text">My Day</span>
               </button>
@@ -9532,55 +9532,62 @@ export default function App() {
               </div>
             </div>
           ) : activeWorkspace === "users" ? (
-            <div className="user-profile-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "10px", border: "1px solid #e2e8f0", padding: "14px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="user-profile-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", padding: "16px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {/* Page Title Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "10px", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
-                  <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#0f172a", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <User size={15} color="#38bdf8" />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #e2e8f0", paddingBottom: "12px", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{ width: "34px", height: "34px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
+                    <User size={18} color="#2563eb" />
                   </div>
                   <div>
-                    <h2 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                    <h1 style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>
                       User Profile & Account Information
-                    </h2>
-                    <p style={{ fontSize: "10.5px", color: "#64748b", margin: "1px 0 0 0", fontWeight: "400" }}>
+                    </h1>
+                    <p style={{ fontSize: "12px", color: "#475569", margin: "3px 0 0 0", lineHeight: "1.4", fontWeight: "400" }}>
                       Manage your personal identity credentials, contact details, security credentials, and organization profile.
                     </p>
                   </div>
                 </div>
 
-                <div style={{ display: "flex", gap: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <button 
+                    type="button"
+                    onClick={() => setActiveWorkspace("pipeline")}
+                    style={{ padding: "0 12px", height: "32px", backgroundColor: "#ffffff", color: "#475569", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="button"
                     onClick={() => {
                       const userKey = currentUser?.id || currentUser?.name || "usr_admin";
                       localStorage.setItem(`crm_user_profile_${userKey}`, JSON.stringify(userProfile));
                       localStorage.setItem("crm_user_profile", JSON.stringify(userProfile));
-                      showToast("Saved profile information successfully!");
-                      setActiveWorkspace("pipeline");
+                      showToast("Saved profile information successfully!", "success");
                     }}
-                    style={{ padding: "4px 12px", height: "28px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "5px", fontSize: "11px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 3px rgba(37, 99, 235, 0.2)" }}
+                    style={{ padding: "0 14px", height: "32px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 1px 2px rgba(37, 99, 235, 0.2)" }}
                   >
-                    <Check size={13} /> Save & Go To Dashboard
+                    <Check size={14} /> Save Profile Changes
                   </button>
                 </div>
               </div>
 
               {/* Profile Hero Overview Card */}
-              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 16px", marginBottom: "12px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "14px 18px", marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                   <div style={{ position: "relative" }}>
                     <div 
                       style={{ 
-                        width: "50px", 
-                        height: "50px", 
+                        width: "52px", 
+                        height: "52px", 
                         borderRadius: "50%", 
                         backgroundColor: "#2563eb", 
                         color: "#ffffff", 
                         display: "flex", 
                         alignItems: "center", 
                         justifyContent: "center", 
-                        fontSize: "17px", 
-                        fontWeight: "800", 
+                        fontSize: "18px", 
+                        fontWeight: "700", 
                         border: "2px solid #ffffff", 
                         boxShadow: "0 2px 6px rgba(37,99,235,0.25)",
                         letterSpacing: "0.5px"
@@ -9588,32 +9595,38 @@ export default function App() {
                     >
                       {(userProfile.fullName || userProfile.displayName || "Admin").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                     </div>
-                    <div style={{ position: "absolute", bottom: "-2px", right: "-2px", backgroundColor: "#10b981", width: "13px", height: "13px", borderRadius: "50%", border: "2px solid #ffffff" }} title="Online & Active" />
+                    <div style={{ position: "absolute", bottom: "-2px", right: "-2px", backgroundColor: "#16a34a", width: "13px", height: "13px", borderRadius: "50%", border: "2px solid #ffffff" }} title="Online & Active" />
                   </div>
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                      <h2 style={{ fontSize: "15px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
                         {userProfile.fullName || "Harsh Goyal"}
-                      </h3>
-                      <span style={{ fontSize: "9.5px", fontWeight: "700", color: "#9333ea", backgroundColor: "#f3e8ff", border: "1px solid #e9d5ff", padding: "1px 6px", borderRadius: "4px" }}>
+                      </h2>
+                      <span style={{ fontSize: "11px", fontWeight: "600", color: "#1e40af", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "2px 8px", borderRadius: "6px" }}>
                         Super Admin
                       </span>
-                      <span style={{ fontSize: "9.5px", fontWeight: "600", color: "#16a34a", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "1px 6px", borderRadius: "4px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: "600", color: "#166534", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "2px 8px", borderRadius: "6px" }}>
                         ● Active
                       </span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px 12px", marginTop: "3px", fontSize: "10.5px", color: "#64748b" }}>
-                      <span>✉️ {userProfile.email}</span>
-                      <span>📞 {userProfile.phone}</span>
-                      <span>🏢 {userProfile.organization}</span>
+                    <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px 16px", marginTop: "6px", fontSize: "12px", color: "#475569" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                        <Mail size={13} color="#2563eb" /> {userProfile.email}
+                      </span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                        <Phone size={13} color="#2563eb" /> {userProfile.phone}
+                      </span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                        <Building2 size={13} color="#2563eb" /> {userProfile.organization}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <div style={{ textAlign: "right" }}>
-                    <span style={{ fontSize: "9.5px", color: "#64748b", fontWeight: "500", display: "block" }}>Account Status</span>
-                    <span style={{ fontSize: "11px", color: "#16a34a", fontWeight: "700", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "2px 8px", borderRadius: "5px", display: "inline-block" }}>
+                    <span style={{ fontSize: "11.5px", color: "#64748b", fontWeight: "500", display: "block" }}>Account Status</span>
+                    <span style={{ fontSize: "12px", color: "#166534", fontWeight: "600", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "3px 9px", borderRadius: "6px", display: "inline-block", marginTop: "2px" }}>
                       Verified & Active
                     </span>
                   </div>
@@ -9621,73 +9634,73 @@ export default function App() {
               </div>
 
               {/* 2-Column Form Layout matching Settings */}
-              <div className="user-profile-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div className="user-profile-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                 {/* Column 1 (Left): Personal Details & Organization */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   
                   {/* Card 1: Personal Contact Details */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-                      <User size={13} color="#2563eb" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "14px 16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <User size={15} color="#2563eb" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         Personal Contact & Identity Details
                       </h3>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Full Legal Name</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Full Legal Name</label>
                           <input 
                             type="text" 
                             value={userProfile.fullName}
                             onChange={(e) => setUserProfile({ ...userProfile, fullName: e.target.value })}
                             placeholder="e.g. Harsh Goyal"
-                            style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Display Name / Greeting</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Display Name / Greeting</label>
                           <input 
                             type="text" 
                             value={userProfile.displayName}
                             onChange={(e) => setUserProfile({ ...userProfile, displayName: e.target.value })}
                             placeholder="e.g. Admin"
-                            style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Official Email Address</label>
+                        <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Official Email Address</label>
                         <input 
                           type="email" 
                           value={userProfile.email}
                           onChange={(e) => setUserProfile({ ...userProfile, email: e.target.value })}
                           placeholder="e.g. admin@pipeline.crm"
-                          style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                          style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                         />
                       </div>
 
-                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Direct Mobile Phone</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Direct Mobile Phone</label>
                           <input 
                             type="tel" 
                             value={userProfile.phone}
                             onChange={(e) => setUserProfile({ ...userProfile, phone: e.target.value })}
                             placeholder="+91 98208 92128"
-                            style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>WhatsApp Alert Number</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>WhatsApp Alert Number</label>
                           <input 
                             type="tel" 
                             value={userProfile.whatsappNumber}
                             onChange={(e) => setUserProfile({ ...userProfile, whatsappNumber: e.target.value })}
                             placeholder="+91 98208 92128"
-                            style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
                       </div>
@@ -9695,55 +9708,55 @@ export default function App() {
                   </div>
 
                   {/* Card 2: Department & Organization Info */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-                      <Building2 size={13} color="#059669" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "14px 16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <Building2 size={15} color="#2563eb" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         Organization & Department Role
                       </h3>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "8px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "10px" }}>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Company / Organization Name</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Company / Organization Name</label>
                           <input 
                             type="text" 
                             value={userProfile.organization}
                             onChange={(e) => setUserProfile({ ...userProfile, organization: e.target.value })}
                             placeholder="e.g. SalesFlow CRM Workspace"
-                            style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Employee / Admin ID</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Employee / Admin ID</label>
                           <input 
                             type="text" 
                             value={userProfile.employeeId}
                             onChange={(e) => setUserProfile({ ...userProfile, employeeId: e.target.value })}
                             placeholder="e.g. SF-ADMIN-01"
-                            style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
                       </div>
 
-                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Job Title / Designation</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Job Title / Designation</label>
                           <input 
                             type="text" 
                             value={userProfile.designation}
                             onChange={(e) => setUserProfile({ ...userProfile, designation: e.target.value })}
                             placeholder="e.g. Super Administrator / Sales Head"
-                            style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Department</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Department</label>
                           <select
                             value={userProfile.department}
                             onChange={(e) => setUserProfile({ ...userProfile, department: e.target.value })}
-                            style={{ width: "100%", padding: "3px 6px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           >
                             <option value="Sales & Revenue Operations">Sales & Revenue Operations</option>
                             <option value="Executive Management">Executive Management</option>
@@ -9758,45 +9771,45 @@ export default function App() {
                 </div>
 
                 {/* Column 2 (Right): Account Security, Regional & Permissions */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   
                   {/* Card 3: Security & PIN / Password */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-                      <Lock size={13} color="#4f46e5" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "14px 16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <Lock size={15} color="#2563eb" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         Security Credentials & Login PIN
                       </h3>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>New Security PIN / Passcode (6-Digits)</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>New Security PIN / Passcode (6-Digits)</label>
                           <input 
                             type="password" 
                             maxLength={6}
                             value={profileNewPassword}
                             onChange={(e) => setProfileNewPassword(e.target.value.replace(/\D/g, "").slice(0, 6))}
                             placeholder="Enter new 6-digit PIN"
-                            style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
                         <div>
-                          <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Confirm New PIN (6-Digits)</label>
+                          <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Confirm New PIN (6-Digits)</label>
                           <input 
                             type="password" 
                             maxLength={6}
                             value={profileConfirmPassword}
                             onChange={(e) => setProfileConfirmPassword(e.target.value.replace(/\D/g, "").slice(0, 6))}
                             placeholder="Re-enter 6-digit PIN"
-                            style={{ width: "100%", padding: "4px 8px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                            style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
                       </div>
 
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", paddingTop: "4px" }}>
-                        <span style={{ fontSize: "9.5px", color: "#64748b" }}>Biometric Face ID & Touch ID unlock is currently active.</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", paddingTop: "4px" }}>
+                        <span style={{ fontSize: "12px", color: "#64748b", lineHeight: "1.4" }}>Biometric Face ID & Touch ID unlock is currently active.</span>
                         <button
                           type="button"
                           onClick={() => {
@@ -9819,7 +9832,7 @@ export default function App() {
                             setProfileConfirmPassword("");
                             showToast("Security 6-digit PIN updated successfully!", "success");
                           }}
-                          style={{ padding: "3px 10px", height: "24px", backgroundColor: "#4f46e5", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "10.5px", fontWeight: "600", cursor: "pointer" }}
+                          style={{ padding: "0 14px", height: "32px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 1px 2px rgba(37, 99, 235, 0.2)" }}
                         >
                           Update Security PIN
                         </button>
@@ -9828,21 +9841,21 @@ export default function App() {
                   </div>
 
                   {/* Card 4: Regional & Display Preferences */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-                      <Globe size={13} color="#0891b2" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "14px 16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <Globe size={15} color="#2563eb" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         Regional & Localization Preferences
                       </h3>
                     </div>
 
-                    <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                    <div className="profile-field-duo" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                       <div>
-                        <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Standard Timezone</label>
+                        <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Standard Timezone</label>
                         <select
                           value={userProfile.timezone}
                           onChange={(e) => setUserProfile({ ...userProfile, timezone: e.target.value })}
-                          style={{ width: "100%", padding: "3px 6px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                          style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                         >
                           <option value="Asia/Kolkata (IST +5:30)">Asia/Kolkata (IST +5:30)</option>
                           <option value="Asia/Dubai (GST +4:00)">Asia/Dubai (GST +4:00)</option>
@@ -9852,11 +9865,11 @@ export default function App() {
                       </div>
 
                       <div>
-                        <label style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "2px" }}>Operating Currency</label>
+                        <label style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Operating Currency</label>
                         <select
                           value={userProfile.currency}
                           onChange={(e) => setUserProfile({ ...userProfile, currency: e.target.value })}
-                          style={{ width: "100%", padding: "3px 6px", height: "26px", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                          style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                         >
                           <option value="INR (₹) - Indian Rupee">INR (₹) - Indian Rupee</option>
                           <option value="USD ($) - US Dollar">USD ($) - US Dollar</option>
@@ -9867,48 +9880,64 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Card 5: Role Permissions & Privileges */}
-                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-                      <Shield size={13} color="#7c3aed" />
-                      <h3 style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                  {/* Card 5: Role Permissions & Privileges Categorized with Icons */}
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "14px 16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                      <ShieldCheck size={15} color="#2563eb" />
+                      <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
                         Workspace Privileges & Security Role
                       </h3>
                     </div>
 
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-                      {["Full Pipeline Control", "Lead CSV Export & Import", "Revenue Audit & Reports", "Automated WhatsApp Alerts", "SMS Gateway Management", "Face ID Biometric Login"].map((perm) => (
-                        <span key={perm} style={{ fontSize: "9.5px", fontWeight: "600", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", padding: "2px 7px", borderRadius: "4px", color: "#334155", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                          ✓ {perm}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      {/* Category 1: Pipeline & Data Operations */}
+                      <div>
+                        <span style={{ fontSize: "11px", fontWeight: "700", color: "#475569", textTransform: "uppercase", letterSpacing: "0.04em", display: "block", marginBottom: "6px" }}>
+                          Pipeline & Data Management
                         </span>
-                      ))}
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "500", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", padding: "4px 9px", borderRadius: "6px", color: "#0f172a", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <Layers size={13} color="#2563eb" /> Full Pipeline Control
+                          </span>
+                          <span style={{ fontSize: "12px", fontWeight: "500", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", padding: "4px 9px", borderRadius: "6px", color: "#0f172a", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <FileSpreadsheet size={13} color="#2563eb" /> Lead CSV Export & Import
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Category 2: Intelligence & Reports */}
+                      <div>
+                        <span style={{ fontSize: "11px", fontWeight: "700", color: "#475569", textTransform: "uppercase", letterSpacing: "0.04em", display: "block", marginBottom: "6px" }}>
+                          Intelligence & Alerts
+                        </span>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "500", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", padding: "4px 9px", borderRadius: "6px", color: "#0f172a", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <BarChart2 size={13} color="#2563eb" /> Revenue Audit & Reports
+                          </span>
+                          <span style={{ fontSize: "12px", fontWeight: "500", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", padding: "4px 9px", borderRadius: "6px", color: "#0f172a", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <MessageCircle size={13} color="#2563eb" /> Automated WhatsApp Alerts
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Category 3: Security & Access Control */}
+                      <div>
+                        <span style={{ fontSize: "11px", fontWeight: "700", color: "#475569", textTransform: "uppercase", letterSpacing: "0.04em", display: "block", marginBottom: "6px" }}>
+                          Security & Authentication
+                        </span>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "500", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", padding: "4px 9px", borderRadius: "6px", color: "#0f172a", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <ScanFace size={13} color="#2563eb" /> Face ID Biometric Login
+                          </span>
+                          <span style={{ fontSize: "12px", fontWeight: "500", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", padding: "4px 9px", borderRadius: "6px", color: "#0f172a", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                            <Smartphone size={13} color="#2563eb" /> SMS Gateway Management
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                 </div>
-              </div>
-
-              {/* Bottom Sticky Action Bar */}
-              <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #f1f5f9", display: "flex", justifyContent: "flex-end", gap: "8px" }}>
-                <button
-                  type="button"
-                  onClick={() => setActiveWorkspace("pipeline")}
-                  style={{ padding: "5px 12px", height: "28px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", fontWeight: "500", color: "#475569", cursor: "pointer" }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const userKey = currentUser?.id || currentUser?.name || "usr_admin";
-                    localStorage.setItem(`crm_user_profile_${userKey}`, JSON.stringify(userProfile));
-                    localStorage.setItem("crm_user_profile", JSON.stringify(userProfile));
-                    showToast("User Profile updated successfully!", "success");
-                  }}
-                  style={{ padding: "5px 14px", height: "28px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "5px", fontSize: "11px", fontWeight: "600", cursor: "pointer", boxShadow: "0 1px 3px rgba(37, 99, 235, 0.2)" }}
-                >
-                  Save Profile Changes
-                </button>
               </div>
 
             </div>
