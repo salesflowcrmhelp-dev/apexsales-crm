@@ -587,20 +587,21 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .header-cta-orange {
-  background: transparent;
+  background: #ffffff;
   color: #475569;
-  border: 1px solid transparent;
-  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  padding: 0 11px;
   height: 34px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: none;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
 }
 
 .header-cta-orange:hover {

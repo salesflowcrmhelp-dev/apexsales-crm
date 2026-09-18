@@ -6913,15 +6913,15 @@ export default function App() {
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "6px",
-                    padding: "5px 11px",
-                    backgroundColor: "#eff6ff",
-                    border: "1.5px solid #93c5fd",
-                    borderRadius: "8px",
-                    fontSize: "11.5px",
-                    fontWeight: "800",
+                    padding: "0 11px",
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: "600",
                     color: "#2563eb",
                     cursor: "pointer",
-                    boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
                     whiteSpace: "nowrap"
                   }}
@@ -6961,10 +6961,10 @@ export default function App() {
                   display: "flex",
                   alignItems: "center",
                   gap: "7px",
-                  padding: "3px 9px 3px 6px",
-                  backgroundColor: "#f8fafc",
+                  padding: "0 10px 0 6px",
+                  backgroundColor: "#ffffff",
                   border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
+                  borderRadius: "6px",
                   boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
                   flexShrink: 0
                 }}
@@ -7116,22 +7116,22 @@ export default function App() {
               </div>
 
               {/* 2. TOP CONTROL HEADER FOR CALENDAR HUB */}
-              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 14px", marginBottom: "10px", display: "flex", flexDirection: "column", gap: "9px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#0f172a", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <Calendar size={15} color="#38bdf8" />
+              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 14px", marginBottom: "10px", display: "flex", flexDirection: "column", gap: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <Calendar size={16} color="#2563eb" />
                     </div>
                     <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <h2 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <h1 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
                           {checkIsSuperAdmin(currentUser) 
                             ? "Enterprise Sales & Meeting Calendar" 
                             : currentUser?.role === "manager" 
                               ? "Team Sales & Follow-up Calendar" 
                               : "My Sales & Follow-up Calendar"}
-                        </h2>
-                        <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#2563eb", backgroundColor: "#faf5ff", padding: "1px 6px", borderRadius: "8px", border: "1px solid #ddd6fe" }}>
+                        </h1>
+                        <span style={{ fontSize: "11px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "2px 8px", borderRadius: "6px", border: "1px solid #bfdbfe" }}>
                           {checkIsSuperAdmin(currentUser) 
                             ? "MASTER SCHEDULE" 
                             : currentUser?.role === "manager" 
@@ -7139,7 +7139,7 @@ export default function App() {
                               : "INDIVIDUAL SCHEDULE"}
                         </span>
                       </div>
-                      <p style={{ fontSize: "10.5px", color: "#64748b", margin: "1px 0 0 0", fontWeight: "400" }}>
+                      <p style={{ fontSize: "12px", color: "#475569", margin: "4px 0 0 0", fontWeight: "400" }}>
                         {checkIsSuperAdmin(currentUser) 
                           ? "Company-wide date-wise tracking of Demos, Payment Follow-ups, and Renewals." 
                           : currentUser?.role === "manager" 
@@ -7150,19 +7150,19 @@ export default function App() {
                   </div>
 
                   {/* Month Navigation + Today Button */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     <button
                       onClick={() => {
                         const d = new Date(calendarViewDate);
                         d.setMonth(d.getMonth() - 1);
                         setCalendarViewDate(d);
                       }}
-                      style={{ padding: "4px 9px", height: "26px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", fontWeight: "500", cursor: "pointer", color: "#334155" }}
+                      style={{ padding: "0 12px", height: "32px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", color: "#475569" }}
                     >
                       ‹ Prev
                     </button>
 
-                    <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a", minWidth: "120px", textAlign: "center" }}>
+                    <span style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", minWidth: "140px", textAlign: "center" }}>
                       {calendarViewDate.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
                     </span>
 
@@ -7172,7 +7172,7 @@ export default function App() {
                         d.setMonth(d.getMonth() + 1);
                         setCalendarViewDate(d);
                       }}
-                      style={{ padding: "4px 9px", height: "26px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "11px", fontWeight: "500", cursor: "pointer", color: "#334155" }}
+                      style={{ padding: "0 12px", height: "32px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", color: "#475569" }}
                     >
                       Next ›
                     </button>
@@ -7182,9 +7182,9 @@ export default function App() {
                         setCalendarViewDate(new Date());
                         setSelectedCalendarDateStr(new Date().toISOString().split('T')[0]);
                       }}
-                      style={{ padding: "4px 10px", height: "26px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "5px", fontSize: "11px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 3px rgba(15, 23, 42, 0.2)" }}
+                      style={{ padding: "0 12px", height: "32px", backgroundColor: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)" }}
                     >
-                      <Calendar size={12} color="#ffffff" />
+                      <Calendar size={13} color="#2563eb" />
                       <span>Today</span>
                     </button>
                   </div>
@@ -7192,30 +7192,31 @@ export default function App() {
 
                 {/* Event Category Filter Pills & Owner Filter Bar */}
                 <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
-                  <div style={{ display: "flex", gap: "5px", alignItems: "center", flexWrap: "wrap" }}>
-                    <span style={{ fontSize: "10.5px", fontWeight: "500", color: "#64748b", marginRight: "3px" }}>Filter:</span>
+                  <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginRight: "4px" }}>Filter:</span>
                     {[
-                      { id: "all", label: "All Scheduled Events", icon: <Calendar size={12} /> },
-                      { id: "demo", label: "Demos Booked", icon: <Target size={12} color="#7c3aed" /> },
-                      { id: "payment", label: "Payment Follow-ups", icon: <IndianRupee size={12} color="#059669" /> },
-                      { id: "renewal", label: "Renewals", icon: <RefreshCw size={12} color="#ea580c" /> },
-                      { id: "followup", label: "General Follow-ups", icon: <Phone size={12} color="#2563eb" /> }
+                      { id: "all", label: "All Scheduled Events", icon: <Calendar size={13} /> },
+                      { id: "demo", label: "Demos Booked", icon: <Target size={13} color="#2563eb" /> },
+                      { id: "payment", label: "Payment Follow-ups", icon: <IndianRupee size={13} color="#16a34a" /> },
+                      { id: "renewal", label: "Renewals", icon: <RefreshCw size={13} color="#ea580c" /> },
+                      { id: "followup", label: "General Follow-ups", icon: <Phone size={13} color="#2563eb" /> }
                     ].map(cat => (
                       <button
                         key={cat.id}
                         onClick={() => setCalendarFilterCategory(cat.id)}
                         style={{
-                          padding: "3px 9px",
-                          borderRadius: "5px",
-                          fontSize: "10.5px",
-                          fontWeight: "500",
+                          height: "32px",
+                          padding: "0 12px",
+                          borderRadius: "6px",
+                          fontSize: "12px",
+                          fontWeight: "600",
                           border: calendarFilterCategory === cat.id ? "1.5px solid #2563eb" : "1px solid #e2e8f0",
                           backgroundColor: calendarFilterCategory === cat.id ? "#eff6ff" : "#ffffff",
                           color: calendarFilterCategory === cat.id ? "#2563eb" : "#475569",
                           cursor: "pointer",
                           display: "inline-flex",
                           alignItems: "center",
-                          gap: "5px",
+                          gap: "6px",
                           transition: "all 0.15s ease"
                         }}
                       >
@@ -7239,17 +7240,17 @@ export default function App() {
                           onChange={(e) => setCalendarOwnerFilter(e.target.value)}
                           style={{
                             appearance: "none",
-                            padding: "3px 22px 3px 8px",
+                            padding: "0 26px 0 10px",
                             border: "1px solid #e2e8f0",
                             borderRadius: "6px",
-                            fontSize: "11px",
-                            color: calendarOwnerFilter ? "#7c3aed" : "#475569",
-                            backgroundColor: isRepOnly ? "#f8fafc" : (calendarOwnerFilter ? "#f5f3ff" : "#ffffff"),
+                            fontSize: "12px",
+                            color: calendarOwnerFilter ? "#2563eb" : "#475569",
+                            backgroundColor: isRepOnly ? "#f8fafc" : (calendarOwnerFilter ? "#eff6ff" : "#ffffff"),
                             outline: "none",
                             cursor: isRepOnly ? "default" : "pointer",
                             fontWeight: "600",
                             fontFamily: "'Plus Jakarta Sans', sans-serif",
-                            height: "28px"
+                            height: "32px"
                           }}
                         >
                           {isRepOnly ? (
@@ -7270,7 +7271,7 @@ export default function App() {
                             </>
                           )}
                         </select>
-                        <ChevronDown size={11} style={{ position: "absolute", right: "6px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8", pointerEvents: "none" }} />
+                        <ChevronDown size={12} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8", pointerEvents: "none" }} />
                       </div>
                     );
                   })()}
@@ -7281,19 +7282,19 @@ export default function App() {
               <div className="calendar-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "12px", alignItems: "start" }}>
                 
                 {/* LEFT COLUMN: 7-DAY MONTH CALENDAR GRID */}
-                <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 12px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                   
                   {/* Day Names Header Row (Mon - Sun) */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", textAlign: "center", paddingBottom: "6px", borderBottom: "1px solid #e2e8f0", marginBottom: "6px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", textAlign: "center", paddingBottom: "8px", borderBottom: "1px solid #e2e8f0", marginBottom: "8px" }}>
                     {["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"].map(day => (
-                      <span key={day} style={{ fontSize: "9.5px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.4px" }}>
+                      <span key={day} style={{ fontSize: "11px", fontWeight: "600", color: "#475569", letterSpacing: "0.5px" }}>
                         {day}
                       </span>
                     ))}
                   </div>
 
                   {/* Days Grid (35 cells) */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "5px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "6px" }}>
                     {(() => {
                       const year = calendarViewDate.getFullYear();
                       const month = calendarViewDate.getMonth();
@@ -7307,7 +7308,7 @@ export default function App() {
                       // Blank cells for previous month padding
                       for (let i = 0; i < startingDay; i++) {
                         cells.push(
-                          <div key={`blank-${i}`} style={{ height: "66px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #f1f5f9" }} />
+                          <div key={`blank-${i}`} style={{ minHeight: "76px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #f1f5f9" }} />
                         );
                       }
 
@@ -7321,14 +7322,13 @@ export default function App() {
                         // Filter events for this date
                         let dayEvents = calendarEventsByDate[dateStr] || [];
                         if (calendarFilterCategory !== "all") {
-                          dayEvents = dayEvents.filter(ev => ev.type === calendarFilterCategory);
+                           dayEvents = dayEvents.filter(ev => ev.type === calendarFilterCategory);
                         }
 
-                        // Special styling matching Option 2 Mockup for Day 1, 2, 10
                         const hasEvents = dayEvents.length > 0;
 
                         const cellBg = isSelected 
-                          ? "#f0f9ff" 
+                          ? "#eff6ff" 
                           : isToday 
                           ? "#fff7ed" 
                           : hasEvents 
@@ -7336,63 +7336,80 @@ export default function App() {
                           : "#ffffff";
 
                         const cellBorder = isSelected 
-                          ? "1.5px solid #0284c7" 
+                          ? "2px solid #2563eb" 
                           : isToday 
                           ? "1.5px solid #ea580c" 
                           : hasEvents 
                           ? "1px solid #cbd5e1" 
                           : "1px solid #e2e8f0";
 
+                        const cellShadow = isSelected 
+                          ? "0 0 0 1px #2563eb, 0 2px 6px rgba(37, 99, 235, 0.15)"
+                          : "none";
+
                         cells.push(
                           <div
                             key={d}
                             onClick={() => setSelectedCalendarDateStr(dateStr)}
                             style={{
-                              height: "68px",
+                              minHeight: "76px",
                               backgroundColor: cellBg,
                               border: cellBorder,
                               borderRadius: "6px",
-                              padding: "4px 5px",
+                              padding: "6px 8px",
                               cursor: "pointer",
                               display: "flex",
                               flexDirection: "column",
                               justifyContent: "space-between",
                               transition: "all 0.15s ease",
+                              boxShadow: cellShadow,
                               overflow: "hidden"
                             }}
                           >
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <span style={{ fontSize: "11px", fontWeight: isToday || isSelected ? "600" : "500", color: isToday ? "#c2410c" : isSelected ? "#0284c7" : "#0f172a" }}>
+                              <span style={{
+                                fontSize: "12px",
+                                fontWeight: isToday || isSelected ? "700" : "500",
+                                color: isSelected ? "#ffffff" : isToday ? "#ea580c" : "#0f172a",
+                                backgroundColor: isSelected ? "#2563eb" : isToday ? "#ffedd5" : "transparent",
+                                borderRadius: isSelected || isToday ? "50%" : "0",
+                                width: isSelected || isToday ? "22px" : "auto",
+                                height: isSelected || isToday ? "22px" : "auto",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                              }}>
                                 {d}
                               </span>
                               {dayEvents.length > 0 && (
-                                <span style={{ fontSize: "8.5px", fontWeight: "600", backgroundColor: "#0f172a", color: "#ffffff", padding: "0 4px", borderRadius: "6px" }}>
+                                <span style={{ fontSize: "10px", fontWeight: "700", backgroundColor: "#0f172a", color: "#ffffff", padding: "1px 5px", borderRadius: "6px" }}>
                                   {dayEvents.length}
                                 </span>
                               )}
                             </div>
 
-                            {/* Day Events Badges (Clean Soft Pastel Chips) */}
-                            <div style={{ display: "flex", flexDirection: "column", gap: "2px", overflow: "hidden", marginTop: "1px" }}>
+                            {/* Day Events Badges (Clean Soft Pastel Chips with proper internal padding) */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: "3px", overflow: "hidden", marginTop: "3px" }}>
                               {dayEvents.slice(0, 2).map((ev, idx) => {
                                 const chipLabel = ev.name 
                                   ? ev.name.split(" ")[0] 
                                   : (ev.type === "demo" ? "Demo" : ev.type === "payment" ? "Payment" : ev.type === "renewal" ? "Renewal" : "Follow-up");
 
-                                const chipBg = ev.bg || (ev.type === "demo" ? "#dcfce7" : ev.type === "payment" ? "#f3e8ff" : ev.type === "renewal" ? "#e0f2fe" : "#ffedd5");
-                                const chipColor = ev.color || (ev.type === "demo" ? "#15803d" : ev.type === "payment" ? "#7e22ce" : ev.type === "renewal" ? "#0369a1" : "#c2410c");
+                                const chipBg = ev.type === "demo" ? "#eff6ff" : ev.type === "payment" ? "#f0fdf4" : ev.type === "renewal" ? "#eff6ff" : "#fff7ed";
+                                const chipColor = ev.type === "demo" ? "#2563eb" : ev.type === "payment" ? "#16a34a" : ev.type === "renewal" ? "#2563eb" : "#ea580c";
+                                const chipBorder = ev.type === "demo" ? "#bfdbfe" : ev.type === "payment" ? "#bbf7d0" : ev.type === "renewal" ? "#bfdbfe" : "#fed7aa";
 
                                 return (
                                   <div
                                     key={idx}
                                     style={{
-                                      fontSize: "8.5px",
-                                      fontWeight: "500",
+                                      fontSize: "10.5px",
+                                      fontWeight: "600",
                                       backgroundColor: chipBg,
                                       color: chipColor,
-                                      border: `1px solid ${chipColor}25`,
-                                      padding: "1px 4px",
-                                      borderRadius: "3px",
+                                      border: `1px solid ${chipBorder}`,
+                                      padding: "2.5px 6px",
+                                      borderRadius: "6px",
                                       whiteSpace: "nowrap",
                                       overflow: "hidden",
                                       textOverflow: "ellipsis",
@@ -7407,7 +7424,7 @@ export default function App() {
                                 );
                               })}
                               {dayEvents.length > 2 && (
-                                <span style={{ fontSize: "8px", fontWeight: "500", color: "#64748b" }}>
+                                <span style={{ fontSize: "10px", fontWeight: "600", color: "#475569" }}>
                                   +{dayEvents.length - 2} more
                                 </span>
                               )}
@@ -7422,20 +7439,20 @@ export default function App() {
                 </div>
 
                 {/* RIGHT COLUMN: EXECUTIVE AGENDA FEED WITH SMART AI NOTE PREVIEWS */}
-                <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "12px", display: "flex", flexDirection: "column", gap: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "14px", display: "flex", flexDirection: "column", gap: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                   
                   {/* Selected Date Header */}
-                  <div style={{ borderBottom: "1px solid #f1f5f9", paddingBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ borderBottom: "1px solid #f1f5f9", paddingBottom: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#4f46e5", backgroundColor: "#eef2ff", padding: "1px 6px", borderRadius: "8px", textTransform: "uppercase", letterSpacing: "0.3px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "2px 8px", borderRadius: "6px", letterSpacing: "0.4px" }}>
                         AGENDA FEED
                       </span>
-                      <h3 style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a", margin: "3px 0 0 0", display: "flex", alignItems: "center", gap: "5px" }}>
-                        <Calendar size={13} color="#4f46e5" />
+                      <h2 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: "4px 0 0 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <Calendar size={15} color="#2563eb" />
                         <span>{new Date(selectedCalendarDateStr + "T00:00:00").toLocaleDateString("en-IN", { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                      </h3>
+                      </h2>
                     </div>
-                    <span style={{ fontSize: "10px", fontWeight: "500", color: "#64748b", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 6px", borderRadius: "5px" }}>
+                    <span style={{ fontSize: "11.5px", fontWeight: "600", color: "#475569", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "3px 8px", borderRadius: "6px" }}>
                       {(calendarEventsByDate[selectedCalendarDateStr] || []).length > 0
                         ? `${(calendarEventsByDate[selectedCalendarDateStr] || []).length} Scheduled`
                         : "Active Pipeline Feed"}
@@ -7443,7 +7460,7 @@ export default function App() {
                   </div>
 
                   {/* List of Scheduled Events for Selected Date */}
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxHeight: "550px", overflowY: "auto" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "550px", overflowY: "auto" }}>
                     {(() => {
                       let dayEvents = calendarEventsByDate[selectedCalendarDateStr] || [];
                       if (calendarFilterCategory !== "all") {
@@ -7457,16 +7474,16 @@ export default function App() {
                         return (
                           <div style={{ textAlign: "center", padding: "35px 12px", color: "#94a3b8" }}>
                             <Calendar size={28} color="#cbd5e1" style={{ margin: "0 auto 8px auto" }} />
-                            <strong style={{ fontSize: "12px", color: "#475569", display: "block" }}>No follow-ups scheduled for this date.</strong>
-                            <span style={{ fontSize: "10px", color: "#94a3b8", display: "block", marginTop: "2px" }}>Select another date on the calendar or schedule a new follow-up.</span>
+                            <strong style={{ fontSize: "13px", color: "#475569", display: "block" }}>No follow-ups scheduled for this date.</strong>
+                            <span style={{ fontSize: "12px", color: "#94a3b8", display: "block", marginTop: "4px" }}>Select another date on the calendar or schedule a new follow-up.</span>
                             <button
                               onClick={() => {
                                 setNewLeadName("");
                                 setShowAddModal(true);
                               }}
-                              style={{ marginTop: "12px", padding: "6px 14px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 3px rgba(234, 88, 12, 0.25)" }}
+                              style={{ marginTop: "12px", height: "32px", padding: "0 14px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 3px rgba(234, 88, 12, 0.25)" }}
                             >
-                              <Plus size={12} color="#ffffff" />
+                              <Plus size={13} color="#ffffff" />
                               <span>+ Schedule Follow-up</span>
                             </button>
                           </div>
@@ -7494,53 +7511,53 @@ export default function App() {
                             style={{
                               backgroundColor: "#ffffff",
                               border: "1px solid #e2e8f0",
-                              borderRadius: "8px",
-                              padding: "10px 12px",
+                              borderRadius: "6px",
+                              padding: "12px 14px",
                               display: "flex",
                               flexDirection: "column",
-                              gap: "8px",
+                              gap: "10px",
                               boxShadow: "0 1px 3px rgba(15, 23, 42, 0.02)",
                               transition: "all 0.15s ease"
                             }}
                           >
                             {/* Top Row: Lead Name, Priority Indicator, and Value */}
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
                               <div>
-                                <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
-                                  <strong style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                                  <strong style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a" }}>
                                     {ev.name}
                                   </strong>
-                                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: scoreDotColor }} title={`Priority: ${ev.score}`} />
+                                  <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: scoreDotColor }} title={`Priority: ${ev.score}`} />
                                   {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && ev.owner && (
-                                    <span style={{ fontSize: "8.5px", backgroundColor: "#f1f5f9", color: "#475569", padding: "1px 5px", borderRadius: "3px", fontWeight: "600", border: "1px solid #e2e8f0" }}>
+                                    <span style={{ fontSize: "11px", backgroundColor: "#f1f5f9", color: "#475569", padding: "2px 6px", borderRadius: "6px", fontWeight: "600", border: "1px solid #e2e8f0" }}>
                                       👤 {ev.owner}
                                     </span>
                                   )}
                                 </div>
-                                <div style={{ fontSize: "10.5px", color: "#64748b", marginTop: "1px", fontWeight: "400" }}>
-                                  {ev.company || "Lead Company"} • <span style={{ color: "#475569", fontWeight: "500" }}>{ev.status}</span>
+                                <div style={{ fontSize: "12px", color: "#475569", marginTop: "2px", fontWeight: "400" }}>
+                                  {ev.company || "Lead Company"} • <span style={{ color: "#0f172a", fontWeight: "600" }}>{ev.status}</span>
                                 </div>
                               </div>
 
-                              <span style={{ fontSize: "11.5px", fontWeight: "600", color: "#0f172a", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 6px", borderRadius: "4px" }}>
+                              <span style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "3px 8px", borderRadius: "6px", whiteSpace: "nowrap" }}>
                                 ₹{ev.value.toLocaleString("en-IN")}
                               </span>
                             </div>
 
                             {/* Middle Row: Time & Quick Contact Buttons (Call & WhatsApp) */}
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f8fafc", padding: "4px 8px", borderRadius: "6px" }}>
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#475569", fontWeight: "400", fontSize: "11px" }}>
-                                <Clock size={12} color="#6366f1" /> {ev.time || "10:00 AM"}
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f8fafc", padding: "6px 10px", borderRadius: "6px", border: "1px solid #f1f5f9" }}>
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", color: "#475569", fontWeight: "500", fontSize: "12px" }}>
+                                <Clock size={13} color="#2563eb" /> {ev.time || "10:00 AM"}
                               </span>
 
-                              <div style={{ display: "flex", gap: "4px" }}>
+                              <div style={{ display: "flex", gap: "6px" }}>
                                 {ev.phone && (
                                   <a
                                     href={`tel:${ev.phone}`}
                                     style={{
-                                      width: "24px",
-                                      height: "24px",
-                                      borderRadius: "5px",
+                                      width: "28px",
+                                      height: "28px",
+                                      borderRadius: "6px",
                                       backgroundColor: "#ffffff",
                                       border: "1px solid #cbd5e1",
                                       display: "flex",
@@ -7551,7 +7568,7 @@ export default function App() {
                                     }}
                                     title="Call Lead"
                                   >
-                                    <Phone size={11} />
+                                    <Phone size={12} />
                                   </a>
                                 )}
                                 {ev.phone && (
@@ -7562,37 +7579,37 @@ export default function App() {
                                       window.open(`https://wa.me/${cleanPhone}?text=${msg}`, "_blank");
                                     }}
                                     style={{
-                                      width: "24px",
-                                      height: "24px",
-                                      borderRadius: "5px",
-                                      backgroundColor: "#dcfce7",
+                                      width: "28px",
+                                      height: "28px",
+                                      borderRadius: "6px",
+                                      backgroundColor: "#f0fdf4",
                                       border: "1px solid #bbf7d0",
                                       display: "flex",
                                       alignItems: "center",
                                       justifyContent: "center",
-                                      color: "#15803d",
+                                      color: "#16a34a",
                                       cursor: "pointer"
                                     }}
                                     title="Send WhatsApp Message"
                                   >
-                                    <MessageCircle size={11} color="#16a34a" />
+                                    <MessageCircle size={12} color="#16a34a" />
                                   </button>
                                 )}
                               </div>
                             </div>
 
                             {/* Smart AI Note Preview Box */}
-                            <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px 8px" }}>
-                              <div style={{ fontSize: "10px", fontWeight: "500", color: "#334155", display: "flex", alignItems: "center", gap: "4px", marginBottom: "2px" }}>
-                                <Sparkles size={10} color="#6366f1" /> Smart AI Note Preview
+                            <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px" }}>
+                              <div style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "flex", alignItems: "center", gap: "5px", marginBottom: "3px" }}>
+                                <Sparkles size={12} color="#2563eb" /> Smart AI Note Preview
                               </div>
-                              <p style={{ fontSize: "10px", color: "#64748b", margin: 0, lineHeight: "1.4", fontWeight: "400" }}>
+                              <p style={{ fontSize: "12px", color: "#475569", margin: 0, lineHeight: "1.5", fontWeight: "400" }}>
                                 {aiNoteText}
                               </p>
                             </div>
 
                             {/* Bottom Actions: View Details & Reschedule */}
-                            <div style={{ display: "flex", gap: "6px", marginTop: "1px" }}>
+                            <div style={{ display: "flex", gap: "8px", marginTop: "2px" }}>
                               <button
                                 onClick={() => {
                                   setSelectedLead(ev.lead);
@@ -7600,22 +7617,22 @@ export default function App() {
                                 }}
                                 style={{
                                   flex: 1,
-                                  padding: "5px 8px",
-                                  height: "26px",
-                                  backgroundColor: "#4f46e5",
+                                  padding: "0 12px",
+                                  height: "32px",
+                                  backgroundColor: "#2563eb",
                                   color: "#ffffff",
                                   border: "none",
-                                  borderRadius: "5px",
-                                  fontSize: "10.5px",
-                                  fontWeight: "500",
+                                  borderRadius: "6px",
+                                  fontSize: "12px",
+                                  fontWeight: "600",
                                   cursor: "pointer",
                                   display: "inline-flex",
                                   alignItems: "center",
                                   justifyContent: "center",
-                                  gap: "4px"
+                                  gap: "5px"
                                 }}
                               >
-                                <Eye size={11} color="#ffffff" />
+                                <Eye size={13} color="#ffffff" />
                                 <span>View Details</span>
                               </button>
 
@@ -7625,21 +7642,21 @@ export default function App() {
                                   setShowModal(true);
                                 }}
                                 style={{
-                                  padding: "5px 8px",
-                                  height: "26px",
+                                  padding: "0 12px",
+                                  height: "32px",
                                   backgroundColor: "#ffffff",
                                   border: "1px solid #cbd5e1",
-                                  borderRadius: "5px",
-                                  fontSize: "10.5px",
-                                  fontWeight: "500",
-                                  color: "#334155",
+                                  borderRadius: "6px",
+                                  fontSize: "12px",
+                                  fontWeight: "600",
+                                  color: "#475569",
                                   cursor: "pointer",
                                   display: "inline-flex",
                                   alignItems: "center",
-                                  gap: "4px"
+                                  gap: "5px"
                                 }}
                               >
-                                <Clock size={11} color="#64748b" />
+                                <Clock size={13} color="#475569" />
                                 <span>Reschedule</span>
                               </button>
                             </div>
