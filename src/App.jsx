@@ -1563,6 +1563,7 @@ export default function App() {
   const [reportSearchQuery, setReportSearchQuery] = useState("");
   const [reportPageSize, setReportPageSize] = useState(10); // 10 | 20 | 30 | 50 | "all"
   const [reportCurrentPage, setReportCurrentPage] = useState(1);
+  const [reportActiveTab, setReportActiveTab] = useState("all");
 
   // Click-outside listener to close Stage Multi-Select Dropdowns cleanly
   useEffect(() => {
@@ -6904,6 +6905,8 @@ export default function App() {
                 className="header-vault-btn"
                 onClick={() => setShowAdminVaultModal(true)}
                 style={{
+                  height: "34px",
+                  boxSizing: "border-box",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",
@@ -6944,6 +6947,8 @@ export default function App() {
             <div 
               className="header-user-badge-container"
               style={{
+                height: "34px",
+                boxSizing: "border-box",
                 display: "flex",
                 alignItems: "center",
                 gap: "7px",
@@ -7637,10 +7642,10 @@ export default function App() {
               </div>
             </div>
           ) : activeWorkspace === "reports" ? (
-            <div className="reports-page-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "92%" }}>
+                        <div className="reports-page-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif",  }}>
               
               {/* TOP CONTROL HEADER & ADVANCED MULTI-CRITERIA FILTER BAR */}
-              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px 12px", marginBottom: "8px", display: "flex", flexDirection: "column", gap: "6px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px 12px", marginBottom: "16px", display: "flex", flexDirection: "column", gap: "6px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                 
                 {/* Row 1: Header Title + Search Bar + Action Buttons */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
@@ -7650,10 +7655,10 @@ export default function App() {
                     </div>
                     <div>
                       <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                        <h2 style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
+                        <h1 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
                           Sales Audit & Performance Reports
-                        </h2>
-                        <span style={{ fontSize: "8px", fontWeight: "600", color: "#059669", backgroundColor: "#ecfdf5", padding: "1px 5px", borderRadius: "6px", border: "1px solid #a7f3d0" }}>
+                        </h1>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#059669", backgroundColor: "#ecfdf5", padding: "1px 5px", borderRadius: "6px", border: "1px solid #a7f3d0" }}>
                           AUDIT
                         </span>
                       </div>
@@ -7669,10 +7674,10 @@ export default function App() {
                         placeholder="Search lead, phone..."
                         value={reportSearchQuery}
                         onChange={(e) => setReportSearchQuery(e.target.value)}
-                        style={{ width: "100%", height: "24px", padding: "2px 18px 2px 24px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "10px", fontWeight: "400", outline: "none", color: "#0f172a" }}
+                        style={{ width: "100%", height: "24px", padding: "2px 18px 2px 24px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "400", outline: "none", color: "#0f172a" }}
                       />
                       {reportSearchQuery && (
-                        <button onClick={() => setReportSearchQuery("")} style={{ position: "absolute", right: "5px", border: "none", background: "none", color: "#94a3b8", cursor: "pointer", fontSize: "10px", padding: 0 }}>✕</button>
+                        <button onClick={() => setReportSearchQuery("")} style={{ position: "absolute", right: "5px", border: "none", background: "none", color: "#94a3b8", cursor: "pointer", fontSize: "12px", padding: 0 }}>✕</button>
                       )}
                     </div>
 
@@ -7691,14 +7696,14 @@ export default function App() {
                         setReportSearchQuery("");
                         showToast("Reset all report filters!");
                       }}
-                      style={{ fontSize: "9.5px", fontWeight: "500", color: "#ea580c", backgroundColor: "#fff7ed", border: "1px solid #ffedd5", padding: "2px 7px", height: "24px", borderRadius: "4px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                      style={{ fontSize: "12px", fontWeight: "500", color: "#ea580c", backgroundColor: "#fff7ed", border: "1px solid #ffedd5", padding: "2px 7px", height: "24px", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
                     >
                       <RotateCcw size={10} color="#ea580c" /> Reset
                     </button>
 
                     <button 
                       onClick={() => window.print()}
-                      style={{ padding: "2px 8px", height: "24px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "9.5px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      style={{ padding: "2px 8px", height: "24px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                     >
                       <Printer size={11} color="#38bdf8" /> Print PDF
                     </button>
@@ -7715,12 +7720,46 @@ export default function App() {
                         a.click();
                         showToast(`Exported ${filteredReportLeads.length} filtered leads!`);
                       }}
-                      style={{ padding: "2px 8px", height: "24px", backgroundColor: "#f8fafc", color: "#0f172a", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "9.5px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      style={{ padding: "2px 8px", height: "24px", backgroundColor: "#f8fafc", color: "#0f172a", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                     >
                       <Download size={11} color="#2563eb" /> Export CSV ({filteredReportLeads.length})
                     </button>
                   </div>
                 </div>
+
+                
+                  {/* Reports Section Switcher Tabs to reduce cognitive density */}
+                  <div style={{ display: "flex", gap: "8px", borderTop: "1px solid #f1f5f9", paddingTop: "10px", flexWrap: "wrap" }}>
+                    {[
+                      { id: "all", label: "All Reports & KPIs" },
+                      { id: "analytics", label: "Revenue Velocity & Pipeline" },
+                      { id: "team", label: "Rep Leaderboard & Digest" },
+                      { id: "table", label: "Audit Ledger & Records" }
+                    ].map(t => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setReportActiveTab(t.id)}
+                        style={{
+                          padding: "4px 12px",
+                          borderRadius: "6px",
+                          fontSize: "12px",
+                          fontWeight: reportActiveTab === t.id ? "700" : "500",
+                          border: reportActiveTab === t.id ? "1px solid #ea580c" : "1px solid #cbd5e1",
+                          backgroundColor: reportActiveTab === t.id ? "#ea580c" : "#f8fafc",
+                          color: reportActiveTab === t.id ? "#ffffff" : "#475569",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                          height: "28px",
+                          display: "inline-flex",
+                          alignItems: "center"
+                        }}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+
 
                 {/* Row 2: Date Field Selector & Timeframe Presets */}
                 <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "5px", display: "flex", flexDirection: "column", gap: "5px" }}>
@@ -7729,11 +7768,11 @@ export default function App() {
                     
                     {/* Date Type Selector */}
                     <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <span style={{ fontSize: "9.5px", fontWeight: "500", color: "#64748b" }}>Date:</span>
+                      <span style={{ fontSize: "12px", fontWeight: "500", color: "#475569" }}>Date:</span>
                       <select
                         value={reportDateType}
                         onChange={(e) => setReportDateType(e.target.value)}
-                        style={{ padding: "2px 5px", height: "22px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "10px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                        style={{ padding: "2px 5px", height: "22px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
                       >
                         <option value="won_date">Sale / Won Date</option>
                         <option value="createdAt">Created Date</option>
@@ -7760,12 +7799,15 @@ export default function App() {
                           onClick={() => setReportTimeframe(tf.id)}
                           style={{
                             padding: "2px 6px",
-                            borderRadius: "4px",
-                            fontSize: "9.5px",
+                            borderRadius: "6px",
+                            fontSize: "12px",
                             fontWeight: "500",
-                            border: reportTimeframe === tf.id ? "1px solid #ea580c" : "1px solid #e2e8f0",
-                            backgroundColor: reportTimeframe === tf.id ? "#fff7ed" : "#ffffff",
-                            color: reportTimeframe === tf.id ? "#ea580c" : "#64748b",
+                            border: reportTimeframe === tf.id ? "1px solid #ea580c" : "1px solid #cbd5e1",
+                            backgroundColor: reportTimeframe === tf.id ? "#ea580c" : "#f8fafc",
+                            color: reportTimeframe === tf.id ? "#ffffff" : "#475569",
+                            height: "28px",
+                            display: "inline-flex",
+                            alignItems: "center",
                             cursor: "pointer",
                             transition: "all 0.15s ease"
                           }}
@@ -7778,30 +7820,30 @@ export default function App() {
 
                   {/* Custom Date Range Picker */}
                   {reportTimeframe === "custom" && (
-                    <div style={{ display: "flex", gap: "6px", alignItems: "center", backgroundColor: "#fff7ed", padding: "4px 8px", borderRadius: "4px", border: "1px solid #fed7aa", width: "fit-content" }}>
+                    <div style={{ display: "flex", gap: "6px", alignItems: "center", backgroundColor: "#fff7ed", padding: "4px 8px", borderRadius: "6px", border: "1px solid #fed7aa", width: "fit-content" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                        <label style={{ fontSize: "9px", fontWeight: "500", color: "#9a3412" }}>From:</label>
+                        <label style={{ fontSize: "12px", fontWeight: "500", color: "#ea580c" }}>From:</label>
                         <input 
                           type="date" 
                           value={reportStartDate} 
                           onChange={(e) => setReportStartDate(e.target.value)}
-                          style={{ padding: "1px 4px", height: "20px", border: "1px solid #fdba74", borderRadius: "3px", fontSize: "9.5px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff" }}
+                          style={{ padding: "1px 4px", height: "20px", border: "1px solid #fdba74", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff" }}
                         />
                       </div>
-                      <span style={{ color: "#ea580c", fontWeight: "600", fontSize: "10px" }}>➔</span>
+                      <span style={{ color: "#ea580c", fontWeight: "600", fontSize: "12px" }}>➔</span>
                       <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                        <label style={{ fontSize: "9px", fontWeight: "500", color: "#9a3412" }}>To:</label>
+                        <label style={{ fontSize: "12px", fontWeight: "500", color: "#ea580c" }}>To:</label>
                         <input 
                           type="date" 
                           value={reportEndDate} 
                           onChange={(e) => setReportEndDate(e.target.value)}
-                          style={{ padding: "1px 4px", height: "20px", border: "1px solid #fdba74", borderRadius: "3px", fontSize: "9.5px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff" }}
+                          style={{ padding: "1px 4px", height: "20px", border: "1px solid #fdba74", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff" }}
                         />
                       </div>
                       {(reportStartDate || reportEndDate) && (
                         <button 
                           onClick={() => { setReportStartDate(""); setReportEndDate(""); }}
-                          style={{ padding: "1px 4px", backgroundColor: "#ffffff", border: "1px solid #fdba74", borderRadius: "3px", fontSize: "9px", fontWeight: "500", color: "#c2410c", cursor: "pointer" }}
+                          style={{ padding: "1px 4px", backgroundColor: "#ffffff", border: "1px solid #fdba74", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#ea580c", cursor: "pointer" }}
                         >
                           Clear
                         </button>
@@ -7810,12 +7852,12 @@ export default function App() {
                   )}
 
                   {/* Row 3: Multi-Criteria Advanced Category Filters */}
-                  <div className="reports-filter-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "6px", borderTop: "1px solid #f1f5f9", paddingTop: "5px" }}>
+                  <div className="reports-filter-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "16px", borderTop: "1px solid #f1f5f9", paddingTop: "10px" }}>
                     <div style={{ position: "relative" }} ref={reportStageDropdownRef}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1px" }}>
-                        <label style={{ fontSize: "8.5px", fontWeight: "500", color: "#64748b" }}>Stage</label>
+                        <label style={{ fontSize: "12px", fontWeight: "500", color: "#475569" }}>Stage</label>
                         {reportSelectedStages.length > 0 && (
-                          <span style={{ fontSize: "8px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "0 3px", borderRadius: "3px" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "0 3px", borderRadius: "6px" }}>
                             {reportSelectedStages.length} sel
                           </span>
                         )}
@@ -7828,10 +7870,10 @@ export default function App() {
                           padding: "2px 5px",
                           height: "22px",
                           border: reportSelectedStages.length > 0 ? "1px solid #3b82f6" : "1px solid #cbd5e1",
-                          borderRadius: "4px",
-                          fontSize: "10px",
+                          borderRadius: "6px",
+                          fontSize: "12px",
                           fontWeight: reportSelectedStages.length > 0 ? "600" : "400",
-                          color: reportSelectedStages.length > 0 ? "#1d4ed8" : "#0f172a",
+                          color: reportSelectedStages.length > 0 ? "#2563eb" : "#0f172a",
                           backgroundColor: reportSelectedStages.length > 0 ? "#eff6ff" : "#ffffff",
                           outline: "none",
                           cursor: "pointer",
@@ -7849,7 +7891,7 @@ export default function App() {
                             ? reportSelectedStages[0]
                             : `${reportSelectedStages.length} Stages sel`}
                         </span>
-                        <ChevronDown size={10} color={reportSelectedStages.length > 0 ? "#2563eb" : "#64748b"} style={{ transform: isReportStageOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s", flexShrink: 0 }} />
+                        <ChevronDown size={10} color={reportSelectedStages.length > 0 ? "#2563eb" : "#475569"} style={{ transform: isReportStageOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s", flexShrink: 0 }} />
                       </button>
 
                       {/* Floating Multi-Select Popover Menu */}
@@ -7870,19 +7912,19 @@ export default function App() {
                           }}
                         >
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: "5px", borderBottom: "1px solid #f1f5f9", marginBottom: "4px" }}>
-                            <span style={{ fontSize: "9px", fontWeight: "700", color: "#475569", textTransform: "uppercase" }}>Select Multiple Stages</span>
+                            <span style={{ fontSize: "12px", fontWeight: "700", color: "#475569", textTransform: "uppercase" }}>Select Multiple Stages</span>
                             <div style={{ display: "flex", gap: "5px" }}>
                               <button
                                 type="button"
                                 onClick={() => setReportSelectedStages([])}
-                                style={{ border: "none", background: "none", color: "#ea580c", fontSize: "9px", fontWeight: "600", cursor: "pointer", padding: "1px 3px" }}
+                                style={{ border: "none", background: "none", color: "#ea580c", fontSize: "12px", fontWeight: "600", cursor: "pointer", padding: "1px 3px" }}
                               >
                                 Clear
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setReportSelectedStages([...STATUS_OPTIONS])}
-                                style={{ border: "none", background: "none", color: "#2563eb", fontSize: "9px", fontWeight: "600", cursor: "pointer", padding: "1px 3px" }}
+                                style={{ border: "none", background: "none", color: "#2563eb", fontSize: "12px", fontWeight: "600", cursor: "pointer", padding: "1px 3px" }}
                               >
                                 Select All
                               </button>
@@ -7901,7 +7943,7 @@ export default function App() {
                                     alignItems: "center",
                                     justifyContent: "space-between",
                                     padding: "3px 6px",
-                                    borderRadius: "4px",
+                                    borderRadius: "6px",
                                     cursor: "pointer",
                                     backgroundColor: isChecked ? "#eff6ff" : "transparent",
                                     userSelect: "none",
@@ -7921,11 +7963,11 @@ export default function App() {
                                       }}
                                       style={{ cursor: "pointer", width: "13px", height: "13px", accentColor: "#2563eb", margin: 0 }}
                                     />
-                                    <span style={{ fontSize: "10.5px", fontWeight: isChecked ? "700" : "500", color: isChecked ? "#1d4ed8" : "#1e293b" }}>
+                                    <span style={{ fontSize: "12px", fontWeight: isChecked ? "700" : "500", color: isChecked ? "#2563eb" : "#1e293b" }}>
                                       {s}
                                     </span>
                                   </div>
-                                  <span style={{ fontSize: "9px", fontWeight: "600", color: count > 0 ? (isChecked ? "#2563eb" : "#64748b") : "#cbd5e1", backgroundColor: isChecked ? "#dbeafe" : "#f1f5f9", padding: "1px 5px", borderRadius: "10px" }}>
+                                  <span style={{ fontSize: "12px", fontWeight: "600", color: count > 0 ? (isChecked ? "#2563eb" : "#475569") : "#cbd5e1", backgroundColor: isChecked ? "#dbeafe" : "#f1f5f9", padding: "1px 5px", borderRadius: "8px" }}>
                                     {count}
                                   </span>
                                 </label>
@@ -7934,13 +7976,13 @@ export default function App() {
                           </div>
 
                           <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "5px", marginTop: "4px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: "9px", color: "#64748b" }}>
+                            <span style={{ fontSize: "12px", color: "#475569" }}>
                               {reportSelectedStages.length === 0 ? "Showing All" : `${reportSelectedStages.length} selected`}
                             </span>
                             <button
                               type="button"
                               onClick={() => setIsReportStageOpen(false)}
-                              style={{ padding: "2px 10px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "9.5px", fontWeight: "600", cursor: "pointer" }}
+                              style={{ padding: "2px 10px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}
                             >
                               Done ✓
                             </button>
@@ -7950,11 +7992,11 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label style={{ fontSize: "8.5px", fontWeight: "500", color: "#64748b", display: "block", marginBottom: "1px" }}>Source</label>
+                      <label style={{ fontSize: "12px", fontWeight: "500", color: "#475569", display: "block", marginBottom: "1px" }}>Source</label>
                       <select 
                         value={reportSourceFilter}
                         onChange={(e) => setReportSourceFilter(e.target.value)}
-                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
                       >
                         <option value="all">All Sources</option>
                         {SOURCE_OPTIONS.map(src => <option key={src} value={src}>{src}</option>)}
@@ -7962,11 +8004,11 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label style={{ fontSize: "8.5px", fontWeight: "500", color: "#64748b", display: "block", marginBottom: "1px" }}>Score</label>
+                      <label style={{ fontSize: "12px", fontWeight: "500", color: "#475569", display: "block", marginBottom: "1px" }}>Score</label>
                       <select 
                         value={reportScoreFilter}
                         onChange={(e) => setReportScoreFilter(e.target.value)}
-                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
                       >
                         <option value="all">All Scores</option>
                         {SCORE_OPTIONS.map(sc => <option key={sc} value={sc}>{sc}</option>)}
@@ -7974,74 +8016,74 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label style={{ fontSize: "8.5px", fontWeight: "500", color: "#64748b", display: "block", marginBottom: "1px" }}>Min (₹)</label>
+                      <label style={{ fontSize: "12px", fontWeight: "500", color: "#475569", display: "block", marginBottom: "1px" }}>Min (₹)</label>
                       <input 
                         type="number"
                         placeholder="Min"
                         value={reportMinValue}
                         onChange={(e) => setReportMinValue(e.target.value)}
-                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ fontSize: "8.5px", fontWeight: "500", color: "#64748b", display: "block", marginBottom: "1px" }}>Max (₹)</label>
+                      <label style={{ fontSize: "12px", fontWeight: "500", color: "#475569", display: "block", marginBottom: "1px" }}>Max (₹)</label>
                       <input 
                         type="number"
                         placeholder="Max"
                         value={reportMaxValue}
                         onChange={(e) => setReportMaxValue(e.target.value)}
-                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
+                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
                       />
                     </div>
                   </div>
 
                   {/* Active Filter Chips Bar */}
                   {(reportTimeframe !== "all" || reportSelectedStages.length > 0 || (reportStatusFilter && reportStatusFilter !== "all") || reportSourceFilter !== "all" || reportScoreFilter !== "all" || reportMinValue || reportMaxValue || reportSearchQuery) && (
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc", padding: "4px 8px", borderRadius: "4px", border: "1px solid #e2e8f0", flexWrap: "wrap", gap: "4px" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc", padding: "4px 8px", borderRadius: "6px", border: "1px solid #e2e8f0", flexWrap: "wrap", gap: "4px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "4px", flexWrap: "wrap" }}>
-                        <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", textTransform: "uppercase" }}>Active:</span>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", textTransform: "uppercase" }}>Active:</span>
                         
                         {reportTimeframe !== "all" && (
-                          <span style={{ fontSize: "9px", fontWeight: "400", backgroundColor: "#fff7ed", color: "#c2410c", border: "1px solid #fed7aa", padding: "1px 4px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "400", backgroundColor: "#fff7ed", color: "#ea580c", border: "1px solid #fed7aa", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                             {reportTimeframe}
-                            <button onClick={() => setReportTimeframe("all")} style={{ border: "none", background: "none", color: "#c2410c", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                            <button onClick={() => setReportTimeframe("all")} style={{ border: "none", background: "none", color: "#ea580c", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
                           </span>
                         )}
 
                         {reportSelectedStages.length > 0 ? (
                           reportSelectedStages.map(st => (
-                            <span key={st} style={{ fontSize: "9px", fontWeight: "500", backgroundColor: "#eff6ff", color: "#1e40af", border: "1px solid #bfdbfe", padding: "1px 4px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                            <span key={st} style={{ fontSize: "12px", fontWeight: "500", backgroundColor: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                               {st}
-                              <button onClick={() => setReportSelectedStages(prev => prev.filter(x => x !== st))} style={{ border: "none", background: "none", color: "#1e40af", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                              <button onClick={() => setReportSelectedStages(prev => prev.filter(x => x !== st))} style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
                             </span>
                           ))
                         ) : (
                           reportStatusFilter !== "all" && (
-                            <span style={{ fontSize: "9px", fontWeight: "400", backgroundColor: "#eff6ff", color: "#1e40af", border: "1px solid #bfdbfe", padding: "1px 4px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                            <span style={{ fontSize: "12px", fontWeight: "400", backgroundColor: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                               {reportStatusFilter}
-                              <button onClick={() => setReportStatusFilter("all")} style={{ border: "none", background: "none", color: "#1e40af", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                              <button onClick={() => setReportStatusFilter("all")} style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
                             </span>
                           )
                         )}
 
                         {reportSourceFilter !== "all" && (
-                          <span style={{ fontSize: "9px", fontWeight: "400", backgroundColor: "#f5f3ff", color: "#6b21a8", border: "1px solid #ddd6fe", padding: "1px 4px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "400", backgroundColor: "#f5f3ff", color: "#6b21a8", border: "1px solid #ddd6fe", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                             {reportSourceFilter}
                             <button onClick={() => setReportSourceFilter("all")} style={{ border: "none", background: "none", color: "#6b21a8", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
                           </span>
                         )}
 
                         {(reportMinValue || reportMaxValue) && (
-                          <span style={{ fontSize: "9px", fontWeight: "400", backgroundColor: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0", padding: "1px 4px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "400", backgroundColor: "#ecfdf5", color: "#16a34a", border: "1px solid #a7f3d0", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                             ₹{reportMinValue || "0"}-₹{reportMaxValue || "Max"}
-                            <button onClick={() => { setReportMinValue(""); setReportMaxValue(""); }} style={{ border: "none", background: "none", color: "#065f46", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                            <button onClick={() => { setReportMinValue(""); setReportMaxValue(""); }} style={{ border: "none", background: "none", color: "#16a34a", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
                           </span>
                         )}
                       </div>
 
                       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <span style={{ fontSize: "9.5px", fontWeight: "400", color: "#64748b" }}>
+                        <span style={{ fontSize: "12px", fontWeight: "400", color: "#475569" }}>
                           Showing <strong style={{ fontWeight: "600", color: "#0f172a" }}>{filteredReportLeads.length}</strong> Leads
                         </span>
                         <button
@@ -8057,7 +8099,7 @@ export default function App() {
                             setReportMaxValue("");
                             setReportSearchQuery("");
                           }}
-                          style={{ fontSize: "9px", fontWeight: "500", color: "#dc2626", border: "none", background: "none", cursor: "pointer", textDecoration: "underline", padding: 0 }}
+                          style={{ fontSize: "12px", fontWeight: "500", color: "#dc2626", border: "none", background: "none", cursor: "pointer", textDecoration: "underline", padding: 0 }}
                         >
                           Clear All
                         </button>
@@ -8072,17 +8114,17 @@ export default function App() {
                 {/* 1. Total Realized Revenue */}
                 <div className="reports-kpi-card" style={{ borderLeft: "3px solid #ea580c" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
-                    <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", letterSpacing: "0.1px" }}>
                       Total Realized Revenue
                     </span>
-                    <span style={{ fontSize: "8px", fontWeight: "700", color: "#166534", backgroundColor: "#f0fdf4", padding: "1px 4px", borderRadius: "3px", border: "1px solid #bbf7d0" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "700", color: "#16a34a", backgroundColor: "#f0fdf4", padding: "1px 4px", borderRadius: "6px", border: "1px solid #bbf7d0" }}>
                       {reportTimeframe === "all" ? "+14.2% MoM" : `${reportStats.newSalesWonCount + reportStats.renewalWonCount} Deals`}
                     </span>
                   </div>
                   <div style={{ fontSize: "15px", fontWeight: "800", color: "#0f172a", letterSpacing: "-0.3px", display: "flex", alignItems: "center", gap: "2px" }}>
                     ₹{(reportStats.totalCollected || 0).toLocaleString("en-IN")}
                   </div>
-                  <div style={{ fontSize: "8px", color: "#64748b", marginTop: "2px" }}>
+                  <div style={{ fontSize: "12px", color: "#475569", marginTop: "2px" }}>
                     Base: ₹{Math.round((reportStats.totalCollected || 0) / 1.18).toLocaleString("en-IN")} • GST (18%): ₹{Math.round((reportStats.totalCollected || 0) - (reportStats.totalCollected || 0) / 1.18).toLocaleString("en-IN")}
                   </div>
                 </div>
@@ -8090,17 +8132,17 @@ export default function App() {
                 {/* 2. Weighted Pipeline Forecast */}
                 <div className="reports-kpi-card" style={{ borderLeft: "3px solid #f97316" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
-                    <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", letterSpacing: "0.1px" }}>
                       Weighted Pipeline Forecast
                     </span>
-                    <span style={{ fontSize: "8px", fontWeight: "700", color: "#c2410c", backgroundColor: "#fff7ed", padding: "1px 4px", borderRadius: "3px", border: "1px solid #fed7aa" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "700", color: "#ea580c", backgroundColor: "#fff7ed", padding: "1px 4px", borderRadius: "6px", border: "1px solid #fed7aa" }}>
                       Expected
                     </span>
                   </div>
                   <div style={{ fontSize: "15px", fontWeight: "800", color: "#ea580c", letterSpacing: "-0.3px" }}>
                     ₹{(weightedForecastData.totalExpected || 0).toLocaleString("en-IN")}
                   </div>
-                  <div style={{ fontSize: "8px", color: "#64748b", marginTop: "2px" }}>
+                  <div style={{ fontSize: "12px", color: "#475569", marginTop: "2px" }}>
                     Confidence Engine • {weightedForecastData.stageBreakdown.reduce((s, i) => s + i.count, 0)} Active Deals
                   </div>
                 </div>
@@ -8108,17 +8150,17 @@ export default function App() {
                 {/* 3. Team Win Rate */}
                 <div className="reports-kpi-card" style={{ borderLeft: "3px solid #10b981" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
-                    <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", letterSpacing: "0.1px" }}>
                       {checkIsSuperAdmin(currentUser) ? "Team Win Rate" : currentUser?.role === "manager" ? "Team Win Rate" : "My Win Rate"}
                     </span>
-                    <span style={{ fontSize: "8px", fontWeight: "700", color: "#166534", backgroundColor: "#f0fdf4", padding: "1px 4px", borderRadius: "3px", border: "1px solid #bbf7d0" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "700", color: "#16a34a", backgroundColor: "#f0fdf4", padding: "1px 4px", borderRadius: "6px", border: "1px solid #bbf7d0" }}>
                       {Number(reportStats.winRate) >= 50 ? "+ Above Target" : "Pace"}
                     </span>
                   </div>
-                  <div style={{ fontSize: "15px", fontWeight: "800", color: "#15803d", letterSpacing: "-0.3px" }}>
+                  <div style={{ fontSize: "15px", fontWeight: "800", color: "#16a34a", letterSpacing: "-0.3px" }}>
                     {reportStats.winRate}%
                   </div>
-                  <div style={{ fontSize: "8px", color: "#64748b", marginTop: "2px" }}>
+                  <div style={{ fontSize: "12px", color: "#475569", marginTop: "2px" }}>
                     {reportStats.newSalesWonCount} Won / {reportStats.totalCount} Total Leads
                   </div>
                 </div>
@@ -8126,30 +8168,31 @@ export default function App() {
                 {/* 4. Avg Closing Velocity */}
                 <div className="reports-kpi-card" style={{ borderLeft: "3px solid #3b82f6" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
-                    <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", letterSpacing: "0.1px" }}>
                       Avg Closing Velocity
                     </span>
-                    <span style={{ fontSize: "8px", fontWeight: "700", color: "#1d4ed8", backgroundColor: "#eff6ff", padding: "1px 4px", borderRadius: "3px", border: "1px solid #bfdbfe" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "1px 4px", borderRadius: "6px", border: "1px solid #bfdbfe" }}>
                       -1.1 Days Fast
                     </span>
                   </div>
-                  <div style={{ fontSize: "15px", fontWeight: "800", color: "#1e40af", letterSpacing: "-0.3px" }}>
+                  <div style={{ fontSize: "15px", fontWeight: "800", color: "#2563eb", letterSpacing: "-0.3px" }}>
                     {reportStats.newSalesWonCount > 0 ? "3.2 Days" : "0 Days"}
                   </div>
-                  <div style={{ fontSize: "8px", color: "#64748b", marginTop: "2px" }}>
+                  <div style={{ fontSize: "12px", color: "#475569", marginTop: "2px" }}>
                     Industry Benchmark: 7.5 Days
                   </div>
                 </div>
               </div>
 
-              {/* 📊 1. VISUAL ANALYTICS GRID (MoM Velocity Area Chart + Stage Donut Chart) */}
+              {/* 📊 1. VISUAL ANALYTICS GRID */}
+              {(reportActiveTab === "all" || reportActiveTab === "analytics") && (
               <div className="reports-analytics-grid">
                 {/* Left: Revenue Velocity Area & Line Chart */}
                 <div className="reports-card" style={{ position: "relative" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px" }}>
                     <div>
-                      <h3 style={{ fontSize: "11px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "5px" }}>
-                        <TrendingUp size={13} color="#ea580c" /> {
+                      <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                        <TrendingUp size={15} color="#ea580c" /> {
                           reportTimeframe === "this_month" || reportTimeframe === "month" ? "September 2026 Revenue Velocity" :
                           reportTimeframe === "last_month" ? "August 2026 Revenue Velocity" :
                           reportTimeframe === "week" ? "This Week Revenue Velocity" :
@@ -8159,7 +8202,7 @@ export default function App() {
                           "Month-on-Month Revenue Velocity"
                         }
                       </h3>
-                      <span style={{ fontSize: "9px", color: "#64748b" }}>
+                      <span style={{ fontSize: "12px", color: "#475569" }}>
                         {
                           reportTimeframe === "this_month" || reportTimeframe === "month" ? "Weekly Target Pace vs Actual Revenue Closed (Sept 1 – 30, 2026)" :
                           reportTimeframe === "last_month" ? "Weekly Target Pace vs Closed Revenue (Aug 1 – 31, 2026)" :
@@ -8170,8 +8213,8 @@ export default function App() {
                         }
                       </span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "9px", fontWeight: "500" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#166534" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "12px", fontWeight: "500" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#16a34a" }}>
                         <span style={{ width: "12px", height: "2px", borderTop: "2px dashed #10b981", display: "inline-block" }} /> Target Pace
                       </span>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#ea580c" }}>
@@ -8181,17 +8224,17 @@ export default function App() {
                   </div>
 
                   {/* Hover dynamic indicator bar */}
-                  <div style={{ height: "18px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1px 6px", backgroundColor: "#fff7ed", borderRadius: "4px", border: "1px solid #ffedd5", marginBottom: "4px" }}>
+                  <div style={{ height: "18px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1px 6px", backgroundColor: "#fff7ed", borderRadius: "6px", border: "1px solid #ffedd5", marginBottom: "4px" }}>
                     {hoveredTrendMonth ? (() => {
                       const item = velocityTrendData.find(d => d.label === hoveredTrendMonth) || velocityTrendData[velocityTrendData.length - 1];
                       const pace = item.target > 0 ? Math.round((item.actual / item.target) * 100) : 0;
                       const gap = item.target - item.actual;
                       return (
                         <>
-                          <span style={{ fontSize: "9px", fontWeight: "600", color: "#c2410c" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c" }}>
                             📅 {item.label}: <strong>₹{item.actual.toLocaleString("en-IN")}</strong> ({item.count} deals closed)
                           </span>
-                          <span style={{ fontSize: "9px", fontWeight: "500", color: item.actual >= item.target ? "#15803d" : "#c2410c" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "500", color: item.actual >= item.target ? "#16a34a" : "#ea580c" }}>
                             Target: ₹{item.target.toLocaleString("en-IN")} ({pace}% pace{gap > 0 ? ` • ₹${gap.toLocaleString("en-IN")} gap` : ` • Target Achieved`})
                           </span>
                         </>
@@ -8202,10 +8245,10 @@ export default function App() {
                       const gap = currentItem.target - currentItem.actual;
                       return (
                         <>
-                          <span style={{ fontSize: "9px", fontWeight: "600", color: "#c2410c" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c" }}>
                             📅 {currentItem.label}: <strong>₹{currentItem.actual.toLocaleString("en-IN")}</strong> ({currentItem.count} deals)
                           </span>
-                          <span style={{ fontSize: "9px", fontWeight: "500", color: currentItem.actual >= currentItem.target ? "#15803d" : "#c2410c" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "500", color: currentItem.actual >= currentItem.target ? "#16a34a" : "#ea580c" }}>
                             Target: ₹{currentItem.target.toLocaleString("en-IN")} ({currentPace}% pace{gap > 0 ? ` • ₹${gap.toLocaleString("en-IN")} gap` : ` • On Track`}) • Hover points to inspect
                           </span>
                         </>
@@ -8327,7 +8370,7 @@ export default function App() {
                                   textAnchor="middle"
                                   fontSize="9"
                                   fontWeight={isHovered ? "700" : "500"}
-                                  fill={isHovered ? "#ea580c" : "#64748b"}
+                                  fill={isHovered ? "#ea580c" : "#475569"}
                                 >
                                   {d.label}
                                 </text>
@@ -8347,9 +8390,9 @@ export default function App() {
                       <h3 style={{ fontSize: "11px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "5px" }}>
                         <PieChart size={13} color="#ea580c" /> Pipeline Stage Distribution
                       </h3>
-                      <span style={{ fontSize: "9px", color: "#64748b" }}>Active Deal Volume & Stage Share %</span>
+                      <span style={{ fontSize: "12px", color: "#475569" }}>Active Deal Volume & Stage Share %</span>
                     </div>
-                    <span style={{ fontSize: "9px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "1px 6px", borderRadius: "4px", border: "1px solid #fed7aa" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "1px 6px", borderRadius: "6px", border: "1px solid #fed7aa" }}>
                       {donutStageData.reduce((s, i) => s + i.count, 0)} Active Deals
                     </span>
                   </div>
@@ -8397,7 +8440,7 @@ export default function App() {
                         <span style={{ fontSize: "11px", fontWeight: "700", color: "#0f172a", lineHeight: 1 }}>
                           ₹{((donutStageData.reduce((s, i) => s + i.value, 0)) / 100000).toFixed(1)}L
                         </span>
-                        <span style={{ fontSize: "8px", fontWeight: "500", color: "#64748b", marginTop: "1px" }}>
+                        <span style={{ fontSize: "12px", fontWeight: "500", color: "#475569", marginTop: "1px" }}>
                           Pipeline
                         </span>
                       </div>
@@ -8417,7 +8460,7 @@ export default function App() {
                               alignItems: "center",
                               justifyContent: "space-between",
                               padding: "2px 5px",
-                              borderRadius: "4px",
+                              borderRadius: "6px",
                               backgroundColor: isHovered ? item.bg : "transparent",
                               border: isHovered ? `1px solid ${item.color}40` : "1px solid transparent",
                               cursor: "pointer",
@@ -8425,14 +8468,14 @@ export default function App() {
                             }}
                           >
                             <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                              <span style={{ width: "7px", height: "7px", borderRadius: "2px", backgroundColor: item.color }} />
-                              <span style={{ fontSize: "9.5px", fontWeight: isHovered ? "700" : "500", color: "#1e293b" }}>
+                              <span style={{ width: "7px", height: "7px", borderRadius: "6px", backgroundColor: item.color }} />
+                              <span style={{ fontSize: "12px", fontWeight: isHovered ? "700" : "500", color: "#1e293b" }}>
                                 {item.name}
                               </span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                              <span style={{ fontSize: "9px", color: "#64748b" }}>{item.count} deals</span>
-                              <span style={{ fontSize: "9.5px", fontWeight: "700", color: item.color, minWidth: "28px", textAlign: "right" }}>
+                              <span style={{ fontSize: "12px", color: "#475569" }}>{item.count} deals</span>
+                              <span style={{ fontSize: "12px", fontWeight: "700", color: item.color, minWidth: "28px", textAlign: "right" }}>
                                 {item.pct}%
                               </span>
                             </div>
@@ -8444,7 +8487,10 @@ export default function App() {
                 </div>
               </div>
 
-              {/* 🏆 2. PERFORMANCE COCKPIT GRID (Leaderboard + Forecasting + Weekly Digest) */}
+              )}
+
+              {/* 🏆 2. PERFORMANCE COCKPIT GRID */}
+              {(reportActiveTab === "all" || reportActiveTab === "team") && (
               <div className="reports-cockpit-grid">
                 {/* Column 1: Sales Rep Leaderboard */}
                 <div className="reports-card">
@@ -8459,7 +8505,7 @@ export default function App() {
                               : "My Performance & Quota Target"
                         }
                       </h3>
-                      <span style={{ fontSize: "9px", color: "#64748b" }}>
+                      <span style={{ fontSize: "12px", color: "#475569" }}>
                         {
                           checkIsSuperAdmin(currentUser) 
                             ? "Ranked by closed revenue & quota" 
@@ -8469,7 +8515,7 @@ export default function App() {
                         }
                       </span>
                     </div>
-                    <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#166534", backgroundColor: "#f0fdf4", padding: "1px 5px", borderRadius: "4px", border: "1px solid #bbf7d0" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#16a34a", backgroundColor: "#f0fdf4", padding: "1px 5px", borderRadius: "6px", border: "1px solid #bbf7d0" }}>
                       M-T-D Quota
                     </span>
                   </div>
@@ -8478,9 +8524,9 @@ export default function App() {
                     {repLeaderboardData.map((rep, idx) => {
                       const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`;
                       const avatarColors = [
-                        { bg: "#ffedd5", text: "#c2410c" },
-                        { bg: "#eff6ff", text: "#1d4ed8" },
-                        { bg: "#f0fdf4", text: "#15803d" },
+                        { bg: "#ffedd5", text: "#ea580c" },
+                        { bg: "#eff6ff", text: "#2563eb" },
+                        { bg: "#f0fdf4", text: "#16a34a" },
                         { bg: "#f5f3ff", text: "#6b21a8" }
                       ][idx % 4];
 
@@ -8488,29 +8534,29 @@ export default function App() {
                         <div key={rep.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 6px", borderRadius: "6px", backgroundColor: idx === 0 ? "#fffbeb" : "#f8fafc", border: idx === 0 ? "1px solid #fef3c7" : "1px solid #f1f5f9" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                             <span style={{ fontSize: "11px", minWidth: "16px", textAlign: "center" }}>{medal}</span>
-                            <div style={{ width: "20px", height: "20px", borderRadius: "50%", backgroundColor: avatarColors.bg, color: avatarColors.text, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "8.5px", fontWeight: "700" }}>
+                            <div style={{ width: "20px", height: "20px", borderRadius: "50%", backgroundColor: avatarColors.bg, color: avatarColors.text, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "700" }}>
                               {getAvatarInitials(rep.name)}
                             </div>
                             <div>
-                              <div style={{ fontSize: "10px", fontWeight: "600", color: "#0f172a", lineHeight: 1.1, display: "flex", alignItems: "center", gap: "4px" }}>
+                              <div style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a", lineHeight: 1.1, display: "flex", alignItems: "center", gap: "4px" }}>
                                 <span>{rep.name}</span>
                                 {rep.name === currentUser?.name && (
-                                  <span style={{ fontSize: "7.5px", backgroundColor: "#dbeafe", color: "#1d4ed8", padding: "0 3px", borderRadius: "3px", fontWeight: "700" }}>You</span>
+                                  <span style={{ fontSize: "12px", backgroundColor: "#dbeafe", color: "#2563eb", padding: "0 3px", borderRadius: "6px", fontWeight: "700" }}>You</span>
                                 )}
                               </div>
-                              <span style={{ fontSize: "8.5px", color: "#64748b" }}>{rep.deals} deals won</span>
+                              <span style={{ fontSize: "12px", color: "#475569" }}>{rep.deals} deals won</span>
                             </div>
                           </div>
 
                           <div style={{ textAlign: "right", minWidth: "85px" }}>
-                            <div style={{ fontSize: "10.5px", fontWeight: "700", color: "#0f172a", lineHeight: 1.1 }}>
+                            <div style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", lineHeight: 1.1 }}>
                               ₹{rep.revenue.toLocaleString("en-IN")}
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "2px", justifyContent: "flex-end" }}>
-                              <div style={{ width: "36px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "2px", overflow: "hidden" }}>
+                              <div style={{ width: "36px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "6px", overflow: "hidden" }}>
                                 <div style={{ width: `${Math.min(rep.achievementPct, 100)}%`, height: "100%", backgroundColor: rep.achievementPct >= 100 ? "#10b981" : rep.achievementPct >= 80 ? "#ea580c" : "#3b82f6" }} />
                               </div>
-                              <span style={{ fontSize: "8.5px", fontWeight: "700", color: rep.achievementPct >= 100 ? "#15803d" : "#ea580c" }}>
+                              <span style={{ fontSize: "12px", fontWeight: "700", color: rep.achievementPct >= 100 ? "#16a34a" : "#ea580c" }}>
                                 {rep.achievementPct}%
                               </span>
                             </div>
@@ -8528,9 +8574,9 @@ export default function App() {
                       <h3 style={{ fontSize: "11px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "5px" }}>
                         <Sparkles size={13} color="#ea580c" /> Weighted Revenue Forecast
                       </h3>
-                      <span style={{ fontSize: "9px", color: "#64748b" }}>Probability confidence cash flow</span>
+                      <span style={{ fontSize: "12px", color: "#475569" }}>Probability confidence cash flow</span>
                     </div>
-                    <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "1px 5px", borderRadius: "4px", border: "1px solid #fed7aa" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "1px 5px", borderRadius: "6px", border: "1px solid #fed7aa" }}>
                       Expected
                     </span>
                   </div>
@@ -8538,13 +8584,13 @@ export default function App() {
                   {/* Big Expected Value Header Card */}
                   <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px 8px", marginBottom: "6px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                      <span style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", textTransform: "uppercase" }}>Expected Month-End</span>
-                      <span style={{ fontSize: "9px", fontWeight: "600", color: "#166534" }}>+27.8% Upside</span>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", textTransform: "uppercase" }}>Expected Month-End</span>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#16a34a" }}>+27.8% Upside</span>
                     </div>
                     <div style={{ fontSize: "15px", fontWeight: "700", color: "#0f172a", letterSpacing: "-0.3px", marginTop: "1px" }}>
                       ₹{(weightedForecastData.totalExpected || 0).toLocaleString("en-IN")}
                     </div>
-                    <div style={{ fontSize: "8px", color: "#64748b", marginTop: "2px" }}>
+                    <div style={{ fontSize: "12px", color: "#475569", marginTop: "2px" }}>
                       Realized: ₹{((weightedForecastData.realizedWon || 0) / 100000).toFixed(2)}L + Pipeline: ₹{((weightedForecastData.weightedPipeline || 0) / 100000).toFixed(2)}L
                     </div>
                   </div>
@@ -8552,14 +8598,14 @@ export default function App() {
                   {/* Stage Confidence Breakdown */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     {weightedForecastData.stageBreakdown.map((sb) => (
-                      <div key={sb.stage} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "9px", padding: "2px 0" }}>
+                      <div key={sb.stage} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", padding: "2px 0" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "5px", flex: 1 }}>
                           <span style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: sb.color }} />
-                          <span style={{ fontWeight: "500", color: "#334155" }}>{sb.stage}</span>
-                          <span style={{ fontSize: "8px", color: "#64748b" }}>({sb.prob}%)</span>
+                          <span style={{ fontWeight: "500", color: "#475569" }}>{sb.stage}</span>
+                          <span style={{ fontSize: "12px", color: "#475569" }}>({sb.prob}%)</span>
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <span style={{ fontSize: "8.5px", color: "#64748b" }}>₹{((sb.withGst || 0) / 1000).toFixed(0)}k</span>
+                          <span style={{ fontSize: "12px", color: "#475569" }}>₹{((sb.withGst || 0) / 1000).toFixed(0)}k</span>
                           <span style={{ fontWeight: "700", color: "#0f172a", minWidth: "46px", textAlign: "right" }}>
                             ₹{(sb.weighted || 0).toLocaleString("en-IN")}
                           </span>
@@ -8574,29 +8620,29 @@ export default function App() {
                   <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                        <div style={{ width: "22px", height: "22px", borderRadius: "5px", backgroundColor: "#0f172a", color: "#38bdf8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: "22px", height: "22px", borderRadius: "6px", backgroundColor: "#0f172a", color: "#38bdf8", display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <Mail size={12} color="#38bdf8" />
                         </div>
                         <div>
                           <h3 style={{ fontSize: "11px", fontWeight: "700", color: "#0f172a", margin: 0 }}>Weekly Digest</h3>
-                          <span style={{ fontSize: "8.5px", color: "#64748b" }}>Automated Executive Email</span>
+                          <span style={{ fontSize: "12px", color: "#475569" }}>Automated Executive Email</span>
                         </div>
                       </div>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", fontSize: "8.5px", fontWeight: "600", color: "#166534", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "1px 5px", borderRadius: "4px" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", fontSize: "12px", fontWeight: "600", color: "#16a34a", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "1px 5px", borderRadius: "6px" }}>
                         <span style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: "#10b981", display: "inline-block" }} /> Scheduled
                       </span>
                     </div>
 
                     <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px 8px", marginBottom: "6px" }}>
-                      <div style={{ fontSize: "9px", fontWeight: "600", color: "#334155" }}>
+                      <div style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>
                         ⏰ Next Run: Monday at 09:00 AM IST
                       </div>
-                      <p style={{ fontSize: "8.5px", color: "#64748b", margin: "2px 0 0 0", lineHeight: 1.3 }}>
+                      <p style={{ fontSize: "12px", color: "#475569", margin: "4px 0 0 0", lineHeight: 1.5 }}>
                         Dispatches MoM velocity graphs, rep leaderboard quotas, forecasting cash flow & renewal audit to leadership.
                       </p>
                     </div>
 
-                    <div style={{ fontSize: "8.5px", color: "#64748b", marginBottom: "8px" }}>
+                    <div style={{ fontSize: "12px", color: "#475569", marginBottom: "16px" }}>
                       <strong>Audience:</strong> leadership@company.com, founders@...
                     </div>
                   </div>
@@ -8605,52 +8651,56 @@ export default function App() {
                     type="button"
                     onClick={() => setShowWeeklyDigestModal(true)}
                     style={{
-                      width: "100%",
-                      padding: "6px 10px",
-                      backgroundColor: "#ea580c",
-                      color: "#ffffff",
-                      border: "none",
+                      width: "auto",
+                      alignSelf: "flex-start",
+                      padding: "6px 14px",
+                      backgroundColor: "#ffffff",
+                      color: "#475569",
+                      border: "1px solid #cbd5e1",
                       borderRadius: "6px",
-                      fontSize: "10px",
+                      fontSize: "12px",
                       fontWeight: "600",
                       cursor: "pointer",
                       display: "inline-flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      gap: "5px",
-                      boxShadow: "0 2px 4px rgba(234, 88, 12, 0.25)",
+                      gap: "6px",
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
                       transition: "all 0.15s ease"
                     }}
                   >
-                    <Mail size={12} /> Preview & Dispatch Digest
+                    <Mail size={13} color="#475569" /> Preview & Dispatch Digest
                   </button>
                 </div>
               </div>
 
-              {/* FILTERED EXECUTIVE SUMMARY KPIS (Granular Filter Slice) */}
-              <div className="reports-filtered-kpis" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "6px", marginBottom: "8px" }}>
+              )}
+
+              {/* FILTERED EXECUTIVE SUMMARY KPIS & AUDIT RECORDS */}
+              {(reportActiveTab === "all" || reportActiveTab === "table") && (
+                <>
+              <div className="reports-filtered-kpis" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "6px", marginBottom: "16px" }}>
                 <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 9px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1px" }}>
-                    <span style={{ fontSize: "8px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>Filtered Pipeline</span>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", letterSpacing: "0.1px" }}>Filtered Pipeline</span>
                     <IndianRupee className="w-3 h-3 text-slate-400" />
                   </div>
                   <div style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a", letterSpacing: "-0.2px" }}>
                     ₹{(reportStats.totalPipeline || 0).toLocaleString("en-IN")}
                   </div>
-                  <span style={{ fontSize: "8.5px", color: "#64748b", marginTop: "1px", display: "block", fontWeight: "400" }}>
+                  <span style={{ fontSize: "12px", color: "#475569", marginTop: "1px", display: "block", fontWeight: "400" }}>
                     {reportStats.totalCount} Total Leads
                   </span>
                 </div>
 
                 <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: "6px", padding: "7px 9px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1px" }}>
-                    <span style={{ fontSize: "8px", fontWeight: "600", color: "#166534", textTransform: "uppercase", letterSpacing: "0.2px" }}>New Sales Won</span>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#16a34a", letterSpacing: "0.1px" }}>New Sales Won</span>
                     <Award className="w-3 h-3 text-emerald-600" />
                   </div>
-                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#15803d", letterSpacing: "-0.2px" }}>
+                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#16a34a", letterSpacing: "-0.2px" }}>
                     ₹{(reportStats.wonPipeline || 0).toLocaleString("en-IN")}
                   </div>
-                  <span style={{ fontSize: "8.5px", color: "#166534", marginTop: "1px", display: "block", fontWeight: "400" }}>
+                  <span style={{ fontSize: "12px", color: "#16a34a", marginTop: "1px", display: "block", fontWeight: "400" }}>
                     {reportStats.newSalesWonCount} Won Deals
                   </span>
                 </div>
@@ -8658,56 +8708,56 @@ export default function App() {
                 {/* DEDICATED RENEWAL REVENUE KPI CARD */}
                 <div style={{ backgroundColor: "#fff7ed", border: "1px solid #ffedd5", borderRadius: "6px", padding: "7px 9px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1px" }}>
-                    <span style={{ fontSize: "8px", fontWeight: "600", color: "#c2410c", textTransform: "uppercase", letterSpacing: "0.2px" }}>Renewal Payment</span>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", letterSpacing: "0.1px" }}>Renewal Payment</span>
                     <RefreshCw size={11} className="text-orange-600 animate-spin-slow" />
                   </div>
-                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#9a3412", letterSpacing: "-0.2px" }}>
+                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#ea580c", letterSpacing: "-0.2px" }}>
                     ₹{(reportStats.renewalPipeline || 0).toLocaleString("en-IN")}
                   </div>
-                  <span style={{ fontSize: "8.5px", color: "#c2410c", marginTop: "1px", display: "block", fontWeight: "500" }}>
+                  <span style={{ fontSize: "12px", color: "#ea580c", marginTop: "1px", display: "block", fontWeight: "500" }}>
                     {reportStats.renewalWonCount} Renewal Deals ({reportStats.renewalSharePct}%)
                   </span>
                 </div>
 
                 <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "7px 9px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1px" }}>
-                    <span style={{ fontSize: "8px", fontWeight: "600", color: "#15803d", textTransform: "uppercase", letterSpacing: "0.2px" }}>Total Collected</span>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#16a34a", letterSpacing: "0.1px" }}>Total Collected</span>
                     <TrendingUp size={11} className="text-emerald-600" />
                   </div>
-                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#166534", letterSpacing: "-0.2px" }}>
+                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#16a34a", letterSpacing: "-0.2px" }}>
                     ₹{(reportStats.totalCollected || 0).toLocaleString("en-IN")}
                   </div>
-                  <span style={{ fontSize: "8.5px", color: "#15803d", marginTop: "1px", display: "block", fontWeight: "500" }}>
+                  <span style={{ fontSize: "12px", color: "#16a34a", marginTop: "1px", display: "block", fontWeight: "500" }}>
                     Won + Renewal
                   </span>
                 </div>
 
                 <div style={{ backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", padding: "7px 9px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1px" }}>
-                    <span style={{ fontSize: "8px", fontWeight: "600", color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.2px" }}>Retention / Win Rate</span>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb", letterSpacing: "0.1px" }}>Retention / Win Rate</span>
                     <Target size={11} className="text-blue-600" />
                   </div>
-                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#1e40af", letterSpacing: "-0.2px" }}>
+                  <div style={{ fontSize: "13px", fontWeight: "600", color: "#2563eb", letterSpacing: "-0.2px" }}>
                     {reportStats.winRate}%
                   </div>
-                  <span style={{ fontSize: "8.5px", color: "#2563eb", marginTop: "1px", display: "block", fontWeight: "400" }}>
+                  <span style={{ fontSize: "12px", color: "#2563eb", marginTop: "1px", display: "block", fontWeight: "400" }}>
                     Avg: ₹{(reportStats.avgValue || 0).toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
 
               {/* RENEWAL & CLIENT RETENTION HEALTH AUDIT CARD */}
-              <div style={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: "6px", padding: "6px 10px", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+              <div style={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: "6px", padding: "6px 10px", marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <div style={{ width: "22px", height: "22px", borderRadius: "5px", backgroundColor: "#ea580c", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: "22px", height: "22px", borderRadius: "6px", backgroundColor: "#ea580c", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <RefreshCw size={12} className="text-white" />
                   </div>
                   <div>
-                    <h4 style={{ fontSize: "11px", fontWeight: "600", color: "#7c2d12", margin: 0, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <h4 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
                       Client Renewal & Retention Audit
                     </h4>
-                    <p style={{ fontSize: "9.5px", color: "#9a3412", margin: "1px 0 0 0", fontWeight: "400" }}>
-                      {reportStats.renewalCount} Active Renewal Contracts totaling <strong>₹{(reportStats.renewalPipeline || 0).toLocaleString("en-IN")}</strong> payment collected (Avg Ticket: <strong>₹{(reportStats.avgRenewalTicket || 0).toLocaleString("en-IN")}</strong>).
+                    <p style={{ fontSize: "12px", color: "#475569", margin: "2px 0 0 0", fontWeight: "400" }}>
+                      {reportStats.renewalCount} Active Renewal Contracts totaling <strong style={{ color: "#0f172a" }}>₹{(reportStats.renewalPipeline || 0).toLocaleString("en-IN")}</strong> payment collected (Avg Ticket: <strong style={{ color: "#0f172a" }}>₹{(reportStats.avgRenewalTicket || 0).toLocaleString("en-IN")}</strong>).
                     </p>
                   </div>
                 </div>
@@ -8718,7 +8768,7 @@ export default function App() {
                       setReportStatusFilter("Renewal");
                       showToast("Filtered view to Renewal stage!");
                     }}
-                    style={{ padding: "3px 7px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "9.5px", fontWeight: "500", cursor: "pointer" }}
+                    style={{ padding: "3px 7px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer" }}
                   >
                     Filter Renewal Stage
                   </button>
@@ -8738,7 +8788,7 @@ export default function App() {
                       a.click();
                       showToast("Exported Renewal Deals CSV Report!");
                     }}
-                    style={{ padding: "3px 7px", backgroundColor: "#ffffff", color: "#ea580c", border: "1px solid #fdba74", borderRadius: "4px", fontSize: "9.5px", fontWeight: "500", cursor: "pointer" }}
+                    style={{ padding: "3px 7px", backgroundColor: "#ffffff", color: "#ea580c", border: "1px solid #fdba74", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer" }}
                   >
                     Export Renewal CSV
                   </button>
@@ -8746,25 +8796,25 @@ export default function App() {
               </div>
 
               {/* 2-COLUMN GRID OF AUDIT TABLES */}
-              <div className="reports-tables-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
+              <div className="reports-tables-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "16px" }}>
                 
                 {/* Column 1: Stage-Wise Audit Table */}
                 <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 10px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
-                    <h3 style={{ fontSize: "10.5px", fontWeight: "600", color: "#0f172a", margin: 0, textTransform: "uppercase", letterSpacing: "0.2px", display: "flex", alignItems: "center", gap: "4px" }}>
-                      <PieChart className="w-3 h-3 text-orange-600" /> Stage-Wise Revenue Audit
+                    <h3 style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                      <PieChart className="w-3.5 h-3.5 text-orange-600" /> Stage-Wise Revenue Audit
                     </h3>
-                    <span style={{ fontSize: "9px", color: "#64748b", fontWeight: "400" }}>{filteredReportLeads.length} Leads</span>
+                    <span style={{ fontSize: "12px", color: "#475569", fontWeight: "400" }}>{filteredReportLeads.length} Leads</span>
                   </div>
 
-                  <div style={{ border: "1px solid #f1f5f9", borderRadius: "4px", overflow: "hidden", maxHeight: "160px", overflowY: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "10px" }}>
+                  <div style={{ border: "1px solid #f1f5f9", borderRadius: "6px", overflow: "hidden", maxHeight: "160px", overflowY: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
                       <thead>
                         <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                          <th style={{ padding: "4px 6px", color: "#64748b", fontWeight: "500" }}>Pipeline Stage</th>
-                          <th style={{ padding: "4px 6px", color: "#64748b", fontWeight: "500" }}>Leads</th>
-                          <th style={{ padding: "4px 6px", color: "#64748b", fontWeight: "500" }}>Revenue (₹)</th>
-                          <th style={{ padding: "4px 6px", color: "#64748b", fontWeight: "500", textAlign: "right" }}>Share</th>
+                          <th style={{ padding: "4px 6px", color: "#475569", fontWeight: "500" }}>Pipeline Stage</th>
+                          <th style={{ padding: "4px 6px", color: "#475569", fontWeight: "500" }}>Leads</th>
+                          <th style={{ padding: "4px 6px", color: "#475569", fontWeight: "500" }}>Revenue (₹)</th>
+                          <th style={{ padding: "4px 6px", color: "#475569", fontWeight: "500", textAlign: "right" }}>Share</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -8778,17 +8828,17 @@ export default function App() {
                           return (
                             <tr key={stg} style={{ borderBottom: "1px solid #f8fafc" }}>
                               <td style={{ padding: "4px 6px", fontWeight: "500", color: "#0f172a" }}>
-                                <span className={`sheet-status-pill sheet-status-${stg.toLowerCase().replace(/ /g, "-")}`} style={{ fontSize: "8.5px", padding: "1px 5px" }}>
+                                <span className={`sheet-status-pill sheet-status-${stg.toLowerCase().replace(/ /g, "-")}`} style={{ fontSize: "12px", padding: "1px 5px" }}>
                                   {stg}
                                 </span>
                               </td>
-                              <td style={{ padding: "4px 6px", fontWeight: "400", color: "#334155" }}>
+                              <td style={{ padding: "4px 6px", fontWeight: "400", color: "#475569" }}>
                                 {stageLeads.length}
                               </td>
                               <td style={{ padding: "4px 6px", fontWeight: "600", color: "#0f172a" }}>
                                 ₹{totalVal.toLocaleString("en-IN")}
                               </td>
-                              <td style={{ padding: "4px 6px", textAlign: "right", fontWeight: "600", color: stg === "Closed Won" ? "#059669" : stg === "Renewal" ? "#ea580c" : "#64748b" }}>
+                              <td style={{ padding: "4px 6px", textAlign: "right", fontWeight: "600", color: stg === "Closed Won" ? "#059669" : stg === "Renewal" ? "#ea580c" : "#475569" }}>
                                 {sharePct}%
                               </td>
                             </tr>
@@ -8802,19 +8852,19 @@ export default function App() {
                 {/* Column 2: Lead Source Performance Table */}
                 <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 10px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
-                    <h3 style={{ fontSize: "10.5px", fontWeight: "600", color: "#0f172a", margin: 0, textTransform: "uppercase", letterSpacing: "0.2px", display: "flex", alignItems: "center", gap: "4px" }}>
-                      <BarChart2 className="w-3 h-3 text-blue-600" /> Lead Source Revenue Contribution
+                    <h3 style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                      <BarChart2 className="w-3.5 h-3.5 text-blue-600" /> Lead Source Revenue Contribution
                     </h3>
                   </div>
 
-                  <div style={{ border: "1px solid #f1f5f9", borderRadius: "4px", overflow: "hidden", maxHeight: "160px", overflowY: "auto" }}>
-                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "10px" }}>
+                  <div style={{ border: "1px solid #f1f5f9", borderRadius: "6px", overflow: "hidden", maxHeight: "160px", overflowY: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
                       <thead>
                         <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                          <th style={{ padding: "4px 6px", color: "#64748b", fontWeight: "500" }}>Lead Source</th>
-                          <th style={{ padding: "4px 6px", color: "#64748b", fontWeight: "500" }}>Leads</th>
-                          <th style={{ padding: "4px 6px", color: "#64748b", fontWeight: "500" }}>Won/Renewal Revenue</th>
-                          <th style={{ padding: "4px 6px", color: "#64748b", fontWeight: "500", textAlign: "right" }}>Win Rate</th>
+                          <th style={{ padding: "4px 6px", color: "#475569", fontWeight: "500" }}>Lead Source</th>
+                          <th style={{ padding: "4px 6px", color: "#475569", fontWeight: "500" }}>Leads</th>
+                          <th style={{ padding: "4px 6px", color: "#475569", fontWeight: "500" }}>Won/Renewal Revenue</th>
+                          <th style={{ padding: "4px 6px", color: "#475569", fontWeight: "500", textAlign: "right" }}>Win Rate</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -8850,27 +8900,27 @@ export default function App() {
               </div>
 
               {/* LIVE FILTERED LEADS AUDIT TABLE WITH PAGINATION (10, 20, 30, All) */}
-              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 10px", marginBottom: "8px" }}>
+              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 10px", marginBottom: "16px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px", flexWrap: "wrap", gap: "6px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    <div style={{ width: "20px", height: "20px", borderRadius: "4px", backgroundColor: "#f0fdf4", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Table size={11} color="#166534" />
+                    <div style={{ width: "20px", height: "20px", borderRadius: "6px", backgroundColor: "#f0fdf4", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Table size={11} color="#16a34a" />
                     </div>
-                    <h3 style={{ fontSize: "10.5px", fontWeight: "600", color: "#0f172a", margin: 0, textTransform: "uppercase", letterSpacing: "0.2px" }}>
+                    <h3 style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a", margin: 0, textTransform: "uppercase", letterSpacing: "0.2px" }}>
                       Filtered Records List ({filteredReportLeads.length} Deals)
                     </h3>
                   </div>
 
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                      <span style={{ fontSize: "9.5px", color: "#64748b", fontWeight: "500" }}>Show:</span>
+                      <span style={{ fontSize: "12px", color: "#475569", fontWeight: "500" }}>Show:</span>
                       <select
                         value={reportPageSize}
                         onChange={(e) => {
                           setReportPageSize(e.target.value === "all" ? "all" : Number(e.target.value));
                           setReportCurrentPage(1);
                         }}
-                        style={{ padding: "1px 4px", height: "20px", border: "1px solid #cbd5e1", borderRadius: "3px", fontSize: "9.5px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer" }}
+                        style={{ padding: "1px 4px", height: "20px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer" }}
                       >
                         <option value={10}>10 per page</option>
                         <option value={20}>20 per page</option>
@@ -8880,8 +8930,8 @@ export default function App() {
                       </select>
                     </div>
 
-                    <span style={{ fontSize: "9.5px", color: "#64748b", fontWeight: "400" }}>
-                      Pipeline: <strong style={{ fontWeight: "600", color: "#0f172a" }}>₹{(reportStats.totalPipeline || 0).toLocaleString("en-IN")}</strong> | Realized: <strong style={{ fontWeight: "600", color: "#15803d" }}>₹{(reportStats.totalCollected || 0).toLocaleString("en-IN")}</strong>
+                    <span style={{ fontSize: "12px", color: "#475569", fontWeight: "400" }}>
+                      Pipeline: <strong style={{ fontWeight: "600", color: "#0f172a" }}>₹{(reportStats.totalPipeline || 0).toLocaleString("en-IN")}</strong> | Realized: <strong style={{ fontWeight: "600", color: "#16a34a" }}>₹{(reportStats.totalCollected || 0).toLocaleString("en-IN")}</strong>
                     </span>
                   </div>
                 </div>
@@ -8890,14 +8940,14 @@ export default function App() {
                   <table style={{ width: "100%", minWidth: "750px", borderCollapse: "collapse", textAlign: "left", fontSize: "11px" }}>
                     <thead>
                       <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                        <th style={{ padding: "6px 8px", color: "#64748b", fontWeight: "500", width: "35px" }}>#</th>
-                        <th style={{ padding: "6px 8px", color: "#64748b", fontWeight: "500" }}>Lead Name & Company</th>
-                        <th style={{ padding: "6px 8px", color: "#64748b", fontWeight: "500" }}>Phone / Email</th>
-                        <th style={{ padding: "6px 8px", color: "#64748b", fontWeight: "500" }}>Stage</th>
-                        <th style={{ padding: "6px 8px", color: "#64748b", fontWeight: "500" }}>Deal Value</th>
-                        <th style={{ padding: "6px 8px", color: "#64748b", fontWeight: "500" }}>Sale / Won Date</th>
-                        <th style={{ padding: "6px 8px", color: "#64748b", fontWeight: "500" }}>Source</th>
-                        <th style={{ padding: "6px 8px", color: "#64748b", fontWeight: "500" }}>Score</th>
+                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500", width: "35px" }}>#</th>
+                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Lead Name & Company</th>
+                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Phone / Email</th>
+                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Stage</th>
+                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Deal Value</th>
+                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Sale / Won Date</th>
+                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Source</th>
+                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Score</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -8905,8 +8955,8 @@ export default function App() {
                         <tr>
                           <td colSpan={8} style={{ padding: "20px", textAlign: "center", color: "#94a3b8" }}>
                             <Filter size={18} color="#94a3b8" style={{ margin: "0 auto 4px" }} />
-                            <strong style={{ display: "block", color: "#64748b", fontSize: "11.5px", fontWeight: "500" }}>No leads match the selected filter criteria.</strong>
-                            <span style={{ fontSize: "10.5px" }}>Try adjusting the date range, stage, source, or search keyword.</span>
+                            <strong style={{ display: "block", color: "#475569", fontSize: "11.5px", fontWeight: "500" }}>No leads match the selected filter criteria.</strong>
+                            <span style={{ fontSize: "12px" }}>Try adjusting the date range, stage, source, or search keyword.</span>
                           </td>
                         </tr>
                       ) : (
@@ -8922,36 +8972,36 @@ export default function App() {
                                 transition: "background-color 0.15s ease"
                               }}
                             >
-                              <td style={{ padding: "6px 8px", color: "#94a3b8", fontWeight: "400", fontSize: "10.5px" }}>
+                              <td style={{ padding: "6px 8px", color: "#94a3b8", fontWeight: "400", fontSize: "12px" }}>
                                 {rowNum}
                               </td>
                               <td style={{ padding: "6px 8px", fontWeight: "500", color: "#0f172a" }}>
                                 {l.name || "Untitled Lead"}
                                 {l.company && (
-                                  <span style={{ display: "block", fontSize: "10px", color: "#64748b", fontWeight: "400" }}>{l.company}</span>
+                                  <span style={{ display: "block", fontSize: "12px", color: "#475569", fontWeight: "400" }}>{l.company}</span>
                                 )}
                               </td>
-                              <td style={{ padding: "6px 8px", color: "#475569", fontSize: "10.5px", fontWeight: "400" }}>
+                              <td style={{ padding: "6px 8px", color: "#475569", fontSize: "12px", fontWeight: "400" }}>
                                 {l.phone && <span style={{ display: "block" }}>{l.phone}</span>}
-                                {l.email && <span style={{ display: "block", color: "#64748b", fontSize: "10px" }}>{l.email}</span>}
+                                {l.email && <span style={{ display: "block", color: "#475569", fontSize: "12px" }}>{l.email}</span>}
                               </td>
                               <td style={{ padding: "6px 8px" }}>
                                 {isRenewalWonLead(l) ? (
-                                  <span className="sheet-status-pill" style={{ fontSize: "9px", padding: "1px 6px", backgroundColor: "#fff7ed", color: "#c2410c", border: "1px solid #fed7aa" }}>
+                                  <span className="sheet-status-pill" style={{ fontSize: "12px", padding: "1px 6px", backgroundColor: "#fff7ed", color: "#ea580c", border: "1px solid #fed7aa" }}>
                                     Won (Renewal)
                                   </span>
                                 ) : (
-                                  <span className={`sheet-status-pill sheet-status-${(l.status || "").toLowerCase().replace(/ /g, "-")}`} style={{ fontSize: "9px", padding: "1px 6px" }}>
+                                  <span className={`sheet-status-pill sheet-status-${(l.status || "").toLowerCase().replace(/ /g, "-")}`} style={{ fontSize: "12px", padding: "1px 6px" }}>
                                     {l.status || "New"}
                                   </span>
                                 )}
                               </td>
-                              <td style={{ padding: "6px 8px", fontWeight: "600", color: isWon ? "#15803d" : "#0f172a" }}>
+                              <td style={{ padding: "6px 8px", fontWeight: "600", color: isWon ? "#16a34a" : "#0f172a" }}>
                                 ₹{(Number(l.value) || 0).toLocaleString("en-IN")}
                               </td>
-                              <td style={{ padding: "6px 8px", fontSize: "10.5px", fontWeight: "400" }}>
+                              <td style={{ padding: "6px 8px", fontSize: "12px", fontWeight: "400" }}>
                                 {l.won_date ? (
-                                  <span style={{ backgroundColor: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0", padding: "1px 5px", borderRadius: "4px", fontWeight: "500", fontSize: "10px" }}>
+                                  <span style={{ backgroundColor: "#ecfdf5", color: "#16a34a", border: "1px solid #a7f3d0", padding: "1px 5px", borderRadius: "6px", fontWeight: "500", fontSize: "12px" }}>
                                     {l.won_date}
                                   </span>
                                 ) : l.next_follow_up ? (
@@ -8967,10 +9017,10 @@ export default function App() {
                               </td>
                               <td style={{ padding: "6px 8px" }}>
                                 <span style={{
-                                  fontSize: "9px",
+                                  fontSize: "12px",
                                   fontWeight: "500",
                                   padding: "1px 5px",
-                                  borderRadius: "4px",
+                                  borderRadius: "6px",
                                   backgroundColor: (l.score || "").toLowerCase() === "hot" ? "#fef2f2" : (l.score || "").toLowerCase() === "warm" ? "#fff7ed" : "#f1f5f9",
                                   color: (l.score || "").toLowerCase() === "hot" ? "#dc2626" : (l.score || "").toLowerCase() === "warm" ? "#ea580c" : "#475569",
                                   border: (l.score || "").toLowerCase() === "hot" ? "1px solid #fecaca" : (l.score || "").toLowerCase() === "warm" ? "1px solid #fed7aa" : "1px solid #e2e8f0"
@@ -8989,7 +9039,7 @@ export default function App() {
                 {/* PAGINATION FOOTER CONTROLS */}
                 {filteredReportLeads.length > 0 && reportPageSize !== "all" && reportTotalPages > 1 && (
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #f1f5f9", flexWrap: "wrap", gap: "6px" }}>
-                    <span style={{ fontSize: "10.5px", color: "#64748b", fontWeight: "400" }}>
+                    <span style={{ fontSize: "12px", color: "#475569", fontWeight: "400" }}>
                       Showing <strong>{(reportCurrentPage - 1) * Number(reportPageSize) + 1}</strong> to <strong>{Math.min(reportCurrentPage * Number(reportPageSize), filteredReportLeads.length)}</strong> of <strong>{filteredReportLeads.length}</strong> Leads
                     </span>
 
@@ -8999,8 +9049,8 @@ export default function App() {
                         disabled={reportCurrentPage === 1}
                         style={{
                           padding: "3px 8px",
-                          borderRadius: "4px",
-                          fontSize: "10.5px",
+                          borderRadius: "6px",
+                          fontSize: "12px",
                           fontWeight: "500",
                           border: "1px solid #cbd5e1",
                           backgroundColor: reportCurrentPage === 1 ? "#f8fafc" : "#ffffff",
@@ -9019,8 +9069,8 @@ export default function App() {
                             minWidth: "24px",
                             height: "24px",
                             padding: "0 6px",
-                            borderRadius: "4px",
-                            fontSize: "10.5px",
+                            borderRadius: "6px",
+                            fontSize: "12px",
                             fontWeight: reportCurrentPage === pageNum ? "600" : "400",
                             border: reportCurrentPage === pageNum ? "1px solid #0f172a" : "1px solid #cbd5e1",
                             backgroundColor: reportCurrentPage === pageNum ? "#0f172a" : "#ffffff",
@@ -9037,8 +9087,8 @@ export default function App() {
                         disabled={reportCurrentPage === reportTotalPages}
                         style={{
                           padding: "3px 8px",
-                          borderRadius: "4px",
-                          fontSize: "10.5px",
+                          borderRadius: "6px",
+                          fontSize: "12px",
                           fontWeight: "500",
                           border: "1px solid #cbd5e1",
                           backgroundColor: reportCurrentPage === reportTotalPages ? "#f8fafc" : "#ffffff",
@@ -9077,7 +9127,7 @@ export default function App() {
                     <Download className="w-4 h-4 text-blue-600" />
                     <div>
                       <strong style={{ fontSize: "11px", color: "#0f172a", display: "block", fontWeight: "500" }}>Filtered Pipeline CSV</strong>
-                      <span style={{ fontSize: "10px", color: "#64748b", fontWeight: "400" }}>Export {filteredReportLeads.length} matching leads</span>
+                      <span style={{ fontSize: "12px", color: "#475569", fontWeight: "400" }}>Export {filteredReportLeads.length} matching leads</span>
                     </div>
                   </button>
 
@@ -9103,7 +9153,7 @@ export default function App() {
                     <Award className="w-4.5 h-4.5 text-emerald-600" />
                     <div>
                       <strong style={{ fontSize: "11.5px", color: "#0f172a", display: "block" }}>Won Deals CSV</strong>
-                      <span style={{ fontSize: "10.5px", color: "#64748b" }}>Closed revenue records</span>
+                      <span style={{ fontSize: "12px", color: "#475569" }}>Closed revenue records</span>
                     </div>
                   </button>
 
@@ -9128,7 +9178,7 @@ export default function App() {
                     <RefreshCw className="w-4.5 h-4.5 text-orange-600" />
                     <div>
                       <strong style={{ fontSize: "11.5px", color: "#0f172a", display: "block" }}>Renewal Deals CSV</strong>
-                      <span style={{ fontSize: "10.5px", color: "#64748b" }}>{reportStats.renewalCount} renewal accounts</span>
+                      <span style={{ fontSize: "12px", color: "#475569" }}>{reportStats.renewalCount} renewal accounts</span>
                     </div>
                   </button>
 
@@ -9155,11 +9205,13 @@ export default function App() {
                     <AlertTriangle className="w-4.5 h-4.5 text-red-500" />
                     <div>
                       <strong style={{ fontSize: "11.5px", color: "#0f172a", display: "block" }}>Overdue Leads CSV</strong>
-                      <span style={{ fontSize: "10.5px", color: "#64748b" }}>Stuck follow-up alerts</span>
+                      <span style={{ fontSize: "12px", color: "#475569" }}>Stuck follow-up alerts</span>
                     </div>
                   </button>
                 </div>
               </div>
+                </>
+              )}
             </div>
           ) : activeWorkspace === "settings" ? (
             <div className="settings-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "10px", border: "1px solid #e2e8f0", padding: "14px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
