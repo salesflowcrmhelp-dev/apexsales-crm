@@ -6613,11 +6613,24 @@ export default function App() {
                 }} 
                 className={`sidebar-nav-item ${activeWorkspace === "team" ? "active" : ""}`}
                 title="Manage Team & Roles (Admin Only)"
-                style={{ color: activeWorkspace === "team" ? "#1d4ed8" : "#2563eb", fontWeight: "700" }}
+                style={{ 
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  color: activeWorkspace === "team" ? "#1d4ed8" : "#2563eb",
+                  backgroundColor: activeWorkspace === "team" ? "#eff6ff" : "transparent",
+                  borderLeft: activeWorkspace === "team" ? "3px solid #2563eb" : "3px solid transparent",
+                  borderRadius: activeWorkspace === "team" ? "0 6px 6px 0" : "6px",
+                  padding: "9px 12px 9px 9px",
+                  fontWeight: "700"
+                }}
               >
-                <ShieldCheck className="nav-item-icon" style={{ color: activeWorkspace === "team" ? "#1d4ed8" : "#2563eb" }} />
-                <span>Team & Roles</span>
-                <span className="sidebar-badge" style={{ fontSize: "9.5px", fontWeight: "700", color: "#475569", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "1.5px 6px", borderRadius: "5px", marginLeft: "auto", letterSpacing: "0.3px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+                  <ShieldCheck className="nav-item-icon" style={{ color: activeWorkspace === "team" ? "#1d4ed8" : "#2563eb" }} />
+                  <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Team & Roles</span>
+                </div>
+                <span className="sidebar-badge" style={{ fontSize: "9.5px", fontWeight: "700", color: "#475569", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "1.5px 6px", borderRadius: "5px", marginLeft: "8px", letterSpacing: "0.3px", flexShrink: 0 }}>
                   Admin
                 </span>
               </button>
@@ -6752,15 +6765,17 @@ export default function App() {
                   onClick={() => setIsPeriodDropdownOpen(!isPeriodDropdownOpen)}
                   className="header-period-btn"
                   style={{
+                    height: "32px",
+                    boxSizing: "border-box",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "6px",
                     backgroundColor: selectedPeriodMonth === "2026-09" ? "#f0fdf4" : selectedPeriodMonth === "all" ? "#eff6ff" : "#fff7ed",
                     border: selectedPeriodMonth === "2026-09" ? "1.5px solid #86efac" : selectedPeriodMonth === "all" ? "1.5px solid #bfdbfe" : "1.5px solid #fed7aa",
-                    padding: "6px 12px",
-                    borderRadius: "8px",
+                    padding: "0 12px",
+                    borderRadius: "6px",
                     fontSize: "12px",
-                    fontWeight: "750",
+                    fontWeight: "600",
                     color: selectedPeriodMonth === "2026-09" ? "#166534" : selectedPeriodMonth === "all" ? "#1e40af" : "#9a3412",
                     cursor: "pointer",
                     boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
@@ -6908,7 +6923,7 @@ export default function App() {
                   className="header-vault-btn"
                   onClick={() => setShowAdminVaultModal(true)}
                   style={{
-                    height: "34px",
+                    height: "32px",
                     boxSizing: "border-box",
                     display: "inline-flex",
                     alignItems: "center",
@@ -6935,8 +6950,9 @@ export default function App() {
               <button 
                 onClick={() => setShowStartMyDay(true)}
                 className="header-cta-orange"
+                style={{ height: "32px", boxSizing: "border-box" }}
               >
-                <Sun className="w-3.5 h-3.5 flex-shrink-0 text-amber-500" />
+                <Sun className="w-3.5 h-3.5 flex-shrink-0 text-white" />
                 <span className="header-cta-desktop-text">Start My Day</span>
                 <span className="header-cta-mobile-text">My Day</span>
               </button>
@@ -6947,7 +6963,7 @@ export default function App() {
 
             {/* Cluster 2: User Account & System Actions */}
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div className="header-notification-btn" onClick={() => setShowStartMyDay(true)} title="3 Pending Follow-ups">
+              <div className="header-notification-btn" onClick={() => setShowStartMyDay(true)} title="3 Pending Follow-ups" style={{ width: "32px", height: "32px" }}>
                 <Bell className="w-4 h-4 text-slate-600" />
                 <span className="notification-badge-dot">3</span>
               </div>
@@ -6956,7 +6972,7 @@ export default function App() {
               <div 
                 className="header-user-badge-container"
                 style={{
-                  height: "34px",
+                  height: "32px",
                   boxSizing: "border-box",
                   display: "flex",
                   alignItems: "center",
@@ -9988,21 +10004,21 @@ export default function App() {
             <div className="team-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "10px", border: "1px solid #e2e8f0", padding: "12px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               {/* Page Title Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "10px", marginBottom: "10px", flexWrap: "wrap", gap: "10px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "12px", marginBottom: "12px", flexWrap: "wrap", gap: "10px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{ width: "32px", height: "32px", borderRadius: "8px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
-                    <ShieldCheck size={18} />
+                  <div style={{ width: "34px", height: "34px", borderRadius: "8px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
+                    <ShieldCheck size={20} />
                   </div>
                   <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <h2 style={{ fontSize: "14px", fontWeight: "800", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <h1 style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>
                         Team & Role-Based Access Control (RBAC)
-                      </h2>
-                      <span style={{ fontSize: "9px", fontWeight: "800", backgroundColor: "#fef3c7", color: "#b45309", padding: "2px 7px", borderRadius: "9999px", border: "1px solid #fde68a" }}>
+                      </h1>
+                      <span style={{ fontSize: "10.5px", fontWeight: "700", backgroundColor: "#fef3c7", color: "#b45309", padding: "2px 8px", borderRadius: "9999px", border: "1px solid #fde68a" }}>
                         👑 Super Admin Only
                       </span>
                     </div>
-                    <p style={{ fontSize: "11px", color: "#64748b", margin: "1px 0 0 0", fontWeight: "500" }}>
+                    <p style={{ fontSize: "12.5px", color: "#475569", margin: "3px 0 0 0", fontWeight: "500" }}>
                       Manage login PINs, sales team credentials, and strict database isolation (Admin vs Sales Rep).
                     </p>
                   </div>
@@ -10015,55 +10031,56 @@ export default function App() {
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
-                      gap: "5px",
-                      padding: "6px 13px",
+                      gap: "6px",
+                      height: "34px",
+                      padding: "0 14px",
                       backgroundColor: showAddUserSubModal ? "#475569" : "#2563eb",
                       color: "#ffffff",
                       border: "none",
                       borderRadius: "6px",
-                      fontSize: "11.5px",
-                      fontWeight: "750",
+                      fontSize: "12px",
+                      fontWeight: "600",
                       cursor: "pointer",
                       boxShadow: "0 1px 3px rgba(37, 99, 235, 0.2)"
                     }}
                   >
-                    <UserPlus size={14} />
+                    <UserPlus size={15} />
                     <span>{showAddUserSubModal ? "Close Form" : "+ Add Team Member"}</span>
                   </button>
                 </div>
               </div>
 
               {/* 4 Summary Stats Cards */}
-              <div className="team-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "10px", marginBottom: "10px" }}>
-                <div style={{ padding: "8px 12px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: "10px", fontWeight: "750", color: "#64748b", textTransform: "uppercase" }}>TOTAL ACTIVE USERS</span>
-                  <div style={{ fontSize: "18px", fontWeight: "850", color: "#0f172a", marginTop: "2px" }}>{allUsersList.length || 4}</div>
-                  <span style={{ fontSize: "9.5px", color: "#94a3b8" }}>Registered accounts</span>
+              <div className="team-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginBottom: "14px" }}>
+                <div style={{ padding: "10px 14px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Total Active Users</span>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>{allUsersList.length || 4}</div>
+                  <span style={{ fontSize: "11.5px", color: "#64748b" }}>Registered accounts</span>
                 </div>
 
-                <div style={{ padding: "8px 12px", backgroundColor: "#fffbeb", borderRadius: "8px", border: "1px solid #fef3c7" }}>
-                  <span style={{ fontSize: "10px", fontWeight: "750", color: "#b45309", textTransform: "uppercase" }}>SUPER ADMINS (FULL DATA)</span>
-                  <div style={{ fontSize: "18px", fontWeight: "850", color: "#d97706", marginTop: "2px" }}>
+                <div style={{ padding: "10px 14px", backgroundColor: "#fffbeb", borderRadius: "8px", border: "1px solid #fef3c7" }}>
+                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#b45309" }}>Super Admins (Full Data)</span>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#b45309", marginTop: "2px" }}>
                     {(allUsersList.filter(u => u.role === "admin").length) || 1}
                   </div>
-                  <span style={{ fontSize: "9.5px", color: "#b45309" }}>Full pipeline visibility</span>
+                  <span style={{ fontSize: "11.5px", color: "#b45309" }}>Full pipeline visibility</span>
                 </div>
 
-                <div style={{ padding: "8px 12px", backgroundColor: "#eff6ff", borderRadius: "8px", border: "1px solid #dbeafe" }}>
-                  <span style={{ fontSize: "10px", fontWeight: "750", color: "#2563eb", textTransform: "uppercase" }}>SALES REPS (ISOLATED)</span>
-                  <div style={{ fontSize: "18px", fontWeight: "850", color: "#2563eb", marginTop: "2px" }}>
+                <div style={{ padding: "10px 14px", backgroundColor: "#eff6ff", borderRadius: "8px", border: "1px solid #dbeafe" }}>
+                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb" }}>Sales Reps (Isolated)</span>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#2563eb", marginTop: "2px" }}>
                     {(allUsersList.filter(u => u.role === "sales_rep").length) || 3}
                   </div>
-                  <span style={{ fontSize: "9.5px", color: "#2563eb" }}>Strict own-lead access only</span>
+                  <span style={{ fontSize: "11.5px", color: "#2563eb" }}>Strict own-lead access only</span>
                 </div>
 
-                <div style={{ padding: "8px 12px", backgroundColor: "#f0fdf4", borderRadius: "8px", border: "1px solid #bbf7d0" }}>
-                  <span style={{ fontSize: "10px", fontWeight: "750", color: "#16a34a", textTransform: "uppercase" }}>SECURITY PROTOCOL</span>
-                  <div style={{ fontSize: "13.5px", fontWeight: "850", color: "#15803d", marginTop: "4px", display: "flex", alignItems: "center", gap: "5px" }}>
-                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#22c55e", display: "inline-block" }} />
+                <div style={{ padding: "10px 14px", backgroundColor: "#f0fdf4", borderRadius: "8px", border: "1px solid #bbf7d0" }}>
+                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#16a34a" }}>Security Protocol</span>
+                  <div style={{ fontSize: "13.5px", fontWeight: "700", color: "#16a34a", marginTop: "4px", display: "flex", alignItems: "center", gap: "5px" }}>
+                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#16a34a", display: "inline-block" }} />
                     Database Guard Active
                   </div>
-                  <span style={{ fontSize: "9.5px", color: "#16a34a" }}>Zero unauthorized leaks</span>
+                  <span style={{ fontSize: "11.5px", color: "#16a34a" }}>Zero unauthorized leaks</span>
                 </div>
               </div>
 
@@ -10075,26 +10092,26 @@ export default function App() {
                     padding: "16px 20px", 
                     backgroundColor: "#f0fdf4", 
                     border: "1.5px solid #86efac", 
-                    borderRadius: "12px", 
+                    borderRadius: "10px", 
                     display: "flex", 
                     flexDirection: "column", 
-                    gap: "12px",
+                    gap: "12px", 
                     marginBottom: "18px"
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <UserPlus size={16} color="#16a34a" />
-                      <strong style={{ fontSize: "13px", color: "#16a34a" }}>Register New Team Member / Sub-User</strong>
+                      <strong style={{ fontSize: "13.5px", color: "#16a34a" }}>Register New Team Member / Sub-User</strong>
                     </div>
-                    <span style={{ fontSize: "11px", color: "#15803d", fontWeight: "600" }}>
+                    <span style={{ fontSize: "11.5px", color: "#16a34a", fontWeight: "600" }}>
                       They can log in from their phone or laptop using this PIN
                     </span>
                   </div>
 
                   <div className="team-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#0f172a", marginBottom: "4px" }}>
+                      <label style={{ display: "block", fontSize: "11.5px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
                         Full Name *
                       </label>
                       <input 
@@ -10110,12 +10127,12 @@ export default function App() {
                           }));
                         }}
                         required
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                        style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#0f172a", marginBottom: "4px" }}>
+                      <label style={{ display: "block", fontSize: "11.5px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
                         Login Username / Handle
                       </label>
                       <input 
@@ -10123,12 +10140,12 @@ export default function App() {
                         placeholder="e.g. rahul"
                         value={newUserData.username}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, username: e.target.value.toLowerCase().trim() }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                        style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#0f172a", marginBottom: "4px" }}>
+                      <label style={{ display: "block", fontSize: "11.5px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
                         Secret Login PIN (4 to 6 Digits) *
                       </label>
                       <input 
@@ -10138,20 +10155,20 @@ export default function App() {
                         value={newUserData.pin}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value }))}
                         required
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                        style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
                   </div>
 
                   <div className="team-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#0f172a", marginBottom: "4px" }}>
+                      <label style={{ display: "block", fontSize: "11.5px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
                         Access Privilege / Role
                       </label>
                       <select 
                         value={newUserData.role}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, role: e.target.value }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                        style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                       >
                         <option value="sales_rep">💼 Sales Representative (Isolated: Own Leads Only)</option>
                         <option value="manager">👔 Sales Manager (Manages Reporting Team)</option>
@@ -10160,7 +10177,7 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#0f172a", marginBottom: "4px" }}>
+                      <label style={{ display: "block", fontSize: "11.5px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
                         Mobile Phone
                       </label>
                       <input 
@@ -10168,12 +10185,12 @@ export default function App() {
                         placeholder="e.g. 9898000005"
                         value={newUserData.phone}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, phone: e.target.value }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                        style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: "block", fontSize: "11px", fontWeight: "750", color: "#0f172a", marginBottom: "4px" }}>
+                      <label style={{ display: "block", fontSize: "11.5px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
                         Email Address
                       </label>
                       <input 
@@ -10181,7 +10198,7 @@ export default function App() {
                         placeholder="e.g. rahul@apexsales.com"
                         value={newUserData.email}
                         onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
-                        style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                        style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                       />
                     </div>
                   </div>
@@ -10190,13 +10207,13 @@ export default function App() {
                     <button 
                       type="button" 
                       onClick={() => setShowAddUserSubModal(false)}
-                      style={{ padding: "6px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer" }}
+                      style={{ height: "32px", padding: "0 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit"
-                      style={{ padding: "6px 16px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11.5px", fontWeight: "750", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                      style={{ height: "32px", padding: "0 16px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
                     >
                       <Check size={14} /> Create Member & Enable Login
                     </button>
@@ -10206,14 +10223,14 @@ export default function App() {
 
               {/* Members List Table - Full Width, Scrollable on mobile */}
               <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "10px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
-                <table className="responsive-table" style={{ width: "100%", minWidth: "680px", borderCollapse: "collapse", textAlign: "left", fontSize: "11.5px" }}>
+                <table className="responsive-table" style={{ width: "100%", minWidth: "680px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
                   <thead>
-                    <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#64748b", fontWeight: "700" }}>
-                      <th style={{ padding: "7px 12px" }}>TEAM MEMBER</th>
-                      <th style={{ padding: "7px 12px" }}>ROLE & PRIVACY</th>
-                      <th style={{ padding: "7px 12px" }}>LOGIN PIN</th>
-                      <th style={{ padding: "7px 12px", textAlign: "center" }}>ASSIGNED LEADS</th>
-                      <th style={{ padding: "7px 12px", textAlign: "right" }}>ACTIONS</th>
+                    <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: "700" }}>
+                      <th style={{ padding: "9px 12px" }}>TEAM MEMBER</th>
+                      <th style={{ padding: "9px 12px" }}>ROLE & PRIVACY</th>
+                      <th style={{ padding: "9px 12px" }}>LOGIN PIN</th>
+                      <th style={{ padding: "9px 12px", textAlign: "center" }}>ASSIGNED LEADS</th>
+                      <th style={{ padding: "9px 12px", textAlign: "right" }}>ACTIONS</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -10230,75 +10247,76 @@ export default function App() {
                       return (
                         <tr key={usr.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.15s ease" }}>
                           {/* Member info */}
-                          <td style={{ padding: "7px 12px" }}>
+                          <td style={{ padding: "8px 12px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                              <div style={{ width: "26px", height: "26px", borderRadius: "50%", backgroundColor: isAdminRole ? "#fef3c7" : "#eff6ff", color: isAdminRole ? "#b45309" : "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", fontSize: "11.5px", border: isAdminRole ? "1px solid #fde68a" : "1px solid #bfdbfe" }}>
+                              <div style={{ width: "28px", height: "28px", borderRadius: "50%", backgroundColor: isAdminRole ? "#fef3c7" : "#eff6ff", color: isAdminRole ? "#b45309" : "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", fontSize: "12px", border: isAdminRole ? "1px solid #fde68a" : "1px solid #bfdbfe" }}>
                                 {usr.name[0]}
                               </div>
                               <div>
-                                <div style={{ fontWeight: "750", color: "#0f172a", fontSize: "12px" }}>{usr.displayName || usr.name}</div>
-                                <div style={{ fontSize: "10.5px", color: "#64748b" }}>@{usr.username || "user"} • {usr.phone || "No phone"}</div>
+                                <div style={{ fontWeight: "600", color: "#0f172a", fontSize: "12.5px" }}>{usr.displayName || usr.name}</div>
+                                <div style={{ fontSize: "11px", color: "#64748b" }}>@{usr.username || "user"} • {usr.phone || "No phone"}</div>
                               </div>
                             </div>
                           </td>
 
                           {/* Role & Privacy */}
-                          <td style={{ padding: "7px 12px" }}>
+                          <td style={{ padding: "8px 12px" }}>
                             {isAdminRole ? (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 8px", backgroundColor: "#fef3c7", color: "#92400e", borderRadius: "5px", fontSize: "10.5px", fontWeight: "750", border: "1px solid #fde68a" }}>
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "4px 9px", backgroundColor: "#fef3c7", color: "#b45309", borderRadius: "6px", fontSize: "12px", fontWeight: "600", border: "1px solid #fde68a" }}>
                                 👑 Super Admin (Full Pipeline)
                               </span>
                             ) : (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "3px 8px", backgroundColor: "#eff6ff", color: "#1e40af", borderRadius: "5px", fontSize: "10.5px", fontWeight: "750", border: "1px solid #bfdbfe" }}>
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "4px 9px", backgroundColor: "#eff6ff", color: "#1d4ed8", borderRadius: "6px", fontSize: "12px", fontWeight: "600", border: "1px solid #bfdbfe" }}>
                                 💼 Sales Rep (Isolated - Own Data Only)
                               </span>
                             )}
                           </td>
 
                           {/* Login PIN */}
-                          <td style={{ padding: "7px 12px" }}>
-                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "3px 8px", borderRadius: "5px" }}>
-                              <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: "850", letterSpacing: "2px", color: "#0f172a" }}>
+                          <td style={{ padding: "8px 12px" }}>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 8px", borderRadius: "6px" }}>
+                              <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: "700", letterSpacing: "2px", color: "#0f172a" }}>
                                 {isPinVisible ? (usr.pin || "••••") : "••••••"}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => setUserPinVisibilityMap(prev => ({ ...prev, [usr.id]: !prev[usr.id] }))}
-                                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "1px", display: "flex", alignItems: "center" }}
+                                style={{ width: "32px", height: "32px", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: "0", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "5px" }}
                                 title={isPinVisible ? "Hide PIN" : "Reveal PIN"}
+                                aria-label={isPinVisible ? "Hide PIN" : "Reveal PIN"}
                               >
-                                {isPinVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                                {isPinVisible ? <EyeOff size={18} /> : <Eye size={18} />}
                               </button>
                             </div>
                           </td>
 
                           {/* Assigned Leads */}
-                          <td style={{ padding: "7px 12px", textAlign: "center" }}>
-                            <span style={{ padding: "2px 8px", borderRadius: "9999px", backgroundColor: "#f1f5f9", fontWeight: "800", color: "#334155", fontSize: "11px", border: "1px solid #e2e8f0" }}>
+                          <td style={{ padding: "8px 12px", textAlign: "center" }}>
+                            <span style={{ padding: "3px 9px", borderRadius: "9999px", backgroundColor: "#f1f5f9", fontWeight: "600", color: "#475569", fontSize: "11.5px", border: "1px solid #e2e8f0" }}>
                               {leadsCount} Deals
                             </span>
                           </td>
 
                           {/* Actions */}
-                          <td style={{ padding: "7px 12px", textAlign: "right" }}>
-                            <div style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                          <td style={{ padding: "8px 12px", textAlign: "right" }}>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                               <button
                                 type="button"
                                 onClick={() => handleUpdateUserPin(usr.id, usr.name)}
-                                style={{ padding: "4px 8px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "10.5px", fontWeight: "600", color: "#334155", cursor: "pointer" }}
+                                style={{ height: "32px", padding: "0 10px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#0f172a", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}
                                 title="Reset or change PIN"
                               >
                                 🔑 Reset PIN
                               </button>
                               {checkIsSuperAdmin(usr) || usr.id === "usr_admin" ? (
-                                <span style={{ padding: "4px 8px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "5px", fontSize: "10.5px", fontWeight: "700", color: "#94a3b8" }} title="Primary Super Admin cannot be deleted">
+                                <span style={{ height: "32px", padding: "0 10px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#94a3b8", display: "inline-flex", alignItems: "center" }} title="Primary Super Admin cannot be deleted">
                                   🔒 Protected
                                 </span>
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteUser(usr.id, usr.name, usr.email, usr.role)}
-                                  style={{ padding: "4px 8px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "5px", fontSize: "10.5px", fontWeight: "700", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                                  style={{ height: "32px", padding: "0 10px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                                   title={`Permanently delete ${usr.name}`}
                                 >
                                   🗑️ Delete
@@ -10315,11 +10333,11 @@ export default function App() {
 
               {/* Bottom Security Banner */}
               <div style={{ marginTop: "16px", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ fontSize: "11.5px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
-                  <ShieldCheck size={14} color="#16a34a" />
+                <div style={{ fontSize: "12.5px", color: "#475569", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <ShieldCheck size={16} color="#16a34a" />
                   <span><strong>Server-Enforced Access Control:</strong> Sales reps can only view their own leads on mobile and desktop. Admin retains full pipeline authority.</span>
                 </div>
-                <span style={{ fontSize: "10.5px", color: "#94a3b8" }}>Central Database: server/data/db.json</span>
+                <span style={{ fontSize: "11px", color: "#94a3b8" }}>Central Database: server/data/db.json</span>
               </div>
 
             </div>
@@ -19585,21 +19603,21 @@ export default function App() {
               {/* Summary Stats & Actions */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
                 <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                  <div style={{ padding: "10px 14px", backgroundColor: "#f8fafc", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
-                    <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#64748b" }}>TOTAL ACTIVE USERS</span>
-                    <div style={{ fontSize: "18px", fontWeight: "850", color: "#0f172a" }}>{allUsersList.length || 4}</div>
+                  <div style={{ padding: "10px 14px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Total Active Users</span>
+                    <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a" }}>{allUsersList.length || 4}</div>
                   </div>
 
-                  <div style={{ padding: "10px 14px", backgroundColor: "#fffbeb", borderRadius: "10px", border: "1px solid #fef3c7" }}>
-                    <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#b45309" }}>SUPER ADMINS (FULL DATA)</span>
-                    <div style={{ fontSize: "18px", fontWeight: "850", color: "#d97706" }}>
+                  <div style={{ padding: "10px 14px", backgroundColor: "#fffbeb", borderRadius: "8px", border: "1px solid #fef3c7" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#b45309" }}>Super Admins (Full Data)</span>
+                    <div style={{ fontSize: "18px", fontWeight: "700", color: "#b45309" }}>
                       {(allUsersList.filter(u => u.role === "admin").length) || 1}
                     </div>
                   </div>
 
-                  <div style={{ padding: "10px 14px", backgroundColor: "#eff6ff", borderRadius: "10px", border: "1px solid #dbeafe" }}>
-                    <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#2563eb" }}>SALES REPS (ISOLATED)</span>
-                    <div style={{ fontSize: "18px", fontWeight: "850", color: "#2563eb" }}>
+                  <div style={{ padding: "10px 14px", backgroundColor: "#eff6ff", borderRadius: "8px", border: "1px solid #dbeafe" }}>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb" }}>Sales Reps (Isolated)</span>
+                    <div style={{ fontSize: "18px", fontWeight: "700", color: "#2563eb" }}>
                       {(allUsersList.filter(u => u.role === "sales_rep").length) || 3}
                     </div>
                   </div>
@@ -19622,15 +19640,16 @@ export default function App() {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "6px",
-                      padding: "10px 16px",
+                      height: "34px",
+                      padding: "0 16px",
                       backgroundColor: showAddUserSubModal ? "#64748b" : "#2563eb",
                       color: "#ffffff",
                       border: "none",
-                      borderRadius: "10px",
+                      borderRadius: "6px",
                       fontSize: "12px",
-                      fontWeight: "750",
+                      fontWeight: "600",
                       cursor: "pointer",
-                      boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)"
+                      boxShadow: "0 1px 3px rgba(37, 99, 235, 0.2)"
                     }}
                   >
                     <UserPlus size={15} />
@@ -19893,31 +19912,32 @@ export default function App() {
 
                           {/* Login PIN */}
                           <td style={{ padding: "8px 12px" }}>
-                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 7px", borderRadius: "6px" }}>
-                              <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: "800", letterSpacing: "2px", color: "#0f172a" }}>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 8px", borderRadius: "6px" }}>
+                              <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: "700", letterSpacing: "2px", color: "#0f172a" }}>
                                 {isPinVisible ? (usr.pin || "••••") : "••••••"}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => setUserPinVisibilityMap(prev => ({ ...prev, [usr.id]: !prev[usr.id] }))}
-                                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "1px", display: "flex", alignItems: "center" }}
+                                style={{ width: "32px", height: "32px", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: "0", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "5px" }}
                                 title={isPinVisible ? "Hide PIN" : "Reveal PIN"}
+                                aria-label={isPinVisible ? "Hide PIN" : "Reveal PIN"}
                               >
-                                {isPinVisible ? <EyeOff size={12} /> : <Eye size={12} />}
+                                {isPinVisible ? <EyeOff size={18} /> : <Eye size={18} />}
                               </button>
                             </div>
                           </td>
 
                           {/* Assigned Leads */}
                           <td style={{ padding: "8px 12px", textAlign: "center" }}>
-                            <span style={{ padding: "2px 8px", borderRadius: "9999px", backgroundColor: "#f1f5f9", fontWeight: "800", color: "#334155", fontSize: "10.5px" }}>
+                            <span style={{ padding: "3px 9px", borderRadius: "9999px", backgroundColor: "#f1f5f9", fontWeight: "600", color: "#475569", fontSize: "11.5px" }}>
                               {leadsCount}
                             </span>
                           </td>
 
                           {/* Actions */}
                           <td style={{ padding: "8px 12px", textAlign: "right" }}>
-                            <div style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                               {usr.email && (
                                 <button
                                   type="button"
@@ -19925,7 +19945,7 @@ export default function App() {
                                     navigator.clipboard.writeText(directInviteUrl);
                                     showToast(`Invite link for ${usr.email} copied!`, "success");
                                   }}
-                                  style={{ padding: "4px 8px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "5px", fontSize: "10px", fontWeight: "750", color: "#2563eb", cursor: "pointer" }}
+                                  style={{ height: "32px", padding: "0 10px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#2563eb", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                                   title="Copy activation link"
                                 >
                                   📋 Link
@@ -19934,20 +19954,20 @@ export default function App() {
                               <button
                                 type="button"
                                 onClick={() => handleUpdateUserPin(usr.id, usr.name)}
-                                style={{ padding: "4px 7px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "5px", fontSize: "10px", fontWeight: "600", color: "#334155", cursor: "pointer" }}
+                                style={{ height: "32px", padding: "0 10px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#0f172a", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}
                                 title="Reset or change PIN"
                               >
-                                🔑 PIN
+                                🔑 Reset PIN
                               </button>
                               {checkIsSuperAdmin(usr) || usr.id === "usr_admin" ? (
-                                <span style={{ padding: "4px 6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "5px", fontSize: "10px", fontWeight: "700", color: "#94a3b8" }} title="Primary Super Admin cannot be deleted">
+                                <span style={{ height: "32px", padding: "0 10px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#94a3b8", display: "inline-flex", alignItems: "center" }} title="Primary Super Admin cannot be deleted">
                                   🔒 Protected
                                 </span>
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleDeleteUser(usr.id, usr.name, usr.email, usr.role)}
-                                  style={{ padding: "4px 7px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "5px", fontSize: "10px", fontWeight: "700", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                                  style={{ height: "32px", padding: "0 10px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                                   title={`Permanently delete ${usr.name}`}
                                 >
                                   🗑️ Delete

@@ -568,6 +568,10 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .header-period-btn {
   white-space: nowrap;
+  height: 32px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
 }
 
 .header-period-desktop-text {
@@ -587,32 +591,33 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .header-cta-orange {
-  background: #ffffff;
-  color: #475569;
-  border: 1px solid #e2e8f0;
-  padding: 0 11px;
-  height: 34px;
+  background: #ea580c !important;
+  color: #ffffff !important;
+  border: 1px solid #c2410c !important;
+  padding: 0 12px !important;
+  height: 32px !important;
   border-radius: 6px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  box-shadow: 0 1px 3px rgba(234, 88, 12, 0.28);
   display: flex;
   align-items: center;
   gap: 6px;
   transition: all 0.15s ease;
-  box-sizing: border-box;
+  box-sizing: border-box !important;
 }
 
 .header-cta-orange:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #0f172a;
+  background: #c2410c !important;
+  border-color: #9a3412 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 5px rgba(234, 88, 12, 0.35);
 }
 
 .header-notification-btn {
-  width: 34px;
-  height: 34px;
+  width: 32px !important;
+  height: 32px !important;
   border-radius: 6px;
   border: 1px solid #e2e8f0;
   background-color: #ffffff;
