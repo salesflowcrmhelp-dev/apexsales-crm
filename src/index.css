@@ -1082,11 +1082,11 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 /* Pills and Badges */
 .sheet-status-pill {
   display: inline-block;
-  padding: 1px 7px;
+  padding: 2px 8px;
   border-radius: 9999px;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: none;
 }
 
 .sheet-status-new { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }

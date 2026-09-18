@@ -6790,19 +6790,12 @@ export default function App() {
                   ) : (
                     <Archive size={12} color="#ea580c" style={{ flexShrink: 0 }} />
                   )}
-                  <span className="header-period-desktop-text">
+                  <span>
                     {selectedPeriodMonth === "2026-09" 
                       ? "September 2026 (Current)" 
                       : selectedPeriodMonth === "2026-08" 
                       ? "August 2026 (Archived)" 
                       : "All-Time Lifetime"}
-                  </span>
-                  <span className="header-period-mobile-text">
-                    {selectedPeriodMonth === "2026-09" 
-                      ? "Sep '26" 
-                      : selectedPeriodMonth === "2026-08" 
-                      ? "Aug '26" 
-                      : "All"}
                   </span>
                   <ChevronDown size={12} style={{ flexShrink: 0 }} />
                 </button>
@@ -12047,64 +12040,62 @@ export default function App() {
                 const aiAction = activeLead ? calculateAiWinProbability(activeLead) : { percentage: 50, level: "Moderate" };
 
                 return (
-                  <div className="split-screen-workspace-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "92%" }}>
+                  <div className="split-screen-workspace-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     {/* TOP ACTION & VIEW SWITCHER BAR */}
-                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "7px 12px", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                        <div style={{ width: "24px", height: "24px", borderRadius: "5px", backgroundColor: "#0f172a", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <Layers size={13} color="#38bdf8" />
+                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 14px", marginBottom: "10px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
+                          <Layers size={17} color="#2563eb" />
                         </div>
                         <div>
-                          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                            <h2 style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
-                              Pipeline 360° Split-Screen Workspace
-                            </h2>
-                          </div>
-                          <span style={{ fontSize: "9.5px", color: "#64748b" }}>
+                          <h1 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>
+                            Pipeline 360° Split-Screen Workspace
+                          </h1>
+                          <p style={{ fontSize: "12px", color: "#475569", margin: "2px 0 0 0", lineHeight: "1.4", fontWeight: "400" }}>
                             Browse, call, update stages, and log conversation notes on a single unified screen with zero popups.
-                          </span>
+                          </p>
                         </div>
                       </div>
 
                       {/* View Modes Switcher */}
-                      <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                        <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "5px", border: "1px solid #e2e8f0" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
                           <button
                             type="button"
                             onClick={() => setPipelineView("analytics")}
-                            style={{ padding: "3px 8px", fontSize: "10px", fontWeight: "600", color: "#64748b", border: "none", backgroundColor: "transparent", borderRadius: "4px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                            style={{ padding: "4px 10px", height: "28px", fontSize: "11px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                           >
-                            <TrendingUp size={11} /> Dashboard
+                            <TrendingUp size={12} /> Dashboard
                           </button>
                           <button
                             type="button"
                             onClick={() => setPipelineView("sheet")}
-                            style={{ padding: "3px 8px", fontSize: "10px", fontWeight: "600", color: "#64748b", border: "none", backgroundColor: "transparent", borderRadius: "4px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                            style={{ padding: "4px 10px", height: "28px", fontSize: "11px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                           >
-                            <Grid size={11} /> Spreadsheet
+                            <Grid size={12} /> Spreadsheet
                           </button>
                           <button
                             type="button"
                             onClick={() => setPipelineView("split")}
-                            style={{ padding: "3px 8px", fontSize: "10px", fontWeight: "700", color: "#2563eb", border: "none", backgroundColor: "#ffffff", borderRadius: "4px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
+                            style={{ padding: "4px 10px", height: "28px", fontSize: "11px", fontWeight: "600", color: "#2563eb", border: "none", backgroundColor: "#ffffff", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
                           >
-                            <Layers size={11} /> Split 360°
+                            <Layers size={12} /> Split 360°
                           </button>
                           <button
                             type="button"
                             onClick={() => setPipelineView("deals")}
-                            style={{ padding: "3px 8px", fontSize: "10px", fontWeight: "600", color: "#16a34a", border: "none", backgroundColor: "transparent", borderRadius: "4px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                            style={{ padding: "4px 10px", height: "28px", fontSize: "11px", fontWeight: "600", color: "#166534", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                           >
-                            <Award size={11} /> Deals Hub
+                            <Award size={12} /> Deals Hub
                           </button>
                         </div>
 
                         <button
                           type="button"
                           onClick={addNewRow}
-                          style={{ padding: "3px 9px", height: "24px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "10.5px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 3px rgba(37, 99, 235, 0.2)" }}
+                          style={{ padding: "0 12px", height: "32px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 3px rgba(37, 99, 235, 0.2)" }}
                         >
-                          <Plus size={12} /> Add Deal
+                          <Plus size={14} /> Add Deal
                         </button>
                       </div>
                     </div>
@@ -12128,40 +12119,40 @@ export default function App() {
                       const avgClosingSpeed = validCount > 0 ? (totalDays / validCount).toFixed(1) : "3.5";
 
                       return (
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "8px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "10px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                           {/* 1. Total Closed Value */}
-                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "8px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "8px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div>
-                              <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.2px", display: "block" }}>Total Closed Value</span>
-                              <strong style={{ fontSize: "14px", fontWeight: "800", color: "#15803d" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
-                              <span style={{ fontSize: "8px", color: "#64748b", display: "block" }}>{wonLeadsList.length} Won Deals</span>
+                              <span style={{ fontSize: "11px", fontWeight: "600", color: "#166534", textTransform: "uppercase", letterSpacing: "0.2px", display: "block" }}>Total Closed Value</span>
+                              <strong style={{ fontSize: "16px", fontWeight: "700", color: "#166534" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
+                              <span style={{ fontSize: "11px", color: "#64748b", display: "block", marginTop: "2px" }}>{wonLeadsList.length} Won Deals</span>
                             </div>
-                            <div style={{ width: "26px", height: "26px", borderRadius: "5px", backgroundColor: "#dcfce7", color: "#15803d", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                              <Award size={13} color="#15803d" />
+                            <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#dcfce7", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <Award size={16} color="#166534" />
                             </div>
                           </div>
 
                           {/* 2. Average Deal Size */}
-                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div>
-                              <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px", display: "block" }}>Average Deal Size</span>
-                              <strong style={{ fontSize: "14px", fontWeight: "800", color: "#0f172a" }}>₹{avgDealVal.toLocaleString("en-IN")}</strong>
-                              <span style={{ fontSize: "8px", color: "#64748b", display: "block" }}>Per Closed Won Deal</span>
+                              <span style={{ fontSize: "11px", fontWeight: "600", color: "#475569", textTransform: "uppercase", letterSpacing: "0.2px", display: "block" }}>Average Deal Size</span>
+                              <strong style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a" }}>₹{avgDealVal.toLocaleString("en-IN")}</strong>
+                              <span style={{ fontSize: "11px", color: "#64748b", display: "block", marginTop: "2px" }}>Per Closed Won Deal</span>
                             </div>
-                            <div style={{ width: "26px", height: "26px", borderRadius: "5px", backgroundColor: "#f1f5f9", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                              <TrendingUp size={13} color="#2563eb" />
+                            <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <TrendingUp size={16} color="#2563eb" />
                             </div>
                           </div>
 
                           {/* 3. Closing Speed */}
-                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "8px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "8px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div>
-                              <span style={{ fontSize: "8.5px", fontWeight: "700", color: "#c2410c", textTransform: "uppercase", letterSpacing: "0.2px", display: "block" }}>Avg Closing Speed</span>
-                              <strong style={{ fontSize: "14px", fontWeight: "800", color: "#c2410c" }}>{avgClosingSpeed} Days</strong>
-                              <span style={{ fontSize: "8px", color: "#64748b", display: "block" }}>Turnaround Time</span>
+                              <span style={{ fontSize: "11px", fontWeight: "600", color: "#c2410c", textTransform: "uppercase", letterSpacing: "0.2px", display: "block" }}>Avg Closing Speed</span>
+                              <strong style={{ fontSize: "16px", fontWeight: "700", color: "#c2410c" }}>{avgClosingSpeed} Days</strong>
+                              <span style={{ fontSize: "11px", color: "#64748b", display: "block", marginTop: "2px" }}>Turnaround Time</span>
                             </div>
-                            <div style={{ width: "26px", height: "26px", borderRadius: "5px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                              <Clock size={13} color="#ea580c" />
+                            <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#c2410c", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <Clock size={16} color="#c2410c" />
                             </div>
                           </div>
                         </div>
@@ -12169,35 +12160,35 @@ export default function App() {
                     })()}
 
                     {/* MAIN 2-COLUMN SPLIT GRID */}
-                    <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: "8px", alignItems: "start" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: "12px", alignItems: "start" }}>
                       
                       {/* ======================================================== */}
-                      {/* LEFT COLUMN: 30% MASTER LEAD QUEUE                       */}
+                      {/* LEFT COLUMN: MASTER LEAD QUEUE                            */}
                       {/* ======================================================== */}
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px", display: "flex", flexDirection: "column", gap: "6px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px", display: "flex", flexDirection: "column", gap: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                         
-                        {/* Search Input */}
-                        <div style={{ position: "relative", width: "100%" }}>
-                          <Search size={11} color="#94a3b8" style={{ position: "absolute", left: "7px", top: "6px", pointerEvents: "none" }} />
+                        {/* Search Input with Clear 10px Separation */}
+                        <div style={{ position: "relative", width: "100%", marginBottom: "8px" }}>
+                          <Search size={14} color="#64748b" style={{ position: "absolute", left: "10px", top: "9px", pointerEvents: "none" }} />
                           <input
                             type="text"
                             placeholder="Search deals, company..."
                             value={splitLeadSearch}
                             onChange={(e) => setSplitLeadSearch(e.target.value)}
-                            style={{ width: "100%", height: "24px", padding: "2px 18px 2px 24px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "10px", fontWeight: "400", outline: "none", color: "#0f172a" }}
+                            style={{ width: "100%", height: "32px", padding: "0 28px 0 32px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "400", outline: "none", color: "#0f172a", boxSizing: "border-box" }}
                           />
                           {splitLeadSearch && (
-                            <button onClick={() => setSplitLeadSearch("")} style={{ position: "absolute", right: "5px", top: "4px", border: "none", background: "none", color: "#94a3b8", cursor: "pointer", fontSize: "10px", padding: 0 }}>✕</button>
+                            <button onClick={() => setSplitLeadSearch("")} style={{ position: "absolute", right: "8px", top: "7px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px", padding: 0 }}>✕</button>
                           )}
                         </div>
 
-                        {/* Filter Bar: Stage Dropdown & Score Pills */}
-                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                          <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "3px" }}>
+                        {/* Filter Bar: Stage Dropdown & Priority Dropdown */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                          <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "6px" }}>
                             <select
                               value={splitLeadFilterStage}
                               onChange={(e) => setSplitLeadFilterStage(e.target.value)}
-                              style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "9.5px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11.5px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                             >
                               <option value="all">All Stages ({leads.length})</option>
                               <option value="hot">Hot Deals</option>
@@ -12213,7 +12204,7 @@ export default function App() {
                             <select
                               value={splitLeadFilterScore}
                               onChange={(e) => setSplitLeadFilterScore(e.target.value)}
-                              style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "9.5px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11.5px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                             >
                               <option value="all">All Priority</option>
                               <option value="Hot">Hot</option>
@@ -12222,19 +12213,19 @@ export default function App() {
                             </select>
                           </div>
 
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1px 2px", fontSize: "9px", color: "#64748b" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "2px 2px", fontSize: "11.5px", color: "#64748b" }}>
                             <span>Showing <strong>{filteredSplitLeads.length}</strong> of {leads.length}</span>
-                            <span>Pipeline: <strong style={{ color: "#0f172a" }}>₹{filteredSplitLeads.reduce((s, l) => s + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
+                            <span>Pipeline: <strong style={{ color: "#166534" }}>₹{filteredSplitLeads.reduce((s, l) => s + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
                           </div>
                         </div>
 
                         {/* Scrollable Lead Queue List */}
-                        <div style={{ display: "flex", flexDirection: "column", gap: "5px", maxHeight: "500px", overflowY: "auto", paddingRight: "2px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "540px", overflowY: "auto", paddingRight: "2px" }}>
                           {filteredSplitLeads.length === 0 ? (
-                            <div style={{ padding: "18px 8px", textAlign: "center", color: "#94a3b8" }}>
-                              <Filter size={14} color="#94a3b8" style={{ margin: "0 auto 3px" }} />
-                              <span style={{ fontSize: "10px", fontWeight: "500", display: "block", color: "#64748b" }}>No deals match filters</span>
-                              <span style={{ fontSize: "9px" }}>Try clearing search</span>
+                            <div style={{ padding: "24px 8px", textAlign: "center", color: "#64748b" }}>
+                              <Filter size={16} color="#64748b" style={{ margin: "0 auto 4px" }} />
+                              <span style={{ fontSize: "12px", fontWeight: "500", display: "block", color: "#475569" }}>No deals match filters</span>
+                              <span style={{ fontSize: "11px", color: "#64748b" }}>Try clearing search or filters</span>
                             </div>
                           ) : (
                             filteredSplitLeads.map((l) => {
@@ -12248,7 +12239,7 @@ export default function App() {
                                   key={l.id}
                                   onClick={() => setSelectedSplitLeadId(l.id)}
                                   style={{
-                                    padding: "6px 8px",
+                                    padding: "10px 12px",
                                     borderRadius: "6px",
                                     border: isSelected ? "1.5px solid #2563eb" : "1px solid #e2e8f0",
                                     backgroundColor: isSelected ? "#eff6ff" : "#ffffff",
@@ -12263,34 +12254,34 @@ export default function App() {
                                   )}
 
                                   {/* Top Row: Name + Deal Value */}
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1px" }}>
-                                    <strong style={{ fontSize: "11px", color: isSelected ? "#1e40af" : "#0f172a", fontWeight: "700" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px" }}>
+                                    <strong style={{ fontSize: "13px", color: isSelected ? "#1d4ed8" : "#0f172a", fontWeight: "600" }}>
                                       {l.name || "Untitled Lead"}
                                     </strong>
-                                    <span style={{ fontSize: "10.5px", fontWeight: "750", color: isWon ? "#059669" : "#0f172a" }}>
+                                    <span style={{ fontSize: "12px", fontWeight: "700", color: "#166534" }}>
                                       ₹{(Number(l.value) || 0).toLocaleString("en-IN")}
                                     </span>
                                   </div>
 
                                   {/* Middle Row: Company or Phone */}
-                                  <div style={{ fontSize: "9.5px", color: "#64748b", marginBottom: "4px", display: "flex", alignItems: "center", gap: "5px" }}>
-                                    <span>{l.company || l.phone || "Direct Lead"}</span>
+                                  <div style={{ fontSize: "11.5px", color: "#475569", marginBottom: "6px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px" }}>{l.company || l.phone || "Direct Lead"}</span>
                                     {l.score && (
-                                      <span style={{ fontSize: "8px", fontWeight: "700", color: scoreColor, backgroundColor: scoreBg, padding: "0.5px 4px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
-                                        {l.score === "Hot" ? <Flame size={8} color="#dc2626" /> : l.score === "Warm" ? <Clock size={8} color="#d97706" /> : <Sun size={8} color="#2563eb" />}
+                                      <span style={{ fontSize: "9.5px", fontWeight: "600", color: scoreColor, backgroundColor: scoreBg, padding: "1px 6px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                                        {l.score === "Hot" ? <Flame size={9} color="#dc2626" /> : l.score === "Warm" ? <Clock size={9} color="#d97706" /> : <Sun size={9} color="#2563eb" />}
                                         {l.score}
                                       </span>
                                     )}
                                   </div>
 
                                   {/* Bottom Row: Stage Pill + Follow-up Date */}
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "3px" }}>
-                                    <span className={`sheet-status-pill sheet-status-${(l.status || "New").toLowerCase().replace(/ /g, "-")}`} style={{ fontSize: "8px", padding: "1px 4px", fontWeight: "600" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "4px" }}>
+                                    <span className={`sheet-status-pill sheet-status-${(l.status || "New").toLowerCase().replace(/ /g, "-")}`} style={{ fontSize: "10px", padding: "2px 7px", fontWeight: "600" }}>
                                       {l.status || "New"}
                                     </span>
 
-                                    <span style={{ fontSize: "8.5px", color: "#64748b", display: "inline-flex", alignItems: "center", gap: "2px" }}>
-                                      <Calendar size={8} color="#64748b" /> {l.next_follow_up ? l.next_follow_up.slice(5) : "No Date"}
+                                    <span style={{ fontSize: "11px", color: "#64748b", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                      <Calendar size={11} color="#64748b" /> {l.next_follow_up ? l.next_follow_up.slice(5) : "No Date"}
                                     </span>
                                   </div>
                                 </div>
@@ -12301,49 +12292,49 @@ export default function App() {
                       </div>
 
                       {/* ======================================================== */}
-                      {/* RIGHT COLUMN: 70% 360° CLIENT DOSSIER WORKSPACE           */}
+                      {/* RIGHT COLUMN: 360° CLIENT DOSSIER WORKSPACE               */}
                       {/* ======================================================== */}
                       {activeLead ? (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                           
                           {/* 1. HERO HEADER CARD */}
-                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "9px 12px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
                               
                               {/* Left Info: Avatar + Name + Company */}
-                              <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
-                                <div style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: isWonStatus(activeLead.status) ? "#059669" : "#2563eb", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: "800", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div style={{ width: "40px", height: "40px", borderRadius: "50%", backgroundColor: isWonStatus(activeLead.status) ? "#166534" : "#2563eb", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", fontWeight: "700", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
                                   {(activeLead.name || "Lead").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                 </div>
                                 <div>
-                                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                    <h2 style={{ fontSize: "13.5px", fontWeight: "800", color: "#0f172a", margin: 0 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    <h2 style={{ fontSize: "15px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
                                       {activeLead.name || "Untitled Lead"}
                                     </h2>
-                                    <span style={{ fontSize: "8.5px", fontWeight: "700", color: activeLead.score === "Hot" ? "#dc2626" : activeLead.score === "Warm" ? "#d97706" : "#2563eb", backgroundColor: activeLead.score === "Hot" ? "#fef2f2" : activeLead.score === "Warm" ? "#fffbeb" : "#eff6ff", border: "1px solid currentColor", padding: "1px 5px", borderRadius: "3px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                                      {activeLead.score === "Hot" ? <Flame size={9} color="#dc2626" /> : activeLead.score === "Warm" ? <Clock size={9} color="#d97706" /> : <Sun size={9} color="#2563eb" />}
+                                    <span style={{ fontSize: "10px", fontWeight: "600", color: activeLead.score === "Hot" ? "#dc2626" : activeLead.score === "Warm" ? "#d97706" : "#2563eb", backgroundColor: activeLead.score === "Hot" ? "#fef2f2" : activeLead.score === "Warm" ? "#fffbeb" : "#eff6ff", border: "1px solid currentColor", padding: "2px 6px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                                      {activeLead.score === "Hot" ? <Flame size={10} color="#dc2626" /> : activeLead.score === "Warm" ? <Clock size={10} color="#d97706" /> : <Sun size={10} color="#2563eb" />}
                                       {activeLead.score || "Warm"} Lead
                                     </span>
                                   </div>
-                                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "2px", fontSize: "9.5px", color: "#64748b" }}>
-                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}><Building2 size={10} color="#64748b" /> {activeLead.company || "Direct Lead"}</span>
-                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}><Phone size={9} color="#64748b" /> {activeLead.phone || "No phone"}</span>
-                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "3px" }}><Globe size={9} color="#64748b" /> {activeLead.email || "No email"}</span>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "4px", fontSize: "12px", color: "#475569" }}>
+                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Building2 size={12} color="#475569" /> {activeLead.company || "Direct Lead"}</span>
+                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Phone size={12} color="#475569" /> {activeLead.phone || "No phone"}</span>
+                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}><Globe size={12} color="#475569" /> {activeLead.email || "No email"}</span>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Center: Deal Amount + Stage Selector Dropdown */}
-                              <div style={{ display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#f8fafc", padding: "4px 8px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "#f8fafc", padding: "6px 12px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
                                 <div>
-                                  <span style={{ fontSize: "8px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", display: "block" }}>Deal Value</span>
+                                  <span style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", display: "block" }}>Deal Value</span>
                                   {splitEditValueMode ? (
-                                    <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                                       <input
                                         type="number"
                                         value={splitTempAmount}
                                         onChange={(e) => setSplitTempAmount(e.target.value)}
-                                        style={{ width: "70px", height: "20px", padding: "1px 3px", fontSize: "10px", fontWeight: "700", border: "1px solid #2563eb", borderRadius: "3px", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ width: "80px", height: "26px", padding: "2px 6px", fontSize: "12px", fontWeight: "700", color: "#166534", border: "1px solid #2563eb", borderRadius: "6px", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                       />
                                       <button
                                         onClick={() => {
@@ -12351,7 +12342,7 @@ export default function App() {
                                           setSplitEditValueMode(false);
                                           showToast("Updated Deal Value!");
                                         }}
-                                        style={{ padding: "1px 3px", backgroundColor: "#2563eb", color: "#fff", border: "none", borderRadius: "3px", fontSize: "8.5px", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ padding: "0 6px", height: "26px", backgroundColor: "#2563eb", color: "#fff", border: "none", borderRadius: "6px", fontSize: "11px", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                       >
                                         ✓
                                       </button>
@@ -12359,19 +12350,19 @@ export default function App() {
                                   ) : (
                                     <div 
                                       onClick={() => { setSplitTempAmount(String(activeLead.value || 0)); setSplitEditValueMode(true); }}
-                                      style={{ display: "flex", alignItems: "center", gap: "3px", cursor: "pointer" }}
+                                      style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer" }}
                                       title="Click to edit deal amount"
                                     >
-                                      <strong style={{ fontSize: "12.5px", fontWeight: "800", color: "#0f172a" }}>
+                                      <strong style={{ fontSize: "14px", fontWeight: "700", color: "#166534" }}>
                                         ₹{(Number(activeLead.value) || 0).toLocaleString("en-IN")}
                                       </strong>
-                                      <Pencil size={9} color="#64748b" />
+                                      <Pencil size={11} color="#64748b" />
                                     </div>
                                   )}
                                 </div>
 
-                                <div style={{ borderLeft: "1px solid #cbd5e1", paddingLeft: "8px" }}>
-                                  <span style={{ fontSize: "8px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", display: "block" }}>Stage</span>
+                                <div style={{ borderLeft: "1px solid #cbd5e1", paddingLeft: "10px" }}>
+                                  <span style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", display: "block" }}>Stage</span>
                                   <select
                                     value={activeLead.status || "New"}
                                     onChange={(e) => {
@@ -12383,7 +12374,7 @@ export default function App() {
                                         showToast(`Stage updated to ${newStg}`);
                                       }
                                     }}
-                                    style={{ padding: "1px 4px", height: "22px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "10px", fontWeight: "700", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ padding: "0 8px", height: "28px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "11.5px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                   >
                                     {STATUS_OPTIONS.map(stg => (
                                       <option key={stg} value={stg}>{stg}</option>
@@ -12393,24 +12384,24 @@ export default function App() {
                               </div>
 
                               {/* Right: Quick Action CTAs */}
-                              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                 {activeLead.phone && (
                                   <a
                                     href={`https://wa.me/${(activeLead.phone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${activeLead.name || ""}, regarding our discussion on your requirements...`)}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    style={{ padding: "3px 8px", height: "24px", backgroundColor: "#22c55e", color: "#ffffff", borderRadius: "5px", fontSize: "10px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "3px", boxShadow: "0 1px 2px rgba(34,197,94,0.3)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ padding: "0 10px", height: "30px", backgroundColor: "#166534", color: "#ffffff", borderRadius: "6px", fontSize: "11px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                   >
-                                    <MessageCircle size={11} /> WhatsApp
+                                    <MessageCircle size={13} /> WhatsApp
                                   </a>
                                 )}
 
                                 {activeLead.phone && (
                                   <a
                                     href={`tel:${activeLead.phone}`}
-                                    style={{ padding: "3px 8px", height: "24px", backgroundColor: "#0f172a", color: "#ffffff", borderRadius: "5px", fontSize: "10px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "3px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ padding: "0 10px", height: "30px", backgroundColor: "#0f172a", color: "#ffffff", borderRadius: "6px", fontSize: "11px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                   >
-                                    <Phone size={10} color="#38bdf8" /> Call
+                                    <Phone size={12} color="#ffffff" /> Call
                                   </a>
                                 )}
 
@@ -12421,13 +12412,13 @@ export default function App() {
                                       handleUpdateActiveLead("won_date", new Date().toISOString().slice(0, 10));
                                       showToast(`Deal marked as WON! Revenue: ₹${(Number(activeLead.value) || 0).toLocaleString("en-IN")}`, "success");
                                     }}
-                                    style={{ padding: "3px 8px", height: "24px", backgroundColor: "#15803d", color: "#ffffff", border: "none", borderRadius: "5px", fontSize: "10px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px", boxShadow: "0 1px 2px rgba(21,128,61,0.25)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ padding: "0 10px", height: "30px", backgroundColor: "#166534", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                   >
-                                    <Award size={11} /> Mark Won
+                                    <Award size={13} /> Mark Won
                                   </button>
                                 ) : (
-                                  <span style={{ fontSize: "9.5px", fontWeight: "700", color: "#16a34a", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "3px 7px", borderRadius: "5px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                                    <Check size={11} color="#166534" /> Won Deal
+                                  <span style={{ fontSize: "11px", fontWeight: "600", color: "#166534", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "4px 9px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                    <Check size={12} color="#166534" /> Won Deal
                                   </span>
                                 )}
                               </div>
@@ -12435,7 +12426,7 @@ export default function App() {
                           </div>
 
                           {/* 2. TABBED SECTIONS NAVIGATION */}
-                          <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", backgroundColor: "#ffffff", borderRadius: "6px 6px 0 0", padding: "0 6px" }}>
+                          <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", backgroundColor: "#ffffff", borderRadius: "6px 6px 0 0", padding: "0 8px" }}>
                             {[
                               { id: "overview", label: "Overview & Details", icon: FileText },
                               { id: "timeline", label: "Call Logs & Notes", icon: ListTodo, count: typeof activeLead.notes === "string" ? (activeLead.notes.split("\n\n").filter(Boolean).length || 1) : 0 },
@@ -12450,25 +12441,25 @@ export default function App() {
                                   type="button"
                                   onClick={() => setSplitDossierTab(tab.id)}
                                   style={{
-                                    padding: "6px 11px",
+                                    padding: "8px 14px",
                                     border: "none",
                                     borderBottom: isActive ? "2px solid #2563eb" : "2px solid transparent",
                                     backgroundColor: "transparent",
                                     color: isActive ? "#2563eb" : "#64748b",
-                                    fontWeight: isActive ? "700" : "500",
-                                    fontSize: "10.5px",
+                                    fontWeight: isActive ? "600" : "500",
+                                    fontSize: "12px",
                                     cursor: "pointer",
                                     display: "inline-flex",
                                     alignItems: "center",
-                                    gap: "4px",
+                                    gap: "5px",
                                     transition: "all 0.15s ease",
                                     fontFamily: "'Plus Jakarta Sans', sans-serif"
                                   }}
                                 >
-                                  <Icon size={11} color={isActive ? "#2563eb" : "#64748b"} />
+                                  <Icon size={13} color={isActive ? "#2563eb" : "#64748b"} />
                                   <span>{tab.label}</span>
                                   {tab.count !== undefined && tab.count > 0 && (
-                                    <span style={{ fontSize: "8px", fontWeight: "700", backgroundColor: isActive ? "#eff6ff" : "#f1f5f9", color: isActive ? "#2563eb" : "#64748b", padding: "1px 4px", borderRadius: "6px" }}>
+                                    <span style={{ fontSize: "10px", fontWeight: "600", backgroundColor: isActive ? "#eff6ff" : "#f1f5f9", color: isActive ? "#2563eb" : "#64748b", padding: "1px 6px", borderRadius: "6px" }}>
                                       {tab.count}
                                     </span>
                                   )}
@@ -12478,57 +12469,57 @@ export default function App() {
                           </div>
 
                           {/* 3. TAB CONTENT CONTAINER */}
-                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "10px 12px", minHeight: "360px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderTop: "none", borderRadius: "0 0 8px 8px", padding: "14px 16px", minHeight: "360px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             
                             {/* TAB 1: OVERVIEW & LEAD DETAILS */}
                             {splitDossierTab === "overview" && (
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                                 
                                 {/* Box 1: Contact Information */}
-                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px" }}>
-                                  <h4 style={{ fontSize: "10.5px", fontWeight: "700", color: "#0f172a", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "4px" }}>
-                                    <User size={11} color="#2563eb" /> Contact & Organization Details
-                                  </h4>
+                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px" }}>
+                                  <h3 style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a", margin: "0 0 10px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <User size={14} color="#2563eb" /> Contact & Organization Details
+                                  </h3>
 
-                                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                                     <div>
-                                      <label style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "1px" }}>Lead / Contact Person Name</label>
+                                      <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Lead / Contact Person Name</label>
                                       <input 
                                         type="text" 
                                         value={activeLead.name || ""} 
                                         onChange={(e) => handleUpdateActiveLead("name", e.target.value)}
-                                        style={{ width: "100%", padding: "3px 6px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", backgroundColor: "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                       />
                                     </div>
 
                                     <div>
-                                      <label style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "1px" }}>Company / Business Name</label>
+                                      <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Company / Business Name</label>
                                       <input 
                                         type="text" 
                                         value={activeLead.company || ""} 
                                         onChange={(e) => handleUpdateActiveLead("company", e.target.value)}
                                         placeholder="e.g. Acme Corp Pvt Ltd"
-                                        style={{ width: "100%", padding: "3px 6px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", backgroundColor: "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                       />
                                     </div>
 
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                                       <div>
-                                        <label style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "1px" }}>Phone Number</label>
+                                        <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Phone Number</label>
                                         <input 
                                           type="tel" 
                                           value={activeLead.phone || ""} 
                                           onChange={(e) => handleUpdateActiveLead("phone", e.target.value)}
-                                          style={{ width: "100%", padding: "3px 6px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", backgroundColor: "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                         />
                                       </div>
                                       <div>
-                                        <label style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "1px" }}>Email Address</label>
+                                        <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Email Address</label>
                                         <input 
                                           type="email" 
                                           value={activeLead.email || ""} 
                                           onChange={(e) => handleUpdateActiveLead("email", e.target.value)}
-                                          style={{ width: "100%", padding: "3px 6px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", backgroundColor: "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                         />
                                       </div>
                                     </div>
@@ -12536,28 +12527,30 @@ export default function App() {
                                 </div>
 
                                 {/* Box 2: Deal & Follow-up Scheduling */}
-                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px" }}>
-                                  <h4 style={{ fontSize: "10.5px", fontWeight: "700", color: "#0f172a", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "4px" }}>
-                                    <Calendar size={11} color="#059669" /> Deal Attributes & Next Follow-Up
-                                  </h4>
+                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px" }}>
+                                  <h3 style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a", margin: "0 0 10px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <Calendar size={14} color="#166534" /> Deal Attributes & Next Follow-Up
+                                  </h3>
 
-                                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                                       <div>
-                                        <label style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "1px" }}>Deal Value (₹)</label>
-                                        <input 
-                                          type="number" 
-                                          value={activeLead.value || 0} 
-                                          onChange={(e) => handleUpdateActiveLead("value", Number(e.target.value) || 0)}
-                                          style={{ width: "100%", padding: "3px 6px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", backgroundColor: "#ffffff", outline: "none", fontWeight: "700", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                                        />
+                                        <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Deal Value (₹)</label>
+                                        <div style={{ position: "relative" }}>
+                                          <input 
+                                            type="number" 
+                                            value={activeLead.value || 0} 
+                                            onChange={(e) => handleUpdateActiveLead("value", Number(e.target.value) || 0)}
+                                            style={{ width: "100%", padding: "0 10px", height: "32px", border: "1.5px solid #86efac", borderRadius: "6px", fontSize: "12.5px", color: "#166534", backgroundColor: "#f0fdf4", outline: "none", fontWeight: "700", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          />
+                                        </div>
                                       </div>
                                       <div>
-                                        <label style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "1px" }}>Priority Score</label>
+                                        <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Priority Score</label>
                                         <select
                                           value={activeLead.score || "Hot"}
                                           onChange={(e) => handleUpdateActiveLead("score", e.target.value)}
-                                          style={{ width: "100%", padding: "2px 4px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", backgroundColor: "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                         >
                                           <option value="Hot">Hot</option>
                                           <option value="Warm">Warm</option>
@@ -12566,22 +12559,22 @@ export default function App() {
                                       </div>
                                     </div>
 
-                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                                       <div>
-                                        <label style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "1px" }}>Next Follow-Up Date</label>
+                                        <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Next Follow-Up Date</label>
                                         <input 
                                           type="date" 
                                           value={activeLead.next_follow_up || ""} 
                                           onChange={(e) => handleUpdateActiveLead("next_follow_up", e.target.value)}
-                                          style={{ width: "100%", padding: "2px 4px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", backgroundColor: "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                         />
                                       </div>
                                       <div>
-                                        <label style={{ fontSize: "8.5px", fontWeight: "600", color: "#64748b", display: "block", marginBottom: "1px" }}>Lead Source</label>
+                                        <label style={{ fontSize: "11px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Lead Source</label>
                                         <select
                                           value={activeLead.source || "Manual"}
                                           onChange={(e) => handleUpdateActiveLead("source", e.target.value)}
-                                          style={{ width: "100%", padding: "2px 4px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "4px", fontSize: "10px", backgroundColor: "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                         >
                                           {SOURCE_OPTIONS.map(src => (
                                             <option key={src} value={src}>{src}</option>
@@ -12590,13 +12583,14 @@ export default function App() {
                                       </div>
                                     </div>
 
-                                    <div style={{ paddingTop: "4px" }}>
+                                    {/* Save Information Button with Clear 24px Top Margin (Issue 10) */}
+                                    <div style={{ marginTop: "24px" }}>
                                       <button
                                         type="button"
                                         onClick={() => showToast("Lead details saved successfully!", "success")}
-                                        style={{ width: "100%", padding: "4px 8px", height: "24px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "4px", fontSize: "10px", fontWeight: "600", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ width: "100%", height: "34px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", boxShadow: "0 1px 2px rgba(37, 99, 235, 0.2)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                       >
-                                        Save Information
+                                        <Check size={14} /> Save Information
                                       </button>
                                     </div>
                                   </div>
@@ -12607,17 +12601,17 @@ export default function App() {
 
                             {/* TAB 2: CALL LOGS & TIMELINE NOTES */}
                             {splitDossierTab === "timeline" && (
-                              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                                 
                                 {/* Quick Note Composer */}
-                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px" }}>
-                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px", flexWrap: "wrap", gap: "4px" }}>
-                                    <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#0f172a", display: "flex", alignItems: "center", gap: "4px" }}>
-                                      <FileText size={11} color="#2563eb" /> Log Conversation Note / Call Summary
-                                    </span>
+                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px" }}>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "6px" }}>
+                                    <h3 style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                                      <FileText size={14} color="#2563eb" /> Log Conversation Note / Call Summary
+                                    </h3>
                                     
                                     {/* Note Type Selector */}
-                                    <div style={{ display: "flex", gap: "2px" }}>
+                                    <div style={{ display: "flex", gap: "4px" }}>
                                       {[
                                         { id: "Call", label: "Call", icon: Phone },
                                         { id: "WhatsApp", label: "WhatsApp", icon: MessageCircle },
@@ -12632,21 +12626,21 @@ export default function App() {
                                             type="button"
                                             onClick={() => setSplitNewNoteType(t.id)}
                                             style={{
-                                              padding: "1px 5px",
-                                              borderRadius: "3px",
-                                              fontSize: "8.5px",
+                                              padding: "3px 8px",
+                                              borderRadius: "6px",
+                                              fontSize: "11px",
                                               fontWeight: "600",
                                               border: splitNewNoteType === t.id ? "1px solid #2563eb" : "1px solid #cbd5e1",
                                               backgroundColor: splitNewNoteType === t.id ? "#eff6ff" : "#ffffff",
-                                              color: splitNewNoteType === t.id ? "#2563eb" : "#64748b",
+                                              color: splitNewNoteType === t.id ? "#2563eb" : "#475569",
                                               cursor: "pointer",
                                               display: "inline-flex",
                                               alignItems: "center",
-                                              gap: "2px",
+                                              gap: "3px",
                                               fontFamily: "'Plus Jakarta Sans', sans-serif"
                                             }}
                                           >
-                                            <TypeIcon size={8} />
+                                            <TypeIcon size={11} />
                                             {t.label}
                                           </button>
                                         );
@@ -12655,7 +12649,7 @@ export default function App() {
                                   </div>
 
                                   {/* Quick Preset Chips */}
-                                  <div style={{ display: "flex", flexWrap: "wrap", gap: "3px", marginBottom: "4px" }}>
+                                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "8px" }}>
                                     {[
                                       "Called - Discussed requirement, sending proposal",
                                       "Positive demo completed - Client agreed on pricing",
@@ -12666,9 +12660,9 @@ export default function App() {
                                         key={pIdx}
                                         type="button"
                                         onClick={() => setSplitNewNoteText(preset)}
-                                        style={{ fontSize: "8.5px", padding: "1px 5px", borderRadius: "3px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", color: "#475569", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ fontSize: "11px", padding: "2px 8px", borderRadius: "6px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", color: "#475569", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                       >
-                                        + {preset.slice(0, 28)}...
+                                        + {preset.slice(0, 32)}...
                                       </button>
                                     ))}
                                   </div>
@@ -12678,38 +12672,38 @@ export default function App() {
                                     placeholder="Type conversation details, objections handled, next steps..."
                                     value={splitNewNoteText}
                                     onChange={(e) => setSplitNewNoteText(e.target.value)}
-                                    style={{ width: "100%", padding: "4px 6px", borderRadius: "4px", border: "1px solid #cbd5e1", fontSize: "10px", color: "#0f172a", outline: "none", resize: "vertical", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", color: "#0f172a", outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                   />
 
-                                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "4px" }}>
+                                  <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px" }}>
                                     <button
                                       type="button"
                                       onClick={handleAddSplitNote}
-                                      style={{ padding: "3px 10px", height: "22px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "3px", fontSize: "10px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                      style={{ padding: "0 12px", height: "30px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                     >
-                                      <Plus size={11} /> Add Note
+                                      <Plus size={13} /> Add Note
                                     </button>
                                   </div>
                                 </div>
 
                                 {/* Timeline History Feed */}
                                 <div>
-                                  <h4 style={{ fontSize: "10px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px", margin: "0 0 6px 0" }}>
+                                  <h3 style={{ fontSize: "12px", fontWeight: "600", color: "#475569", textTransform: "uppercase", letterSpacing: "0.2px", margin: "0 0 8px 0" }}>
                                     Conversation History
-                                  </h4>
+                                  </h3>
 
-                                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                     {typeof activeLead.notes === "string" && activeLead.notes.trim() ? (
                                       activeLead.notes.split("\n\n").filter(Boolean).map((noteBlock, nIdx) => (
-                                        <div key={nIdx} style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "5px", padding: "6px 8px" }}>
-                                          <p style={{ margin: 0, fontSize: "10px", color: "#0f172a", whiteSpace: "pre-wrap", lineHeight: 1.35, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                        <div key={nIdx} style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px" }}>
+                                          <p style={{ margin: 0, fontSize: "12px", color: "#0f172a", whiteSpace: "pre-wrap", lineHeight: 1.4, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                                             {noteBlock}
                                           </p>
                                         </div>
                                       ))
                                     ) : (
-                                      <div style={{ padding: "12px", textAlign: "center", color: "#94a3b8", backgroundColor: "#f8fafc", borderRadius: "5px", border: "1px dashed #cbd5e1" }}>
-                                        <span style={{ fontSize: "9.5px" }}>No conversation notes logged yet. Use the box above to add call summaries.</span>
+                                      <div style={{ padding: "16px", textAlign: "center", color: "#64748b", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px dashed #cbd5e1" }}>
+                                        <span style={{ fontSize: "12px" }}>No conversation notes logged yet. Use the box above to add call summaries.</span>
                                       </div>
                                     )}
                                   </div>
@@ -12720,38 +12714,38 @@ export default function App() {
 
                             {/* TAB 3: AI CLOSING STRATEGY */}
                             {splitDossierTab === "ai" && (
-                              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                                <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "8px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                    <Sparkles size={14} color="#166534" />
+                              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                                <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "8px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    <Sparkles size={16} color="#166534" />
                                     <div>
-                                      <h4 style={{ fontSize: "11px", fontWeight: "750", color: "#16a34a", margin: 0 }}>
+                                      <h3 style={{ fontSize: "13px", fontWeight: "600", color: "#166534", margin: 0 }}>
                                         AI Closing Probability: {aiAction.percentage}% ({aiAction.level})
-                                      </h4>
-                                      <span style={{ fontSize: "9px", color: "#15803d" }}>
+                                      </h3>
+                                      <span style={{ fontSize: "11px", color: "#166534" }}>
                                         Calculated based on stage momentum, score, and follow-up frequency.
                                       </span>
                                     </div>
                                   </div>
-                                  <span style={{ fontSize: "9.5px", fontWeight: "800", color: "#16a34a", backgroundColor: "#dcfce7", padding: "2px 6px", borderRadius: "4px" }}>
+                                  <span style={{ fontSize: "11px", fontWeight: "600", color: "#166534", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "3px 8px", borderRadius: "6px" }}>
                                     {aiAction.level}
                                   </span>
                                 </div>
 
-                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px" }}>
-                                  <h4 style={{ fontSize: "10.5px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: "4px" }}>
-                                    <Target size={11} color="#2563eb" /> AI Recommended Next Best Action (NBA)
-                                  </h4>
-                                  <p style={{ fontSize: "10px", color: "#334155", margin: 0, fontWeight: "500" }}>
+                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px" }}>
+                                  <h3 style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <Target size={14} color="#2563eb" /> AI Recommended Next Best Action (NBA)
+                                  </h3>
+                                  <p style={{ fontSize: "12px", color: "#475569", margin: 0, fontWeight: "500", lineHeight: "1.4" }}>
                                     {getAiNextBestAction(activeLead)}
                                   </p>
                                 </div>
 
-                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px" }}>
-                                  <h4 style={{ fontSize: "10.5px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: "4px" }}>
-                                    <Sparkles size={11} color="#ea580c" /> Objection Handling Pitch Script
-                                  </h4>
-                                  <p style={{ fontSize: "9.5px", color: "#475569", margin: 0, lineHeight: 1.35 }}>
+                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px" }}>
+                                  <h3 style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <Sparkles size={14} color="#c2410c" /> Objection Handling Pitch Script
+                                  </h3>
+                                  <p style={{ fontSize: "12px", color: "#475569", margin: 0, lineHeight: 1.4 }}>
                                     <em>"Namaste {activeLead.name || "Sir"}, hum aapke business ke liye best tailored package ready kar rahe hain. Agar aap aaj finalize karte hain to hum aapko instant onboarding & priority technical support provide karenge."</em>
                                   </p>
                                 </div>
@@ -12760,13 +12754,13 @@ export default function App() {
 
                             {/* TAB 4: PAYMENT & INVOICE */}
                             {splitDossierTab === "payment" && (
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px" }}>
-                                  <h4 style={{ fontSize: "10.5px", fontWeight: "700", color: "#0f172a", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "4px" }}>
-                                    <IndianRupee size={11} color="#0f172a" /> Deal Value Breakdown
-                                  </h4>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px" }}>
+                                  <h3 style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a", margin: "0 0 8px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <IndianRupee size={14} color="#0f172a" /> Deal Value Breakdown
+                                  </h3>
 
-                                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "10px" }}>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "12px" }}>
                                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                                       <span style={{ color: "#64748b" }}>Base Deal Amount:</span>
                                       <strong style={{ color: "#0f172a" }}>₹{(Number(activeLead.value) || 0).toLocaleString("en-IN")}</strong>
@@ -12775,35 +12769,35 @@ export default function App() {
                                       <span style={{ color: "#64748b" }}>GST (18%):</span>
                                       <strong style={{ color: "#0f172a" }}>₹{(Math.round((Number(activeLead.value) || 0) * 0.18)).toLocaleString("en-IN")}</strong>
                                     </div>
-                                    <div style={{ borderTop: "1px solid #cbd5e1", paddingTop: "4px", display: "flex", justifyContent: "space-between", fontSize: "11px" }}>
-                                      <span style={{ fontWeight: "700", color: "#0f172a" }}>Total Invoice Amount:</span>
-                                      <strong style={{ fontWeight: "800", color: "#16a34a" }}>₹{(Math.round((Number(activeLead.value) || 0) * 1.18)).toLocaleString("en-IN")}</strong>
+                                    <div style={{ borderTop: "1px solid #cbd5e1", paddingTop: "6px", display: "flex", justifyContent: "space-between", fontSize: "12.5px" }}>
+                                      <span style={{ fontWeight: "600", color: "#0f172a" }}>Total Invoice Amount:</span>
+                                      <strong style={{ fontWeight: "700", color: "#166534" }}>₹{(Math.round((Number(activeLead.value) || 0) * 1.18)).toLocaleString("en-IN")}</strong>
                                     </div>
                                   </div>
                                 </div>
 
-                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                                <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                                   <div>
-                                    <h4 style={{ fontSize: "10.5px", fontWeight: "700", color: "#0f172a", margin: "0 0 3px 0", display: "flex", alignItems: "center", gap: "4px" }}>
-                                      <CreditCard size={11} color="#2563eb" /> Instant WhatsApp Payment Link
-                                    </h4>
-                                    <p style={{ fontSize: "9px", color: "#64748b", margin: 0 }}>
+                                    <h3 style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                                      <CreditCard size={14} color="#2563eb" /> Instant WhatsApp Payment Link
+                                    </h3>
+                                    <p style={{ fontSize: "12px", color: "#475569", margin: 0, lineHeight: "1.4" }}>
                                       Send pre-filled payment request with invoice amount to the client on WhatsApp.
                                     </p>
                                   </div>
 
-                                  <div style={{ paddingTop: "6px" }}>
+                                  <div style={{ paddingTop: "10px" }}>
                                     {activeLead.phone ? (
                                       <a
                                         href={`https://wa.me/${(activeLead.phone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${activeLead.name || ""}, here are the payment details for your subscription: Total Amount: ₹${(Number(activeLead.value) || 0).toLocaleString("en-IN")}. Please confirm once paid!`)}`}
                                         target="_blank"
                                         rel="noreferrer"
-                                        style={{ display: "block", textAlign: "center", padding: "4px 8px", backgroundColor: "#22c55e", color: "#ffffff", borderRadius: "4px", fontSize: "10px", fontWeight: "700", textDecoration: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ display: "block", textAlign: "center", padding: "0 12px", height: "32px", lineHeight: "32px", backgroundColor: "#166534", color: "#ffffff", borderRadius: "6px", fontSize: "12px", fontWeight: "600", textDecoration: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                       >
                                         Send Payment Link via WhatsApp
                                       </a>
                                     ) : (
-                                      <span style={{ fontSize: "9px", color: "#94a3b8" }}>Add client phone number first.</span>
+                                      <span style={{ fontSize: "11px", color: "#64748b" }}>Add client phone number first.</span>
                                     )}
                                   </div>
                                 </div>
@@ -12814,10 +12808,10 @@ export default function App() {
 
                         </div>
                       ) : (
-                        <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "30px 16px", textAlign: "center", color: "#64748b" }}>
-                          <Users size={20} color="#94a3b8" style={{ margin: "0 auto 6px" }} />
-                          <h3 style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", margin: 0 }}>Select a deal from the left queue</h3>
-                          <p style={{ fontSize: "10px", color: "#64748b", margin: "2px 0 0 0" }}>Click any lead card on the left panel to inspect its full 360° dossier.</p>
+                        <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "36px 16px", textAlign: "center", color: "#64748b" }}>
+                          <Users size={24} color="#64748b" style={{ margin: "0 auto 8px" }} />
+                          <h3 style={{ fontSize: "13.5px", fontWeight: "600", color: "#0f172a", margin: 0 }}>Select a deal from the left queue</h3>
+                          <p style={{ fontSize: "12px", color: "#64748b", margin: "4px 0 0 0" }}>Click any lead card on the left panel to inspect its full 360° dossier.</p>
                         </div>
                       )}
 
