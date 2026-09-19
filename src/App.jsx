@@ -1756,8 +1756,7 @@ export default function App() {
     company: "",
     phone: "",
     email: "",
-    value: "15000",
-    packageId: "pkg_silver",
+    value: "",
     status: "New",
     source: "Manual",
     score: "Warm",
@@ -5635,7 +5634,7 @@ export default function App() {
       company: (newLeadData.company || "").trim(),
       status: newLeadData.status || "New",
       value: dealVal,
-      packageId: newLeadData.packageId || "pkg_silver",
+      packageId: newLeadData.packageId || "",
       email: (newLeadData.email || "").trim(),
       phone: (newLeadData.phone || "").trim(),
       source: newLeadData.source || "Manual",
@@ -20557,33 +20556,8 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Row 3: Package, Deal Value, Stage & Source */}
-                <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1.2fr 1fr", gap: "10px", borderTop: "1px solid #f1f5f9", paddingTop: "12px" }}>
-                  <div>
-                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
-                      📦 Client Package
-                    </label>
-                    <select
-                      value={newLeadData.packageId || (clientDealPackages[0]?.id || "pkg_silver")}
-                      onChange={(e) => {
-                        const selectedId = e.target.value;
-                        const selectedPkg = clientDealPackages.find(p => p.id === selectedId);
-                        setNewLeadData(prev => ({
-                          ...prev,
-                          packageId: selectedId,
-                          value: selectedPkg && selectedPkg.price > 0 ? String(selectedPkg.price) : prev.value
-                        }));
-                      }}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
-                    >
-                      {clientDealPackages.map(pkg => (
-                        <option key={pkg.id} value={pkg.id}>
-                          {pkg.name} ({pkg.price ? `₹${Number(pkg.price).toLocaleString('en-IN')}` : 'Bespoke'})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
+                {/* Row 3: Deal Value, Stage & Source */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", borderTop: "1px solid #f1f5f9", paddingTop: "12px" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
                       Deal Value (₹)
@@ -20596,7 +20570,7 @@ export default function App() {
                       aria-autocomplete="none"
                       data-lpignore="true"
                       data-1p-ignore="true"
-                      placeholder="Enter amount"
+                      placeholder="e.g. 25000"
                       value={newLeadData.value}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, value: e.target.value }))}
                       style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
