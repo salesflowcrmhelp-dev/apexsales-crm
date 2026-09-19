@@ -14133,18 +14133,30 @@ export default function App() {
 
                                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                                       <div>
-                                        <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Phone Number</label>
+                                        <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Mobile / WhatsApp</label>
                                         <input 
-                                          type="tel" 
+                                          type="text" 
+                                          name="ed_lead_contact_num"
+                                          autoComplete="new-password"
+                                          role="presentation"
+                                          aria-autocomplete="none"
+                                          data-lpignore="true"
+                                          data-1p-ignore="true"
                                           value={activeLead.phone || ""} 
                                           onChange={(e) => handleUpdateActiveLead("phone", e.target.value)}
                                           style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                                         />
                                       </div>
                                       <div>
-                                        <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Email Address</label>
+                                        <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Email ID</label>
                                         <input 
-                                          type="email" 
+                                          type="text" 
+                                          name="ed_lead_inbox_acc"
+                                          autoComplete="new-password"
+                                          role="presentation"
+                                          aria-autocomplete="none"
+                                          data-lpignore="true"
+                                          data-1p-ignore="true"
                                           value={activeLead.email || ""} 
                                           onChange={(e) => handleUpdateActiveLead("email", e.target.value)}
                                           style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
@@ -20430,25 +20442,36 @@ export default function App() {
               }}
               style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, overflowY: "auto" }}
             >
+              {/* Dummy honeypot inputs to capture and neutralize Chrome's aggressive autofill scanner */}
+              <div style={{ position: "absolute", opacity: 0, height: 0, width: 0, overflow: "hidden", zIndex: -1, pointerEvents: "none" }} aria-hidden="true">
+                <input type="text" name="fake_lead_field_suppress" tabIndex={-1} autoComplete="off" />
+                <input type="password" name="fake_lead_pwd_suppress" tabIndex={-1} autoComplete="off" />
+              </div>
+
               <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "13px" }}>
                 
                 {/* Row 1: Name & Company */}
                 <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "12px" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
-                      Lead / Contact Name <span style={{ color: "#dc2626" }}>*</span>
+                      Contact Person <span style={{ color: "#dc2626" }}>*</span>
                     </label>
                     <input
                       type="text"
-                      name="crm_lead_contact_name"
-                      autoComplete="one-time-code"
+                      name="cl_contact_person"
+                      autoComplete="new-password"
+                      role="presentation"
+                      aria-autocomplete="none"
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      spellCheck="false"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
                       readOnly
-                      onFocus={(e) => { e.target.readOnly = false; }}
+                      onFocus={(e) => { e.target.removeAttribute('readonly'); e.target.readOnly = false; }}
                       required
-                      placeholder="e.g. Rahul Sharma"
+                      placeholder="Enter contact person name"
                       value={newLeadData.name}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, name: e.target.value }))}
                       style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
@@ -20457,18 +20480,23 @@ export default function App() {
 
                   <div>
                     <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
-                      Company / Organization
+                      Company / Business
                     </label>
                     <input
                       type="text"
-                      name="crm_lead_company_org"
-                      autoComplete="one-time-code"
+                      name="cl_company_firm"
+                      autoComplete="new-password"
+                      role="presentation"
+                      aria-autocomplete="none"
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      spellCheck="false"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
                       readOnly
-                      onFocus={(e) => { e.target.readOnly = false; }}
-                      placeholder="e.g. Apex Tech Pvt Ltd"
+                      onFocus={(e) => { e.target.removeAttribute('readonly'); e.target.readOnly = false; }}
+                      placeholder="Enter company or firm name"
                       value={newLeadData.company}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, company: e.target.value }))}
                       style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
@@ -20480,19 +20508,23 @@ export default function App() {
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "12px" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
-                      Phone Number
+                      Mobile / WhatsApp
                     </label>
                     <input
                       type="text"
-                      inputMode="tel"
-                      name="crm_lead_phone_no"
-                      autoComplete="one-time-code"
+                      name="cl_contact_digits"
+                      autoComplete="new-password"
+                      role="presentation"
+                      aria-autocomplete="none"
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      spellCheck="false"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
                       readOnly
-                      onFocus={(e) => { e.target.readOnly = false; }}
-                      placeholder="e.g. 9876543210"
+                      onFocus={(e) => { e.target.removeAttribute('readonly'); e.target.readOnly = false; }}
+                      placeholder="Enter contact digits"
                       value={newLeadData.phone}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, phone: e.target.value }))}
                       style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
@@ -20501,19 +20533,23 @@ export default function App() {
 
                   <div>
                     <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
-                      Email Address
+                      Email ID
                     </label>
                     <input
                       type="text"
-                      inputMode="email"
-                      name="crm_lead_email_addr"
-                      autoComplete="one-time-code"
+                      name="cl_inbox_contact"
+                      autoComplete="new-password"
+                      role="presentation"
+                      aria-autocomplete="none"
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      spellCheck="false"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
                       readOnly
-                      onFocus={(e) => { e.target.readOnly = false; }}
-                      placeholder="e.g. rahul@example.com"
+                      onFocus={(e) => { e.target.removeAttribute('readonly'); e.target.readOnly = false; }}
+                      placeholder="Enter email ID"
                       value={newLeadData.email}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, email: e.target.value }))}
                       style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
@@ -20554,11 +20590,13 @@ export default function App() {
                     </label>
                     <input
                       type="number"
-                      name="crm_deal_amount"
-                      autoComplete="off"
+                      name="cl_contract_amount"
+                      autoComplete="new-password"
+                      role="presentation"
+                      aria-autocomplete="none"
                       data-lpignore="true"
                       data-1p-ignore="true"
-                      placeholder="e.g. 15000"
+                      placeholder="Enter amount"
                       value={newLeadData.value}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, value: e.target.value }))}
                       style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
