@@ -12751,19 +12751,19 @@ export default function App() {
                             <option value={currentUser.name}>👤 My Leads ({currentUser.name})</option>
                           ) : isManager ? (
                             <>
-                              <option value="__my_leads__">👤 My Leads ({myName}) - {leads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
-                              <option value="">👥 Team: All Leads ({leads.length})</option>
+                              <option value="__my_leads__">👤 My Leads ({myName}) - {ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
+                              <option value="">👥 Team: All Leads ({ownerScopedLeads.length})</option>
                               {otherOwners.map(m => (
-                                <option key={m} value={m}>👤 {m} ({leads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
+                                <option key={m} value={m}>👤 {m} ({ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
                               ))}
                             </>
                           ) : (
                             <>
-                              <option value="__my_leads__">👤 My Leads ({myName}) - {leads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
-                              <option value="">👥 All Leads ({leads.length} Total)</option>
-                              <option value="__unassigned__">⚠️ Unassigned ({leads.filter(l => !l.owner || l.owner === "Unassigned").length})</option>
+                              <option value="__my_leads__">👤 My Leads ({myName}) - {ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
+                              <option value="">👥 All Leads ({ownerScopedLeads.length} Total)</option>
+                              <option value="__unassigned__">⚠️ Unassigned ({ownerScopedLeads.filter(l => !l.owner || l.owner === "Unassigned").length})</option>
                               {otherOwners.map(m => (
-                                <option key={m} value={m}>👤 {m} ({leads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
+                                <option key={m} value={m}>👤 {m} ({ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
                               ))}
                             </>
                           )}
@@ -13945,7 +13945,7 @@ export default function App() {
                               onChange={(e) => setSplitLeadFilterStage(e.target.value)}
                               style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                             >
-                              <option value="all">All Stages ({leads.length})</option>
+                              <option value="all">All Stages ({ownerScopedLeads.length})</option>
                               <option value="hot">Hot Deals</option>
                               <option value="due_today">Due Today</option>
                               <option value="won">Won Deals</option>
@@ -13969,7 +13969,7 @@ export default function App() {
                           </div>
 
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "2px 2px", fontSize: "12px", color: "#64748b" }}>
-                            <span>Showing <strong>{filteredSplitLeads.length}</strong> of {leads.length}</span>
+                            <span>Showing <strong>{filteredSplitLeads.length}</strong> of {ownerScopedLeads.length}</span>
                             <span>Pipeline: <strong style={{ color: "#166534" }}>₹{filteredSplitLeads.reduce((s, l) => s + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
                           </div>
                         </div>
@@ -14840,7 +14840,7 @@ export default function App() {
                           boxShadow: "0 1px 3px rgba(22, 163, 74, 0.25)"
                         }}
                       >
-                        <Grid size={13} /> View All {leads.length} Leads in Spreadsheet →
+                        <Grid size={13} /> View All {ownerScopedLeads.length} Leads in Spreadsheet →
                       </button>
                     </div>
 
@@ -16191,41 +16191,58 @@ export default function App() {
                   <div className="analytics-chart-box full-width animate-fade-in" style={{ padding: 0, background: "transparent", border: "none", boxShadow: "none", marginBottom: "16px" }}>
                     <div className="analytics-kpi-quad-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "14px" }}>
                       
-                      {/* Card 1: Forecast Revenue */}
-                      <div style={{
-                        backgroundColor: "#ffffff",
-                        borderRadius: "8px",
-                        border: "1px solid #e2e8f0",
-                        padding: "12px 14px",
-                        boxShadow: "0 1px 3px rgba(15, 23, 42, 0.02)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        transition: "all 0.2s ease"
-                      }}>
-                        <div style={{ width: "36px", height: "36px", borderRadius: "8px", backgroundColor: "#dcfce7", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <TrendingUp size={18} style={{ strokeWidth: 2.2 }} />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px" }}>
-                            <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                              Forecast Revenue
-                            </span>
-                            <span style={{ fontSize: "10px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                              +28%
-                            </span>
-                          </div>
-                          <div style={{ fontSize: "18px", fontWeight: "800", color: "#166534", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                            ₹1,85,000
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Card 2: Pipeline Health */}
+                      {/* Card 1: Dynamic Forecast Revenue (Strictly scoped to logged in user's deals) */}
                       {(() => {
-                        const activeCount = leads.filter(l => l.status !== "Won" && l.status !== "Lost" && l.status !== "Junk").length;
-                        const hotCount = leads.filter(l => (l.score || "warm").toLowerCase() === "hot" && l.status !== "Won").length;
-                        const healthPct = activeCount > 0 ? Math.min(100, Math.round(((hotCount + (activeCount - hotCount) * 0.5) / activeCount) * 100)) : 77;
+                        const activeScoped = ownerScopedLeads.filter(l => isActiveStatus(l.status));
+                        const forecastVal = activeScoped.reduce((sum, l) => {
+                          const sc = (l.score || "warm").toLowerCase();
+                          const multiplier = sc === "hot" ? 0.75 : (sc === "warm" ? 0.4 : 0.15);
+                          return sum + (Number(l.value) || 0) * multiplier;
+                        }, 0);
+                        const totalVal = activeScoped.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+                        const forecastPct = totalVal > 0 ? Math.round((forecastVal / totalVal) * 100) : 0;
+
+                        return (
+                          <div style={{
+                            backgroundColor: "#ffffff",
+                            borderRadius: "8px",
+                            border: "1px solid #e2e8f0",
+                            padding: "12px 14px",
+                            boxShadow: "0 1px 3px rgba(15, 23, 42, 0.02)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "12px",
+                            transition: "all 0.2s ease"
+                          }}>
+                            <div style={{ width: "36px", height: "36px", borderRadius: "8px", backgroundColor: "#dcfce7", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <TrendingUp size={18} style={{ strokeWidth: 2.2 }} />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px" }}>
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                  Forecast Revenue
+                                </span>
+                                <span style={{ fontSize: "10px", fontWeight: "700", color: forecastPct > 0 ? "#166534" : "#64748b", backgroundColor: forecastPct > 0 ? "#dcfce7" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                  {forecastPct > 0 ? `+${forecastPct}%` : "0%"}
+                                </span>
+                              </div>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#166534", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                ₹{Math.round(forecastVal).toLocaleString("en-IN")}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Card 2: Dynamic Pipeline Health (Strictly scoped to logged in user's deals) */}
+                      {(() => {
+                        const activeScoped = ownerScopedLeads.filter(l => isActiveStatus(l.status));
+                        const activeCount = activeScoped.length;
+                        const hotCount = activeScoped.filter(l => (l.score || "").toLowerCase() === "hot").length;
+                        const healthPct = activeCount > 0 ? Math.min(100, Math.round(((hotCount + (activeCount - hotCount) * 0.5) / activeCount) * 100)) : 0;
+                        const healthLabel = healthPct >= 70 ? "Optimal" : (healthPct >= 40 ? "Good" : (activeCount > 0 ? "Needs Focus" : "No Deals"));
+                        const healthColor = healthPct >= 70 ? "#166534" : (healthPct >= 40 ? "#2563eb" : "#64748b");
+                        const healthBg = healthPct >= 70 ? "#dcfce7" : (healthPct >= 40 ? "#eff6ff" : "#f1f5f9");
                         
                         return (
                           <div style={{
@@ -16247,8 +16264,8 @@ export default function App() {
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                                   Pipeline Health
                                 </span>
-                                <span style={{ fontSize: "10px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                                  Optimal
+                                <span style={{ fontSize: "10px", fontWeight: "700", color: healthColor, backgroundColor: healthBg, padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                  {healthLabel}
                                 </span>
                               </div>
                               <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -16259,11 +16276,11 @@ export default function App() {
                         );
                       })()}
 
-                      {/* Card 3: Hot Deals Value */}
+                      {/* Card 3: Dynamic Hot Deals Value (Strictly scoped, zero fallback) */}
                       {(() => {
-                        const hotLeads = ownerScopedLeads.filter(l => (l.score || "").toLowerCase() === "hot" && l.status !== "Won" && l.status !== "Lost");
-                        const hotCount = hotLeads.length || 8;
-                        const hotVal = hotLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0) || 120000;
+                        const hotLeads = ownerScopedLeads.filter(l => (l.score || "").toLowerCase() === "hot" && isActiveStatus(l.status));
+                        const hotCount = hotLeads.length;
+                        const hotVal = hotLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
 
                         return (
                           <div style={{
@@ -16297,35 +16314,56 @@ export default function App() {
                         );
                       })()}
 
-                      {/* Card 4: Avg Conversion Time */}
-                      <div style={{
-                        backgroundColor: "#ffffff",
-                        borderRadius: "8px",
-                        border: "1px solid #e2e8f0",
-                        padding: "12px 14px",
-                        boxShadow: "0 1px 3px rgba(15, 23, 42, 0.02)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        transition: "all 0.2s ease"
-                      }}>
-                        <div style={{ width: "36px", height: "36px", borderRadius: "8px", backgroundColor: "#f3e8ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <Calendar size={18} style={{ strokeWidth: 2.2 }} />
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px" }}>
-                            <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                              Avg Conversion
-                            </span>
-                            <span style={{ fontSize: "10px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                              -3 Days
-                            </span>
+                      {/* Card 4: Dynamic Avg Conversion Time (Strictly computed from user's won deals) */}
+                      {(() => {
+                        const wonLeads = ownerScopedLeads.filter(l => isWonStatus(l.status));
+                        let avgDays = 0;
+                        if (wonLeads.length > 0) {
+                          let totalDays = 0;
+                          let countWithDates = 0;
+                          wonLeads.forEach(l => {
+                            const created = getLeadCreationDate(l);
+                            const won = getLeadWonDate(l) || (l.stageUpdatedAt ? new Date(l.stageUpdatedAt) : null);
+                            if (created && won && won >= created) {
+                              const diffDays = Math.max(1, Math.round((won.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)));
+                              totalDays += diffDays;
+                              countWithDates++;
+                            }
+                          });
+                          avgDays = countWithDates > 0 ? Math.round(totalDays / countWithDates) : 1;
+                        }
+
+                        return (
+                          <div style={{
+                            backgroundColor: "#ffffff",
+                            borderRadius: "8px",
+                            border: "1px solid #e2e8f0",
+                            padding: "12px 14px",
+                            boxShadow: "0 1px 3px rgba(15, 23, 42, 0.02)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "12px",
+                            transition: "all 0.2s ease"
+                          }}>
+                            <div style={{ width: "36px", height: "36px", borderRadius: "8px", backgroundColor: "#f3e8ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <Calendar size={18} style={{ strokeWidth: 2.2 }} />
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px" }}>
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                  Avg Conversion
+                                </span>
+                                <span style={{ fontSize: "10px", fontWeight: "700", color: wonLeads.length > 0 ? "#166534" : "#64748b", backgroundColor: wonLeads.length > 0 ? "#dcfce7" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                  {wonLeads.length > 0 ? `${wonLeads.length} Won` : "0 Won"}
+                                </span>
+                              </div>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#2563eb", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                {wonLeads.length > 0 ? `${avgDays} Days` : "0 Days"}
+                              </div>
+                            </div>
                           </div>
-                          <div style={{ fontSize: "18px", fontWeight: "800", color: "#2563eb", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                            14 Days
-                          </div>
-                        </div>
-                      </div>
+                        );
+                      })()}
 
                     </div>
                   </div>
@@ -16375,7 +16413,7 @@ export default function App() {
                         const paymentFollowUp = targetLeads.filter(l => (l.status || "").toLowerCase() === "payment follow up").length;
                         const renewalCount = targetLeads.filter(l => (l.status || "").toLowerCase() === "renewal").length;
 
-                        const dealsWon = leads.filter(l => {
+                        const dealsWon = ownerScopedLeads.filter(l => {
                           if (!isWonStatus(l.status)) return false;
                           if (trendDays === 0) return true;
                           let wonTimestamp = null;
@@ -16396,7 +16434,7 @@ export default function App() {
                         const payPct = totalLeads > 0 ? Math.round((paymentFollowUp / totalLeads) * 100) : 0;
                         const wonPct = totalLeads > 0 ? Math.round((dealsWon / totalLeads) * 100) : 0;
                         const renewalPct = totalLeads > 0 ? Math.round((renewalCount / totalLeads) * 100) : 0;
-                        const overallHealthPct = totalLeads > 0 ? Math.min(100, Math.round(((dealsWon + demoDone * 0.5 + paymentFollowUp * 0.7) / totalLeads) * 100)) : 75;
+                        const overallHealthPct = totalLeads > 0 ? Math.min(100, Math.round(((dealsWon + demoDone * 0.5 + paymentFollowUp * 0.7) / totalLeads) * 100)) : 0;
 
                         // Circumference math: Orbit R=23 -> C=144.5, Center R=46 -> C=289, Renewal R=16 -> C=100.5
                         const demoOffset = (144.5 * (1 - demoPct / 100)).toFixed(1);
@@ -16696,8 +16734,8 @@ export default function App() {
                                   <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b" }}>Forecast Value</span>
                                   <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "12px", fontWeight: "750", color: "#2563eb" }}>
                                     ₹{(
-                                      leads.filter(l => (l.score || "warm").toLowerCase() === "hot" && isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0) * 0.7 + 
-                                      leads.filter(l => (l.score || "warm").toLowerCase() === "warm" && isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0) * 0.3
+                                      ownerScopedLeads.filter(l => (l.score || "warm").toLowerCase() === "hot" && isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0) * 0.7 + 
+                                      ownerScopedLeads.filter(l => (l.score || "warm").toLowerCase() === "warm" && isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0) * 0.3
                                     ).toLocaleString("en-IN")}
                                   </div>
                                 </div>
@@ -16713,7 +16751,7 @@ export default function App() {
                   <div className="analytics-chart-box" style={{ animationDelay: "0.3s" }}>
                     <h3 className="chart-box-title">Lead Score Priorities</h3>
                     <div className="svg-chart-wrapper">
-                      {leads.length === 0 ? (
+                      {ownerScopedLeads.length === 0 ? (
                         <div className="empty-chart-state">No score data available</div>
                       ) : (
                         <svg viewBox="0 0 300 200" width="100%" height="100%">
@@ -16777,7 +16815,7 @@ export default function App() {
                   <div className="analytics-chart-box full-width animate-fade-in" style={{ animationDelay: "0.4s" }}>
                     <h3 className="chart-box-title">Lead Acquisition Channels & Proportions</h3>
                     
-                    {leads.length === 0 ? (
+                    {ownerScopedLeads.length === 0 ? (
                       <div className="empty-chart-state">No source data available</div>
                     ) : (
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "24px", alignItems: "center", marginTop: "12px" }}>
@@ -16790,7 +16828,7 @@ export default function App() {
                             { name: "Campaign", icon: "📧", color: "#b45309" },
                             { name: "Social", icon: "📱", color: "#2563eb" }
                           ];
-                          const total = leads.length;
+                          const total = ownerScopedLeads.length;
                           let cumulativeAngle = 0;
 
                           return (
@@ -16798,7 +16836,7 @@ export default function App() {
                               <div style={{ position: "relative", width: "160px", height: "160px" }}>
                                 <svg viewBox="0 0 100 100" width="100%" height="100%">
                                   {channels.map((ch, i) => {
-                                    const count = leads.filter(l => (l.source || "Manual").toLowerCase() === ch.name.toLowerCase()).length;
+                                    const count = ownerScopedLeads.filter(l => (l.source || "Manual").toLowerCase() === ch.name.toLowerCase()).length;
                                     if (count === 0) return null;
                                     const pct = count / total;
                                     const strokeDasharray = `${pct * 283} ${283 - pct * 283}`;
@@ -16840,8 +16878,8 @@ export default function App() {
                             { name: "Campaign", icon: "📧", color: "#b45309" },
                             { name: "Social", icon: "📱", color: "#2563eb" }
                           ].map((ch, idx) => {
-                            const count = leads.filter(l => (l.source || "Manual").toLowerCase() === ch.name.toLowerCase()).length;
-                            const total = leads.length;
+                            const count = ownerScopedLeads.filter(l => (l.source || "Manual").toLowerCase() === ch.name.toLowerCase()).length;
+                            const total = ownerScopedLeads.length;
                             const pct = total > 0 ? Math.round((count / total) * 100) : 0;
 
                             return (
@@ -16934,7 +16972,7 @@ export default function App() {
                             <span>📅</span> Weekly Sales Summary
                           </h4>
                           <span style={{ fontSize: "12px", fontWeight: "800", color: "#2563eb", backgroundColor: "#eff6ff", padding: "2px 10px", borderRadius: "12px", border: "1px solid #bfdbfe" }}>
-                            Total System Leads: {leads.length}
+                            Total Deals: {ownerScopedLeads.length}
                           </span>
                         </div>
 
@@ -19584,7 +19622,7 @@ export default function App() {
                     <Download className="w-5 h-5 text-blue-600" />
                     <div>
                       <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Full Pipeline CSV</strong>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>All {leads.length} leads data</span>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>All {ownerScopedLeads.length} leads data</span>
                     </div>
                   </button>
 
