@@ -12210,14 +12210,45 @@ export default function App() {
                   }}>
                     {/* Search Input */}
                     <div style={{ position: "relative", flex: "1", minWidth: "220px", maxWidth: "420px" }}>
-                      <Search size={13} style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
+                      <Search size={13} style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none" }} />
                       <input 
-                        type="text" 
-                        placeholder="Search leads by name, email, phone..." 
+                        type="search"
+                        name="leads_quick_search"
+                        role="searchbox"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck="false"
+                        data-lpignore="true"
+                        data-1p-ignore="true"
+                        placeholder="Search leads by name, company..." 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{ width: "100%", padding: "5px 10px 5px 30px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
+                        style={{ width: "100%", padding: searchQuery ? "5px 28px 5px 30px" : "5px 10px 5px 30px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
                       />
+                      {searchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setSearchQuery("")}
+                          style={{
+                            position: "absolute",
+                            right: "8px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            background: "none",
+                            border: "none",
+                            color: "#94a3b8",
+                            cursor: "pointer",
+                            padding: "2px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            lineHeight: 1
+                          }}
+                          title="Clear search"
+                        >
+                          <X size={13} />
+                        </button>
+                      )}
                     </div>
 
                     {/* Right Actions: 'Delete Lead' (if selected) + '+ Add Lead' + 'Import Leads' + 'Actions ▾' */}
@@ -14767,13 +14798,20 @@ export default function App() {
                       <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
                         {/* Search */}
                         <div style={{ position: "relative", flex: 1, minWidth: "200px" }}>
-                          <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "10px" }} />
+                          <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "10px", pointerEvents: "none" }} />
                           <input
-                            type="text"
-                            placeholder="Search deals by client, company, phone, email, amount..."
+                            type="search"
+                            name="deals_quick_search"
+                            role="searchbox"
+                            autoComplete="off"
+                            autoCorrect="off"
+                            spellCheck="false"
+                            data-lpignore="true"
+                            data-1p-ignore="true"
+                            placeholder="Search deals by client, company, amount..."
                             value={dealsSearchQuery}
                             onChange={(e) => setDealsSearchQuery(e.target.value)}
-                            style={{ width: "100%", height: "34px", padding: "0 10px 0 32px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", outline: "none", color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ width: "100%", height: "34px", padding: "0 28px 0 32px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", outline: "none", color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           />
                           {dealsSearchQuery && (
                             <button onClick={() => setDealsSearchQuery("")} style={{ position: "absolute", right: "8px", top: "7px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px" }}>✕</button>
