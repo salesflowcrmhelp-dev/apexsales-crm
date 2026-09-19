@@ -1052,6 +1052,10 @@ export function getUserEffectivePermissions(user) {
   merged.canViewAllLeads = false;
   merged.canDeleteLeads = false;
   merged.canAccessTeam = false;
+  if (user.role !== "manager") {
+    merged.canReassignLeads = false;
+    merged.canExportCSV = false;
+  }
 
   return merged;
 }
@@ -3351,15 +3355,27 @@ export default function App() {
     if (!selectedUserForAccess) return;
 
     try {
+      const isSuper = checkIsSuperAdmin(selectedUserForAccess) || selectedUserForAccess.role === "admin";
+      const safePerms = { ...(accessFormData.permissions || {}) };
+      if (!isSuper) {
+        safePerms.canViewAllLeads = false;
+        safePerms.canDeleteLeads = false;
+        safePerms.canAccessTeam = false;
+        if (selectedUserForAccess.role !== "manager") {
+          safePerms.canReassignLeads = false;
+          safePerms.canExportCSV = false;
+        }
+      }
+
       const updatedUser = {
         ...selectedUserForAccess,
-        packageTier: accessFormData.packageTier,
-        permissions: accessFormData.permissions,
+        packageTier: isSuper ? "super_admin" : (selectedUserForAccess.role === "manager" ? "enterprise" : accessFormData.packageTier),
+        permissions: safePerms,
         maxLeadsLimit: accessFormData.maxLeadsLimit
       };
 
       try {
-        localStorage.setItem(`crm_user_perms_${selectedUserForAccess.id}`, JSON.stringify(accessFormData.permissions));
+        localStorage.setItem(`crm_user_perms_${selectedUserForAccess.id}`, JSON.stringify(safePerms));
         localStorage.setItem(`crm_user_pkg_${selectedUserForAccess.id}`, accessFormData.packageTier);
       } catch(e) {}
 

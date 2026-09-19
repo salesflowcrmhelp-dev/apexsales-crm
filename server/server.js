@@ -571,10 +571,11 @@ async function autoSeedMongoIfEmpty() {
 // --- DATA ACCESS METHODS ---
 
 async function getUsers() {
+  let userList = [];
   if (isMongoConnected && mongoDb) {
     try {
       const docs = await mongoDb.collection('users').find({}).toArray();
-      return docs.map(d => {
+      userList = docs.map(d => {
         const { _id, ...rest } = d;
         return {
           id: rest.id || (_id ? _id.toString() : ''),
@@ -583,18 +584,22 @@ async function getUsers() {
       });
     } catch (e) {
       console.error('MongoDB getUsers error:', e);
+      userList = readLocalDB().users;
     }
+  } else {
+    userList = readLocalDB().users;
   }
-  return readLocalDB().users;
+  return (userList || []).map(u => (typeof sanitizeUserRecord === 'function' ? sanitizeUserRecord(u) : u));
 }
 
 async function saveUser(user) {
   if (!user || !user.id) return;
+  const cleanUser = typeof sanitizeUserRecord === 'function' ? sanitizeUserRecord(user) : user;
   if (isMongoConnected && mongoDb) {
     try {
       await mongoDb.collection('users').updateOne(
-        { $or: [{ id: user.id }, { email: user.email }] },
-        { $set: user },
+        { $or: [{ id: cleanUser.id }, { email: cleanUser.email }] },
+        { $set: cleanUser },
         { upsert: true }
       );
     } catch (e) {
@@ -603,11 +608,11 @@ async function saveUser(user) {
   }
   // Keep local db in sync
   const local = readLocalDB();
-  const idx = local.users.findIndex(u => u.id === user.id || (u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase()));
+  const idx = local.users.findIndex(u => u.id === cleanUser.id || (u.email && cleanUser.email && u.email.toLowerCase() === cleanUser.email.toLowerCase()));
   if (idx !== -1) {
-    local.users[idx] = { ...local.users[idx], ...user };
+    local.users[idx] = { ...local.users[idx], ...cleanUser };
   } else {
-    local.users.push(user);
+    local.users.push(cleanUser);
   }
   writeLocalDB(local);
 }
@@ -793,6 +798,42 @@ export const isSuperAdminEmailOrName = (u) => {
          username === 'harsh' ||
          username === 'salesflowcrmhelp' ||
          id === 'usr_admin';
+};
+
+// 🛡️ UNIVERSAL USER SANITIZER (Guarantees no future user ever leaks or sees global data)
+export const sanitizeUserRecord = (u) => {
+  if (!u) return u;
+  const isSuper = isSuperAdminEmailOrName(u) || u.role === 'admin';
+  if (!isSuper) {
+    const safeRole = u.role === 'manager' ? 'manager' : 'sales_rep';
+    const safePkg = u.packageTier === 'super_admin' 
+      ? (safeRole === 'manager' ? 'enterprise' : 'starter') 
+      : (u.packageTier || (safeRole === 'manager' ? 'enterprise' : 'starter'));
+    const safePerms = u.permissions ? { ...u.permissions } : {};
+    
+    // Strict hard-locks for non-superadmins:
+    safePerms.canViewAllLeads = false;
+    safePerms.canDeleteLeads = false;
+    safePerms.canAccessTeam = false;
+    if (safeRole !== 'manager') {
+      safePerms.canReassignLeads = false;
+      safePerms.canExportCSV = false;
+    }
+    
+    return {
+      ...u,
+      role: safeRole,
+      packageTier: safePkg,
+      permissions: safePerms,
+      maxLeadsLimit: u.maxLeadsLimit || (safeRole === 'manager' ? 1000 : 50)
+    };
+  }
+  return {
+    ...u,
+    role: 'admin',
+    packageTier: 'super_admin',
+    maxLeadsLimit: 999999
+  };
 };
 
 // --- AUTHENTICATION & ROLE RESOLUTION MIDDLEWARE ---
@@ -1331,6 +1372,9 @@ app.post('/api/users/invite', async (req, res) => {
     savedUserRecord = existingUser;
   } else {
     const usernameSlug = cleanEmail.split('@')[0].replace(/[^a-z0-9_]/g, '_');
+    const isSuperEmail = cleanEmail === 'salesflowcrmhelp@gmail.com' || cleanEmail === 'harsh.accomation@gmail.com';
+    const finalRole = (userRole === 'admin' && isSuperEmail) ? 'admin' : (userRole === 'manager' ? 'manager' : 'sales_rep');
+    const finalPkg = finalRole === 'admin' ? 'super_admin' : (finalRole === 'manager' ? 'enterprise' : 'starter');
     savedUserRecord = {
       id: `usr_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
       name: cleanName,
@@ -1338,10 +1382,18 @@ app.post('/api/users/invite', async (req, res) => {
       username: usernameSlug,
       email: cleanEmail,
       pin: userPin,
-      role: userRole,
-      packageTier: 'starter',
-      permissions: null,
-      maxLeadsLimit: userRole === 'admin' ? 999999 : 50,
+      role: finalRole,
+      packageTier: finalPkg,
+      permissions: {
+        canViewAllLeads: false,
+        canDeleteLeads: false,
+        canAccessTeam: false,
+        canReassignLeads: finalRole === 'manager',
+        canExportCSV: finalRole === 'manager',
+        canCreateLeads: true,
+        canEditLeads: true
+      },
+      maxLeadsLimit: finalRole === 'admin' ? 999999 : (finalRole === 'manager' ? 1000 : 50),
       phone: phone.trim(),
       reportsTo: reportsTo.trim(),
       active: true,
