@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { 
   Download, Plus, Save, RefreshCw, FileSpreadsheet, 
   HelpCircle, X, Check, AlertCircle, TrendingUp, IndianRupee, Award, Grid, Upload, Trash2, Target, Pencil, Gift, Lock, Unlock, KeyRound, Calendar, Phone, AlertTriangle, Flame, CheckCircle2, MessageCircle, Clock, Bell, Sparkles, RotateCcw,
-  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut
+  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders
 } from "lucide-react";
 
 // Dropdown options
@@ -717,6 +717,147 @@ function checkIsSuperAdmin(u) {
   return isHarshEmail || isHarshName || isHarshUsername || isHarshId;
 }
 
+// 🌟 Employee Access Packages & Granular Permissions System
+export const EMPLOYEE_PACKAGES = {
+  starter: {
+    id: "starter",
+    name: "Starter Rep",
+    badge: "📦 Starter",
+    bg: "#eff6ff",
+    border: "#bfdbfe",
+    color: "#2563eb",
+    price: "Free Tier",
+    quota: 50,
+    targetAudience: "Trainees & Lead Qualifiers",
+    description: "Strict own-lead pipeline isolation. Basic follow-up & dialing without data export.",
+    permissions: {
+      canViewAllLeads: false,
+      canCreateLeads: true,
+      canEditLeads: true,
+      canDeleteLeads: false,
+      canViewRevenue: false,
+      canEditTarget: false,
+      canExportCSV: false,
+      canBulkImport: false,
+      canUseWhatsApp: true,
+      canMakeCalls: true,
+      canUseAI: false
+    }
+  },
+  growth: {
+    id: "growth",
+    name: "Growth Closer",
+    badge: "🚀 Growth Pro",
+    bg: "#f0fdf4",
+    border: "#bbf7d0",
+    color: "#166534",
+    price: "₹1,999/mo",
+    quota: 250,
+    targetAudience: "Senior Closers & Account Execs",
+    description: "Expanded pipeline quota with AI objection scripts, deal values, and bulk import.",
+    permissions: {
+      canViewAllLeads: false,
+      canCreateLeads: true,
+      canEditLeads: true,
+      canDeleteLeads: false,
+      canViewRevenue: true,
+      canEditTarget: false,
+      canExportCSV: false,
+      canBulkImport: true,
+      canUseWhatsApp: true,
+      canMakeCalls: true,
+      canUseAI: true
+    }
+  },
+  enterprise: {
+    id: "enterprise",
+    name: "Enterprise Manager",
+    badge: "🏢 Enterprise",
+    bg: "#faf5ff",
+    border: "#e9d5ff",
+    color: "#7c3aed",
+    price: "₹4,999/mo",
+    quota: 1000,
+    targetAudience: "Team Leads & Branch Managers",
+    description: "Full team oversight, lead reassignment, CSV exports, analytics and lead deletion.",
+    permissions: {
+      canViewAllLeads: true,
+      canCreateLeads: true,
+      canEditLeads: true,
+      canDeleteLeads: true,
+      canViewRevenue: true,
+      canEditTarget: true,
+      canExportCSV: true,
+      canBulkImport: true,
+      canUseWhatsApp: true,
+      canMakeCalls: true,
+      canUseAI: true
+    }
+  },
+  super_admin: {
+    id: "super_admin",
+    name: "Super Admin",
+    badge: "👑 Master Authority",
+    bg: "#fef3c7",
+    border: "#fde68a",
+    color: "#b45309",
+    price: "Master Lifetime",
+    quota: 999999,
+    targetAudience: "Harsh Goyal & Business Owners",
+    description: "100% unrestricted system control, user access configuration, data vault, and audit logs.",
+    permissions: {
+      canViewAllLeads: true,
+      canCreateLeads: true,
+      canEditLeads: true,
+      canDeleteLeads: true,
+      canViewRevenue: true,
+      canEditTarget: true,
+      canExportCSV: true,
+      canBulkImport: true,
+      canUseWhatsApp: true,
+      canMakeCalls: true,
+      canUseAI: true
+    }
+  }
+};
+
+// 💼 Client Deal Packages (CRM Service Plans for Leads)
+export const CLIENT_DEAL_PACKAGES = [
+  { id: "pkg_silver", name: "Silver Starter Plan", price: 15000, duration: "1 Month", color: "#64748b", bg: "#f1f5f9", border: "#cbd5e1", quota: "250 Leads", features: ["Single User Account", "Lead Pipeline Sheet", "WhatsApp 1-Click Chat", "Standard Daily Alarms"] },
+  { id: "pkg_gold", name: "Gold Professional Plan", price: 35000, duration: "3 Months", color: "#2563eb", bg: "#eff6ff", border: "#bfdbfe", quota: "1,000 Leads", features: ["Up to 5 Users / Reps", "AI Sales Pitch Assistant", "Bulk CSV Import", "Priority WhatsApp Integration"] },
+  { id: "pkg_platinum", name: "Platinum Enterprise Plan", price: 75000, duration: "12 Months", color: "#166534", bg: "#f0fdf4", border: "#bbf7d0", quota: "Unlimited Leads", features: ["Unlimited Team Seats", "Dedicated MongoDB Database", "Automated Data Vault Backups", "Custom Fields Support"] },
+  { id: "pkg_custom", name: "Custom Bespoke Plan", price: 0, duration: "Custom", color: "#b45309", bg: "#fffbeb", border: "#fde68a", quota: "Bespoke", features: ["Tailored Workflow Architecture", "Custom SLA & API Webhooks", "Dedicated Account Manager"] }
+];
+
+export function getUserEffectivePermissions(user) {
+  if (!user) return EMPLOYEE_PACKAGES.starter.permissions;
+  if (checkIsSuperAdmin(user) || user.role === "admin") {
+    return EMPLOYEE_PACKAGES.super_admin.permissions;
+  }
+  const pkgTier = user.packageTier || (user.role === "manager" ? "enterprise" : "starter");
+  const pkgDefaults = EMPLOYEE_PACKAGES[pkgTier] ? EMPLOYEE_PACKAGES[pkgTier].permissions : EMPLOYEE_PACKAGES.starter.permissions;
+  
+  let localOverrides = {};
+  try {
+    const saved = localStorage.getItem(`crm_user_perms_${user.id}`);
+    if (saved) localOverrides = JSON.parse(saved);
+  } catch(e) {}
+
+  return {
+    ...pkgDefaults,
+    ...(user.permissions || {}),
+    ...localOverrides
+  };
+}
+
+export function formatLeadRevenue(val, user) {
+  const perms = getUserEffectivePermissions(user);
+  if (!perms.canViewRevenue) {
+    return "₹••••••";
+  }
+  return `₹${(Number(val) || 0).toLocaleString("en-IN")}`;
+}
+
 export default function App() {
   const [leads, setLeads] = useState(() => {
     try {
@@ -1286,6 +1427,14 @@ export default function App() {
   });
   const [currentLoggedInUser, setCurrentLoggedInUser] = useState(() => currentUser?.name || "");
   const [allUsersList, setAllUsersList] = useState([]);
+  const [teamTab, setTeamTab] = useState("members"); // "members" | "packages" | "deal_packages"
+  const [selectedUserForAccess, setSelectedUserForAccess] = useState(null);
+  const [showAccessModal, setShowAccessModal] = useState(false);
+  const [accessFormData, setAccessFormData] = useState({
+    packageTier: "starter",
+    permissions: { ...EMPLOYEE_PACKAGES.starter.permissions },
+    maxLeadsLimit: 50
+  });
   const [showUserManagementModal, setShowUserManagementModal] = useState(() => {
     try {
       return new URLSearchParams(window.location.search).get("modal") === "team";
@@ -1303,6 +1452,7 @@ export default function App() {
     username: "",
     pin: "",
     role: "sales_rep",
+    packageTier: "starter",
     email: "",
     phone: "",
     reportsTo: ""
@@ -1381,7 +1531,8 @@ export default function App() {
     company: "",
     phone: "",
     email: "",
-    value: "",
+    value: "15000",
+    packageId: "pkg_silver",
     status: "New",
     source: "Manual",
     score: "Warm",
@@ -1811,6 +1962,11 @@ export default function App() {
   };
 
   const requestDeleteSelectedRow = () => {
+    const effectivePerms = getUserEffectivePermissions(currentUser);
+    if (!effectivePerms.canDeleteLeads) {
+      showToast("🔒 Lead Deletion Restricted: Your current package does not permit deleting leads. Contact Harsh Goyal (Super Admin).", "error");
+      return;
+    }
     let idsToDelete = [...selectedLeadIds];
     if (idsToDelete.length === 0 && selectedCell) {
       const lead = filteredLeads[selectedCell.rowIndex];
@@ -1868,6 +2024,11 @@ export default function App() {
 
   const handleDeleteLead = (lead) => {
     if (!lead) return;
+    const effectivePerms = getUserEffectivePermissions(currentUser);
+    if (!effectivePerms.canDeleteLeads) {
+      showToast("🔒 Lead Deletion Restricted: Your current package does not permit deleting leads. Contact Harsh Goyal (Super Admin).", "error");
+      return;
+    }
     setDeleteConfirmData({
       title: "Delete Lead",
       leadName: lead.name || "Lead",
@@ -2840,6 +3001,61 @@ export default function App() {
     }
   };
 
+    const handleOpenAccessModal = (usr) => {
+    const currentPkg = usr.packageTier || (usr.role === "admin" ? "super_admin" : usr.role === "manager" ? "enterprise" : "starter");
+    const effPerms = getUserEffectivePermissions(usr);
+    setSelectedUserForAccess(usr);
+    setAccessFormData({
+      packageTier: currentPkg,
+      permissions: { ...effPerms },
+      maxLeadsLimit: usr.maxLeadsLimit || (EMPLOYEE_PACKAGES[currentPkg]?.quota || 50)
+    });
+    setShowAccessModal(true);
+  };
+
+  const handleSaveUserAccess = async (e) => {
+    if (e) e.preventDefault();
+    if (!selectedUserForAccess) return;
+
+    try {
+      const updatedUser = {
+        ...selectedUserForAccess,
+        packageTier: accessFormData.packageTier,
+        permissions: accessFormData.permissions,
+        maxLeadsLimit: accessFormData.maxLeadsLimit
+      };
+
+      try {
+        localStorage.setItem(`crm_user_perms_${selectedUserForAccess.id}`, JSON.stringify(accessFormData.permissions));
+        localStorage.setItem(`crm_user_pkg_${selectedUserForAccess.id}`, accessFormData.packageTier);
+      } catch(e) {}
+
+      setAllUsersList(prev => prev.map(u => u.id === selectedUserForAccess.id ? updatedUser : u));
+
+      const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
+      await fetch(`/api/users/${encodeURIComponent(selectedUserForAccess.id)}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-role": currentUser?.role || "admin",
+          "x-user-name": currentUser?.name || "Harsh Goyal",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          packageTier: accessFormData.packageTier,
+          permissions: accessFormData.permissions,
+          maxLeadsLimit: accessFormData.maxLeadsLimit
+        })
+      });
+
+      setShowAccessModal(false);
+      showToast(`🎉 Access & Permissions updated for ${selectedUserForAccess.name}!`, "success");
+    } catch(err) {
+      showToast("Access updated locally.", "success");
+      setShowAccessModal(false);
+    }
+  };
+
   const handleCreateUser = async (e) => {
     if (e) e.preventDefault();
     if (!newUserData.name.trim()) {
@@ -2865,7 +3081,7 @@ export default function App() {
           showToast(`Team member "${data.user.name}" created! PIN: ${data.user.pin}`, "success");
         }
         setCreatedInviteInfo(data);
-        setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", email: "", phone: "", reportsTo: "", managerId: "" });
+        setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", packageTier: "starter", email: "", phone: "", reportsTo: "", managerId: "" });
         setShowAddUserSubModal(false);
         loadUsersFromBackend();
       } else {
@@ -4931,6 +5147,22 @@ export default function App() {
 
   const handleCreateLead = (e) => {
     if (e) e.preventDefault();
+    const effectivePerms = getUserEffectivePermissions(currentUser);
+    if (!effectivePerms.canCreateLeads) {
+      showToast("🔒 Action Restricted: You do not have permission to add new leads.", "error");
+      return;
+    }
+
+    const isSuper = checkIsSuperAdmin(currentUser) || currentUser?.role === "admin";
+    if (!isSuper) {
+      const userLeadsCount = leads.filter(l => (l.owner || "").toLowerCase() === (currentUser?.name || "").toLowerCase()).length;
+      const userQuota = currentUser?.maxLeadsLimit || (EMPLOYEE_PACKAGES[currentUser?.packageTier || "starter"]?.quota || 50);
+      if (userLeadsCount >= userQuota) {
+        showToast(`⚠️ Quota Limit Reached: Your current package limit is ${userQuota} leads. Contact Super Admin (Harsh Goyal) to upgrade.`, "error");
+        return;
+      }
+    }
+
     if (!newLeadData.name || !newLeadData.name.trim()) {
       showToast("Please enter a Lead Name", "error");
       return;
@@ -4946,6 +5178,7 @@ export default function App() {
       company: (newLeadData.company || "").trim(),
       status: newLeadData.status || "New",
       value: dealVal,
+      packageId: newLeadData.packageId || "pkg_silver",
       email: (newLeadData.email || "").trim(),
       phone: (newLeadData.phone || "").trim(),
       source: newLeadData.source || "Manual",
@@ -5116,6 +5349,11 @@ export default function App() {
 
   // Trigger manual CSV download of the grid
   const exportToCSV = () => {
+    const effectivePerms = getUserEffectivePermissions(currentUser);
+    if (!effectivePerms.canExportCSV) {
+      showToast("🔒 Anti-Theft Protection: Your package tier does not permit exporting lead database. Contact Super Admin.", "error");
+      return;
+    }
     if (!leads.length) return;
     
     // CSV Header row
@@ -9926,13 +10164,13 @@ export default function App() {
 
             </div>
           ) : activeWorkspace === "team" ? (
-            <div className="team-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", padding: "12px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="team-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", padding: "16px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               
               {/* Page Title Header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "12px", marginBottom: "12px", flexWrap: "wrap", gap: "10px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div style={{ width: "34px", height: "34px", borderRadius: "8px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
-                    <ShieldCheck size={20} />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "14px", marginBottom: "14px", flexWrap: "wrap", gap: "10px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{ width: "38px", height: "38px", borderRadius: "8px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
+                    <ShieldCheck size={22} />
                   </div>
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -9944,7 +10182,7 @@ export default function App() {
                       </span>
                     </div>
                     <p style={{ fontSize: "12px", color: "#475569", margin: "3px 0 0 0", fontWeight: "500" }}>
-                      Manage login PINs, sales team credentials, and strict database isolation (Admin vs Sales Rep).
+                      Manage login credentials, employee access permissions, lead quotas, and subscription packages.
                     </p>
                   </div>
                 </div>
@@ -9957,7 +10195,7 @@ export default function App() {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "6px",
-                      height: "34px",
+                      height: "36px",
                       padding: "0 14px",
                       backgroundColor: "#2563eb",
                       color: "#ffffff",
@@ -9975,302 +10213,978 @@ export default function App() {
                 </div>
               </div>
 
-              {/* 4 Summary Stats Cards - Unified Neutral Palette */}
-              <div className="team-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginBottom: "14px" }}>
-                <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Total Active Users</span>
-                  <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>{allUsersList.length || 4}</div>
-                  <span style={{ fontSize: "12px", color: "#64748b" }}>Registered accounts</span>
-                </div>
-
-                <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Super Admins (Full Data)</span>
-                  <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>
-                    {(allUsersList.filter(u => u.role === "admin").length) || 1}
-                  </div>
-                  <span style={{ fontSize: "12px", color: "#64748b" }}>Full pipeline visibility</span>
-                </div>
-
-                <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Sales Reps (Isolated)</span>
-                  <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>
-                    {(allUsersList.filter(u => u.role === "sales_rep").length) || 3}
-                  </div>
-                  <span style={{ fontSize: "12px", color: "#64748b" }}>Strict own-lead access only</span>
-                </div>
-
-                <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Security Protocol</span>
-                  <div style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", marginTop: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#16a34a", display: "inline-block" }} />
-                    Database Guard Active
-                  </div>
-                  <span style={{ fontSize: "12px", color: "#64748b" }}>Zero unauthorized leaks</span>
-                </div>
+              {/* Top Sub-Navigation Tabs */}
+              <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid #e2e8f0", paddingBottom: "10px", marginBottom: "16px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={() => setTeamTab("members")}
+                  style={{
+                    padding: "7px 14px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    borderRadius: "6px",
+                    border: teamTab === "members" ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                    backgroundColor: teamTab === "members" ? "#eff6ff" : "#ffffff",
+                    color: teamTab === "members" ? "#1d4ed8" : "#475569",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}
+                >
+                  <Users size={15} /> 👥 Team Members & Permissions
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTeamTab("packages")}
+                  style={{
+                    padding: "7px 14px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    borderRadius: "6px",
+                    border: teamTab === "packages" ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                    backgroundColor: teamTab === "packages" ? "#eff6ff" : "#ffffff",
+                    color: teamTab === "packages" ? "#1d4ed8" : "#475569",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}
+                >
+                  <Package size={15} /> 📦 Employee Package Tiers Matrix
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTeamTab("deal_packages")}
+                  style={{
+                    padding: "7px 14px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    borderRadius: "6px",
+                    border: teamTab === "deal_packages" ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                    backgroundColor: teamTab === "deal_packages" ? "#eff6ff" : "#ffffff",
+                    color: teamTab === "deal_packages" ? "#1d4ed8" : "#475569",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px"
+                  }}
+                >
+                  <Briefcase size={15} /> 💼 Client Deal Packages
+                </button>
               </div>
 
-              {/* Add New User Modal (Preserves table visibility at top) */}
-              {showAddUserSubModal && (
-                <div 
-                  className="modal-overlay animate-fade-in" 
-                  onClick={() => setShowAddUserSubModal(false)}
-                  style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.55)", backdropFilter: "blur(4px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
-                >
-                  <div 
-                    onClick={(e) => e.stopPropagation()} 
-                    style={{ width: "100%", maxWidth: "600px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.15)", overflow: "hidden" }}
-                  >
-                    <div style={{ padding: "14px 18px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <UserPlus size={18} color="#2563eb" />
-                        <h2 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>Register New Team Member</h2>
-                      </div>
-                      <button 
-                        type="button" 
-                        onClick={() => setShowAddUserSubModal(false)} 
-                        aria-label="Close registration form"
-                        style={{ width: "28px", height: "28px", borderRadius: "6px", border: "none", backgroundColor: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-                      >
-                        <X size={16} />
-                      </button>
+              {/* VIEW 1: Team Members & Permissions */}
+              {teamTab === "members" && (
+                <div>
+                  {/* 4 Summary Stats Cards */}
+                  <div className="team-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginBottom: "16px" }}>
+                    <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Total Active Users</span>
+                      <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>{allUsersList.length || 4}</div>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Registered team accounts</span>
                     </div>
 
-                    <form 
-                      onSubmit={handleCreateUser} 
-                      style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: "12px" }}
+                    <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Super Admins (Full Data)</span>
+                      <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>
+                        {(allUsersList.filter(u => u.role === "admin").length) || 1}
+                      </div>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Full master visibility</span>
+                    </div>
+
+                    <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Sales Reps (Isolated)</span>
+                      <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>
+                        {(allUsersList.filter(u => u.role === "sales_rep").length) || 3}
+                      </div>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Strict own-lead access</span>
+                    </div>
+
+                    <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Security Protocol</span>
+                      <div style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", marginTop: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#16a34a", display: "inline-block" }} />
+                        Database Guard Active
+                      </div>
+                      <span style={{ fontSize: "12px", color: "#64748b" }}>Anti-theft & quota enforced</span>
+                    </div>
+                  </div>
+
+                  {/* Add New User Modal */}
+                  {showAddUserSubModal && (
+                    <div 
+                      className="modal-overlay animate-fade-in" 
+                      onClick={() => setShowAddUserSubModal(false)}
+                      style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.55)", backdropFilter: "blur(4px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
                     >
-                      <div className="team-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
-                        <div>
-                          <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
-                            Full Name *
-                          </label>
-                          <input 
-                            type="text"
-                            placeholder="e.g. Rahul Sharma"
-                            value={newUserData.name}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setNewUserData(prev => ({ 
-                                ...prev, 
-                                name: val, 
-                                username: prev.username || val.toLowerCase().replace(/\s+/g, '_') 
-                              }));
-                            }}
-                            required
-                            style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
-                            Login Username / Handle
-                          </label>
-                          <input 
-                            type="text"
-                            placeholder="e.g. rahul"
-                            value={newUserData.username}
-                            onChange={(e) => setNewUserData(prev => ({ ...prev, username: e.target.value.toLowerCase().trim() }))}
-                            style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
-                            Secret Login PIN (4 to 6 Digits) *
-                          </label>
-                          <input 
-                            type="text"
-                            maxLength={6}
-                            placeholder="e.g. 554433"
-                            value={newUserData.pin}
-                            onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value }))}
-                            required
-                            style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="team-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
-                        <div>
-                          <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
-                            Access Privilege / Role
-                          </label>
-                          <select 
-                            value={newUserData.role}
-                            onChange={(e) => setNewUserData(prev => ({ ...prev, role: e.target.value }))}
-                            style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                      <div 
+                        onClick={(e) => e.stopPropagation()} 
+                        style={{ width: "100%", maxWidth: "620px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.15)", overflow: "hidden" }}
+                      >
+                        <div style={{ padding: "14px 18px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <UserPlus size={18} color="#2563eb" />
+                            <h2 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>Register New Team Member</h2>
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => setShowAddUserSubModal(false)} 
+                            aria-label="Close registration form"
+                            style={{ width: "28px", height: "28px", borderRadius: "6px", border: "none", backgroundColor: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                           >
-                            <option value="sales_rep">💼 Sales Representative (Isolated: Own Leads Only)</option>
-                            <option value="manager">👔 Sales Manager (Manages Reporting Team)</option>
-                            <option value="admin">👑 Super Admin (Full Control: All Data & Export)</option>
-                          </select>
+                            <X size={16} />
+                          </button>
                         </div>
 
-                        <div>
-                          <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
-                            Mobile Phone
-                          </label>
-                          <input 
-                            type="text"
-                            placeholder="e.g. 9898000005"
-                            value={newUserData.phone}
-                            onChange={(e) => setNewUserData(prev => ({ ...prev, phone: e.target.value }))}
-                            style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
-                            Email Address
-                          </label>
-                          <input 
-                            type="email"
-                            placeholder="e.g. rahul@apexsales.com"
-                            value={newUserData.email}
-                            onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
-                            style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
-                          />
-                        </div>
-                      </div>
-
-                      <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "6px" }}>
-                        <button 
-                          type="button" 
-                          onClick={() => setShowAddUserSubModal(false)}
-                          style={{ height: "32px", padding: "0 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
+                        <form 
+                          onSubmit={handleCreateUser} 
+                          style={{ padding: "18px 20px", display: "flex", flexDirection: "column", gap: "12px" }}
                         >
-                          Cancel
-                        </button>
-                        <button 
-                          type="submit"
-                          style={{ height: "32px", padding: "0 16px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
-                        >
-                          <Check size={14} /> Create Member & Enable Login
-                        </button>
+                          <div className="team-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                Full Name *
+                              </label>
+                              <input 
+                                type="text"
+                                placeholder="e.g. Rahul Sharma"
+                                value={newUserData.name}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setNewUserData(prev => ({ 
+                                    ...prev, 
+                                    name: val, 
+                                    username: prev.username || val.toLowerCase().replace(/\s+/g, '_') 
+                                  }));
+                                }}
+                                required
+                                style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                Login Username
+                              </label>
+                              <input 
+                                type="text"
+                                placeholder="e.g. rahul"
+                                value={newUserData.username}
+                                onChange={(e) => setNewUserData(prev => ({ ...prev, username: e.target.value.toLowerCase().trim() }))}
+                                style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                Login PIN (4 to 6 Digits) *
+                              </label>
+                              <input 
+                                type="text"
+                                maxLength={6}
+                                placeholder="e.g. 554433"
+                                value={newUserData.pin}
+                                onChange={(e) => setNewUserData(prev => ({ ...prev, pin: e.target.value }))}
+                                required
+                                style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="team-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                Role Privilege
+                              </label>
+                              <select 
+                                value={newUserData.role}
+                                onChange={(e) => {
+                                  const r = e.target.value;
+                                  setNewUserData(prev => ({ 
+                                    ...prev, 
+                                    role: r,
+                                    packageTier: r === "admin" ? "super_admin" : r === "manager" ? "enterprise" : "starter"
+                                  }));
+                                }}
+                                style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                              >
+                                <option value="sales_rep">💼 Sales Representative</option>
+                                <option value="manager">👔 Sales Manager</option>
+                                <option value="admin">👑 Super Admin</option>
+                              </select>
+                            </div>
+
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                Package / Access Tier
+                              </label>
+                              <select 
+                                value={newUserData.packageTier || "starter"}
+                                onChange={(e) => setNewUserData(prev => ({ ...prev, packageTier: e.target.value }))}
+                                style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                              >
+                                <option value="starter">📦 Starter Rep (50 Leads Quota, Own Data)</option>
+                                <option value="growth">🚀 Growth Closer (250 Leads, AI Pitch, Bulk)</option>
+                                <option value="enterprise">🏢 Enterprise Manager (1,000 Leads, Team View)</option>
+                                <option value="super_admin">👑 Super Admin (Unlimited Lifetime)</option>
+                              </select>
+                            </div>
+
+                            <div>
+                              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                Mobile Phone
+                              </label>
+                              <input 
+                                type="text"
+                                placeholder="e.g. 9898000005"
+                                value={newUserData.phone}
+                                onChange={(e) => setNewUserData(prev => ({ ...prev, phone: e.target.value }))}
+                                style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                              Official Email Address
+                            </label>
+                            <input 
+                              type="email"
+                              placeholder="e.g. rahul@apexsales.com"
+                              value={newUserData.email}
+                              onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
+                              style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
+                            />
+                          </div>
+
+                          <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "8px" }}>
+                            <button 
+                              type="button" 
+                              onClick={() => setShowAddUserSubModal(false)}
+                              style={{ height: "34px", padding: "0 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
+                            >
+                              Cancel
+                            </button>
+                            <button 
+                              type="submit"
+                              style={{ height: "34px", padding: "0 16px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                            >
+                              <Check size={14} /> Create Member & Assign Package
+                            </button>
+                          </div>
+                        </form>
                       </div>
-                    </form>
+                    </div>
+                  )}
+
+                  {/* Modal: Granular Employee Access & Permissions Configurator */}
+                  {showAccessModal && selectedUserForAccess && (
+                    <div 
+                      className="modal-overlay animate-fade-in" 
+                      onClick={() => setShowAccessModal(false)}
+                      style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
+                    >
+                      <div 
+                        onClick={(e) => e.stopPropagation()} 
+                        style={{ width: "100%", maxWidth: "680px", maxHeight: "90vh", display: "flex", flexDirection: "column", backgroundColor: "#ffffff", borderRadius: "10px", border: "1px solid #cbd5e1", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", overflow: "hidden" }}
+                      >
+                        {/* Header */}
+                        <div style={{ padding: "14px 18px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <div style={{ width: "34px", height: "34px", borderRadius: "8px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
+                              <Sliders size={18} />
+                            </div>
+                            <div>
+                              <h2 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                                Employee Access & Permissions: {selectedUserForAccess.name}
+                              </h2>
+                              <p style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0 0" }}>
+                                Role: <strong>{selectedUserForAccess.role}</strong> • Username: @{selectedUserForAccess.username}
+                              </p>
+                            </div>
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => setShowAccessModal(false)} 
+                            aria-label="Close modal"
+                            style={{ width: "28px", height: "28px", borderRadius: "6px", border: "none", backgroundColor: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+
+                        {/* Scrollable Body */}
+                        <div style={{ padding: "16px 20px", overflowY: "auto", flex: 1, display: "flex", flexDirection: "column", gap: "16px" }}>
+                          
+                          {/* Step 1: Quick Package Tier Presets */}
+                          <div>
+                            <span style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", display: "block", marginBottom: "8px" }}>
+                              1. Quick Select Package Tier (Auto-configures Recommended Permissions)
+                            </span>
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "8px" }}>
+                              {Object.entries(EMPLOYEE_PACKAGES).map(([tierKey, pkg]) => {
+                                const isSelected = accessFormData.packageTier === tierKey;
+                                return (
+                                  <div
+                                    key={tierKey}
+                                    onClick={() => {
+                                      setAccessFormData(prev => ({
+                                        ...prev,
+                                        packageTier: tierKey,
+                                        permissions: { ...pkg.permissions },
+                                        maxLeadsLimit: pkg.quota
+                                      }));
+                                    }}
+                                    style={{
+                                      padding: "10px",
+                                      borderRadius: "8px",
+                                      border: isSelected ? `2px solid ${pkg.color}` : "1px solid #e2e8f0",
+                                      backgroundColor: isSelected ? pkg.bg : "#ffffff",
+                                      cursor: "pointer",
+                                      transition: "all 0.15s ease",
+                                      boxShadow: isSelected ? "0 2px 6px rgba(0,0,0,0.05)" : "none"
+                                    }}
+                                  >
+                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
+                                      <span style={{ fontSize: "12px", fontWeight: "700", color: pkg.color }}>
+                                        {pkg.badge}
+                                      </span>
+                                      {isSelected && <Check size={14} color={pkg.color} />}
+                                    </div>
+                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a" }}>
+                                      {pkg.price}
+                                    </div>
+                                    <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
+                                      Quota: {pkg.quota > 9999 ? 'Unlimited' : `${pkg.quota} Leads`}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Step 2: Granular Permission Checklist */}
+                          <div>
+                            <span style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", display: "block", marginBottom: "10px" }}>
+                              2. Granular Access Control & Permissions Matrix
+                            </span>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px" }}>
+                              
+                              {/* Group A: Pipeline Operations */}
+                              <div style={{ padding: "10px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc" }}>
+                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#1e40af", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <Grid size={14} /> Pipeline & Lead Isolation
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canViewAllLeads}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canViewAllLeads: e.target.checked } }))}
+                                      style={{ accentColor: "#2563eb", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>View All Team Leads</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Unchecked = Strict isolation (rep sees only assigned leads)</span>
+                                    </span>
+                                  </label>
+
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canCreateLeads}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canCreateLeads: e.target.checked } }))}
+                                      style={{ accentColor: "#2563eb", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>Create New Leads</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Can add deals to the pipeline</span>
+                                    </span>
+                                  </label>
+
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canEditLeads}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canEditLeads: e.target.checked } }))}
+                                      style={{ accentColor: "#2563eb", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>Edit Leads & Stages</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Can update lead details, notes & stages</span>
+                                    </span>
+                                  </label>
+
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#dc2626", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canDeleteLeads}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canDeleteLeads: e.target.checked } }))}
+                                      style={{ accentColor: "#dc2626", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>Delete Leads from Pipeline</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Allow permanent deletion (disabled by default for safety)</span>
+                                    </span>
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* Group B: Financials & Quota */}
+                              <div style={{ padding: "10px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc" }}>
+                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#166534", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <IndianRupee size={14} /> Financials & Sales Targets
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canViewRevenue}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canViewRevenue: e.target.checked } }))}
+                                      style={{ accentColor: "#16a34a", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>View Deal Values & Revenue</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Unchecked = Masked as ₹•••••• (protects sensitive pricing)</span>
+                                    </span>
+                                  </label>
+
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canEditTarget}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canEditTarget: e.target.checked } }))}
+                                      style={{ accentColor: "#16a34a", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>Edit Monthly Sales Targets</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Allow modifying target quotas & projections</span>
+                                    </span>
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* Group C: Data Anti-Theft Protection */}
+                              <div style={{ padding: "10px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc" }}>
+                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#9a3412", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <Lock size={14} /> Security & Anti-Theft Guard
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canExportCSV}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canExportCSV: e.target.checked } }))}
+                                      style={{ accentColor: "#ea580c", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>Export Leads to CSV</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Keep unchecked to prevent reps downloading your client database</span>
+                                    </span>
+                                  </label>
+
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canBulkImport}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canBulkImport: e.target.checked } }))}
+                                      style={{ accentColor: "#ea580c", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>Bulk CSV Import</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Allow bulk uploading lead spreadsheets</span>
+                                    </span>
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* Group D: Tools & AI */}
+                              <div style={{ padding: "10px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc" }}>
+                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#7c3aed", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <Sparkles size={14} /> Communication & AI Tools
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canUseWhatsApp}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canUseWhatsApp: e.target.checked } }))}
+                                      style={{ accentColor: "#7c3aed", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>1-Click WhatsApp Direct Chat</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Allow sending WhatsApp follow-up messages</span>
+                                    </span>
+                                  </label>
+
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canMakeCalls}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canMakeCalls: e.target.checked } }))}
+                                      style={{ accentColor: "#7c3aed", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>Click-to-Call Dialing</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Direct phone call dialing integration</span>
+                                    </span>
+                                  </label>
+
+                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
+                                    <input 
+                                      type="checkbox"
+                                      checked={!!accessFormData.permissions.canUseAI}
+                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canUseAI: e.target.checked } }))}
+                                      style={{ accentColor: "#7c3aed", marginTop: "2px" }}
+                                    />
+                                    <span>
+                                      <strong>AI Sales Pitch & Objection Bot</strong>
+                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>AI-generated objection handling scripts</span>
+                                    </span>
+                                  </label>
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+
+                          {/* Step 3: Quota Limit Setting */}
+                          <div style={{ padding: "12px 14px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#ffffff", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                            <div>
+                              <strong style={{ fontSize: "12px", color: "#0f172a" }}>Max Active Leads Quota Limit</strong>
+                              <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>
+                                Maximum active leads this employee can hold in their pipeline simultaneously.
+                              </p>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              <input 
+                                type="number"
+                                min={10}
+                                max={999999}
+                                value={accessFormData.maxLeadsLimit}
+                                onChange={(e) => setAccessFormData(prev => ({ ...prev, maxLeadsLimit: parseInt(e.target.value) || 50 }))}
+                                style={{ width: "100px", height: "34px", padding: "4px 8px", fontSize: "12px", fontWeight: "700", border: "1px solid #cbd5e1", borderRadius: "6px" }}
+                              />
+                              <span style={{ fontSize: "12px", color: "#475569", fontWeight: "600" }}>Leads Cap</span>
+                            </div>
+                          </div>
+
+                        </div>
+
+                        {/* Footer Actions */}
+                        <div style={{ padding: "12px 18px", borderTop: "1px solid #e2e8f0", backgroundColor: "#f8fafc", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: "12px", color: "#64748b" }}>
+                            Changes take effect immediately on next refresh.
+                          </span>
+                          <div style={{ display: "flex", gap: "8px" }}>
+                            <button
+                              type="button"
+                              onClick={() => setShowAccessModal(false)}
+                              style={{ height: "34px", padding: "0 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleSaveUserAccess}
+                              style={{ height: "34px", padding: "0 18px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                            >
+                              <Save size={14} /> Save & Apply Permissions
+                            </button>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Members List Table */}
+                  <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
+                    <table className="responsive-table" style={{ width: "100%", minWidth: "820px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
+                      <thead>
+                        <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: "700" }}>
+                          <th style={{ padding: "9px 12px" }}>TEAM MEMBER</th>
+                          <th style={{ padding: "9px 12px" }}>PACKAGE TIER</th>
+                          <th style={{ padding: "9px 12px" }}>ACTIVE PERMISSIONS</th>
+                          <th style={{ padding: "9px 12px" }}>LOGIN PIN</th>
+                          <th style={{ padding: "9px 12px", textAlign: "center" }}>ASSIGNED LEADS / QUOTA</th>
+                          <th style={{ padding: "9px 12px", textAlign: "right" }}>ACTIONS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(allUsersList.length > 0 ? allUsersList : [
+                          { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", packageTier: "super_admin", phone: "9876543210" },
+                          { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", pin: "112233", role: "sales_rep", packageTier: "growth", phone: "9898000001" },
+                          { id: "usr_priya", name: "Priya Verma", displayName: "Priya Verma", username: "priya", pin: "223344", role: "sales_rep", packageTier: "starter", phone: "9898000002" },
+                          { id: "usr_amit", name: "Amit Patel", displayName: "Amit Patel", username: "amit", pin: "334455", role: "sales_rep", packageTier: "starter", phone: "9898000003" }
+                        ]).map((usr) => {
+                          const isPinVisible = userPinVisibilityMap[usr.id];
+                          const leadsCount = leads.filter(l => (l.owner || "").toLowerCase() === usr.name.toLowerCase()).length;
+                          const isAdminRole = usr.role === "admin" || checkIsSuperAdmin(usr);
+                          const userPkgKey = usr.packageTier || (isAdminRole ? "super_admin" : usr.role === "manager" ? "enterprise" : "starter");
+                          const pkgInfo = EMPLOYEE_PACKAGES[userPkgKey] || EMPLOYEE_PACKAGES.starter;
+                          const effectivePerms = getUserEffectivePermissions(usr);
+                          const quota = usr.maxLeadsLimit || pkgInfo.quota;
+                          const quotaPercent = Math.min(100, Math.round((leadsCount / quota) * 100));
+
+                          return (
+                            <tr key={usr.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.15s ease" }}>
+                              {/* Member info */}
+                              <td style={{ padding: "8px 12px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                  <div style={{ width: "30px", height: "30px", borderRadius: "50%", backgroundColor: pkgInfo.bg, color: pkgInfo.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", fontSize: "12px", border: `1px solid ${pkgInfo.border}` }}>
+                                    {usr.name[0]}
+                                  </div>
+                                  <div>
+                                    <div style={{ fontWeight: "600", color: "#0f172a", fontSize: "12px" }}>{usr.displayName || usr.name}</div>
+                                    <div style={{ fontSize: "11px", color: "#64748b" }}>@{usr.username || "user"} • {usr.phone || "No phone"}</div>
+                                  </div>
+                                </div>
+                              </td>
+
+                              {/* Package Tier Badge */}
+                              <td style={{ padding: "8px 12px" }}>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "3px 9px", backgroundColor: pkgInfo.bg, color: pkgInfo.color, borderRadius: "6px", fontSize: "11px", fontWeight: "700", border: `1px solid ${pkgInfo.border}` }}>
+                                  {pkgInfo.badge}
+                                </span>
+                              </td>
+
+                              {/* Active Permissions Summary Pills */}
+                              <td style={{ padding: "8px 12px" }}>
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                                  <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", backgroundColor: effectivePerms.canViewAllLeads ? "#eff6ff" : "#f1f5f9", color: effectivePerms.canViewAllLeads ? "#1e40af" : "#475569", fontWeight: "600" }}>
+                                    {effectivePerms.canViewAllLeads ? "👁️ All Leads" : "🔒 Own Leads"}
+                                  </span>
+                                  <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", backgroundColor: effectivePerms.canExportCSV ? "#f0fdf4" : "#fef2f2", color: effectivePerms.canExportCSV ? "#166534" : "#b91c1c", fontWeight: "600" }}>
+                                    {effectivePerms.canExportCSV ? "📥 Export OK" : "🚫 No Export"}
+                                  </span>
+                                  {!effectivePerms.canViewRevenue && (
+                                    <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", backgroundColor: "#fffbeb", color: "#b45309", fontWeight: "600" }}>
+                                      🙈 Revenue Masked
+                                    </span>
+                                  )}
+                                  {effectivePerms.canUseAI && (
+                                    <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", backgroundColor: "#faf5ff", color: "#7c3aed", fontWeight: "600" }}>
+                                      🤖 AI Enabled
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* Login PIN */}
+                              <td style={{ padding: "8px 12px" }}>
+                                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 8px", borderRadius: "6px" }}>
+                                  <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: "700", letterSpacing: "2px", color: "#0f172a" }}>
+                                    {isPinVisible ? (usr.pin || "••••") : "••••••"}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setUserPinVisibilityMap(prev => ({ ...prev, [usr.id]: !prev[usr.id] }))}
+                                    style={{ width: "24px", height: "24px", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: "0", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+                                    title={isPinVisible ? "Hide PIN" : "Reveal PIN"}
+                                    aria-label={isPinVisible ? "Hide PIN" : "Reveal PIN"}
+                                  >
+                                    {isPinVisible ? <EyeOff size={15} /> : <Eye size={15} />}
+                                  </button>
+                                </div>
+                              </td>
+
+                              {/* Assigned Leads & Quota Indicator */}
+                              <td style={{ padding: "8px 12px", textAlign: "center" }}>
+                                <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                                  <span style={{ padding: "2px 8px", borderRadius: "9999px", backgroundColor: quotaPercent >= 90 ? "#fef2f2" : "#f1f5f9", fontWeight: "700", color: quotaPercent >= 90 ? "#dc2626" : "#475569", fontSize: "11px", border: "1px solid #e2e8f0" }}>
+                                    {leadsCount} / {quota > 9999 ? '∞' : quota} Leads
+                                  </span>
+                                  {quota <= 9999 && (
+                                    <div style={{ width: "70px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "2px", overflow: "hidden", marginTop: "2px" }}>
+                                      <div style={{ width: `${quotaPercent}%`, height: "100%", backgroundColor: quotaPercent >= 90 ? "#dc2626" : quotaPercent >= 70 ? "#f59e0b" : "#2563eb" }} />
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+
+                              {/* Actions */}
+                              <td style={{ padding: "8px 12px", textAlign: "right" }}>
+                                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "flex-end" }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenAccessModal(usr)}
+                                    style={{ height: "30px", padding: "0 10px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "11px", fontWeight: "700", color: "#1e40af", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                                    title="Configure permissions & package"
+                                  >
+                                    <Sliders size={13} /> ⚙️ Access
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateUserPin(usr.id, usr.name)}
+                                    style={{ height: "30px", padding: "0 8px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#0f172a", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                                    title="Reset login PIN"
+                                  >
+                                    🔑 PIN
+                                  </button>
+                                  {checkIsSuperAdmin(usr) || usr.id === "usr_admin" ? (
+                                    <span style={{ height: "30px", padding: "0 8px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#64748b", display: "inline-flex", alignItems: "center" }}>
+                                      🔒 Admin
+                                    </span>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteUser(usr.id, usr.name, usr.email, usr.role)}
+                                      style={{ height: "30px", padding: "0 8px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center" }}
+                                      title={`Permanently delete ${usr.name}`}
+                                    >
+                                      🗑️
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Bottom Security Banner */}
+                  <div style={{ marginTop: "16px", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                    <div style={{ fontSize: "12px", color: "#475569", display: "flex", alignItems: "center", gap: "8px" }}>
+                      <ShieldCheck size={16} color="#16a34a" />
+                      <span><strong>Super Admin Enforcement:</strong> Sales reps can only view their own leads, cannot steal/export CSV database, and financial metrics are protected.</span>
+                    </div>
+                    <span style={{ fontSize: "11px", color: "#64748b" }}>Role-Based Access Control • Active</span>
                   </div>
                 </div>
               )}
 
-              {/* Members List Table - Full Width, Scrollable on mobile */}
-              <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
-                <table className="responsive-table" style={{ width: "100%", minWidth: "680px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
-                  <thead>
-                    <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: "700" }}>
-                      <th style={{ padding: "9px 12px" }}>TEAM MEMBER</th>
-                      <th style={{ padding: "9px 12px" }}>ROLE & PRIVACY</th>
-                      <th style={{ padding: "9px 12px" }}>LOGIN PIN</th>
-                      <th style={{ padding: "9px 12px", textAlign: "center" }}>ASSIGNED LEADS</th>
-                      <th style={{ padding: "9px 12px", textAlign: "right" }}>ACTIONS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(allUsersList.length > 0 ? allUsersList : [
-                      { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", phone: "9876543210" },
-                      { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", pin: "112233", role: "sales_rep", phone: "9898000001" },
-                      { id: "usr_priya", name: "Priya Verma", displayName: "Priya Verma", username: "priya", pin: "223344", role: "sales_rep", phone: "9898000002" },
-                      { id: "usr_amit", name: "Amit Patel", displayName: "Amit Patel", username: "amit", pin: "334455", role: "sales_rep", phone: "9898000003" }
-                    ]).map((usr) => {
-                      const isPinVisible = userPinVisibilityMap[usr.id];
-                      const leadsCount = leads.filter(l => (l.owner || "").toLowerCase() === usr.name.toLowerCase()).length;
-                      const isAdminRole = usr.role === "admin";
+              {/* VIEW 2: Employee Package Tiers Matrix */}
+              {teamTab === "packages" && (
+                <div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0" }}>
+                      📦 Employee Access & Subscription Tiers
+                    </h2>
+                    <p style={{ fontSize: "12px", color: "#475569", margin: 0 }}>
+                      Choose or assign standard access packages to sales reps, closers, and managers. Super Admin can override any permission individually.
+                    </p>
+                  </div>
 
-                      return (
-                        <tr key={usr.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.15s ease" }}>
-                          {/* Member info */}
-                          <td style={{ padding: "8px 12px" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                              <div style={{ width: "28px", height: "28px", borderRadius: "50%", backgroundColor: isAdminRole ? "#fef3c7" : "#eff6ff", color: isAdminRole ? "#b45309" : "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", fontSize: "12px", border: isAdminRole ? "1px solid #fde68a" : "1px solid #bfdbfe" }}>
-                                {usr.name[0]}
-                              </div>
-                              <div>
-                                <div style={{ fontWeight: "600", color: "#0f172a", fontSize: "12px" }}>{usr.displayName || usr.name}</div>
-                                <div style={{ fontSize: "12px", color: "#64748b" }}>@{usr.username || "user"} • {usr.phone || "No phone"}</div>
-                              </div>
-                            </div>
-                          </td>
-
-                          {/* Role & Privacy */}
-                          <td style={{ padding: "8px 12px" }}>
-                            {isAdminRole ? (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "4px 9px", backgroundColor: "#fef3c7", color: "#b45309", borderRadius: "6px", fontSize: "12px", fontWeight: "600", border: "1px solid #fde68a" }}>
-                                👑 Super Admin (Full Pipeline)
-                              </span>
-                            ) : (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "4px 9px", backgroundColor: "#eff6ff", color: "#2563eb", borderRadius: "6px", fontSize: "12px", fontWeight: "600", border: "1px solid #bfdbfe" }}>
-                                💼 Sales Rep (Isolated - Own Data Only)
-                              </span>
-                            )}
-                          </td>
-
-                          {/* Login PIN */}
-                          <td style={{ padding: "8px 12px" }}>
-                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 8px", borderRadius: "6px" }}>
-                              <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: "700", letterSpacing: "2px", color: "#0f172a" }}>
-                                {isPinVisible ? (usr.pin || "••••") : "••••••"}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => setUserPinVisibilityMap(prev => ({ ...prev, [usr.id]: !prev[usr.id] }))}
-                                style={{ width: "32px", height: "32px", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: "0", display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: "6px" }}
-                                title={isPinVisible ? "Hide PIN" : "Reveal PIN"}
-                                aria-label={isPinVisible ? "Hide PIN" : "Reveal PIN"}
-                              >
-                                {isPinVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-                              </button>
-                            </div>
-                          </td>
-
-                          {/* Assigned Leads */}
-                          <td style={{ padding: "8px 12px", textAlign: "center" }}>
-                            <span style={{ padding: "3px 9px", borderRadius: "9999px", backgroundColor: "#f1f5f9", fontWeight: "600", color: "#475569", fontSize: "12px", border: "1px solid #e2e8f0" }}>
-                              {leadsCount} Deals
+                  {/* 4 Package Cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "14px", marginBottom: "20px" }}>
+                    {Object.entries(EMPLOYEE_PACKAGES).map(([key, pkg]) => (
+                      <div 
+                        key={key} 
+                        style={{ 
+                          backgroundColor: "#ffffff", 
+                          borderRadius: "8px", 
+                          border: `1.5px solid ${pkg.border}`, 
+                          padding: "16px", 
+                          display: "flex", 
+                          flexDirection: "column", 
+                          justifyContent: "space-between",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.03)"
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "12px", fontWeight: "750", color: pkg.color, padding: "3px 8px", backgroundColor: pkg.bg, borderRadius: "6px", border: `1px solid ${pkg.border}` }}>
+                              {pkg.badge}
                             </span>
-                          </td>
+                            <span style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a" }}>
+                              {pkg.price}
+                            </span>
+                          </div>
 
-                          {/* Actions - Standardized Width Alignment */}
-                          <td style={{ padding: "8px 12px", textAlign: "right" }}>
-                            <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "flex-end" }}>
-                              <button
-                                type="button"
-                                onClick={() => handleUpdateUserPin(usr.id, usr.name)}
-                                style={{ width: "96px", height: "32px", padding: "0", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#0f172a", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px", boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}
-                                title="Reset or change PIN"
-                              >
-                                🔑 Reset PIN
-                              </button>
-                              {checkIsSuperAdmin(usr) || usr.id === "usr_admin" ? (
-                                <span style={{ width: "84px", height: "32px", padding: "0", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#64748b", display: "inline-flex", alignItems: "center", justifyContent: "center" }} title="Primary Super Admin cannot be deleted">
-                                  🔒 Protected
-                                </span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteUser(usr.id, usr.name, usr.email, usr.role)}
-                                  style={{ width: "84px", height: "32px", padding: "0", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
-                                  title={`Permanently delete ${usr.name}`}
-                                >
-                                  🗑️ Delete
-                                </button>
-                              )}
+                          <h3 style={{ fontSize: "15px", fontWeight: "700", color: "#0f172a", margin: "6px 0 2px 0" }}>
+                            {pkg.name}
+                          </h3>
+                          <p style={{ fontSize: "11px", color: "#64748b", margin: "0 0 10px 0" }}>
+                            Target: <strong>{pkg.targetAudience}</strong>
+                          </p>
+
+                          <div style={{ padding: "8px 10px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0", marginBottom: "12px" }}>
+                            <span style={{ fontSize: "11px", color: "#475569", display: "block" }}>Pipeline Quota</span>
+                            <strong style={{ fontSize: "14px", color: "#0f172a" }}>
+                              {pkg.quota > 9999 ? "Unlimited Lifetime" : `${pkg.quota} Active Leads`}
+                            </strong>
+                          </div>
+
+                          <p style={{ fontSize: "12px", color: "#334155", lineHeight: "1.4", margin: "0 0 12px 0" }}>
+                            {pkg.description}
+                          </p>
+
+                          {/* Key Capabilities List */}
+                          <div style={{ display: "flex", flexDirection: "column", gap: "5px", fontSize: "11px", color: "#475569" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              {pkg.permissions.canViewAllLeads ? <Check size={13} color="#16a34a" /> : <X size={13} color="#94a3b8" />}
+                              <span>{pkg.permissions.canViewAllLeads ? "View All Team Leads" : "Isolated Own Data Only"}</span>
                             </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              {pkg.permissions.canViewRevenue ? <Check size={13} color="#16a34a" /> : <X size={13} color="#dc2626" />}
+                              <span>{pkg.permissions.canViewRevenue ? "Deal Values Visible" : "Revenue Masked (₹••••)"}</span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              {pkg.permissions.canExportCSV ? <Check size={13} color="#16a34a" /> : <X size={13} color="#dc2626" />}
+                              <span>{pkg.permissions.canExportCSV ? "CSV Database Export" : "Anti-Theft Export Locked"}</span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              {pkg.permissions.canDeleteLeads ? <Check size={13} color="#16a34a" /> : <X size={13} color="#94a3b8" />}
+                              <span>{pkg.permissions.canDeleteLeads ? "Delete Leads Allowed" : "Lead Deletion Protected"}</span>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              {pkg.permissions.canUseAI ? <Check size={13} color="#7c3aed" /> : <X size={13} color="#94a3b8" />}
+                              <span>{pkg.permissions.canUseAI ? "AI Pitch & Scripts" : "No AI Access"}</span>
+                            </div>
+                          </div>
+                        </div>
 
-              {/* Bottom Security Banner */}
-              <div style={{ marginTop: "16px", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ fontSize: "12px", color: "#475569", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <ShieldCheck size={16} color="#16a34a" />
-                  <span><strong>Server-Enforced Access Control:</strong> Sales reps can only view their own leads on mobile and desktop. Admin retains full pipeline authority.</span>
+                        <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #f1f5f9" }}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTeamTab("members");
+                              showToast(`Assign ${pkg.name} package to any member via the '⚙️ Access' button in the members table.`, "info");
+                            }}
+                            style={{ width: "100%", height: "32px", borderRadius: "6px", border: `1px solid ${pkg.border}`, backgroundColor: pkg.bg, color: pkg.color, fontSize: "11px", fontWeight: "700", cursor: "pointer" }}
+                          >
+                            Assign to Team Member →
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Feature Matrix Table */}
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "16px" }}>
+                    <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: "0 0 12px 0" }}>
+                      📋 Full Feature & Permission Comparison Matrix
+                    </h3>
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", textAlign: "left" }}>
+                        <thead>
+                          <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+                            <th style={{ padding: "8px 12px", color: "#475569" }}>FEATURE / PERMISSION</th>
+                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#2563eb" }}>STARTER REP</th>
+                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#166534" }}>GROWTH CLOSER</th>
+                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#7c3aed" }}>ENTERPRISE</th>
+                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#b45309" }}>SUPER ADMIN</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            { label: "Active Leads Quota", starter: "50 Leads", growth: "250 Leads", enterprise: "1,000 Leads", admin: "Unlimited" },
+                            { label: "Pipeline Scope", starter: "Own Leads Only", growth: "Own Leads Only", enterprise: "Full Team Leads", admin: "Full Master Vault" },
+                            { label: "Deal Revenue & Pricing", starter: "Masked (₹••••)", growth: "Full Visibility", enterprise: "Full Visibility", admin: "Full Visibility" },
+                            { label: "Anti-Theft CSV Export", starter: "❌ Blocked", growth: "❌ Blocked", enterprise: "✅ Enabled", admin: "✅ Enabled" },
+                            { label: "Bulk CSV Import", starter: "❌ Blocked", growth: "✅ Enabled", enterprise: "✅ Enabled", admin: "✅ Enabled" },
+                            { label: "Lead Deletion Protection", starter: "🔒 Protected", growth: "🔒 Protected", enterprise: "✅ Enabled", admin: "✅ Enabled" },
+                            { label: "Target Quota Editing", starter: "❌ Read-Only", growth: "❌ Read-Only", enterprise: "✅ Editable", admin: "✅ Master Override" },
+                            { label: "AI Sales Pitch Bot", starter: "❌ Disabled", growth: "✅ AI Assistant", enterprise: "✅ Full AI Suite", admin: "✅ Master AI" },
+                            { label: "WhatsApp & Call Integration", starter: "✅ Direct Dial", growth: "✅ Direct Dial", enterprise: "✅ Direct Dial", admin: "✅ Direct Dial" },
+                            { label: "RBAC & User Management", starter: "❌ None", growth: "❌ None", enterprise: "❌ None", admin: "👑 Full Management" }
+                          ].map((row, idx) => (
+                            <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "8px 12px", fontWeight: "600", color: "#0f172a" }}>{row.label}</td>
+                              <td style={{ padding: "8px 12px", textAlign: "center", color: "#475569" }}>{row.starter}</td>
+                              <td style={{ padding: "8px 12px", textAlign: "center", color: "#475569" }}>{row.growth}</td>
+                              <td style={{ padding: "8px 12px", textAlign: "center", color: "#475569" }}>{row.enterprise}</td>
+                              <td style={{ padding: "8px 12px", textAlign: "center", color: "#b45309", fontWeight: "700" }}>{row.admin}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-                <span style={{ fontSize: "12px", color: "#64748b" }}>Central Database: server/data/db.json</span>
-              </div>
+              )}
+
+              {/* VIEW 3: Client Deal Packages */}
+              {teamTab === "deal_packages" && (
+                <div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0" }}>
+                      💼 Client CRM Sales Packages & Pricing Plans
+                    </h2>
+                    <p style={{ fontSize: "12px", color: "#475569", margin: 0 }}>
+                      These are the CRM packages offered to prospective clients. When creating a new lead, pick one of these plans to automatically populate deal value and pipeline tags.
+                    </p>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "14px", marginBottom: "20px" }}>
+                    {CLIENT_DEAL_PACKAGES.map((pkg) => (
+                      <div 
+                        key={pkg.id} 
+                        style={{ 
+                          backgroundColor: "#ffffff", 
+                          borderRadius: "8px", 
+                          border: `1.5px solid ${pkg.border}`, 
+                          padding: "16px", 
+                          display: "flex", 
+                          flexDirection: "column", 
+                          justifyContent: "space-between",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.03)"
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                            <span style={{ fontSize: "12px", fontWeight: "750", color: pkg.color, padding: "3px 8px", backgroundColor: pkg.bg, borderRadius: "6px", border: `1px solid ${pkg.border}` }}>
+                              {pkg.name}
+                            </span>
+                            <span style={{ fontSize: "11px", fontWeight: "600", color: "#64748b" }}>
+                              {pkg.duration}
+                            </span>
+                          </div>
+
+                          <div style={{ margin: "10px 0" }}>
+                            <span style={{ fontSize: "22px", fontWeight: "800", color: "#0f172a" }}>
+                              {pkg.price ? `₹${pkg.price.toLocaleString('en-IN')}` : 'Bespoke Quote'}
+                            </span>
+                            <span style={{ fontSize: "12px", color: "#64748b", marginLeft: "4px" }}>
+                              / {pkg.duration}
+                            </span>
+                          </div>
+
+                          <div style={{ padding: "6px 10px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0", marginBottom: "12px" }}>
+                            <span style={{ fontSize: "11px", color: "#475569" }}>Included Capacity: <strong>{pkg.quota}</strong></span>
+                          </div>
+
+                          <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "12px", color: "#475569", lineHeight: "1.6" }}>
+                            {pkg.features.map((feat, fIdx) => (
+                              <li key={fIdx}>{feat}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNewLeadData(prev => ({
+                                ...prev,
+                                packageId: pkg.id,
+                                value: pkg.price > 0 ? String(pkg.price) : "50000"
+                              }));
+                              setShowAddLeadModal(true);
+                            }}
+                            style={{ width: "100%", height: "34px", borderRadius: "6px", border: "none", backgroundColor: pkg.color, color: "#ffffff", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+                          >
+                            <Plus size={14} /> Create Lead with this Plan
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Operational Note */}
+                  <div style={{ padding: "12px 16px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "8px", display: "flex", alignItems: "center", gap: "10px" }}>
+                    <Briefcase size={18} color="#2563eb" />
+                    <span style={{ fontSize: "12px", color: "#1e40af" }}>
+                      <strong>Sales Rep Automation:</strong> Whenever a rep closes a deal with any package above, the deal value is automatically calculated and revenue analytics are updated in real-time.
+                    </span>
+                  </div>
+                </div>
+              )}
 
             </div>
           ) : activeWorkspace === "pipeline" ? (
@@ -11351,7 +12265,13 @@ export default function App() {
                               {/* Deal Value with GST Badge (Col 2) */}
                               <td 
                                 onClick={() => setSelectedCell({ rowIndex: rIdx, colIndex: 2 })}
-                                onDoubleClick={() => startEditing(rIdx, 2)}
+                                onDoubleClick={() => {
+                                  if (!getUserEffectivePermissions(currentUser).canViewRevenue) {
+                                    showToast("🔒 Deal revenue is protected for your role/package tier.", "info");
+                                    return;
+                                  }
+                                  startEditing(rIdx, 2);
+                                }}
                                 style={{ padding: "3px 8px 3px 12px", verticalAlign: "middle", whiteSpace: "nowrap" }}
                               >
                                 {editingCell?.rowIndex === rIdx && editingCell?.colIndex === 2 ? (
@@ -11367,7 +12287,7 @@ export default function App() {
                                 ) : (
                                   <div style={{ display: "flex", alignItems: "center", gap: "5px", cursor: "pointer" }} title="Double-click to edit value">
                                     <span style={{ fontSize: "12px", fontWeight: "750", color: "#0f172a" }}>
-                                      ₹{(Number(lead.value) || 0).toLocaleString("en-IN")}
+                                      {formatLeadRevenue(lead.value, currentUser)}
                                     </span>
                                     <span style={{ fontSize: "10px", padding: "1px 4px", backgroundColor: "#f1f5f9", color: "#64748b", borderRadius: "6px", fontWeight: "700" }}>
                                       GST
@@ -18874,15 +19794,40 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Row 3: Deal Value, Stage & Source */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr", gap: "10px", borderTop: "1px solid #f1f5f9", paddingTop: "12px" }}>
+                {/* Row 3: Package, Deal Value, Stage & Source */}
+                <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1.2fr 1fr", gap: "10px", borderTop: "1px solid #f1f5f9", paddingTop: "12px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
+                      📦 Client Package
+                    </label>
+                    <select
+                      value={newLeadData.packageId || "pkg_silver"}
+                      onChange={(e) => {
+                        const selectedId = e.target.value;
+                        const selectedPkg = CLIENT_DEAL_PACKAGES.find(p => p.id === selectedId);
+                        setNewLeadData(prev => ({
+                          ...prev,
+                          packageId: selectedId,
+                          value: selectedPkg && selectedPkg.price > 0 ? String(selectedPkg.price) : prev.value
+                        }));
+                      }}
+                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
+                    >
+                      {CLIENT_DEAL_PACKAGES.map(pkg => (
+                        <option key={pkg.id} value={pkg.id}>
+                          {pkg.name} ({pkg.price ? `₹${pkg.price.toLocaleString('en-IN')}` : 'Bespoke'})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div>
                     <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
                       Deal Value (₹)
                     </label>
                     <input
                       type="number"
-                      placeholder="e.g. 25000"
+                      placeholder="e.g. 15000"
                       value={newLeadData.value}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, value: e.target.value }))}
                       style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}

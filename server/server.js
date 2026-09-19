@@ -1462,7 +1462,7 @@ app.post('/api/users', async (req, res) => {
     return res.status(403).json({ success: false, message: 'Access denied. Only Admin can create users.' });
   }
 
-  const { name, username, pin, role = 'sales_rep', email = '', phone = '', reportsTo = '', managerId = '' } = req.body;
+  const { name, username, pin, role = 'sales_rep', email = '', phone = '', reportsTo = '', managerId = '', packageTier = 'starter', permissions = null } = req.body;
   if (!name || !pin) {
     return res.status(400).json({ success: false, message: 'Name and PIN are required.' });
   }
@@ -1482,6 +1482,8 @@ app.post('/api/users', async (req, res) => {
     username: userSlug,
     pin: String(pin).trim(),
     role: ['admin', 'manager'].includes(role) ? role : 'sales_rep',
+    packageTier: ['starter', 'growth', 'enterprise', 'super_admin'].includes(packageTier) ? packageTier : 'starter',
+    permissions: permissions || null,
     email: email.trim(),
     phone: phone.trim(),
     reportsTo: reportsTo ? reportsTo.trim() : '',
@@ -1544,7 +1546,7 @@ app.put('/api/users/:id', async (req, res) => {
   }
 
   const { id } = req.params;
-  const { name, pin, role, reportsTo, managerId, email, phone, active } = req.body;
+  const { name, pin, role, reportsTo, managerId, email, phone, active, packageTier, permissions } = req.body;
 
   const allUsers = await getUsers();
   const targetUser = allUsers.find(u => u.id === id);
@@ -1562,6 +1564,12 @@ app.put('/api/users/:id', async (req, res) => {
   }
   if (role !== undefined) {
     updated.role = ['admin', 'manager'].includes(role) ? role : 'sales_rep';
+  }
+  if (packageTier !== undefined) {
+    updated.packageTier = ['starter', 'growth', 'enterprise', 'super_admin'].includes(packageTier) ? packageTier : 'starter';
+  }
+  if (permissions !== undefined) {
+    updated.permissions = permissions;
   }
   if (reportsTo !== undefined) updated.reportsTo = reportsTo.trim();
   if (managerId !== undefined) updated.managerId = managerId.trim();
