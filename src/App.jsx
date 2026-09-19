@@ -1904,6 +1904,8 @@ export default function App() {
   const [taskLinkedLeadId, setTaskLinkedLeadId] = useState("");
   const [taskFilter, setTaskFilter] = useState("All");
   const [taskSearchQuery, setTaskSearchQuery] = useState("");
+  const [taskToComplete, setTaskToComplete] = useState(null); // LeadSquared-style complete task modal
+  const [taskToReopen, setTaskToReopen] = useState(null); // Reopen task confirmation modal
   // Stage Transition Popup Modal States
   const [stageModalData, setStageModalData] = useState(null); // { lead, oldStatus, newStatus }
   const [stageModalAmount, setStageModalAmount] = useState("");
@@ -3624,19 +3626,103 @@ export default function App() {
   };
 
   const handleToggleTask = (taskId) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    if (task.completed) {
+      setTaskToReopen(task);
+    } else {
+      const linkedLead = leads.find(l => l.id === task.linkedLeadId);
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const nextDateStr = tomorrow.toISOString().split("T")[0];
+
+      setTaskToComplete({
+        task,
+        lead: linkedLead,
+        outcome: "Completed - Call Successful",
+        remarks: "",
+        scheduleNext: false,
+        nextDate: nextDateStr,
+        nextTime: "11:00 AM",
+        nextTitle: linkedLead ? `Follow-up with ${linkedLead.name}` : "Follow-up"
+      });
+    }
+  };
+
+  const confirmCompleteTaskAction = () => {
+    if (!taskToComplete) return;
+    const { task, lead, outcome, remarks, scheduleNext, nextDate, nextTime, nextTitle } = taskToComplete;
+
+    let updatedTasks = tasks.map(t => {
+      if (t.id === task.id) {
+        return {
+          ...t,
+          completed: true,
+          completedAt: new Date().toISOString(),
+          outcome: outcome || "Completed",
+          completionRemark: remarks || ""
+        };
+      }
+      return t;
+    });
+
+    if (scheduleNext && nextDate) {
+      const newTask = {
+        id: "task_" + Date.now(),
+        title: nextTitle || (lead ? `Follow-up with ${lead.name}` : "Follow-up"),
+        priority: "Medium",
+        dueDate: nextDate,
+        linkedLeadId: lead ? lead.id : (task.linkedLeadId || ""),
+        completed: false,
+        completedAt: null,
+        createdAt: new Date().toISOString(),
+        owner: currentLoggedInUser || "Harsh Goyal"
+      };
+      updatedTasks = [newTask, ...updatedTasks];
+
+      if (lead) {
+        const updatedLeads = leads.map(l => {
+          if (l.id === lead.id) {
+            return {
+              ...l,
+              next_follow_up: nextDate,
+              next_follow_up_time: nextTime || "11:00 AM"
+            };
+          }
+          return l;
+        });
+        saveLeadsToStorage(updatedLeads);
+      }
+    }
+
+    saveTasksToStorage(updatedTasks);
+
+    if (lead) {
+      const cleanTitle = (task.title || "").replace(" (No Company)", "").replace("(No Company)", "").trim();
+      const activityDesc = `Outcome: ${outcome || "Completed"}${remarks ? ` | Notes: ${remarks}` : ""}${scheduleNext && nextDate ? ` | Next follow-up scheduled for ${nextDate}` : ""}`;
+      logLeadActivity(lead.id, "call", `Task Completed: ${cleanTitle}`, activityDesc);
+    }
+
+    showToast("Task completed successfully! 🎉", "success");
+    setTaskToComplete(null);
+  };
+
+  const confirmReopenTaskAction = () => {
+    if (!taskToReopen) return;
     const updated = tasks.map(t => {
-      if (t.id === taskId) {
-        return { 
-          ...t, 
-          completed: !t.completed,
-          completedAt: !t.completed ? new Date().toISOString() : null
+      if (t.id === taskToReopen.id) {
+        return {
+          ...t,
+          completed: false,
+          completedAt: null
         };
       }
       return t;
     });
     saveTasksToStorage(updated);
-    const completed = updated.find(t => t.id === taskId).completed;
-    showToast(completed ? "Task marked completed! 🎉" : "Task marked pending.");
+    showToast("Task marked pending.", "info");
+    setTaskToReopen(null);
   };
 
   const handleDeleteTask = (taskId) => {
@@ -20832,6 +20918,241 @@ export default function App() {
                   <span>Save Lead</span>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 📋 LeadSquared-Style Complete Task Confirmation Modal */}
+      {taskToComplete && (
+        <div 
+          className="modal-overlay" 
+          onClick={() => setTaskToComplete(null)}
+          style={{ backdropFilter: "blur(4px)", backgroundColor: "rgba(15, 23, 42, 0.55)", zIndex: 99999, display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <div 
+            className="modal-content animate-fade-in" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ 
+              maxWidth: "520px", 
+              width: "92%", 
+              maxHeight: "90vh", 
+              borderRadius: "12px", 
+              overflow: "hidden", 
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", 
+              padding: 0, 
+              display: "flex", 
+              flexDirection: "column", 
+              backgroundColor: "#ffffff", 
+              border: "1px solid #e2e8f0" 
+            }}
+          >
+            {/* Header */}
+            <div style={{ padding: "14px 20px 12px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", backgroundColor: "#ffffff" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "34px", height: "34px", borderRadius: "8px", backgroundColor: "#ecfdf5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <CheckCircle size={18} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: "15px", fontWeight: "750", color: "#0f172a", margin: 0 }}>
+                    Complete Task
+                  </h3>
+                  <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "500" }}>
+                    Confirm task outcome and log discussion details
+                  </span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setTaskToComplete(null)}
+                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "6px" }}
+                title="Cancel"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "12px", overflowY: "auto", maxHeight: "calc(90vh - 120px)" }}>
+              {/* Task Summary Card */}
+              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px" }}>
+                <div style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", marginBottom: "4px" }}>
+                  {(taskToComplete.task.title || "").replace(" (No Company)", "").replace("(No Company)", "").trim()}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", fontSize: "11px" }}>
+                  {taskToComplete.lead && (
+                    <span style={{ color: "#2563eb", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                      <User size={11} /> {taskToComplete.lead.name} {taskToComplete.lead.company ? `(${taskToComplete.lead.company})` : ""}
+                    </span>
+                  )}
+                  {taskToComplete.task.dueDate && (
+                    <span style={{ color: "#64748b", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                      <Calendar size={11} /> Due: {new Date(taskToComplete.task.dueDate).toLocaleDateString("en-IN", { day: '2-digit', month: 'short' })}
+                    </span>
+                  )}
+                  <span style={{ 
+                    padding: "1px 6px", 
+                    borderRadius: "4px", 
+                    fontWeight: "600", 
+                    fontSize: "10px",
+                    backgroundColor: taskToComplete.task.priority === "High" ? "#fef2f2" : "#eff6ff",
+                    color: taskToComplete.task.priority === "High" ? "#dc2626" : "#2563eb"
+                  }}>
+                    {taskToComplete.task.priority} Priority
+                  </span>
+                </div>
+              </div>
+
+              {/* Task Outcome / Disposition */}
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
+                  Task Outcome / Call Disposition <span style={{ color: "#dc2626" }}>*</span>
+                </label>
+                <select
+                  value={taskToComplete.outcome}
+                  onChange={(e) => setTaskToComplete(prev => ({ ...prev, outcome: e.target.value }))}
+                  style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
+                >
+                  <option value="Completed - Call Successful">Completed - Call Successful & Discussed</option>
+                  <option value="Completed - Client Interested">Completed - Client Interested</option>
+                  <option value="Completed - Follow-up Required">Completed - Follow-up Required</option>
+                  <option value="Completed - Meeting / Demo Done">Completed - Meeting / Demo Done</option>
+                  <option value="Completed - Client Did Not Answer">Completed - Client Did Not Answer</option>
+                  <option value="Completed - Not Interested">Completed - Not Interested / Rejected</option>
+                  <option value="Completed - Other">Completed - Other</option>
+                  <option value="Cancelled - Not Needed">Cancelled - Task No Longer Needed</option>
+                </select>
+              </div>
+
+              {/* Discussion Notes / Remarks */}
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
+                  Discussion Notes / Remarks
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="What was discussed? Any specific requirements or client feedback..."
+                  value={taskToComplete.remarks}
+                  onChange={(e) => setTaskToComplete(prev => ({ ...prev, remarks: e.target.value }))}
+                  style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit", minHeight: "68px" }}
+                />
+              </div>
+
+              {/* Schedule Next Action Checkbox (LeadSquared feature) */}
+              <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "10px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "12px", fontWeight: "700", color: "#0f172a" }}>
+                  <input
+                    type="checkbox"
+                    checked={taskToComplete.scheduleNext}
+                    onChange={(e) => setTaskToComplete(prev => ({ ...prev, scheduleNext: e.target.checked }))}
+                    style={{ width: "15px", height: "15px", cursor: "pointer", accentColor: "#2563eb" }}
+                  />
+                  <span>📅 Schedule Next Follow-up for this Lead</span>
+                </label>
+
+                {taskToComplete.scheduleNext && (
+                  <div style={{ marginTop: "10px", padding: "10px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "8px" }}>
+                      <div>
+                        <label style={{ display: "block", fontSize: "11px", fontWeight: "600", color: "#475569", marginBottom: "2px" }}>
+                          Next Date
+                        </label>
+                        <input
+                          type="date"
+                          value={taskToComplete.nextDate}
+                          onChange={(e) => setTaskToComplete(prev => ({ ...prev, nextDate: e.target.value }))}
+                          style={{ width: "100%", height: "32px", padding: "0 8px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: "block", fontSize: "11px", fontWeight: "600", color: "#475569", marginBottom: "2px" }}>
+                          Next Time
+                        </label>
+                        <select
+                          value={taskToComplete.nextTime}
+                          onChange={(e) => setTaskToComplete(prev => ({ ...prev, nextTime: e.target.value }))}
+                          style={{ width: "100%", height: "32px", padding: "0 8px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", cursor: "pointer", boxSizing: "border-box" }}
+                        >
+                          {["10:00 AM", "11:00 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM", "06:30 PM"].map(t => (
+                            <option key={t} value={t}>{t}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{ padding: "12px 20px", borderTop: "1px solid #e2e8f0", backgroundColor: "#f8fafc", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "10px" }}>
+              <button
+                type="button"
+                onClick={() => setTaskToComplete(null)}
+                style={{ height: "34px", padding: "0 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmCompleteTaskAction}
+                style={{ height: "34px", padding: "0 18px", backgroundColor: "#059669", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 4px rgba(5, 150, 105, 0.25)" }}
+              >
+                <Check size={14} /> Complete Task
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🔄 Reopen Task Confirmation Modal */}
+      {taskToReopen && (
+        <div 
+          className="modal-overlay" 
+          onClick={() => setTaskToReopen(null)}
+          style={{ backdropFilter: "blur(4px)", backgroundColor: "rgba(15, 23, 42, 0.55)", zIndex: 99999, display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <div 
+            className="modal-content animate-fade-in" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ 
+              maxWidth: "420px", 
+              width: "90%", 
+              borderRadius: "12px", 
+              overflow: "hidden", 
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", 
+              padding: 0, 
+              display: "flex", 
+              flexDirection: "column", 
+              backgroundColor: "#ffffff", 
+              border: "1px solid #e2e8f0" 
+            }}
+          >
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid #f1f5f9" }}>
+              <h3 style={{ fontSize: "15px", fontWeight: "750", color: "#0f172a", margin: "0 0 4px 0" }}>
+                Reopen Task?
+              </h3>
+              <p style={{ fontSize: "12px", color: "#475569", margin: 0, lineHeight: 1.5 }}>
+                Do you want to mark this task as <strong>Pending</strong> again?
+              </p>
+              <div style={{ marginTop: "10px", padding: "8px 10px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0", fontSize: "12px", fontWeight: "600", color: "#0f172a" }}>
+                {(taskToReopen.title || "").replace(" (No Company)", "").replace("(No Company)", "").trim()}
+              </div>
+            </div>
+            <div style={{ padding: "12px 20px", backgroundColor: "#f8fafc", display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+              <button
+                type="button"
+                onClick={() => setTaskToReopen(null)}
+                style={{ height: "32px", padding: "0 12px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
+              >
+                Keep Completed
+              </button>
+              <button
+                type="button"
+                onClick={confirmReopenTaskAction}
+                style={{ height: "32px", padding: "0 14px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}
+              >
+                Yes, Reopen Task
+              </button>
             </div>
           </div>
         </div>
