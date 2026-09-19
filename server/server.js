@@ -554,7 +554,10 @@ async function getUsers() {
       const docs = await mongoDb.collection('users').find({}).toArray();
       return docs.map(d => {
         const { _id, ...rest } = d;
-        return rest;
+        return {
+          id: rest.id || (_id ? _id.toString() : ''),
+          ...rest
+        };
       });
     } catch (e) {
       console.error('MongoDB getUsers error:', e);
@@ -564,10 +567,11 @@ async function getUsers() {
 }
 
 async function saveUser(user) {
+  if (!user || !user.id) return;
   if (isMongoConnected && mongoDb) {
     try {
       await mongoDb.collection('users').updateOne(
-        { id: user.id },
+        { $or: [{ id: user.id }, { email: user.email }] },
         { $set: user },
         { upsert: true }
       );
@@ -577,9 +581,9 @@ async function saveUser(user) {
   }
   // Keep local db in sync
   const local = readLocalDB();
-  const idx = local.users.findIndex(u => u.id === user.id);
+  const idx = local.users.findIndex(u => u.id === user.id || (u.email && user.email && u.email.toLowerCase() === user.email.toLowerCase()));
   if (idx !== -1) {
-    local.users[idx] = user;
+    local.users[idx] = { ...local.users[idx], ...user };
   } else {
     local.users.push(user);
   }
@@ -1622,7 +1626,8 @@ app.post('/api/users', async (req, res) => {
 
 // Admin: Update User
 app.put('/api/users/:id', async (req, res) => {
-  if (req.user?.role !== 'admin') {
+  const isSuper = isSuperAdminEmailOrName(req.user);
+  if (req.user?.role !== 'admin' && !isSuper) {
     return res.status(403).json({ success: false, message: 'Access denied. Only Admin can modify users.' });
   }
 
@@ -1630,7 +1635,13 @@ app.put('/api/users/:id', async (req, res) => {
   const { name, pin, role, reportsTo, managerId, email, phone, active, packageTier, permissions, maxLeadsLimit } = req.body;
 
   const allUsers = await getUsers();
-  const targetUser = allUsers.find(u => u.id === id);
+  const targetUser = allUsers.find(u => 
+    u.id === id || 
+    u._id === id || 
+    (u._id && u._id.toString() === id) || 
+    (u.name && u.name.toLowerCase() === id.toLowerCase()) || 
+    (u.email && u.email.toLowerCase() === id.toLowerCase())
+  );
   if (!targetUser) {
     return res.status(404).json({ success: false, message: 'User not found.' });
   }
@@ -1758,9 +1769,14 @@ app.get('/api/leads', async (req, res) => {
 
   const isSuperAdmin = isSuperAdminEmailOrName(user);
   const isManager = user.role === 'manager';
+  const hasFullLeadAccess = isSuperAdmin || 
+                            user.role === 'admin' || 
+                            user.permissions?.canViewAllLeads === true || 
+                            user.packageTier === 'enterprise' || 
+                            user.packageTier === 'super_admin';
 
-  // 1. If user is Super Admin Harsh Goyal: Full Pipeline Access
-  if (isSuperAdmin) {
+  // 1. If user is Super Admin or has Full Pipeline Access / canViewAllLeads permission:
+  if (hasFullLeadAccess) {
     let resultLeads = allLeads;
     if (owner && owner !== 'All' && owner !== 'all') {
       resultLeads = resultLeads.filter(l => (l.owner || '').trim().toLowerCase() === owner.trim().toLowerCase());
@@ -1768,7 +1784,7 @@ app.get('/api/leads', async (req, res) => {
 
     return res.json({
       success: true,
-      role: 'admin',
+      role: isSuperAdmin ? 'admin' : (user.role || 'sales_rep'),
       count: resultLeads.length,
       leads: resultLeads
     });

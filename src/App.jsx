@@ -2816,8 +2816,11 @@ export default function App() {
             syncLeadsToBackend(sanitized);
           }
 
-          // 🛡️ STRICT REP / MANAGER CACHING:
-          if (!isSuper) {
+          // 🛡️ REP / MANAGER CACHING (Respects canViewAllLeads permission):
+          const userPerms = getUserEffectivePermissions(activeUser);
+          const canViewAll = isSuper || activeUser.role === "admin" || userPerms.canViewAllLeads === true;
+
+          if (!canViewAll) {
             if (!isManager) {
               const userNameLower = (activeUser.name || "").trim().toLowerCase();
               sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
@@ -2827,9 +2830,10 @@ export default function App() {
             } catch(e) {}
           } else {
             try {
+              sessionStorage.setItem(`salesflow_rep_leads_${activeUser.id || activeUser.name}`, JSON.stringify(sanitized));
               localStorage.setItem("salesflow_standalone_leads", JSON.stringify(sanitized));
               localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(sanitized));
-              localStorage.setItem("salesflow_admin_vault_backup", JSON.stringify(sanitized));
+              if (isSuper) localStorage.setItem("salesflow_admin_vault_backup", JSON.stringify(sanitized));
             } catch(e) {}
           }
 
@@ -3781,7 +3785,10 @@ export default function App() {
     const isManager = currentUser?.role === "manager";
     let scoped = leads;
 
-    if (!isSuper) {
+    const userPerms = getUserEffectivePermissions(currentUser);
+    const canViewAll = isSuper || currentUser?.role === "admin" || userPerms.canViewAllLeads === true;
+
+    if (!canViewAll) {
       if (isManager) {
         const managerNameLower = (currentUser.name || "").trim().toLowerCase();
         const reportingEmployees = allUsersList.filter(u => {
@@ -7273,14 +7280,14 @@ export default function App() {
               </button>
             )}
 
-            {currentUser?.role === "admin" && (
+            {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || getUserEffectivePermissions(currentUser).canAccessTeam) && (
               <button 
                 onClick={() => {
                   setActiveWorkspace("team");
                   setShowUserManagementModal(false);
                 }} 
                 className={`sidebar-nav-item ${activeWorkspace === "team" ? "active" : ""}`}
-                title="Manage Team & Roles (Admin Only)"
+                title="Manage Team & Roles"
                 style={{ 
                   display: "flex",
                   alignItems: "center",
@@ -13067,7 +13074,7 @@ export default function App() {
                                   <div style={{ width: "18px", height: "18px", borderRadius: "50%", backgroundColor: "#eef2ff", color: "#2563eb", border: "1px solid #c7d2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "800", flexShrink: 0 }}>
                                     {(lead.owner || "Admin").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                   </div>
-                                  {checkIsSuperAdmin(currentUser) ? (
+                                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canReassignLeads) ? (
                                     <select
                                       value={lead.owner || "Harsh Goyal"}
                                       onChange={(e) => reassignLeadOwner(lead.id, e.target.value)}
