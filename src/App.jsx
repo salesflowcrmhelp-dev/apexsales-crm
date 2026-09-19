@@ -20421,7 +20421,14 @@ export default function App() {
             </div>
 
             {/* Form Body */}
-            <form onSubmit={handleCreateLead} style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, overflowY: "auto" }}>
+            <form 
+              onSubmit={handleCreateLead} 
+              autoComplete="off" 
+              autoCorrect="off" 
+              autoCapitalize="off" 
+              spellCheck="false"
+              style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, overflowY: "auto" }}
+            >
               <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "13px" }}>
                 
                 {/* Row 1: Name & Company */}
@@ -20432,7 +20439,11 @@ export default function App() {
                     </label>
                     <input
                       type="text"
-                      autoFocus
+                      name="crm_lead_contact_name"
+                      autoComplete="off"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
+                      data-form-type="other"
                       required
                       placeholder="e.g. Rahul Sharma"
                       value={newLeadData.name}
@@ -20447,6 +20458,11 @@ export default function App() {
                     </label>
                     <input
                       type="text"
+                      name="crm_lead_company_org"
+                      autoComplete="off"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
+                      data-form-type="other"
                       placeholder="e.g. Apex Tech Pvt Ltd"
                       value={newLeadData.company}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, company: e.target.value }))}
@@ -20462,7 +20478,13 @@ export default function App() {
                       Phone Number
                     </label>
                     <input
-                      type="tel"
+                      type="text"
+                      inputMode="tel"
+                      name="crm_lead_phone_no"
+                      autoComplete="off"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
+                      data-form-type="other"
                       placeholder="e.g. 9876543210"
                       value={newLeadData.phone}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, phone: e.target.value }))}
@@ -20475,7 +20497,13 @@ export default function App() {
                       Email Address
                     </label>
                     <input
-                      type="email"
+                      type="text"
+                      inputMode="email"
+                      name="crm_lead_email_addr"
+                      autoComplete="off"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
+                      data-form-type="other"
                       placeholder="e.g. rahul@example.com"
                       value={newLeadData.email}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, email: e.target.value }))}
@@ -20517,6 +20545,10 @@ export default function App() {
                     </label>
                     <input
                       type="number"
+                      name="crm_deal_amount"
+                      autoComplete="off"
+                      data-lpignore="true"
+                      data-1p-ignore="true"
                       placeholder="e.g. 15000"
                       value={newLeadData.value}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, value: e.target.value }))}
