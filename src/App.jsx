@@ -717,6 +717,122 @@ function checkIsSuperAdmin(u) {
   return isHarshEmail || isHarshName || isHarshUsername || isHarshId;
 }
 
+// 🌟 Complete Granular Permissions Matrix & Categories
+export const ALL_PERMISSION_CATEGORIES = [
+  {
+    id: "cards",
+    name: "🃏 Dashboard & KPI Cards Visibility",
+    desc: "Select which performance KPI cards and metrics appear on this employee's screen.",
+    color: "#2563eb",
+    bg: "#eff6ff",
+    items: [
+      { key: "canViewKpiTotalPipeline", label: "Total Pipeline Value Card", desc: "Shows ₹ total open pipeline value card on top dashboard" },
+      { key: "canViewKpiClosedWon", label: "Closed Won Revenue Card", desc: "Shows won deals total revenue and closed count KPI card" },
+      { key: "canViewKpiWinRate", label: "Pipeline Win Rate Card", desc: "Shows percentage conversion rate of closed vs lost deals" },
+      { key: "canViewKpiSalesTarget", label: "Monthly Sales Target Card", desc: "Shows target progress circular ring & monthly quota percentage" },
+      { key: "canViewKpiDailyTarget", label: "Daily Target Breakdown Card", desc: "Shows daily pacing required to hit monthly sales targets" },
+      { key: "canViewKpiIncentive", label: "My Incentive & Bonus Card", desc: "Shows calculated sales commission & bonus reward card" },
+      { key: "canViewRenewalCard", label: "Renewal Revenue & Contracts Card", desc: "Shows upcoming client renewal contracts & retention revenue" },
+      { key: "canViewPerformanceCockpit", label: "Sales Leaderboard & Rep Cockpit", desc: "Shows team closing leaderboard, ranks, and sales velocity" },
+      { key: "canViewForecastEngine", label: "Weighted Revenue Forecast Card", desc: "Shows probability-weighted predictive revenue engine" },
+      { key: "canViewWeeklyDigest", label: "Automated Weekly Digest Card", desc: "Shows scheduled executive summary email digest card" }
+    ]
+  },
+  {
+    id: "workspaces",
+    name: "🌐 Navigation Workspaces & Modules",
+    desc: "Control which major pages and sidebar navigation items this employee can access.",
+    color: "#0891b2",
+    bg: "#ecfeff",
+    items: [
+      { key: "canAccessPipeline", label: "Leads Pipeline Workspace", desc: "Main CRM pipeline sheet, Kanban & deal boards" },
+      { key: "canAccessTasks", label: "Daily Tasks & To-Dos", desc: "Task scheduler, reminders and follow-up checklists" },
+      { key: "canAccessCalendar", label: "Demo & Meeting Calendar", desc: "Interactive demo bookings and calendar schedule" },
+      { key: "canAccessReports", label: "Executive Reports & Analytics", desc: "High-level visual charts, velocity & trends" },
+      { key: "canAccessSettings", label: "Settings & Integrations", desc: "Biometrics, webhook endpoints, and app preferences" },
+      { key: "canAccessTeam", label: "Team & RBAC Management", desc: "Super Admin only user and access control page" }
+    ]
+  },
+  {
+    id: "views",
+    name: "👁️ Pipeline View Modes",
+    desc: "Which pipeline view switchers are available on the top bar.",
+    color: "#7c3aed",
+    bg: "#faf5ff",
+    items: [
+      { key: "canViewSpreadsheetGrid", label: "Excel Spreadsheet Grid View", desc: "Interactive data grid with inline cell editing" },
+      { key: "canViewKanbanDeals", label: "Kanban Deal Pipeline Board", desc: "Visual drag-and-drop card columns by sales stage" },
+      { key: "canViewSplitView", label: "Split-Screen Deal Inspector", desc: "Side-by-side list with deep contact detail panel" },
+      { key: "canViewAnalyticsDashboard", label: "Analytics Dashboard View", desc: "KPI ribbon, win rates, and stage distribution charts" }
+    ]
+  },
+  {
+    id: "pipeline",
+    name: "📋 Lead Operations & CRUD Isolation",
+    desc: "Core pipeline operations, deal editing, and lead reassignment.",
+    color: "#166534",
+    bg: "#f0fdf4",
+    items: [
+      { key: "canViewAllLeads", label: "View All Team Leads", desc: "Unchecked = Strict isolation (rep sees only assigned leads)" },
+      { key: "canCreateLeads", label: "Add / Create New Leads", desc: "Allow adding new prospects and deals to the CRM" },
+      { key: "canEditLeads", label: "Edit Lead Details & Stages", desc: "Allow modifying contact info, remarks, and stages" },
+      { key: "canDeleteLeads", label: "Delete Leads from Database", desc: "Permanently delete leads (keep off to prevent data loss)" },
+      { key: "canReassignLeads", label: "Reassign Lead Owners", desc: "Transfer leads between different sales representatives" },
+      { key: "canChangeLeadScore", label: "Change Priority Score", desc: "Mark leads as Hot, Warm, or Cold priority" }
+    ]
+  },
+  {
+    id: "financials",
+    name: "💰 Financials & Pricing Confidentiality",
+    desc: "Protect confidential deal values, targets, and commission rules.",
+    color: "#b45309",
+    bg: "#fffbeb",
+    items: [
+      { key: "canViewRevenue", label: "View Deal Values & Revenue", desc: "Unchecked = Masked as ₹•••••• (protects contract values)" },
+      { key: "canEditDealValue", label: "Edit Deal Value Amount", desc: "Allow changing rupee contract value on deals" },
+      { key: "canEditTarget", label: "Edit Monthly Sales Targets", desc: "Modify target quotas and projection numbers" },
+      { key: "canEditIncentive", label: "Edit Incentive Rates", desc: "Modify bonus commission rules and spot bonus" }
+    ]
+  },
+  {
+    id: "security",
+    name: "🔒 Data Security & Anti-Theft Guard",
+    desc: "Prevent unauthorized customer data extraction or bulk alterations.",
+    color: "#dc2626",
+    bg: "#fef2f2",
+    items: [
+      { key: "canExportCSV", label: "Export Leads to CSV / Excel", desc: "Anti-theft: prevent employees downloading client database" },
+      { key: "canBulkImport", label: "Bulk CSV Spreadsheet Import", desc: "Allow uploading lead spreadsheets into the CRM" },
+      { key: "canSyncGoogleSheets", label: "Google Sheets 2-Way Sync", desc: "Configure and trigger live cloud spreadsheet synchronization" }
+    ]
+  },
+  {
+    id: "tools",
+    name: "⚡ Communication, AI & Audio Tools",
+    desc: "Messaging, voice calling, AI pitch generators, and sound alerts.",
+    color: "#4f46e5",
+    bg: "#eef2ff",
+    items: [
+      { key: "canUseWhatsApp", label: "1-Click WhatsApp Direct Chat", desc: "Send direct pre-filled WhatsApp messages to leads" },
+      { key: "canMakeCalls", label: "Click-to-Call Phone Dialing", desc: "Direct phone dialer and call logging" },
+      { key: "canSendEmail", label: "Email Client Integration", desc: "Send proposal and follow-up emails" },
+      { key: "canUseAI", label: "AI Sales Pitch & Objection Bot", desc: "Generate objection scripts and tailored pitch responses" },
+      { key: "canUseAudioChimes", label: "Sound & Audio Chimes", desc: "Play victory horns on Won deals and reminder rings" }
+    ]
+  }
+];
+
+// Helper to build full permissions object with fallback defaults
+export function buildDefaultPermissions(overrides = {}) {
+  const base = {};
+  ALL_PERMISSION_CATEGORIES.forEach(cat => {
+    cat.items.forEach(item => {
+      base[item.key] = false;
+    });
+  });
+  return { ...base, ...overrides };
+}
+
 // 🌟 Employee Access Packages & Granular Permissions System
 export const EMPLOYEE_PACKAGES = {
   starter: {
@@ -728,21 +844,55 @@ export const EMPLOYEE_PACKAGES = {
     color: "#2563eb",
     price: "Free Tier",
     quota: 50,
-    targetAudience: "Trainees & Lead Qualifiers",
-    description: "Strict own-lead pipeline isolation. Basic follow-up & dialing without data export.",
-    permissions: {
+    targetAudience: "Trainees, Interns & Lead Qualifiers",
+    description: "Strict own-lead pipeline isolation. Basic follow-up & dialing without data export or financial visibility.",
+    permissions: buildDefaultPermissions({
+      // Cards
+      canViewKpiTotalPipeline: false,
+      canViewKpiClosedWon: true,
+      canViewKpiWinRate: true,
+      canViewKpiSalesTarget: false,
+      canViewKpiDailyTarget: false,
+      canViewKpiIncentive: false,
+      canViewRenewalCard: false,
+      canViewPerformanceCockpit: false,
+      canViewForecastEngine: false,
+      canViewWeeklyDigest: false,
+      // Workspaces
+      canAccessPipeline: true,
+      canAccessTasks: true,
+      canAccessCalendar: true,
+      canAccessReports: false,
+      canAccessSettings: false,
+      canAccessTeam: false,
+      // Views
+      canViewSpreadsheetGrid: true,
+      canViewKanbanDeals: true,
+      canViewSplitView: true,
+      canViewAnalyticsDashboard: false,
+      // Pipeline
       canViewAllLeads: false,
       canCreateLeads: true,
       canEditLeads: true,
       canDeleteLeads: false,
+      canReassignLeads: false,
+      canChangeLeadScore: true,
+      // Financials
       canViewRevenue: false,
+      canEditDealValue: false,
       canEditTarget: false,
+      canEditIncentive: false,
+      // Security
       canExportCSV: false,
       canBulkImport: false,
+      canSyncGoogleSheets: false,
+      // Tools
       canUseWhatsApp: true,
       canMakeCalls: true,
-      canUseAI: false
-    }
+      canSendEmail: true,
+      canUseAI: false,
+      canUseAudioChimes: true
+    })
   },
   growth: {
     id: "growth",
@@ -755,19 +905,53 @@ export const EMPLOYEE_PACKAGES = {
     quota: 250,
     targetAudience: "Senior Closers & Account Execs",
     description: "Expanded pipeline quota with AI objection scripts, deal values, and bulk import.",
-    permissions: {
+    permissions: buildDefaultPermissions({
+      // Cards
+      canViewKpiTotalPipeline: true,
+      canViewKpiClosedWon: true,
+      canViewKpiWinRate: true,
+      canViewKpiSalesTarget: true,
+      canViewKpiDailyTarget: true,
+      canViewKpiIncentive: true,
+      canViewRenewalCard: false,
+      canViewPerformanceCockpit: false,
+      canViewForecastEngine: false,
+      canViewWeeklyDigest: false,
+      // Workspaces
+      canAccessPipeline: true,
+      canAccessTasks: true,
+      canAccessCalendar: true,
+      canAccessReports: false,
+      canAccessSettings: false,
+      canAccessTeam: false,
+      // Views
+      canViewSpreadsheetGrid: true,
+      canViewKanbanDeals: true,
+      canViewSplitView: true,
+      canViewAnalyticsDashboard: true,
+      // Pipeline
       canViewAllLeads: false,
       canCreateLeads: true,
       canEditLeads: true,
       canDeleteLeads: false,
+      canReassignLeads: false,
+      canChangeLeadScore: true,
+      // Financials
       canViewRevenue: true,
+      canEditDealValue: true,
       canEditTarget: false,
+      canEditIncentive: false,
+      // Security
       canExportCSV: false,
       canBulkImport: true,
+      canSyncGoogleSheets: false,
+      // Tools
       canUseWhatsApp: true,
       canMakeCalls: true,
-      canUseAI: true
-    }
+      canSendEmail: true,
+      canUseAI: true,
+      canUseAudioChimes: true
+    })
   },
   enterprise: {
     id: "enterprise",
@@ -779,20 +963,17 @@ export const EMPLOYEE_PACKAGES = {
     price: "₹4,999/mo",
     quota: 1000,
     targetAudience: "Team Leads & Branch Managers",
-    description: "Full team oversight, lead reassignment, CSV exports, analytics and lead deletion.",
-    permissions: {
-      canViewAllLeads: true,
-      canCreateLeads: true,
-      canEditLeads: true,
-      canDeleteLeads: true,
-      canViewRevenue: true,
-      canEditTarget: true,
-      canExportCSV: true,
-      canBulkImport: true,
-      canUseWhatsApp: true,
-      canMakeCalls: true,
-      canUseAI: true
-    }
+    description: "Full team oversight, all dashboard cards, lead reassignment, CSV exports, analytics and lead deletion.",
+    permissions: (() => {
+      const allTrue = {};
+      ALL_PERMISSION_CATEGORIES.forEach(cat => {
+        cat.items.forEach(item => {
+          allTrue[item.key] = true;
+        });
+      });
+      allTrue.canAccessTeam = false; // Only Super Admin has Team RBAC
+      return allTrue;
+    })()
   },
   super_admin: {
     id: "super_admin",
@@ -804,20 +985,16 @@ export const EMPLOYEE_PACKAGES = {
     price: "Master Lifetime",
     quota: 999999,
     targetAudience: "Harsh Goyal & Business Owners",
-    description: "100% unrestricted system control, user access configuration, data vault, and audit logs.",
-    permissions: {
-      canViewAllLeads: true,
-      canCreateLeads: true,
-      canEditLeads: true,
-      canDeleteLeads: true,
-      canViewRevenue: true,
-      canEditTarget: true,
-      canExportCSV: true,
-      canBulkImport: true,
-      canUseWhatsApp: true,
-      canMakeCalls: true,
-      canUseAI: true
-    }
+    description: "100% unrestricted system control, all cards, user access configuration, data vault, and audit logs.",
+    permissions: (() => {
+      const masterTrue = {};
+      ALL_PERMISSION_CATEGORIES.forEach(cat => {
+        cat.items.forEach(item => {
+          masterTrue[item.key] = true;
+        });
+      });
+      return masterTrue;
+    })()
   }
 };
 
@@ -1435,6 +1612,8 @@ export default function App() {
     permissions: { ...EMPLOYEE_PACKAGES.starter.permissions },
     maxLeadsLimit: 50
   });
+  const [permSearchQuery, setPermSearchQuery] = useState("");
+  const [permCategoryFilter, setPermCategoryFilter] = useState("all");
   const [showUserManagementModal, setShowUserManagementModal] = useState(() => {
     try {
       return new URLSearchParams(window.location.search).get("modal") === "team";
@@ -3001,7 +3180,7 @@ export default function App() {
     }
   };
 
-    const handleOpenAccessModal = (usr) => {
+  const handleOpenAccessModal = (usr) => {
     const currentPkg = usr.packageTier || (usr.role === "admin" ? "super_admin" : usr.role === "manager" ? "enterprise" : "starter");
     const effPerms = getUserEffectivePermissions(usr);
     setSelectedUserForAccess(usr);
@@ -3010,6 +3189,8 @@ export default function App() {
       permissions: { ...effPerms },
       maxLeadsLimit: usr.maxLeadsLimit || (EMPLOYEE_PACKAGES[currentPkg]?.quota || 50)
     });
+    setPermSearchQuery("");
+    setPermCategoryFilter("all");
     setShowAccessModal(true);
   };
 
@@ -6767,23 +6948,27 @@ export default function App() {
               <span>Deals Hub</span>
             </button>
 
-            <button 
-              onClick={() => setActiveWorkspace("tasks")} 
-              className={`sidebar-nav-item ${activeWorkspace === "tasks" ? "active" : ""}`}
-              title="Task Manager"
-            >
-              <Calendar className="nav-item-icon" />
-              <span>Task Manager</span>
-            </button>
+            {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessTasks !== false) && (
+              <button 
+                onClick={() => setActiveWorkspace("tasks")} 
+                className={`sidebar-nav-item ${activeWorkspace === "tasks" ? "active" : ""}`}
+                title="Task Manager"
+              >
+                <Calendar className="nav-item-icon" />
+                <span>Task Manager</span>
+              </button>
+            )}
 
-            <button 
-              onClick={() => setActiveWorkspace("calendar")} 
-              className={`sidebar-nav-item ${activeWorkspace === "calendar" ? "active" : ""}`}
-              title="Sales Calendar"
-            >
-              <Calendar className="nav-item-icon" />
-              <span>Sales Calendar</span>
-            </button>
+            {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessCalendar !== false) && (
+              <button 
+                onClick={() => setActiveWorkspace("calendar")} 
+                className={`sidebar-nav-item ${activeWorkspace === "calendar" ? "active" : ""}`}
+                title="Sales Calendar"
+              >
+                <Calendar className="nav-item-icon" />
+                <span>Sales Calendar</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -6793,14 +6978,16 @@ export default function App() {
             SETTINGS
           </span>
           <div className="sidebar-nav-list" style={{ marginTop: "6px" }}>
-            <button 
-              onClick={() => { setActiveWorkspace("reports"); setShowReportsModal(false); }} 
-              className={`sidebar-nav-item ${activeWorkspace === "reports" ? "active" : ""}`}
-              title="Reports"
-            >
-              <BarChart2 className="nav-item-icon" />
-              <span>Reports</span>
-            </button>
+            {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessReports !== false) && (
+              <button 
+                onClick={() => { setActiveWorkspace("reports"); setShowReportsModal(false); }} 
+                className={`sidebar-nav-item ${activeWorkspace === "reports" ? "active" : ""}`}
+                title="Reports"
+              >
+                <BarChart2 className="nav-item-icon" />
+                <span>Reports</span>
+              </button>
+            )}
 
             <button 
               onClick={() => { setActiveWorkspace("users"); setShowReportsModal(false); }} 
@@ -6811,14 +6998,16 @@ export default function App() {
               <span>User Profile</span>
             </button>
 
-            <button 
-              onClick={() => setActiveWorkspace("settings")} 
-              className={`sidebar-nav-item ${activeWorkspace === "settings" ? "active" : ""}`}
-              title="Settings"
-            >
-              <Settings className="nav-item-icon" />
-              <span>Settings</span>
-            </button>
+            {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessSettings !== false) && (
+              <button 
+                onClick={() => setActiveWorkspace("settings")} 
+                className={`sidebar-nav-item ${activeWorkspace === "settings" ? "active" : ""}`}
+                title="Settings"
+              >
+                <Settings className="nav-item-icon" />
+                <span>Settings</span>
+              </button>
+            )}
 
             {currentUser?.role === "admin" && (
               <button 
@@ -8675,6 +8864,7 @@ export default function App() {
               {(reportActiveTab === "all" || reportActiveTab === "team") && (
               <div className="reports-cockpit-grid">
                 {/* Column 1: Sales Rep Leaderboard */}
+                {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewPerformanceCockpit !== false) && (
                 <div className="reports-card">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                     <div>
@@ -8748,8 +8938,10 @@ export default function App() {
                     })}
                   </div>
                 </div>
+                )}
 
                 {/* Column 2: Weighted Revenue Forecasting Engine */}
+                {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewForecastEngine !== false) && (
                 <div className="reports-card">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                     <div>
@@ -8796,8 +8988,10 @@ export default function App() {
                     ))}
                   </div>
                 </div>
+                )}
 
                 {/* Column 3: Automated Weekly Email Digest Card */}
+                {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewWeeklyDigest !== false) && (
                 <div className="reports-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                   <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
@@ -8853,6 +9047,7 @@ export default function App() {
                     <Mail size={13} color="#475569" /> Preview & Dispatch Digest
                   </button>
                 </div>
+                )}
               </div>
 
               )}
@@ -8888,6 +9083,7 @@ export default function App() {
                 </div>
 
                 {/* DEDICATED RENEWAL REVENUE KPI CARD */}
+                {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewRenewalCard !== false) && (
                 <div style={{ backgroundColor: "#fff7ed", border: "1px solid #ffedd5", borderRadius: "6px", padding: "7px 9px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1px" }}>
                     <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", letterSpacing: "0.1px" }}>Renewal Payment</span>
@@ -8900,6 +9096,7 @@ export default function App() {
                     {reportStats.renewalWonCount} Renewal Deals ({reportStats.renewalSharePct}%)
                   </span>
                 </div>
+                )}
 
                 <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "7px 9px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1px" }}>
@@ -10483,24 +10680,29 @@ export default function App() {
                     <div 
                       className="modal-overlay animate-fade-in" 
                       onClick={() => setShowAccessModal(false)}
-                      style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.6)", backdropFilter: "blur(4px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
+                      style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.65)", backdropFilter: "blur(5px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
                     >
                       <div 
                         onClick={(e) => e.stopPropagation()} 
-                        style={{ width: "100%", maxWidth: "680px", maxHeight: "90vh", display: "flex", flexDirection: "column", backgroundColor: "#ffffff", borderRadius: "10px", border: "1px solid #cbd5e1", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", overflow: "hidden" }}
+                        style={{ width: "100%", maxWidth: "860px", maxHeight: "92vh", display: "flex", flexDirection: "column", backgroundColor: "#ffffff", borderRadius: "12px", border: "1px solid #cbd5e1", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.3)", overflow: "hidden" }}
                       >
                         {/* Header */}
-                        <div style={{ padding: "14px 18px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc" }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                            <div style={{ width: "34px", height: "34px", borderRadius: "8px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
-                              <Sliders size={18} />
+                        <div style={{ padding: "14px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                            <div style={{ width: "38px", height: "38px", borderRadius: "10px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
+                              <Sliders size={20} />
                             </div>
                             <div>
-                              <h2 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
-                                Employee Access & Permissions: {selectedUserForAccess.name}
-                              </h2>
+                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                <h2 style={{ fontSize: "15px", fontWeight: "750", color: "#0f172a", margin: 0 }}>
+                                  Full Access & Card Permissions Control: {selectedUserForAccess.name}
+                                </h2>
+                                <span style={{ fontSize: "11px", fontWeight: "700", padding: "2px 8px", borderRadius: "9999px", backgroundColor: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe" }}>
+                                  @{selectedUserForAccess.username}
+                                </span>
+                              </div>
                               <p style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0 0" }}>
-                                Role: <strong>{selectedUserForAccess.role}</strong> • Username: @{selectedUserForAccess.username}
+                                Super Admin Authority • Configure exactly which cards, workspaces, view modes, and operations this employee can access.
                               </p>
                             </div>
                           </div>
@@ -10508,21 +10710,27 @@ export default function App() {
                             type="button" 
                             onClick={() => setShowAccessModal(false)} 
                             aria-label="Close modal"
-                            style={{ width: "28px", height: "28px", borderRadius: "6px", border: "none", backgroundColor: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            style={{ width: "32px", height: "32px", borderRadius: "8px", border: "none", backgroundColor: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
                           >
-                            <X size={16} />
+                            <X size={18} />
                           </button>
                         </div>
 
                         {/* Scrollable Body */}
-                        <div style={{ padding: "16px 20px", overflowY: "auto", flex: 1, display: "flex", flexDirection: "column", gap: "16px" }}>
+                        <div style={{ padding: "18px 22px", overflowY: "auto", flex: 1, display: "flex", flexDirection: "column", gap: "16px" }}>
                           
-                          {/* Step 1: Quick Package Tier Presets */}
+                          {/* Step 1: Quick Select Package Tier */}
                           <div>
-                            <span style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", display: "block", marginBottom: "8px" }}>
-                              1. Quick Select Package Tier (Auto-configures Recommended Permissions)
-                            </span>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "8px" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                              <span style={{ fontSize: "12px", fontWeight: "750", color: "#0f172a" }}>
+                                1. Quick Select Package Tier (Auto-Configures Defaults)
+                              </span>
+                              <span style={{ fontSize: "11px", color: "#64748b" }}>
+                                Current Tier: <strong style={{ color: "#2563eb" }}>{EMPLOYEE_PACKAGES[accessFormData.packageTier]?.name || accessFormData.packageTier}</strong>
+                              </span>
+                            </div>
+
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "10px" }}>
                               {Object.entries(EMPLOYEE_PACKAGES).map(([tierKey, pkg]) => {
                                 const isSelected = accessFormData.packageTier === tierKey;
                                 return (
@@ -10537,22 +10745,22 @@ export default function App() {
                                       }));
                                     }}
                                     style={{
-                                      padding: "10px",
+                                      padding: "10px 12px",
                                       borderRadius: "8px",
                                       border: isSelected ? `2px solid ${pkg.color}` : "1px solid #e2e8f0",
                                       backgroundColor: isSelected ? pkg.bg : "#ffffff",
                                       cursor: "pointer",
                                       transition: "all 0.15s ease",
-                                      boxShadow: isSelected ? "0 2px 6px rgba(0,0,0,0.05)" : "none"
+                                      boxShadow: isSelected ? "0 2px 6px rgba(0,0,0,0.06)" : "none"
                                     }}
                                   >
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
-                                      <span style={{ fontSize: "12px", fontWeight: "700", color: pkg.color }}>
+                                      <span style={{ fontSize: "12px", fontWeight: "750", color: pkg.color }}>
                                         {pkg.badge}
                                       </span>
                                       {isSelected && <Check size={14} color={pkg.color} />}
                                     </div>
-                                    <div style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a" }}>
+                                    <div style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a" }}>
                                       {pkg.price}
                                     </div>
                                     <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
@@ -10564,234 +10772,326 @@ export default function App() {
                             </div>
                           </div>
 
-                          {/* Step 2: Granular Permission Checklist */}
-                          <div>
-                            <span style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", display: "block", marginBottom: "10px" }}>
-                              2. Granular Access Control & Permissions Matrix
+                          {/* Quick Global Action Presets */}
+                          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", padding: "10px 12px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", alignItems: "center" }}>
+                            <span style={{ fontSize: "11px", fontWeight: "700", color: "#475569", marginRight: "4px" }}>
+                              ⚡ Quick Actions:
                             </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const allOn = {};
+                                ALL_PERMISSION_CATEGORIES.forEach(c => c.items.forEach(i => { allOn[i.key] = true; }));
+                                setAccessFormData(prev => ({ ...prev, permissions: allOn }));
+                              }}
+                              style={{ padding: "4px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #bfdbfe", backgroundColor: "#eff6ff", color: "#1d4ed8", cursor: "pointer" }}
+                            >
+                              ✅ Grant All Permissions (38)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const allOff = {};
+                                ALL_PERMISSION_CATEGORIES.forEach(c => c.items.forEach(i => { allOff[i.key] = false; }));
+                                setAccessFormData(prev => ({ ...prev, permissions: allOff }));
+                              }}
+                              style={{ padding: "4px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: "#ffffff", color: "#475569", cursor: "pointer" }}
+                            >
+                              ❌ Deselect All
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAccessFormData(prev => ({
+                                  ...prev,
+                                  permissions: {
+                                    ...prev.permissions,
+                                    canExportCSV: false,
+                                    canBulkImport: false,
+                                    canDeleteLeads: false,
+                                    canViewRevenue: false,
+                                    canEditTarget: false,
+                                    canViewKpiSalesTarget: false,
+                                    canViewKpiIncentive: false,
+                                    canAccessReports: false,
+                                    canAccessSettings: false
+                                  }
+                                }));
+                              }}
+                              style={{ padding: "4px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #fed7aa", backgroundColor: "#fff7ed", color: "#c2410c", cursor: "pointer" }}
+                            >
+                              🔒 Anti-Theft Lockdown
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAccessFormData(prev => ({
+                                  ...prev,
+                                  permissions: {
+                                    ...prev.permissions,
+                                    canViewRevenue: !prev.permissions.canViewRevenue,
+                                    canViewKpiTotalPipeline: !prev.permissions.canViewRevenue,
+                                    canViewKpiSalesTarget: !prev.permissions.canViewRevenue,
+                                    canViewKpiDailyTarget: !prev.permissions.canViewRevenue,
+                                    canViewKpiIncentive: !prev.permissions.canViewRevenue
+                                  }
+                                }));
+                              }}
+                              style={{ padding: "4px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #fde68a", backgroundColor: "#fffbeb", color: "#b45309", cursor: "pointer" }}
+                            >
+                              🙈 Toggle Revenue & Financial Cards
+                            </button>
+                          </div>
 
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px" }}>
-                              
-                              {/* Group A: Pipeline Operations */}
-                              <div style={{ padding: "10px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc" }}>
-                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#1e40af", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
-                                  <Grid size={14} /> Pipeline & Lead Isolation
-                                </div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canViewAllLeads}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canViewAllLeads: e.target.checked } }))}
-                                      style={{ accentColor: "#2563eb", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>View All Team Leads</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Unchecked = Strict isolation (rep sees only assigned leads)</span>
-                                    </span>
-                                  </label>
-
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canCreateLeads}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canCreateLeads: e.target.checked } }))}
-                                      style={{ accentColor: "#2563eb", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>Create New Leads</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Can add deals to the pipeline</span>
-                                    </span>
-                                  </label>
-
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canEditLeads}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canEditLeads: e.target.checked } }))}
-                                      style={{ accentColor: "#2563eb", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>Edit Leads & Stages</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Can update lead details, notes & stages</span>
-                                    </span>
-                                  </label>
-
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#dc2626", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canDeleteLeads}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canDeleteLeads: e.target.checked } }))}
-                                      style={{ accentColor: "#dc2626", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>Delete Leads from Pipeline</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Allow permanent deletion (disabled by default for safety)</span>
-                                    </span>
-                                  </label>
-                                </div>
+                          {/* Step 2: Search & Filter Toolbar */}
+                          <div>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "8px" }}>
+                              <span style={{ fontSize: "12px", fontWeight: "750", color: "#0f172a" }}>
+                                2. Granular Permissions & Card Controls (38 Available)
+                              </span>
+                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                <input 
+                                  type="text"
+                                  placeholder="🔍 Search cards, permissions, tools..."
+                                  value={permSearchQuery}
+                                  onChange={(e) => setPermSearchQuery(e.target.value)}
+                                  style={{ width: "240px", height: "30px", padding: "4px 10px", fontSize: "11px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none" }}
+                                />
+                                {permSearchQuery && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setPermSearchQuery("")}
+                                    style={{ height: "30px", padding: "0 8px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", cursor: "pointer", color: "#64748b" }}
+                                  >
+                                    Clear
+                                  </button>
+                                )}
                               </div>
+                            </div>
 
-                              {/* Group B: Financials & Quota */}
-                              <div style={{ padding: "10px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc" }}>
-                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#166534", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
-                                  <IndianRupee size={14} /> Financials & Sales Targets
-                                </div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canViewRevenue}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canViewRevenue: e.target.checked } }))}
-                                      style={{ accentColor: "#16a34a", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>View Deal Values & Revenue</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Unchecked = Masked as ₹•••••• (protects sensitive pricing)</span>
-                                    </span>
-                                  </label>
+                            {/* Category Filter Pills */}
+                            <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "4px", marginBottom: "12px" }}>
+                              <button
+                                type="button"
+                                onClick={() => setPermCategoryFilter("all")}
+                                style={{
+                                  padding: "4px 10px",
+                                  fontSize: "11px",
+                                  fontWeight: "600",
+                                  borderRadius: "6px",
+                                  border: permCategoryFilter === "all" ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                                  backgroundColor: permCategoryFilter === "all" ? "#eff6ff" : "#ffffff",
+                                  color: permCategoryFilter === "all" ? "#1d4ed8" : "#475569",
+                                  cursor: "pointer",
+                                  whiteSpace: "nowrap"
+                                }}
+                              >
+                                All Categories (38)
+                              </button>
+                              {ALL_PERMISSION_CATEGORIES.map(cat => (
+                                <button
+                                  key={cat.id}
+                                  type="button"
+                                  onClick={() => setPermCategoryFilter(cat.id)}
+                                  style={{
+                                    padding: "4px 10px",
+                                    fontSize: "11px",
+                                    fontWeight: "600",
+                                    borderRadius: "6px",
+                                    border: permCategoryFilter === cat.id ? `1px solid ${cat.color}` : "1px solid #e2e8f0",
+                                    backgroundColor: permCategoryFilter === cat.id ? cat.bg : "#ffffff",
+                                    color: permCategoryFilter === cat.id ? cat.color : "#475569",
+                                    cursor: "pointer",
+                                    whiteSpace: "nowrap"
+                                  }}
+                                >
+                                  {cat.name.split(' ')[0]} {cat.name.split(' ').slice(1).join(' ')} ({cat.items.length})
+                                </button>
+                              ))}
+                            </div>
 
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canEditTarget}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canEditTarget: e.target.checked } }))}
-                                      style={{ accentColor: "#16a34a", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>Edit Monthly Sales Targets</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Allow modifying target quotas & projections</span>
-                                    </span>
-                                  </label>
-                                </div>
-                              </div>
+                            {/* Render Filtered Categories */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                              {ALL_PERMISSION_CATEGORIES
+                                .filter(cat => permCategoryFilter === "all" || permCategoryFilter === cat.id)
+                                .map(cat => {
+                                  const filteredItems = cat.items.filter(item => {
+                                    if (!permSearchQuery.trim()) return true;
+                                    const q = permSearchQuery.toLowerCase();
+                                    return item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) || item.key.toLowerCase().includes(q);
+                                  });
 
-                              {/* Group C: Data Anti-Theft Protection */}
-                              <div style={{ padding: "10px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc" }}>
-                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#9a3412", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
-                                  <Lock size={14} /> Security & Anti-Theft Guard
-                                </div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canExportCSV}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canExportCSV: e.target.checked } }))}
-                                      style={{ accentColor: "#ea580c", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>Export Leads to CSV</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Keep unchecked to prevent reps downloading your client database</span>
-                                    </span>
-                                  </label>
+                                  if (filteredItems.length === 0) return null;
 
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canBulkImport}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canBulkImport: e.target.checked } }))}
-                                      style={{ accentColor: "#ea580c", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>Bulk CSV Import</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Allow bulk uploading lead spreadsheets</span>
-                                    </span>
-                                  </label>
-                                </div>
-                              </div>
+                                  const activeCount = filteredItems.filter(i => !!accessFormData.permissions[i.key]).length;
 
-                              {/* Group D: Tools & AI */}
-                              <div style={{ padding: "10px 12px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc" }}>
-                                <div style={{ fontSize: "12px", fontWeight: "700", color: "#7c3aed", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
-                                  <Sparkles size={14} /> Communication & AI Tools
-                                </div>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canUseWhatsApp}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canUseWhatsApp: e.target.checked } }))}
-                                      style={{ accentColor: "#7c3aed", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>1-Click WhatsApp Direct Chat</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Allow sending WhatsApp follow-up messages</span>
-                                    </span>
-                                  </label>
+                                  return (
+                                    <div 
+                                      key={cat.id} 
+                                      style={{ 
+                                        border: "1px solid #e2e8f0", 
+                                        borderRadius: "10px", 
+                                        backgroundColor: "#ffffff",
+                                        overflow: "hidden",
+                                        boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                                      }}
+                                    >
+                                      {/* Category Header */}
+                                      <div style={{ padding: "10px 14px", backgroundColor: cat.bg, borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+                                        <div>
+                                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                            <strong style={{ fontSize: "13px", color: cat.color }}>{cat.name}</strong>
+                                            <span style={{ fontSize: "11px", fontWeight: "700", padding: "1px 6px", borderRadius: "9999px", backgroundColor: "#ffffff", color: cat.color, border: `1px solid ${cat.color}40` }}>
+                                              {activeCount} / {filteredItems.length} Enabled
+                                            </span>
+                                          </div>
+                                          <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>{cat.desc}</p>
+                                        </div>
 
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canMakeCalls}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canMakeCalls: e.target.checked } }))}
-                                      style={{ accentColor: "#7c3aed", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>Click-to-Call Dialing</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>Direct phone call dialing integration</span>
-                                    </span>
-                                  </label>
+                                        <div style={{ display: "flex", gap: "6px" }}>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updated = { ...accessFormData.permissions };
+                                              filteredItems.forEach(i => { updated[i.key] = true; });
+                                              setAccessFormData(prev => ({ ...prev, permissions: updated }));
+                                            }}
+                                            style={{ padding: "2px 8px", fontSize: "11px", fontWeight: "600", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#ffffff", color: "#0f172a", cursor: "pointer" }}
+                                          >
+                                            Select All
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updated = { ...accessFormData.permissions };
+                                              filteredItems.forEach(i => { updated[i.key] = false; });
+                                              setAccessFormData(prev => ({ ...prev, permissions: updated }));
+                                            }}
+                                            style={{ padding: "2px 8px", fontSize: "11px", fontWeight: "600", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#ffffff", color: "#64748b", cursor: "pointer" }}
+                                          >
+                                            Clear
+                                          </button>
+                                        </div>
+                                      </div>
 
-                                  <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "12px", color: "#0f172a", cursor: "pointer" }}>
-                                    <input 
-                                      type="checkbox"
-                                      checked={!!accessFormData.permissions.canUseAI}
-                                      onChange={(e) => setAccessFormData(prev => ({ ...prev, permissions: { ...prev.permissions, canUseAI: e.target.checked } }))}
-                                      style={{ accentColor: "#7c3aed", marginTop: "2px" }}
-                                    />
-                                    <span>
-                                      <strong>AI Sales Pitch & Objection Bot</strong>
-                                      <span style={{ display: "block", fontSize: "11px", color: "#64748b" }}>AI-generated objection handling scripts</span>
-                                    </span>
-                                  </label>
-                                </div>
-                              </div>
-
+                                      {/* Items Grid */}
+                                      <div style={{ padding: "12px 14px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "10px" }}>
+                                        {filteredItems.map(item => {
+                                          const isChecked = !!accessFormData.permissions[item.key];
+                                          return (
+                                            <label 
+                                              key={item.key}
+                                              style={{ 
+                                                display: "flex", 
+                                                alignItems: "flex-start", 
+                                                gap: "10px", 
+                                                padding: "8px 10px", 
+                                                borderRadius: "6px", 
+                                                border: isChecked ? `1px solid ${cat.color}60` : "1px solid #f1f5f9",
+                                                backgroundColor: isChecked ? `${cat.bg}50` : "#fafafa",
+                                                cursor: "pointer",
+                                                transition: "all 0.12s ease"
+                                              }}
+                                            >
+                                              <input 
+                                                type="checkbox"
+                                                checked={isChecked}
+                                                onChange={(e) => {
+                                                  const val = e.target.checked;
+                                                  setAccessFormData(prev => ({
+                                                    ...prev,
+                                                    permissions: { ...prev.permissions, [item.key]: val }
+                                                  }));
+                                                }}
+                                                style={{ accentColor: cat.color, marginTop: "3px", width: "15px", height: "15px", flexShrink: 0 }}
+                                              />
+                                              <div style={{ minWidth: 0, flex: 1 }}>
+                                                <div style={{ fontSize: "12px", fontWeight: "700", color: isChecked ? "#0f172a" : "#475569" }}>
+                                                  {item.label}
+                                                </div>
+                                                <div style={{ fontSize: "11px", color: isChecked ? "#475569" : "#94a3b8", lineHeight: "1.3", marginTop: "1px" }}>
+                                                  {item.desc}
+                                                </div>
+                                              </div>
+                                            </label>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                             </div>
                           </div>
 
-                          {/* Step 3: Quota Limit Setting */}
-                          <div style={{ padding: "12px 14px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#ffffff", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                          {/* Step 3: Quota Limit Setting with Quick Boost Buttons */}
+                          <div style={{ padding: "14px 16px", border: "1px solid #e2e8f0", borderRadius: "10px", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
                             <div>
-                              <strong style={{ fontSize: "12px", color: "#0f172a" }}>Max Active Leads Quota Limit</strong>
+                              <strong style={{ fontSize: "13px", color: "#0f172a" }}>3. Active Pipeline Leads Quota Cap</strong>
                               <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>
-                                Maximum active leads this employee can hold in their pipeline simultaneously.
+                                Maximum active leads this employee can hold concurrently. Creating beyond this requires upgrade.
                               </p>
                             </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                               <input 
                                 type="number"
                                 min={10}
                                 max={999999}
                                 value={accessFormData.maxLeadsLimit}
                                 onChange={(e) => setAccessFormData(prev => ({ ...prev, maxLeadsLimit: parseInt(e.target.value) || 50 }))}
-                                style={{ width: "100px", height: "34px", padding: "4px 8px", fontSize: "12px", fontWeight: "700", border: "1px solid #cbd5e1", borderRadius: "6px" }}
+                                style={{ width: "110px", height: "34px", padding: "4px 10px", fontSize: "13px", fontWeight: "750", border: "1px solid #cbd5e1", borderRadius: "6px" }}
                               />
-                              <span style={{ fontSize: "12px", color: "#475569", fontWeight: "600" }}>Leads Cap</span>
+                              <button
+                                type="button"
+                                onClick={() => setAccessFormData(prev => ({ ...prev, maxLeadsLimit: 50 }))}
+                                style={{ padding: "4px 8px", fontSize: "11px", fontWeight: "600", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#ffffff", color: "#475569", cursor: "pointer" }}
+                              >
+                                50
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAccessFormData(prev => ({ ...prev, maxLeadsLimit: 250 }))}
+                                style={{ padding: "4px 8px", fontSize: "11px", fontWeight: "600", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#ffffff", color: "#475569", cursor: "pointer" }}
+                              >
+                                250
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAccessFormData(prev => ({ ...prev, maxLeadsLimit: 1000 }))}
+                                style={{ padding: "4px 8px", fontSize: "11px", fontWeight: "600", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#ffffff", color: "#475569", cursor: "pointer" }}
+                              >
+                                1,000
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAccessFormData(prev => ({ ...prev, maxLeadsLimit: 999999 }))}
+                                style={{ padding: "4px 8px", fontSize: "11px", fontWeight: "700", borderRadius: "4px", border: "1px solid #fde68a", backgroundColor: "#fef3c7", color: "#b45309", cursor: "pointer" }}
+                              >
+                                ∞ Unlimited
+                              </button>
                             </div>
                           </div>
 
                         </div>
 
                         {/* Footer Actions */}
-                        <div style={{ padding: "12px 18px", borderTop: "1px solid #e2e8f0", backgroundColor: "#f8fafc", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ padding: "14px 20px", borderTop: "1px solid #e2e8f0", backgroundColor: "#f8fafc", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
                           <span style={{ fontSize: "12px", color: "#64748b" }}>
-                            Changes take effect immediately on next refresh.
+                            Permissions saved to MongoDB & browser cache • Applied instantly
                           </span>
                           <div style={{ display: "flex", gap: "8px" }}>
                             <button
                               type="button"
                               onClick={() => setShowAccessModal(false)}
-                              style={{ height: "34px", padding: "0 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
+                              style={{ height: "36px", padding: "0 16px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
                             >
                               Cancel
                             </button>
                             <button
                               type="button"
                               onClick={handleSaveUserAccess}
-                              style={{ height: "34px", padding: "0 18px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px" }}
+                              style={{ height: "36px", padding: "0 20px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)" }}
                             >
-                              <Save size={14} /> Save & Apply Permissions
+                              <Save size={15} /> Save & Apply All 38 Permissions
                             </button>
                           </div>
                         </div>
@@ -11215,184 +11515,220 @@ export default function App() {
                 </div>
               )}
 
-              {/* KPI Panel (Visible only in Analytics view) */}
+              {/* KPI Panel (Visible only in Analytics view - Responsive Dynamic Cards) */}
               {pipelineView === "analytics" && (
-                <div className="kpi-row-clean" style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "8px", width: "100%", marginBottom: "16px" }}>
+                <div className="kpi-row-clean" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "8px", width: "100%", marginBottom: "16px" }}>
+                  
                   {/* Card 1: TOTAL PIPELINE VALUE */}
-                  <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                      <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <Bookmark size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiTotalPipeline !== false) && (
+                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <Bookmark size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          Total Pipeline Value
+                        </span>
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        Total Pipeline Value
-                      </span>
+                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <AnimatedNumber value={stats.totalPipeline} isCurrency />
+                      </div>
+                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <span style={{ color: "#64748b", fontWeight: "600", fontSize: "12px" }}>Active Open Pipeline</span>
+                      </div>
                     </div>
-                    <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      <AnimatedNumber value={stats.totalPipeline} isCurrency />
-                    </div>
-                    <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                      <span style={{ color: "#64748b", fontWeight: "600", fontSize: "12px" }}>Active Open Pipeline</span>
-                    </div>
-                  </div>
+                  )}
 
                   {/* Card 2: CLOSED WON DEALS */}
-                  <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                      <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <Award size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiClosedWon !== false) && (
+                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <Award size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          Closed Won Deals
+                        </span>
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        Closed Won Deals
-                      </span>
+                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <AnimatedNumber value={stats.wonPipeline} isCurrency />
+                      </div>
+                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        {stats.wonPipeline === 0 ? (
+                          <span style={{ color: "#64748b", fontWeight: "600" }}>Fresh Month (0 Won)</span>
+                        ) : (
+                          <span style={{ color: "#166534", fontWeight: "700" }}>₹{stats.wonPipeline.toLocaleString("en-IN")} Won</span>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      <AnimatedNumber value={stats.wonPipeline} isCurrency />
-                    </div>
-                    <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                      {stats.wonPipeline === 0 ? (
-                        <span style={{ color: "#64748b", fontWeight: "600" }}>Fresh Month (0 Won)</span>
-                      ) : (
-                        <span style={{ color: "#166534", fontWeight: "700" }}>₹{stats.wonPipeline.toLocaleString("en-IN")} Won</span>
-                      )}
-                    </div>
-                  </div>
+                  )}
 
                   {/* Card 3: PIPELINE WIN RATE */}
-                  <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                      <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#ecfdf5", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <TrendingUp size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiWinRate !== false) && (
+                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#ecfdf5", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <TrendingUp size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          Pipeline Win Rate
+                        </span>
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        Pipeline Win Rate
-                      </span>
+                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <AnimatedNumber value={Number(stats.winRate)} isPercent />
+                      </div>
+                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        {Number(stats.winRate) === 0 ? (
+                          <span style={{ color: "#64748b", fontWeight: "600" }}>0 Closed in Sept</span>
+                        ) : (
+                          <span style={{ color: "#166534", fontWeight: "700" }}>✓ Won conversion rate</span>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      <AnimatedNumber value={Number(stats.winRate)} isPercent />
-                    </div>
-                    <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                      {Number(stats.winRate) === 0 ? (
-                        <span style={{ color: "#64748b", fontWeight: "600" }}>0 Closed in Sept</span>
-                      ) : (
-                        <span style={{ color: "#166534", fontWeight: "700" }}>✓ Won conversion rate</span>
-                      )}
-                    </div>
-                  </div>
+                  )}
 
                   {/* Card 4: SALES TARGET */}
-                  <div 
-                    className="kpi-luxury-card" 
-                    onClick={() => startEditingTarget()}
-                    title="Click to view or edit monthly sales target"
-                    style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
-                  >
-                    <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
-                          <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <Target size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
+                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiSalesTarget !== false) && (
+                    <div 
+                      className="kpi-luxury-card" 
+                      onClick={() => {
+                        if (!checkIsSuperAdmin(currentUser) && !getUserEffectivePermissions(currentUser).canEditTarget) {
+                          showToast("🔒 Sales target editing is restricted by Super Admin.", "info");
+                          return;
+                        }
+                        startEditingTarget();
+                      }}
+                      title="Click to view or edit monthly sales target"
+                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
+                    >
+                      <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
+                            <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <Target size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
+                            </div>
+                            <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                              Sales Target
+                            </span>
                           </div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                            Sales Target
-                          </span>
+                          {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canEditTarget) && (
+                            <span style={{ fontSize: "12px", color: "#ea580c", fontWeight: "700", marginLeft: "4px" }}>
+                              Edit ✎
+                            </span>
+                          )}
                         </div>
-                        <span style={{ fontSize: "12px", color: "#ea580c", fontWeight: "700", marginLeft: "4px" }}>
-                          Edit ✎
+                        
+                        <div style={{ fontSize: targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {targetValue > 0 ? <AnimatedNumber value={targetValue} isCurrency /> : "Pending ⏳"}
+                        </div>
+                        <span style={{ fontSize: "12px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#64748b", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          {targetValue > 0 ? (
+                            targetStats.baseProgress >= 100
+                              ? `🎉 100% Goal Conquered!`
+                              : `Goal Progress: ${Math.round(targetStats.baseProgress)}%`
+                          ) : "Target Pending"}
                         </span>
                       </div>
-                      
-                      <div style={{ fontSize: targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {targetValue > 0 ? <AnimatedNumber value={targetValue} isCurrency /> : "Pending ⏳"}
+                      <div style={{ marginLeft: "4px", flexShrink: 0 }}>
+                        <CircularProgress 
+                          percentage={targetValue > 0 ? Math.round(targetStats.baseProgress) : 0} 
+                          color={targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#16a34a" : "#ea580c"} 
+                          size={32} 
+                          strokeWidth={3} 
+                        />
                       </div>
-                      <span style={{ fontSize: "12px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#64748b", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        {targetValue > 0 ? (
-                          targetStats.baseProgress >= 100
-                            ? `🎉 100% Goal Conquered!`
-                            : `Goal Progress: ${Math.round(targetStats.baseProgress)}%`
-                        ) : "Target Pending"}
-                      </span>
                     </div>
-                    <div style={{ marginLeft: "4px", flexShrink: 0 }}>
-                      <CircularProgress 
-                        percentage={targetValue > 0 ? Math.round(targetStats.baseProgress) : 0} 
-                        color={targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#16a34a" : "#ea580c"} 
-                        size={32} 
-                        strokeWidth={3} 
-                      />
-                    </div>
-                  </div>
+                  )}
 
                   {/* Card 5: DAILY TARGET */}
-                  <div 
-                    className="kpi-luxury-card" 
-                    onClick={() => startEditingTarget()}
-                    title="Click to view or edit target breakdown"
-                    style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
-                  >
-                    <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
-                        <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <Clock size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
+                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiDailyTarget !== false) && (
+                    <div 
+                      className="kpi-luxury-card" 
+                      onClick={() => {
+                        if (!checkIsSuperAdmin(currentUser) && !getUserEffectivePermissions(currentUser).canEditTarget) {
+                          showToast("🔒 Daily target editing is restricted by Super Admin.", "info");
+                          return;
+                        }
+                        startEditingTarget();
+                      }}
+                      title="Click to view or edit target breakdown"
+                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
+                    >
+                      <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
+                          <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <Clock size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
+                          </div>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                            Daily Target
+                          </span>
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                          Daily Target
+                        <div style={{ fontSize: selectedPeriodMonth === "2026-08" ? "14.5px" : targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: selectedPeriodMonth === "2026-08" ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {selectedPeriodMonth === "2026-08" ? "Month Ended" : targetValue > 0 ? <AnimatedNumber value={targetStats.dailyRequired} isCurrency /> : "-- / day"}
+                        </div>
+                        <span style={{ fontSize: "12px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          {targetStats.dailySubtitle || (selectedPeriodMonth === "2026-08" ? "August 2026 Closed" : targetValue > 0 ? `For remaining ${targetStats.daysRemaining} days` : "Waiting for assignment")}
                         </span>
                       </div>
-                      <div style={{ fontSize: selectedPeriodMonth === "2026-08" ? "14.5px" : targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: selectedPeriodMonth === "2026-08" ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {selectedPeriodMonth === "2026-08" ? "Month Ended" : targetValue > 0 ? <AnimatedNumber value={targetStats.dailyRequired} isCurrency /> : "-- / day"}
+                      <div style={{ marginLeft: "4px", flexShrink: 0 }}>
+                        <CircularProgress 
+                          percentage={selectedPeriodMonth === "2026-08" ? 100 : (targetValue > 0 ? Math.round(targetStats.baseProgress) : 0)} 
+                          color={selectedPeriodMonth === "2026-08" ? "#94a3b8" : targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#7c3aed" : "#2563eb"} 
+                          size={32} 
+                          strokeWidth={3} 
+                        />
                       </div>
-                      <span style={{ fontSize: "12px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                        {targetStats.dailySubtitle || (selectedPeriodMonth === "2026-08" ? "August 2026 Closed" : targetValue > 0 ? `For remaining ${targetStats.daysRemaining} days` : "Waiting for assignment")}
-                      </span>
                     </div>
-                    <div style={{ marginLeft: "4px", flexShrink: 0 }}>
-                      <CircularProgress 
-                        percentage={selectedPeriodMonth === "2026-08" ? 100 : (targetValue > 0 ? Math.round(targetStats.baseProgress) : 0)} 
-                        color={selectedPeriodMonth === "2026-08" ? "#94a3b8" : targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#7c3aed" : "#2563eb"} 
-                        size={32} 
-                        strokeWidth={3} 
-                      />
-                    </div>
-                  </div>
+                  )}
 
                   {/* Card 6: MY INCENTIVE */}
-                  <div 
-                    className="kpi-luxury-card" 
-                    onClick={() => startEditingTarget()}
-                    title="Click to view or add Spot Incentive & Custom Bonus"
-                    style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer" }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fef2f2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <Gift size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiIncentive !== false) && (
+                    <div 
+                      className="kpi-luxury-card" 
+                      onClick={() => {
+                        if (!checkIsSuperAdmin(currentUser) && !getUserEffectivePermissions(currentUser).canEditIncentive) {
+                          showToast("🔒 Incentive structure editing is restricted by Super Admin.", "info");
+                          return;
+                        }
+                        startEditingTarget();
+                      }}
+                      title="Click to view or add Spot Incentive & Custom Bonus"
+                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer" }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                          <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fef2f2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <Gift size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                          </div>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                            My Incentive
+                          </span>
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                          My Incentive
+                        {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canEditIncentive) && (
+                          <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "12px", color: "#ea580c", fontWeight: "700" }}>
+                            <Pencil size={11} color="#ea580c" />
+                            <span>Edit</span>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <AnimatedNumber value={targetStats.incentiveAmount} isCurrency />
+                      </div>
+                      <div style={{ fontSize: "12px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <span style={{ color: targetStats.incentiveAmount > 0 ? "#059669" : "#64748b", fontWeight: "800", backgroundColor: targetStats.incentiveAmount > 0 ? "#ecfdf5" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", border: targetStats.incentiveAmount > 0 ? "1px solid #a7f3d0" : "1px solid #e2e8f0", whiteSpace: "nowrap", flexShrink: 0 }}>
+                          {targetStats.tierStatusBadge}
+                        </span>
+                        <span style={{ color: "#64748b", fontWeight: "700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginLeft: "4px" }}>
+                          {targetStats.nextMilestoneText}
                         </span>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "12px", color: "#ea580c", fontWeight: "700" }}>
-                        <Pencil size={11} color="#ea580c" />
-                        <span>Edit</span>
-                      </div>
                     </div>
-                    <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      <AnimatedNumber value={targetStats.incentiveAmount} isCurrency />
-                    </div>
-                    <div style={{ fontSize: "12px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                      <span style={{ color: targetStats.incentiveAmount > 0 ? "#059669" : "#64748b", fontWeight: "800", backgroundColor: targetStats.incentiveAmount > 0 ? "#ecfdf5" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", border: targetStats.incentiveAmount > 0 ? "1px solid #a7f3d0" : "1px solid #e2e8f0", whiteSpace: "nowrap", flexShrink: 0 }}>
-                        {targetStats.tierStatusBadge}
-                      </span>
-                      <span style={{ color: "#64748b", fontWeight: "700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginLeft: "4px" }}>
-                        {targetStats.nextMilestoneText}
-                      </span>
-                    </div>
-                  </div>
+                  )}
+
                 </div>
               )}
 
-            {pipelineView === "sheet" ? (() => {
+              {pipelineView === "sheet" ? (() => {
               const totalLeadsCount = filteredLeads.length;
               const totalPages = Math.max(1, Math.ceil(totalLeadsCount / pageSize));
               const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
@@ -11474,36 +11810,44 @@ export default function App() {
                     })}
                   </div>
 
-                  {/* View Modes Switcher (Issue 10: Standardized Button Height & Discoverability) */}
+                  {/* View Modes Switcher (Guarded per employee permissions) */}
                   <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "6px", border: "1px solid #e2e8f0", gap: "2px" }}>
-                    <button
-                      type="button"
-                      onClick={() => setPipelineView("analytics")}
-                      style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#475569", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
-                    >
-                      <TrendingUp size={14} /> Dashboard
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPipelineView("sheet")}
-                      style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#2563eb" : "#475569", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
-                    >
-                      <Grid size={14} /> Spreadsheet
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPipelineView("split")}
-                      style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#475569", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
-                    >
-                      <Layers size={14} /> Split 360°
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPipelineView("deals")}
-                      style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#16a34a" : "#475569", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
-                    >
-                      <Award size={14} /> Deals Hub
-                    </button>
+                    {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewAnalyticsDashboard !== false) && (
+                      <button
+                        type="button"
+                        onClick={() => setPipelineView("analytics")}
+                        style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#475569", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
+                      >
+                        <TrendingUp size={14} /> Dashboard
+                      </button>
+                    )}
+                    {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewSpreadsheetGrid !== false) && (
+                      <button
+                        type="button"
+                        onClick={() => setPipelineView("sheet")}
+                        style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#2563eb" : "#475569", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
+                      >
+                        <Grid size={14} /> Spreadsheet
+                      </button>
+                    )}
+                    {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewSplitView !== false) && (
+                      <button
+                        type="button"
+                        onClick={() => setPipelineView("split")}
+                        style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#475569", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
+                      >
+                        <Layers size={14} /> Split 360°
+                      </button>
+                    )}
+                    {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKanbanDeals !== false) && (
+                      <button
+                        type="button"
+                        onClick={() => setPipelineView("deals")}
+                        style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#16a34a" : "#475569", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
+                      >
+                        <Award size={14} /> Deals Hub
+                      </button>
+                    )}
                   </div>
                 </div>
 
