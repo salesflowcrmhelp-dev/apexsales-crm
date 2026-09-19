@@ -1011,8 +1011,27 @@ export function getUserEffectivePermissions(user) {
   if (checkIsSuperAdmin(user) || user.role === "admin") {
     return EMPLOYEE_PACKAGES.super_admin.permissions;
   }
-  const pkgTier = user.packageTier || (user.role === "manager" ? "enterprise" : "starter");
-  const pkgDefaults = EMPLOYEE_PACKAGES[pkgTier] ? EMPLOYEE_PACKAGES[pkgTier].permissions : EMPLOYEE_PACKAGES.starter.permissions;
+  let pkgTier = user.packageTier;
+  if (!pkgTier && user.id) {
+    try {
+      const savedPkg = localStorage.getItem(`crm_user_pkg_${user.id}`);
+      if (savedPkg) pkgTier = savedPkg;
+    } catch(e) {}
+  }
+  if (!pkgTier) {
+    pkgTier = user.role === "manager" ? "enterprise" : "starter";
+  }
+
+  let empPackages = EMPLOYEE_PACKAGES;
+  try {
+    const saved = localStorage.getItem("crm_employee_packages");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed === "object") empPackages = { ...EMPLOYEE_PACKAGES, ...parsed };
+    }
+  } catch(e) {}
+
+  const pkgDefaults = empPackages[pkgTier] ? empPackages[pkgTier].permissions : EMPLOYEE_PACKAGES.starter.permissions;
   
   let localOverrides = {};
   try {
@@ -1612,6 +1631,33 @@ export default function App() {
     permissions: { ...EMPLOYEE_PACKAGES.starter.permissions },
     maxLeadsLimit: 50
   });
+
+  // Dynamic Package State (Client Deal Packages & Employee Subscription Tiers)
+  const [clientDealPackages, setClientDealPackages] = useState(() => {
+    try {
+      const saved = localStorage.getItem("crm_client_deal_packages");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch(e) {}
+    return CLIENT_DEAL_PACKAGES;
+  });
+
+  const [employeePackagesList, setEmployeePackagesList] = useState(() => {
+    try {
+      const saved = localStorage.getItem("crm_employee_packages");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === "object") return { ...EMPLOYEE_PACKAGES, ...parsed };
+      }
+    } catch(e) {}
+    return EMPLOYEE_PACKAGES;
+  });
+
+  // Package Rate Editor State
+  const [showEditPackageModal, setShowEditPackageModal] = useState(false);
+  const [editingPackageData, setEditingPackageData] = useState(null);
   const [permSearchQuery, setPermSearchQuery] = useState("");
   const [permCategoryFilter, setPermCategoryFilter] = useState("all");
   const [showUserManagementModal, setShowUserManagementModal] = useState(() => {
@@ -2374,6 +2420,65 @@ export default function App() {
   useEffect(() => {
     setIsMobileSidebarOpen(false);
   }, [activeWorkspace, pipelineView, currentTab]);
+
+  // Synchronize dynamic packages from server
+  useEffect(() => {
+    const fetchServerPackages = async () => {
+      try {
+        const res = await fetch("/api/packages");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success && data.packages) {
+            if (Array.isArray(data.packages.dealPackages) && data.packages.dealPackages.length > 0) {
+              setClientDealPackages(data.packages.dealPackages);
+              try { localStorage.setItem("crm_client_deal_packages", JSON.stringify(data.packages.dealPackages)); } catch(e) {}
+            }
+            if (data.packages.employeePackages && typeof data.packages.employeePackages === "object") {
+              setEmployeePackagesList(prev => ({ ...prev, ...data.packages.employeePackages }));
+              try { localStorage.setItem("crm_employee_packages", JSON.stringify(data.packages.employeePackages)); } catch(e) {}
+            }
+          }
+        }
+      } catch(e) {
+        console.warn("Packages fetch fallback to local:", e);
+      }
+    };
+    fetchServerPackages();
+  }, []);
+
+  // Permission-based routing guards: Ensure user always lands on an authorized view & workspace
+  useEffect(() => {
+    if (!currentUser) return;
+    const perms = getUserEffectivePermissions(currentUser);
+    const isSuper = checkIsSuperAdmin(currentUser) || currentUser.role === "admin";
+    if (isSuper) return;
+
+    // View Guards in Pipeline
+    if (activeWorkspace === "pipeline") {
+      if (pipelineView === "analytics" && perms.canViewAnalyticsDashboard === false) {
+        if (perms.canViewSpreadsheetGrid !== false) setPipelineView("sheet");
+        else if (perms.canViewKanbanDeals !== false) setPipelineView("deals");
+        else if (perms.canViewSplitView !== false) setPipelineView("split");
+      }
+    }
+
+    // Workspace Guards
+    if (activeWorkspace === "reports" && perms.canAccessReports === false) {
+      setActiveWorkspace("pipeline");
+    }
+    if (activeWorkspace === "settings" && perms.canAccessSettings === false) {
+      setActiveWorkspace("pipeline");
+    }
+    if (activeWorkspace === "tasks" && perms.canAccessTasks === false) {
+      setActiveWorkspace("pipeline");
+    }
+    if (activeWorkspace === "calendar" && perms.canAccessCalendar === false) {
+      setActiveWorkspace("pipeline");
+    }
+    if (activeWorkspace === "team") {
+      setActiveWorkspace("pipeline");
+    }
+  }, [currentUser, activeWorkspace, pipelineView]);
   const [selectedSplitLeadId, setSelectedSplitLeadId] = useState(null);
   const [splitDossierTab, setSplitDossierTab] = useState("overview"); // "overview", "timeline", "ai", "payment"
   const [splitLeadSearch, setSplitLeadSearch] = useState("");
@@ -2626,15 +2731,35 @@ export default function App() {
             localStorage.setItem("crm_team_members", JSON.stringify(names));
           } catch(e) {}
 
-          // Synchronize currentUser role with latest database role from server
-          if (currentUser && currentUser.email) {
-            const serverMe = data.users.find(u => u.email && u.email.toLowerCase() === currentUser.email.toLowerCase());
-            if (serverMe && serverMe.role !== currentUser.role) {
-              const updatedUser = { ...currentUser, role: serverMe.role, name: serverMe.name };
-              setCurrentUser(updatedUser);
-              setCurrentUserRole(serverMe.role);
-              try { sessionStorage.setItem("crm_auth_user", JSON.stringify(updatedUser)); } catch(e) {}
-              loadLeadsFromBackend(updatedUser);
+          // Synchronize currentUser role, packageTier & permissions with latest database from server
+          if (currentUser) {
+            const serverMe = data.users.find(u => 
+              (currentUser.id && u.id === currentUser.id) || 
+              (currentUser.email && u.email && u.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+              (currentUser.name && u.name && u.name.toLowerCase() === currentUser.name.toLowerCase())
+            );
+            if (serverMe) {
+              const needsUpdate = serverMe.role !== currentUser.role || 
+                                  serverMe.packageTier !== currentUser.packageTier ||
+                                  serverMe.maxLeadsLimit !== currentUser.maxLeadsLimit ||
+                                  JSON.stringify(serverMe.permissions) !== JSON.stringify(currentUser.permissions);
+              if (needsUpdate) {
+                const updatedUser = { 
+                  ...currentUser, 
+                  role: serverMe.role, 
+                  name: serverMe.name,
+                  packageTier: serverMe.packageTier,
+                  permissions: serverMe.permissions !== undefined ? serverMe.permissions : currentUser.permissions,
+                  maxLeadsLimit: serverMe.maxLeadsLimit || currentUser.maxLeadsLimit
+                };
+                setCurrentUser(updatedUser);
+                setCurrentUserRole(serverMe.role);
+                try { 
+                  sessionStorage.setItem("crm_auth_user", JSON.stringify(updatedUser)); 
+                  localStorage.setItem("crm_auth_user", JSON.stringify(updatedUser));
+                } catch(e) {}
+                loadLeadsFromBackend(updatedUser);
+              }
             }
           }
         }
@@ -3181,13 +3306,25 @@ export default function App() {
   };
 
   const handleOpenAccessModal = (usr) => {
-    const currentPkg = usr.packageTier || (usr.role === "admin" ? "super_admin" : usr.role === "manager" ? "enterprise" : "starter");
+    if (!usr) return;
+    const isSuper = checkIsSuperAdmin(usr) || usr.role === "admin";
+    let currentPkg = usr.packageTier;
+    if (!currentPkg && usr.id) {
+      try {
+        const savedPkg = localStorage.getItem(`crm_user_pkg_${usr.id}`);
+        if (savedPkg) currentPkg = savedPkg;
+      } catch(e) {}
+    }
+    if (!currentPkg) {
+      currentPkg = isSuper ? "super_admin" : usr.role === "manager" ? "enterprise" : "starter";
+    }
     const effPerms = getUserEffectivePermissions(usr);
     setSelectedUserForAccess(usr);
+    const activePkgObj = (employeePackagesList && employeePackagesList[currentPkg]) || EMPLOYEE_PACKAGES[currentPkg] || EMPLOYEE_PACKAGES.starter;
     setAccessFormData({
       packageTier: currentPkg,
       permissions: { ...effPerms },
-      maxLeadsLimit: usr.maxLeadsLimit || (EMPLOYEE_PACKAGES[currentPkg]?.quota || 50)
+      maxLeadsLimit: usr.maxLeadsLimit || (activePkgObj?.quota || 50)
     });
     setPermSearchQuery("");
     setPermCategoryFilter("all");
@@ -3211,6 +3348,25 @@ export default function App() {
         localStorage.setItem(`crm_user_pkg_${selectedUserForAccess.id}`, accessFormData.packageTier);
       } catch(e) {}
 
+      // If the edited user is currently logged in, update currentUser immediately!
+      if (currentUser && (
+        currentUser.id === selectedUserForAccess.id ||
+        (currentUser.email && selectedUserForAccess.email && currentUser.email.toLowerCase() === selectedUserForAccess.email.toLowerCase()) ||
+        (currentUser.name && selectedUserForAccess.name && currentUser.name.toLowerCase() === selectedUserForAccess.name.toLowerCase())
+      )) {
+        const updatedCurrentUser = {
+          ...currentUser,
+          packageTier: accessFormData.packageTier,
+          permissions: accessFormData.permissions,
+          maxLeadsLimit: accessFormData.maxLeadsLimit
+        };
+        setCurrentUser(updatedCurrentUser);
+        try {
+          sessionStorage.setItem("crm_auth_user", JSON.stringify(updatedCurrentUser));
+          localStorage.setItem("crm_auth_user", JSON.stringify(updatedCurrentUser));
+        } catch(e) {}
+      }
+
       setAllUsersList(prev => prev.map(u => u.id === selectedUserForAccess.id ? updatedUser : u));
 
       const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
@@ -3231,9 +3387,117 @@ export default function App() {
 
       setShowAccessModal(false);
       showToast(`🎉 Access & Permissions updated for ${selectedUserForAccess.name}!`, "success");
+      loadUsersFromBackend();
     } catch(err) {
       showToast("Access updated locally.", "success");
       setShowAccessModal(false);
+    }
+  };
+
+  // Package Rate Customization Handlers (Decide package rate & specs)
+  const handleSavePackageRate = async (updatedPkg) => {
+    if (!updatedPkg) return;
+    try {
+      const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
+      const headers = {
+        "Content-Type": "application/json",
+        "x-user-role": currentUser?.role || "admin",
+        "x-user-name": currentUser?.name || "Harsh Goyal",
+        ...(token ? { "Authorization": `Bearer ${token}` } : {})
+      };
+
+      if (updatedPkg.type === "deal") {
+        let updatedList;
+        const exists = clientDealPackages.some(p => p.id === updatedPkg.id);
+        const parsedFeatures = Array.isArray(updatedPkg.features) 
+          ? updatedPkg.features 
+          : (typeof updatedPkg.features === "string" ? updatedPkg.features.split("\n").map(f => f.trim()).filter(Boolean) : []);
+        
+        if (exists) {
+          updatedList = clientDealPackages.map(p => p.id === updatedPkg.id ? {
+            ...p,
+            name: updatedPkg.name,
+            price: Number(updatedPkg.price) || 0,
+            duration: updatedPkg.duration || p.duration,
+            quota: updatedPkg.quota || p.quota,
+            features: parsedFeatures.length > 0 ? parsedFeatures : p.features
+          } : p);
+        } else {
+          updatedList = [...clientDealPackages, {
+            id: updatedPkg.id || `pkg_${Date.now()}`,
+            name: updatedPkg.name,
+            price: Number(updatedPkg.price) || 0,
+            duration: updatedPkg.duration || "1 Month",
+            quota: updatedPkg.quota || "500 Leads",
+            color: updatedPkg.color || "#2563eb",
+            bg: updatedPkg.bg || "#eff6ff",
+            border: updatedPkg.border || "#bfdbfe",
+            features: parsedFeatures.length > 0 ? parsedFeatures : ["Full Lead Pipeline", "WhatsApp 1-Click Dialing"]
+          }];
+        }
+
+        setClientDealPackages(updatedList);
+        try { localStorage.setItem("crm_client_deal_packages", JSON.stringify(updatedList)); } catch(e) {}
+        showToast(`🎉 Client package "${updatedPkg.name}" rate updated to ₹${(Number(updatedPkg.price) || 0).toLocaleString("en-IN")}!`, "success");
+
+        try {
+          await fetch("/api/packages", {
+            method: "PUT",
+            headers,
+            body: JSON.stringify({ dealPackages: updatedList })
+          });
+        } catch(e) {}
+      } else if (updatedPkg.type === "employee") {
+        const updatedObj = {
+          ...employeePackagesList,
+          [updatedPkg.id]: {
+            ...employeePackagesList[updatedPkg.id],
+            name: updatedPkg.name,
+            price: updatedPkg.price,
+            quota: Number(updatedPkg.quota) || (employeePackagesList[updatedPkg.id]?.quota || 50),
+            targetAudience: updatedPkg.targetAudience || employeePackagesList[updatedPkg.id]?.targetAudience,
+            description: updatedPkg.description || employeePackagesList[updatedPkg.id]?.description
+          }
+        };
+        setEmployeePackagesList(updatedObj);
+        try { localStorage.setItem("crm_employee_packages", JSON.stringify(updatedObj)); } catch(e) {}
+        showToast(`🎉 Employee tier "${updatedPkg.name}" rate & quota updated!`, "success");
+
+        try {
+          await fetch("/api/packages", {
+            method: "PUT",
+            headers,
+            body: JSON.stringify({ employeePackages: updatedObj })
+          });
+        } catch(e) {}
+      }
+
+      setShowEditPackageModal(false);
+      setEditingPackageData(null);
+    } catch(err) {
+      showToast("Error updating package rate", "error");
+    }
+  };
+
+  const handleResetPackageRate = (pkgId, type) => {
+    if (type === "deal") {
+      const defaultPkg = CLIENT_DEAL_PACKAGES.find(p => p.id === pkgId);
+      if (defaultPkg) {
+        const updatedList = clientDealPackages.map(p => p.id === pkgId ? defaultPkg : p);
+        setClientDealPackages(updatedList);
+        try { localStorage.setItem("crm_client_deal_packages", JSON.stringify(updatedList)); } catch(e) {}
+        showToast(`Package reset to default rate (₹${defaultPkg.price})`, "info");
+        setShowEditPackageModal(false);
+      }
+    } else if (type === "employee") {
+      const defaultPkg = EMPLOYEE_PACKAGES[pkgId];
+      if (defaultPkg) {
+        const updatedObj = { ...employeePackagesList, [pkgId]: defaultPkg };
+        setEmployeePackagesList(updatedObj);
+        try { localStorage.setItem("crm_employee_packages", JSON.stringify(updatedObj)); } catch(e) {}
+        showToast(`Tier reset to default (${defaultPkg.price})`, "info");
+        setShowEditPackageModal(false);
+      }
     }
   };
 
@@ -10726,12 +10990,12 @@ export default function App() {
                                 1. Quick Select Package Tier (Auto-Configures Defaults)
                               </span>
                               <span style={{ fontSize: "11px", color: "#64748b" }}>
-                                Current Tier: <strong style={{ color: "#2563eb" }}>{EMPLOYEE_PACKAGES[accessFormData.packageTier]?.name || accessFormData.packageTier}</strong>
+                                Current Tier: <strong style={{ color: "#2563eb" }}>{(employeePackagesList[accessFormData.packageTier] || EMPLOYEE_PACKAGES[accessFormData.packageTier])?.name || accessFormData.packageTier}</strong>
                               </span>
                             </div>
 
                             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "10px" }}>
-                              {Object.entries(EMPLOYEE_PACKAGES).map(([tierKey, pkg]) => {
+                              {Object.entries(employeePackagesList).map(([tierKey, pkg]) => {
                                 const isSelected = accessFormData.packageTier === tierKey;
                                 return (
                                   <div
@@ -11272,7 +11536,7 @@ export default function App() {
 
                   {/* 4 Package Cards */}
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "14px", marginBottom: "20px" }}>
-                    {Object.entries(EMPLOYEE_PACKAGES).map(([key, pkg]) => (
+                    {Object.entries(employeePackagesList).map(([key, pkg]) => (
                       <div 
                         key={key} 
                         style={{ 
@@ -11339,14 +11603,37 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #f1f5f9" }}>
+                        <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #f1f5f9", display: "flex", flexDirection: "column", gap: "6px" }}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingPackageData({
+                                type: "employee",
+                                id: key,
+                                name: pkg.name,
+                                price: pkg.price,
+                                quota: pkg.quota,
+                                targetAudience: pkg.targetAudience,
+                                description: pkg.description,
+                                badge: pkg.badge,
+                                color: pkg.color,
+                                bg: pkg.bg,
+                                border: pkg.border
+                              });
+                              setShowEditPackageModal(true);
+                            }}
+                            style={{ width: "100%", height: "30px", borderRadius: "6px", border: "1.5px solid #cbd5e1", backgroundColor: "#ffffff", color: "#0f172a", fontSize: "11px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
+                            title="Decide custom rate and pipeline quota for this tier"
+                          >
+                            <Pencil size={12} /> Edit Tier Rate & Quota
+                          </button>
                           <button
                             type="button"
                             onClick={() => {
                               setTeamTab("members");
                               showToast(`Assign ${pkg.name} package to any member via the '⚙️ Access' button in the members table.`, "info");
                             }}
-                            style={{ width: "100%", height: "32px", borderRadius: "6px", border: `1px solid ${pkg.border}`, backgroundColor: pkg.bg, color: pkg.color, fontSize: "11px", fontWeight: "700", cursor: "pointer" }}
+                            style={{ width: "100%", height: "30px", borderRadius: "6px", border: `1px solid ${pkg.border}`, backgroundColor: pkg.bg, color: pkg.color, fontSize: "11px", fontWeight: "700", cursor: "pointer" }}
                           >
                             Assign to Team Member →
                           </button>
@@ -11402,17 +11689,42 @@ export default function App() {
               {/* VIEW 3: Client Deal Packages */}
               {teamTab === "deal_packages" && (
                 <div>
-                  <div style={{ marginBottom: "16px" }}>
-                    <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0" }}>
-                      💼 Client CRM Sales Packages & Pricing Plans
-                    </h2>
-                    <p style={{ fontSize: "12px", color: "#475569", margin: 0 }}>
-                      These are the CRM packages offered to prospective clients. When creating a new lead, pick one of these plans to automatically populate deal value and pipeline tags.
-                    </p>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
+                    <div>
+                      <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0" }}>
+                        💼 Client CRM Sales Packages & Pricing Plans
+                      </h2>
+                      <p style={{ fontSize: "12px", color: "#475569", margin: 0 }}>
+                        Decide and customize package rates (₹), billing durations, and included quotas. Edited rates automatically reflect in new deal values.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newId = `pkg_${Date.now()}`;
+                        setEditingPackageData({
+                          type: "deal",
+                          id: newId,
+                          isNew: true,
+                          name: "New Custom CRM Plan",
+                          price: 25000,
+                          duration: "1 Month",
+                          quota: "500 Leads",
+                          features: ["Custom Lead Pipeline", "WhatsApp 1-Click Dialing", "Priority Support"],
+                          color: "#2563eb",
+                          bg: "#eff6ff",
+                          border: "#bfdbfe"
+                        });
+                        setShowEditPackageModal(true);
+                      }}
+                      style={{ height: "34px", padding: "0 14px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 4px rgba(37,99,235,0.2)" }}
+                    >
+                      <Plus size={14} /> Add Custom Plan
+                    </button>
                   </div>
 
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "14px", marginBottom: "20px" }}>
-                    {CLIENT_DEAL_PACKAGES.map((pkg) => (
+                    {clientDealPackages.map((pkg) => (
                       <div 
                         key={pkg.id} 
                         style={{ 
@@ -11456,7 +11768,29 @@ export default function App() {
                           </ul>
                         </div>
 
-                        <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid #f1f5f9" }}>
+                        <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid #f1f5f9", display: "flex", gap: "6px" }}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingPackageData({
+                                type: "deal",
+                                id: pkg.id,
+                                name: pkg.name,
+                                price: pkg.price,
+                                duration: pkg.duration,
+                                quota: pkg.quota,
+                                features: [...(pkg.features || [])],
+                                color: pkg.color,
+                                bg: pkg.bg,
+                                border: pkg.border
+                              });
+                              setShowEditPackageModal(true);
+                            }}
+                            style={{ flex: 1, height: "34px", borderRadius: "6px", border: "1.5px solid #cbd5e1", backgroundColor: "#ffffff", color: "#0f172a", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
+                            title="Decide and edit package rate & specifications"
+                          >
+                            <Pencil size={13} /> Edit Rate
+                          </button>
                           <button
                             type="button"
                             onClick={() => {
@@ -11467,9 +11801,9 @@ export default function App() {
                               }));
                               setShowAddLeadModal(true);
                             }}
-                            style={{ width: "100%", height: "34px", borderRadius: "6px", border: "none", backgroundColor: pkg.color, color: "#ffffff", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+                            style={{ flex: 1.4, height: "34px", borderRadius: "6px", border: "none", backgroundColor: pkg.color, color: "#ffffff", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
                           >
-                            <Plus size={14} /> Create Lead with this Plan
+                            <Plus size={14} /> Create Lead
                           </button>
                         </div>
                       </div>
@@ -20145,10 +20479,10 @@ export default function App() {
                       📦 Client Package
                     </label>
                     <select
-                      value={newLeadData.packageId || "pkg_silver"}
+                      value={newLeadData.packageId || (clientDealPackages[0]?.id || "pkg_silver")}
                       onChange={(e) => {
                         const selectedId = e.target.value;
-                        const selectedPkg = CLIENT_DEAL_PACKAGES.find(p => p.id === selectedId);
+                        const selectedPkg = clientDealPackages.find(p => p.id === selectedId);
                         setNewLeadData(prev => ({
                           ...prev,
                           packageId: selectedId,
@@ -20157,9 +20491,9 @@ export default function App() {
                       }}
                       style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
                     >
-                      {CLIENT_DEAL_PACKAGES.map(pkg => (
+                      {clientDealPackages.map(pkg => (
                         <option key={pkg.id} value={pkg.id}>
-                          {pkg.name} ({pkg.price ? `₹${pkg.price.toLocaleString('en-IN')}` : 'Bespoke'})
+                          {pkg.name} ({pkg.price ? `₹${Number(pkg.price).toLocaleString('en-IN')}` : 'Bespoke'})
                         </option>
                       ))}
                     </select>
@@ -21515,6 +21849,221 @@ export default function App() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+
+      {/* ✏️ Super Admin Package Rate & Plan Specifications Modal */}
+      {showEditPackageModal && editingPackageData && (
+        <div 
+          className="modal-overlay animate-fade-in"
+          onClick={() => setShowEditPackageModal(false)}
+          style={{ position: "fixed", inset: 0, backgroundColor: "rgba(15, 23, 42, 0.65)", backdropFilter: "blur(5px)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: "100%", maxWidth: "560px", backgroundColor: "#ffffff", borderRadius: "12px", border: "1px solid #cbd5e1", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.3)", overflow: "hidden" }}
+          >
+            {/* Modal Header */}
+            <div style={{ padding: "14px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "34px", height: "34px", borderRadius: "8px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #bfdbfe" }}>
+                  <Pencil size={16} />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: "15px", fontWeight: "750", color: "#0f172a", margin: 0 }}>
+                    {editingPackageData.type === "deal" ? "Decide Client Package Rate & Terms" : "Decide Employee Subscription Tier & Rate"}
+                  </h2>
+                  <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>
+                    Super Admin Authority • Set custom rate (₹), billing cycle, and quota capacity
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditPackageModal(false)}
+                aria-label="Close modal"
+                style={{ width: "30px", height: "30px", borderRadius: "6px", border: "none", backgroundColor: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Modal Form Content */}
+            <div style={{ padding: "18px 22px", display: "flex", flexDirection: "column", gap: "14px", maxHeight: "75vh", overflowY: "auto" }}>
+              
+              {/* Field 1: Package / Plan Name */}
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "5px" }}>
+                  Plan / Tier Name
+                </label>
+                <input
+                  type="text"
+                  value={editingPackageData.name}
+                  onChange={(e) => setEditingPackageData(prev => ({ ...prev, name: e.target.value }))}
+                  style={{ width: "100%", height: "36px", padding: "0 12px", fontSize: "13px", fontWeight: "600", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+
+              {/* Field 2: Rate / Price (₹) */}
+              {editingPackageData.type === "deal" ? (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "5px" }}>
+                    <label style={{ fontSize: "12px", fontWeight: "700", color: "#334155" }}>
+                      Decide Package Rate / Price (₹)
+                    </label>
+                    <span style={{ fontSize: "12px", fontWeight: "800", color: "#16a34a" }}>
+                      Active Rate: ₹{(Number(editingPackageData.price) || 0).toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                  <div style={{ position: "relative" }}>
+                    <span style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", fontSize: "14px", fontWeight: "750", color: "#64748b" }}>
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      step={500}
+                      value={editingPackageData.price}
+                      onChange={(e) => setEditingPackageData(prev => ({ ...prev, price: e.target.value }))}
+                      placeholder="Enter custom rate in INR e.g. 15000"
+                      style={{ width: "100%", height: "38px", paddingLeft: "30px", paddingRight: "12px", fontSize: "14px", fontWeight: "750", color: "#0f172a", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
+                    />
+                  </div>
+                  {/* Quick Price Increment Presets */}
+                  <div style={{ display: "flex", gap: "6px", marginTop: "6px", flexWrap: "wrap" }}>
+                    {[9999, 15000, 25000, 35000, 50000, 75000, 100000].map(val => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setEditingPackageData(prev => ({ ...prev, price: val }))}
+                        style={{ padding: "3px 8px", fontSize: "10px", fontWeight: "700", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#f8fafc", color: "#334155", cursor: "pointer" }}
+                      >
+                        ₹{(val).toLocaleString("en-IN")}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "5px" }}>
+                    Monthly Subscription Rate / Pricing Label
+                  </label>
+                  <input
+                    type="text"
+                    value={editingPackageData.price}
+                    onChange={(e) => setEditingPackageData(prev => ({ ...prev, price: e.target.value }))}
+                    placeholder="e.g. Free Tier, ₹1,999/mo, ₹4,999/mo"
+                    style={{ width: "100%", height: "36px", padding: "0 12px", fontSize: "13px", fontWeight: "600", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+              )}
+
+              {/* Field 3: Duration & Quota */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                {editingPackageData.type === "deal" ? (
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "5px" }}>
+                      Billing Cycle / Duration
+                    </label>
+                    <input
+                      type="text"
+                      value={editingPackageData.duration}
+                      onChange={(e) => setEditingPackageData(prev => ({ ...prev, duration: e.target.value }))}
+                      placeholder="e.g. 1 Month, 3 Months, 1 Year"
+                      style={{ width: "100%", height: "36px", padding: "0 12px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "5px" }}>
+                      Target Role / Audience
+                    </label>
+                    <input
+                      type="text"
+                      value={editingPackageData.targetAudience}
+                      onChange={(e) => setEditingPackageData(prev => ({ ...prev, targetAudience: e.target.value }))}
+                      placeholder="e.g. Closers & Account Execs"
+                      style={{ width: "100%", height: "36px", padding: "0 12px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "5px" }}>
+                    Pipeline Quota / Capacity
+                  </label>
+                  <input
+                    type={editingPackageData.type === "employee" ? "number" : "text"}
+                    value={editingPackageData.quota}
+                    onChange={(e) => setEditingPackageData(prev => ({ ...prev, quota: e.target.value }))}
+                    placeholder={editingPackageData.type === "employee" ? "e.g. 250" : "e.g. 250 Leads"}
+                    style={{ width: "100%", height: "36px", padding: "0 12px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+
+              {/* Field 4: Features / Description */}
+              {editingPackageData.type === "deal" ? (
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "5px" }}>
+                    Package Features & Deliverables (One per line)
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={Array.isArray(editingPackageData.features) ? editingPackageData.features.join("\n") : (editingPackageData.features || "")}
+                    onChange={(e) => setEditingPackageData(prev => ({ ...prev, features: e.target.value.split("\n") }))}
+                    placeholder="Single User Account&#10;Lead Pipeline Sheet&#10;WhatsApp 1-Click Chat"
+                    style={{ width: "100%", padding: "8px 12px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box", resize: "vertical", fontFamily: "inherit" }}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#334155", marginBottom: "5px" }}>
+                    Tier Description & Responsibilities
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={editingPackageData.description || ""}
+                    onChange={(e) => setEditingPackageData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Describe access privileges and role details..."
+                    style={{ width: "100%", padding: "8px 12px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box", resize: "vertical", fontFamily: "inherit" }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer Actions */}
+            <div style={{ padding: "14px 20px", borderTop: "1px solid #e2e8f0", backgroundColor: "#f8fafc", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                {!editingPackageData.isNew && (
+                  <button
+                    type="button"
+                    onClick={() => handleResetPackageRate(editingPackageData.id, editingPackageData.type)}
+                    style={{ height: "32px", padding: "0 10px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#64748b", cursor: "pointer" }}
+                  >
+                    🔄 Revert to Factory Default
+                  </button>
+                )}
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowEditPackageModal(false)}
+                  style={{ height: "36px", padding: "0 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSavePackageRate(editingPackageData)}
+                  style={{ height: "36px", padding: "0 18px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)" }}
+                >
+                  <Save size={14} /> Save & Apply Custom Rate
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

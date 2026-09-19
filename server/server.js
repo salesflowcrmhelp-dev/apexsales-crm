@@ -29,6 +29,68 @@ if (fs.existsSync(ENV_FILE)) {
 }
 
 const app = express();
+
+// --- PACKAGES CONFIGURATION (CLIENT DEAL PLANS & EMPLOYEE ACCESS TIERS) ---
+async function getPackages() {
+  if (isMongoConnected && mongoDb) {
+    try {
+      const doc = await mongoDb.collection('app_settings').findOne({ id: 'packages_config' });
+      if (doc && (doc.dealPackages || doc.employeePackages)) {
+        return {
+          dealPackages: doc.dealPackages || null,
+          employeePackages: doc.employeePackages || null
+        };
+      }
+    } catch (e) {
+      console.error('MongoDB getPackages error:', e.message);
+    }
+  }
+  const local = readLocalDB();
+  return {
+    dealPackages: local.dealPackages || null,
+    employeePackages: local.employeePackages || null
+  };
+}
+
+async function savePackages(packagesData) {
+  if (isMongoConnected && mongoDb) {
+    try {
+      await mongoDb.collection('app_settings').updateOne(
+        { id: 'packages_config' },
+        { $set: { id: 'packages_config', ...packagesData, updatedAt: new Date().toISOString() } },
+        { upsert: true }
+      );
+    } catch (e) {
+      console.error('MongoDB savePackages error:', e.message);
+    }
+  }
+  const local = readLocalDB();
+  if (packagesData.dealPackages) local.dealPackages = packagesData.dealPackages;
+  if (packagesData.employeePackages) local.employeePackages = packagesData.employeePackages;
+  writeLocalDB(local);
+}
+
+// Get Configured Packages
+app.get('/api/packages', async (req, res) => {
+  try {
+    const pkgs = await getPackages();
+    res.json({ success: true, packages: pkgs });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+// Update Configured Packages (Super Admin Only)
+app.put('/api/packages', async (req, res) => {
+  const isSuper = req.user?.role === 'admin' || isSuperAdminEmailOrName(req.user);
+  if (!isSuper) {
+    return res.status(403).json({ success: false, message: 'Access denied. Only Super Admin can modify package pricing and tiers.' });
+  }
+  const { dealPackages, employeePackages } = req.body;
+  await savePackages({ dealPackages, employeePackages });
+  res.json({ success: true, message: 'Package pricing and configurations saved successfully!' });
+});
+
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || '';
 
@@ -726,7 +788,10 @@ app.use(async (req, res, next) => {
         displayName: 'Harsh Goyal (Admin)',
         username: 'admin',
         role: 'admin',
-        email: 'salesflowcrmhelp@gmail.com'
+        email: 'salesflowcrmhelp@gmail.com',
+        packageTier: 'super_admin',
+        permissions: null,
+        maxLeadsLimit: 999999
       };
       req.user = adminUser;
       return next();
@@ -863,6 +928,9 @@ app.post('/api/auth/login', async (req, res) => {
       displayName: user.displayName || user.name,
       username: user.username,
       role: user.role || 'sales_rep',
+      packageTier: user.packageTier || (user.role === 'admin' ? 'super_admin' : 'starter'),
+      permissions: user.permissions || null,
+      maxLeadsLimit: user.maxLeadsLimit || (user.role === 'admin' ? 999999 : 50),
       email: user.email || '',
       phone: user.phone || ''
     },
@@ -924,6 +992,9 @@ app.post('/api/auth/accept-invite', async (req, res) => {
       displayName: user.displayName || user.name,
       username: user.username,
       role: user.role || 'sales_rep',
+      packageTier: user.packageTier || (user.role === 'admin' ? 'super_admin' : 'starter'),
+      permissions: user.permissions || null,
+      maxLeadsLimit: user.maxLeadsLimit || (user.role === 'admin' ? 999999 : 50),
       email: user.email || '',
       phone: user.phone || ''
     },
@@ -1120,6 +1191,9 @@ app.post('/api/auth/verify-reset-password', async (req, res) => {
       displayName: user.displayName || user.name,
       username: user.username,
       role: user.role || 'sales_rep',
+      packageTier: user.packageTier || (user.role === 'admin' ? 'super_admin' : 'starter'),
+      permissions: user.permissions || null,
+      maxLeadsLimit: user.maxLeadsLimit || (user.role === 'admin' ? 999999 : 50),
       email: user.email || '',
       phone: user.phone || ''
     },
@@ -1177,6 +1251,9 @@ app.get('/api/users', async (req, res) => {
     displayName: u.displayName || u.name,
     username: u.username,
     role: u.role || 'sales_rep',
+    packageTier: u.packageTier || (u.role === 'admin' ? 'super_admin' : 'starter'),
+    permissions: u.permissions || null,
+    maxLeadsLimit: u.maxLeadsLimit || (u.role === 'admin' ? 999999 : 50),
     email: isSuper ? (u.email || '') : (u.id === user.id ? u.email : ''),
     phone: isSuper ? (u.phone || '') : (u.id === user.id ? u.phone : ''),
     reportsTo: u.reportsTo || u.manager || '',
@@ -1236,6 +1313,9 @@ app.post('/api/users/invite', async (req, res) => {
       email: cleanEmail,
       pin: userPin,
       role: userRole,
+      packageTier: 'starter',
+      permissions: null,
+      maxLeadsLimit: userRole === 'admin' ? 999999 : 50,
       phone: phone.trim(),
       reportsTo: reportsTo.trim(),
       active: true,
@@ -1462,7 +1542,7 @@ app.post('/api/users', async (req, res) => {
     return res.status(403).json({ success: false, message: 'Access denied. Only Admin can create users.' });
   }
 
-  const { name, username, pin, role = 'sales_rep', email = '', phone = '', reportsTo = '', managerId = '', packageTier = 'starter', permissions = null } = req.body;
+  const { name, username, pin, role = 'sales_rep', email = '', phone = '', reportsTo = '', managerId = '', packageTier = 'starter', permissions = null, maxLeadsLimit } = req.body;
   if (!name || !pin) {
     return res.status(400).json({ success: false, message: 'Name and PIN are required.' });
   }
@@ -1484,6 +1564,7 @@ app.post('/api/users', async (req, res) => {
     role: ['admin', 'manager'].includes(role) ? role : 'sales_rep',
     packageTier: ['starter', 'growth', 'enterprise', 'super_admin'].includes(packageTier) ? packageTier : 'starter',
     permissions: permissions || null,
+    maxLeadsLimit: maxLeadsLimit ? Number(maxLeadsLimit) : (role === 'admin' ? 999999 : 50),
     email: email.trim(),
     phone: phone.trim(),
     reportsTo: reportsTo ? reportsTo.trim() : '',
@@ -1546,7 +1627,7 @@ app.put('/api/users/:id', async (req, res) => {
   }
 
   const { id } = req.params;
-  const { name, pin, role, reportsTo, managerId, email, phone, active, packageTier, permissions } = req.body;
+  const { name, pin, role, reportsTo, managerId, email, phone, active, packageTier, permissions, maxLeadsLimit } = req.body;
 
   const allUsers = await getUsers();
   const targetUser = allUsers.find(u => u.id === id);
@@ -1570,6 +1651,9 @@ app.put('/api/users/:id', async (req, res) => {
   }
   if (permissions !== undefined) {
     updated.permissions = permissions;
+  }
+  if (maxLeadsLimit !== undefined) {
+    updated.maxLeadsLimit = Number(maxLeadsLimit) || 50;
   }
   if (reportsTo !== undefined) updated.reportsTo = reportsTo.trim();
   if (managerId !== undefined) updated.managerId = managerId.trim();

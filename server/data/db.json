@@ -21,6 +21,18 @@
       "email": "harsh.accomation@gmail.com",
       "phone": "9876543210",
       "active": true
+    },
+    {
+      "id": "usr_1789033985345_n62j",
+      "active": true,
+      "createdAt": "2026-09-10T09:53:05.345Z",
+      "displayName": "Kashish",
+      "email": "Kashish.accomation@gmail.com",
+      "name": "Kashish",
+      "phone": "7240705579",
+      "pin": "Admin@123",
+      "role": "sales_rep",
+      "username": "kashish"
     }
   ],
   "leads": [
