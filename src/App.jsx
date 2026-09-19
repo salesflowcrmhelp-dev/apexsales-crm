@@ -6446,7 +6446,7 @@ export default function App() {
               </svg>
             </div>
             <div className="sidebar-brand-text" style={{ minWidth: 0 }}>
-              <span className="brand-name" style={{ whiteSpace: "nowrap", letterSpacing: "-0.3px" }}>ApexSales</span>
+              <h1 className="brand-name" style={{ margin: 0, fontSize: "15px", fontWeight: "800", color: "#0f172a", whiteSpace: "nowrap", letterSpacing: "-0.3px" }}>ApexSales</h1>
               <span className="brand-tag" style={{ fontSize: "12px", color: "#475569", fontWeight: "700", whiteSpace: "nowrap", letterSpacing: "0.2px" }}>Revenue Intelligence</span>
             </div>
           </div>
@@ -6699,18 +6699,19 @@ export default function App() {
                 {getActiveTabInfo().icon}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <span 
+                <h1 
                   style={{
                     fontSize: "13.5px",
                     fontWeight: "800",
                     color: "#0f172a",
                     fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif",
                     letterSpacing: "-0.2px",
-                    lineHeight: 1
+                    lineHeight: 1,
+                    margin: 0
                   }}
                 >
                   {getActiveTabInfo().name}
-                </span>
+                </h1>
                 {getActiveTabInfo().badge ? (
                   <span 
                     style={{
@@ -10655,21 +10656,22 @@ export default function App() {
                         style={{ 
                           display: "inline-flex", 
                           alignItems: "center", 
-                          gap: "5px", 
-                          backgroundColor: "#ea580c", 
+                          gap: "6px", 
+                          backgroundColor: "#2563eb", 
                           color: "#ffffff", 
                           border: "none", 
                           borderRadius: "6px", 
-                          padding: "6px 14px", 
+                          padding: "0 14px", 
                           fontSize: "12px", 
                           fontWeight: "600", 
                           cursor: "pointer", 
-                          boxShadow: "0 1px 2px rgba(234, 88, 12, 0.25)", 
+                          boxShadow: "0 1px 2px rgba(37, 99, 235, 0.25)", 
                           fontFamily: "'Plus Jakarta Sans', sans-serif",
-                          height: "32px"
+                          height: "34px",
+                          boxSizing: "border-box"
                         }}
                       >
-                        <Plus size={13} /> Add Lead
+                        <Plus size={14} /> Add Lead
                       </button>
 
                       {/* Dedicated Import Leads Button */}
@@ -11174,8 +11176,8 @@ export default function App() {
                           {customFields.filter(cf => cf.showInTable).map(cf => (
                             <th key={cf.id} style={{ width: "10%", minWidth: "90px", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>{cf.name}</th>
                           ))}
-                          <th style={{ width: "16%", minWidth: "140px", padding: "4px 8px 4px 16px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px" }}>Next Follow-up</th>
-                          <th style={{ width: "13%", minWidth: "110px", padding: "4px 8px 4px 4px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px", textAlign: "right" }}>Actions</th>
+                          <th style={{ width: "16%", minWidth: "140px", padding: "4px 8px 4px 16px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Next Follow-up</th>
+                          <th style={{ width: "13%", minWidth: "125px", padding: "4px 8px 4px 4px", whiteSpace: "nowrap", fontSize: "10.5px", letterSpacing: "0.2px", textAlign: "right", verticalAlign: "middle" }}>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -11580,7 +11582,7 @@ export default function App() {
 
                               {/* Dedicated Actions Column (Issue 9: Primary 1-2 actions + Kebab More Menu) */}
                               <td style={{ padding: "4px 8px", verticalAlign: "middle", textAlign: "right", whiteSpace: "nowrap", position: "relative" }}>
-                                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: "4px", whiteSpace: "nowrap" }}>
+                                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: "6px", whiteSpace: "nowrap" }}>
                                   {lead.phone && (
                                     <a
                                       href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${lead.name || ""}, connecting regarding your inquiry.`)}`}
@@ -11590,13 +11592,16 @@ export default function App() {
                                         display: "inline-flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        width: "26px",
-                                        height: "26px",
+                                        width: "32px",
+                                        height: "32px",
+                                        minWidth: "32px",
                                         borderRadius: "6px",
                                         backgroundColor: "#f0fdf4",
                                         border: "1px solid #bbf7d0",
                                         color: "#16a34a",
-                                        textDecoration: "none"
+                                        textDecoration: "none",
+                                        boxSizing: "border-box",
+                                        transition: "all 0.15s ease"
                                       }}
                                       title="WhatsApp"
                                       aria-label="WhatsApp"
@@ -11604,7 +11609,7 @@ export default function App() {
                                         logLeadActivity(lead.id, "whatsapp", "WhatsApp Chat Opened", `Initiated WhatsApp follow-up with ${lead.name}`);
                                       }}
                                     >
-                                      <MessageCircle size={13} />
+                                      <MessageCircle size={15} />
                                     </a>
                                   )}
                                   {lead.phone && (
@@ -11614,13 +11619,16 @@ export default function App() {
                                         display: "inline-flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        width: "26px",
-                                        height: "26px",
+                                        width: "32px",
+                                        height: "32px",
+                                        minWidth: "32px",
                                         borderRadius: "6px",
                                         backgroundColor: "#eff6ff",
                                         border: "1px solid #bfdbfe",
                                         color: "#2563eb",
-                                        textDecoration: "none"
+                                        textDecoration: "none",
+                                        boxSizing: "border-box",
+                                        transition: "all 0.15s ease"
                                       }}
                                       title="Call"
                                       aria-label="Call"
@@ -11628,7 +11636,7 @@ export default function App() {
                                         logLeadActivity(lead.id, "call", "Call Dialed", `Dialed call to ${lead.name} (${lead.phone || 'No phone'})`);
                                       }}
                                     >
-                                      <Phone size={13} />
+                                      <Phone size={15} />
                                     </a>
                                   )}
 
@@ -11644,18 +11652,21 @@ export default function App() {
                                         display: "inline-flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        width: "26px",
-                                        height: "26px",
+                                        width: "32px",
+                                        height: "32px",
+                                        minWidth: "32px",
                                         borderRadius: "6px",
                                         backgroundColor: activeRowMenuId === lead.id ? "#f1f5f9" : "#ffffff",
                                         border: "1px solid #e2e8f0",
                                         color: "#475569",
-                                        cursor: "pointer"
+                                        cursor: "pointer",
+                                        boxSizing: "border-box",
+                                        transition: "all 0.15s ease"
                                       }}
                                       title="More Actions"
                                       aria-label="More Actions"
                                     >
-                                      <MoreVertical size={13} />
+                                      <MoreVertical size={15} />
                                     </button>
 
                                     {activeRowMenuId === lead.id && (
@@ -18912,9 +18923,9 @@ export default function App() {
                 </div>
 
                 {/* Row 4: Priority / Score & Owner */}
-                <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "12px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "20px" }}>
                   <div>
-                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "#334155", marginBottom: "4px" }}>
+                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "#334155", marginBottom: "6px" }}>
                       Priority / Score
                     </label>
                     <div style={{ display: "flex", gap: "6px" }}>
@@ -18950,7 +18961,7 @@ export default function App() {
                   </div>
 
                   <div>
-                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "#334155", marginBottom: "4px" }}>
+                    <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "#334155", marginBottom: "6px" }}>
                       Assigned Owner
                     </label>
                     {(() => {
@@ -19000,56 +19011,61 @@ export default function App() {
 
                 {/* Row 5: Schedule Next Follow-up */}
                 <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "12px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                    <label style={{ fontSize: "11px", fontWeight: "700", color: "#334155" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <label style={{ fontSize: "11px", fontWeight: "700", color: "#334155", margin: 0 }}>
                       Next Follow-up
                     </label>
-                    <div style={{ display: "flex", gap: "4px" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                       {[
                         { label: "Today", days: 0 },
                         { label: "Tomorrow", days: 1 },
                         { label: "+3 Days", days: 3 },
                         { label: "Next Wk", days: 7 }
-                      ].map(chip => (
-                        <button
-                          key={chip.label}
-                          type="button"
-                          onClick={() => {
-                            const d = new Date();
-                            d.setDate(d.getDate() + chip.days);
-                            const yr = d.getFullYear();
-                            const mo = String(d.getMonth() + 1).padStart(2, '0');
-                            const da = String(d.getDate()).padStart(2, '0');
-                            setNewLeadData(prev => ({ ...prev, next_follow_up: `${yr}-${mo}-${da}` }));
-                          }}
-                          style={{
-                            padding: "2px 7px",
-                            fontSize: "10px",
-                            fontWeight: "600",
-                            backgroundColor: "#f1f5f9",
-                            color: "#475569",
-                            border: "1px solid #e2e8f0",
-                            borderRadius: "4px",
-                            cursor: "pointer"
-                          }}
-                        >
-                          {chip.label}
-                        </button>
-                      ))}
+                      ].map(chip => {
+                        const d = new Date();
+                        d.setDate(d.getDate() + chip.days);
+                        const yr = d.getFullYear();
+                        const mo = String(d.getMonth() + 1).padStart(2, '0');
+                        const da = String(d.getDate()).padStart(2, '0');
+                        const targetDateStr = `${yr}-${mo}-${da}`;
+                        const isSelected = newLeadData.next_follow_up === targetDateStr;
+                        return (
+                          <button
+                            key={chip.label}
+                            type="button"
+                            onClick={() => setNewLeadData(prev => ({ ...prev, next_follow_up: targetDateStr }))}
+                            style={{
+                              padding: "3px 8px",
+                              fontSize: "11px",
+                              fontWeight: "600",
+                              backgroundColor: isSelected ? "#eff6ff" : "#f8fafc",
+                              color: isSelected ? "#2563eb" : "#475569",
+                              border: isSelected ? "1px solid #2563eb" : "1px solid #cbd5e1",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              transition: "all 0.15s ease",
+                              display: "inline-flex",
+                              alignItems: "center"
+                            }}
+                          >
+                            {chip.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "10px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "10px", alignItems: "center" }}>
                     <input
                       type="date"
                       value={newLeadData.next_follow_up}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, next_follow_up: e.target.value }))}
-                      style={{ padding: "6px 10px", fontSize: "11.5px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff" }}
+                      style={{ height: "34px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                     />
                     <select
                       value={newLeadData.next_follow_up_time}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, next_follow_up_time: e.target.value }))}
-                      style={{ padding: "6px 10px", fontSize: "11.5px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", cursor: "pointer" }}
+                      style={{ height: "34px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", cursor: "pointer", boxSizing: "border-box" }}
                     >
                       {["10:00 AM", "11:00 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM", "06:30 PM"].map(t => (
                         <option key={t} value={t}>{t}</option>
@@ -19064,30 +19080,30 @@ export default function App() {
                     Notes / Remarks
                   </label>
                   <textarea
-                    rows={2}
+                    rows={4}
                     placeholder="Discussion points, requirements or client preferences..."
                     value={newLeadData.notes}
                     onChange={(e) => setNewLeadData(prev => ({ ...prev, notes: e.target.value }))}
-                    style={{ width: "100%", padding: "7px 10px", fontSize: "11.5px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", resize: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                    style={{ width: "100%", minHeight: "88px", padding: "8px 12px", fontSize: "12px", lineHeight: "1.5", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", resize: "vertical", boxSizing: "border-box", fontFamily: "inherit" }}
                   />
                 </div>
 
               </div>
 
               {/* Footer */}
-              <div style={{ padding: "12px 20px", borderTop: "1px solid #e2e8f0", backgroundColor: "#f8fafc", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "8px" }}>
+              <div style={{ padding: "12px 20px", borderTop: "1px solid #e2e8f0", backgroundColor: "#f8fafc", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "10px" }}>
                 <button
                   type="button"
                   onClick={() => setShowAddLeadModal(false)}
-                  style={{ padding: "6px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11.5px", fontWeight: "600", color: "#475569", cursor: "pointer" }}
+                  style={{ height: "36px", padding: "0 16px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12.5px", fontWeight: "600", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  style={{ padding: "6px 18px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "11.5px", fontWeight: "700", cursor: "pointer", boxShadow: "0 2px 4px rgba(37, 99, 235, 0.25)", display: "inline-flex", alignItems: "center", gap: "5px" }}
+                  style={{ height: "36px", padding: "0 20px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12.5px", fontWeight: "700", cursor: "pointer", boxShadow: "0 2px 4px rgba(37, 99, 235, 0.25)", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px", boxSizing: "border-box" }}
                 >
-                  <Plus size={14} />
+                  <Plus size={15} />
                   <span>Save Lead</span>
                 </button>
               </div>
