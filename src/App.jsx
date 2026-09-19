@@ -20420,13 +20420,14 @@ export default function App() {
               </button>
             </div>
 
-            {/* Form Body */}
-            <form 
-              onSubmit={handleCreateLead} 
-              autoComplete="off" 
-              autoCorrect="off" 
-              autoCapitalize="off" 
-              spellCheck="false"
+            {/* Form Body - Container is a div to prevent browser address autofill grouping */}
+            <div 
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+                  e.preventDefault();
+                  handleCreateLead(e);
+                }
+              }}
               style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, overflowY: "auto" }}
             >
               <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "13px" }}>
@@ -20440,10 +20441,12 @@ export default function App() {
                     <input
                       type="text"
                       name="crm_lead_contact_name"
-                      autoComplete="off"
+                      autoComplete="one-time-code"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
+                      readOnly
+                      onFocus={(e) => { e.target.readOnly = false; }}
                       required
                       placeholder="e.g. Rahul Sharma"
                       value={newLeadData.name}
@@ -20459,10 +20462,12 @@ export default function App() {
                     <input
                       type="text"
                       name="crm_lead_company_org"
-                      autoComplete="off"
+                      autoComplete="one-time-code"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
+                      readOnly
+                      onFocus={(e) => { e.target.readOnly = false; }}
                       placeholder="e.g. Apex Tech Pvt Ltd"
                       value={newLeadData.company}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, company: e.target.value }))}
@@ -20481,10 +20486,12 @@ export default function App() {
                       type="text"
                       inputMode="tel"
                       name="crm_lead_phone_no"
-                      autoComplete="off"
+                      autoComplete="one-time-code"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
+                      readOnly
+                      onFocus={(e) => { e.target.readOnly = false; }}
                       placeholder="e.g. 9876543210"
                       value={newLeadData.phone}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, phone: e.target.value }))}
@@ -20500,10 +20507,12 @@ export default function App() {
                       type="text"
                       inputMode="email"
                       name="crm_lead_email_addr"
-                      autoComplete="off"
+                      autoComplete="one-time-code"
                       data-lpignore="true"
                       data-1p-ignore="true"
                       data-form-type="other"
+                      readOnly
+                      onFocus={(e) => { e.target.readOnly = false; }}
                       placeholder="e.g. rahul@example.com"
                       value={newLeadData.email}
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, email: e.target.value }))}
@@ -20765,14 +20774,15 @@ export default function App() {
                   Cancel
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={handleCreateLead}
                   style={{ height: "36px", padding: "0 20px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", boxShadow: "0 2px 4px rgba(37, 99, 235, 0.25)", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "6px", boxSizing: "border-box" }}
                 >
                   <Plus size={15} />
                   <span>Save Lead</span>
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
