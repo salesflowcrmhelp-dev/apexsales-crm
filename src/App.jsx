@@ -848,16 +848,16 @@ export const EMPLOYEE_PACKAGES = {
     description: "Strict own-lead pipeline isolation. Basic follow-up & dialing without data export or financial visibility.",
     permissions: buildDefaultPermissions({
       // Cards
-      canViewKpiTotalPipeline: false,
+      canViewKpiTotalPipeline: true,
       canViewKpiClosedWon: true,
       canViewKpiWinRate: true,
-      canViewKpiSalesTarget: false,
-      canViewKpiDailyTarget: false,
-      canViewKpiIncentive: false,
-      canViewRenewalCard: false,
-      canViewPerformanceCockpit: false,
-      canViewForecastEngine: false,
-      canViewWeeklyDigest: false,
+      canViewKpiSalesTarget: true,
+      canViewKpiDailyTarget: true,
+      canViewKpiIncentive: true,
+      canViewRenewalCard: true,
+      canViewPerformanceCockpit: true,
+      canViewForecastEngine: true,
+      canViewWeeklyDigest: true,
       // Workspaces
       canAccessPipeline: true,
       canAccessTasks: true,
@@ -869,7 +869,7 @@ export const EMPLOYEE_PACKAGES = {
       canViewSpreadsheetGrid: true,
       canViewKanbanDeals: true,
       canViewSplitView: true,
-      canViewAnalyticsDashboard: false,
+      canViewAnalyticsDashboard: true,
       // Pipeline
       canViewAllLeads: false,
       canCreateLeads: true,
@@ -878,8 +878,8 @@ export const EMPLOYEE_PACKAGES = {
       canReassignLeads: false,
       canChangeLeadScore: true,
       // Financials
-      canViewRevenue: false,
-      canEditDealValue: false,
+      canViewRevenue: true,
+      canEditDealValue: true,
       canEditTarget: false,
       canEditIncentive: false,
       // Security
@@ -2475,7 +2475,7 @@ export default function App() {
     if (activeWorkspace === "calendar" && perms.canAccessCalendar === false) {
       setActiveWorkspace("pipeline");
     }
-    if (activeWorkspace === "team") {
+    if (activeWorkspace === "team" && perms.canAccessTeam === false) {
       setActiveWorkspace("pipeline");
     }
   }, [currentUser, activeWorkspace, pipelineView]);
@@ -3071,6 +3071,7 @@ export default function App() {
         } catch(e) {}
         
         const userLeads = await loadLeadsFromBackend(data.user);
+        await loadUsersFromBackend();
         const count = (userLeads || leads).filter(l => l.status === "Payment Follow Up").length;
 
         if (data.user.role === "admin") {
@@ -3383,6 +3384,9 @@ export default function App() {
           ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
         body: JSON.stringify({
+          id: selectedUserForAccess.id,
+          name: selectedUserForAccess.name,
+          email: selectedUserForAccess.email,
           packageTier: accessFormData.packageTier,
           permissions: accessFormData.permissions,
           maxLeadsLimit: accessFormData.maxLeadsLimit
@@ -3391,7 +3395,8 @@ export default function App() {
 
       setShowAccessModal(false);
       showToast(`🎉 Access & Permissions updated for ${selectedUserForAccess.name}!`, "success");
-      loadUsersFromBackend();
+      await loadUsersFromBackend();
+      await loadLeadsFromBackend();
     } catch(err) {
       showToast("Access updated locally.", "success");
       setShowAccessModal(false);

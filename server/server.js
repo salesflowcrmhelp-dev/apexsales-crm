@@ -541,6 +541,28 @@ async function autoSeedMongoIfEmpty() {
       await mongoDb.collection('leads').insertMany(local.leads);
       console.log(`✅ Auto-seeded MongoDB Atlas with ${local.leads.length} initial pipeline leads from db.json.`);
     }
+
+    // Synchronize users from db.json to MongoDB if they have explicit packageTier or permissions
+    if (local.users && local.users.length > 0) {
+      for (const u of local.users) {
+        if (u.permissions || u.packageTier) {
+          await mongoDb.collection('users').updateOne(
+            { $or: [{ id: u.id }, { email: u.email }, { name: u.name }] },
+            { 
+              $set: { 
+                id: u.id,
+                name: u.name,
+                packageTier: u.packageTier,
+                permissions: u.permissions,
+                maxLeadsLimit: u.maxLeadsLimit || 1000
+              } 
+            },
+            { upsert: false }
+          );
+        }
+      }
+      console.log('✅ Synchronized user packageTier & permissions from db.json to MongoDB Atlas.');
+    }
   } catch (err) {
     console.error('Error auto-seeding MongoDB Atlas:', err);
   }
@@ -2035,14 +2057,26 @@ app.put('/api/leads/:id', async (req, res) => {
   }
 
   const isSuper = isSuperAdminEmailOrName(user);
+  const isOwner = (currentLead.owner || '').trim().toLowerCase() === (user.name || '').trim().toLowerCase();
+  const canEditAnyLead = isSuper || 
+                         user.role === 'admin' || 
+                         user.packageTier === 'enterprise' || 
+                         user.packageTier === 'super_admin' || 
+                         user.permissions?.canEditLeads === true ||
+                         user.permissions?.canViewAllLeads === true;
 
-  // Security enforcement: If sales rep, ensure they only edit their own lead
-  if (!isSuper && (currentLead.owner || '').trim().toLowerCase() !== (user.name || '').trim().toLowerCase()) {
+  const canReassign = isSuper || 
+                      user.role === 'admin' || 
+                      user.packageTier === 'enterprise' ||
+                      user.permissions?.canReassignLeads === true;
+
+  // Security enforcement: allow editing if lead owner or has workspace lead editing permission
+  if (!isOwner && !canEditAnyLead) {
     return res.status(403).json({ success: false, message: 'Access denied. You can only update your own assigned leads.' });
   }
 
-  // Sales rep cannot reassign lead ownership to someone else
-  if (!isSuper && updates.owner && updates.owner !== user.name) {
+  // Reassign owner check: if updating owner and not permitted, ignore owner update
+  if (updates.owner && updates.owner !== currentLead.owner && !canReassign) {
     delete updates.owner;
   }
 
@@ -2052,7 +2086,7 @@ app.put('/api/leads/:id', async (req, res) => {
   res.json({ success: true, lead: updatedLead, message: 'Lead updated successfully!' });
 });
 
-// Delete Lead (Admin Only or Owner)
+// Delete Lead (Admin, Enterprise, canDeleteLeads permission or Lead Owner)
 app.delete('/api/leads/:id', async (req, res) => {
   const { id } = req.params;
   const user = req.user;
@@ -2067,10 +2101,14 @@ app.delete('/api/leads/:id', async (req, res) => {
   }
 
   const isSuper = isSuperAdminEmailOrName(user);
+  const isOwner = (targetLead.owner || '').trim().toLowerCase() === (user.name || '').trim().toLowerCase();
+  const canDeleteAny = isSuper || 
+                       user.role === 'admin' || 
+                       user.packageTier === 'enterprise' || 
+                       user.permissions?.canDeleteLeads === true;
 
-  // Only Admin or the lead's owner can delete
-  if (!isSuper && (targetLead.owner || '').trim().toLowerCase() !== (user.name || '').trim().toLowerCase()) {
-    return res.status(403).json({ success: false, message: 'Access denied. Only Admin or lead owner can delete leads.' });
+  if (!isOwner && !canDeleteAny) {
+    return res.status(403).json({ success: false, message: 'Access denied. You do not have permission to delete this lead.' });
   }
 
   const deleted = await removeLead(id);
@@ -2085,9 +2123,14 @@ app.post('/api/sync/bulk', async (req, res) => {
 
   const { leads, users } = req.body;
   const isSuper = isSuperAdminEmailOrName(req.user);
+  const canSyncAny = isSuper || 
+                     req.user.role === 'admin' || 
+                     req.user.packageTier === 'enterprise' || 
+                     req.user.permissions?.canViewAllLeads === true || 
+                     req.user.permissions?.canEditLeads === true;
 
-  if (!isSuper) {
-    // Sales reps can safely sync ONLY the leads assigned to them
+  if (!canSyncAny) {
+    // Sales reps with strict isolation can sync ONLY their own leads
     const repLeads = Array.isArray(leads) 
       ? leads.filter(l => (l.owner || '').trim().toLowerCase() === (req.user.name || '').trim().toLowerCase()) 
       : [];
@@ -2097,8 +2140,8 @@ app.post('/api/sync/bulk', async (req, res) => {
     return res.json({ success: true, message: 'Assigned leads synchronized successfully!' });
   }
 
-  // Admin syncs all leads & users
-  await syncBulkData(leads, users);
+  // Authorized user / Admin syncs all leads
+  await syncBulkData(leads, isSuper || req.user.role === 'admin' ? users : null);
   res.json({ success: true, message: 'Bulk data synchronized successfully!' });
 });
 
