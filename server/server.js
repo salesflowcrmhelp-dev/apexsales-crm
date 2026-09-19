@@ -1244,7 +1244,7 @@ app.get('/api/users', async (req, res) => {
     return res.status(401).json({ success: false, message: 'Authentication required.', users: [] });
   }
 
-  const isSuper = isSuperAdminEmailOrName(user);
+  const isSuper = isSuperAdminEmailOrName(user) || user.role === 'admin';
   const isManager = user.role === 'manager';
 
   let visibleUsers = [];
@@ -1599,6 +1599,14 @@ app.post('/api/users', async (req, res) => {
     createdAt: new Date().toISOString()
   };
 
+  if (newUser.role !== 'admin' && !isSuperAdminEmailOrName(newUser)) {
+    if (newUser.permissions) {
+      newUser.permissions.canViewAllLeads = false;
+      newUser.permissions.canDeleteLeads = false;
+      newUser.permissions.canAccessTeam = false;
+    }
+  }
+
   await saveUser(newUser);
 
   let emailSent = false;
@@ -1684,6 +1692,13 @@ app.put('/api/users/:id', async (req, res) => {
   }
   if (permissions !== undefined) {
     updated.permissions = permissions;
+  }
+  if (updated.role !== 'admin' && !isSuperAdminEmailOrName(updated)) {
+    if (updated.permissions) {
+      updated.permissions.canViewAllLeads = false;
+      updated.permissions.canDeleteLeads = false;
+      updated.permissions.canAccessTeam = false;
+    }
   }
   if (maxLeadsLimit !== undefined) {
     updated.maxLeadsLimit = Number(maxLeadsLimit) || 50;
@@ -1789,15 +1804,11 @@ app.get('/api/leads', async (req, res) => {
   const allUsers = await getUsers();
   const { owner } = req.query;
 
-  const isSuperAdmin = isSuperAdminEmailOrName(user);
+  const isSuperAdmin = isSuperAdminEmailOrName(user) || user.role === 'admin';
   const isManager = user.role === 'manager';
-  const hasFullLeadAccess = isSuperAdmin || 
-                            user.role === 'admin' || 
-                            user.permissions?.canViewAllLeads === true || 
-                            user.packageTier === 'enterprise' || 
-                            user.packageTier === 'super_admin';
+  const hasFullLeadAccess = isSuperAdmin;
 
-  // 1. If user is Super Admin or has Full Pipeline Access / canViewAllLeads permission:
+  // 1. If user is Super Admin: Full CRM Master Access
   if (hasFullLeadAccess) {
     let resultLeads = allLeads;
     if (owner && owner !== 'All' && owner !== 'all') {
@@ -2056,26 +2067,27 @@ app.put('/api/leads/:id', async (req, res) => {
     return res.status(404).json({ success: false, message: 'Lead not found.' });
   }
 
-  const isSuper = isSuperAdminEmailOrName(user);
+  const isSuper = isSuperAdminEmailOrName(user) || user.role === 'admin';
+  const isManager = user.role === 'manager';
   const isOwner = (currentLead.owner || '').trim().toLowerCase() === (user.name || '').trim().toLowerCase();
-  const canEditAnyLead = isSuper || 
-                         user.role === 'admin' || 
-                         user.packageTier === 'enterprise' || 
-                         user.packageTier === 'super_admin' || 
-                         user.permissions?.canEditLeads === true ||
-                         user.permissions?.canViewAllLeads === true;
 
-  const canReassign = isSuper || 
-                      user.role === 'admin' || 
-                      user.packageTier === 'enterprise' ||
-                      user.permissions?.canReassignLeads === true;
+  let isManagerReportingLead = false;
+  if (isManager) {
+    const managerNameLower = (user.name || '').trim().toLowerCase();
+    const reportingUsers = allUsers.filter(u => {
+      const uReportsTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+      return uReportsTo === managerNameLower || u.managerId === user.id;
+    }).map(u => (u.name || '').trim().toLowerCase());
+    isManagerReportingLead = reportingUsers.includes((currentLead.owner || '').trim().toLowerCase());
+  }
 
-  // Security enforcement: allow editing if lead owner or has workspace lead editing permission
-  if (!isOwner && !canEditAnyLead) {
+  // Security enforcement: allow editing if Super Admin, lead owner, or manager of reporting team
+  if (!isSuper && !isOwner && !isManagerReportingLead) {
     return res.status(403).json({ success: false, message: 'Access denied. You can only update your own assigned leads.' });
   }
 
-  // Reassign owner check: if updating owner and not permitted, ignore owner update
+  // Reassign owner check: only Super Admin and Manager can reassign leads
+  const canReassign = isSuper || isManager;
   if (updates.owner && updates.owner !== currentLead.owner && !canReassign) {
     delete updates.owner;
   }
@@ -2086,12 +2098,17 @@ app.put('/api/leads/:id', async (req, res) => {
   res.json({ success: true, lead: updatedLead, message: 'Lead updated successfully!' });
 });
 
-// Delete Lead (Admin, Enterprise, canDeleteLeads permission or Lead Owner)
+// Delete Lead: Strictly restricted to Super Admin only (protects client database)
 app.delete('/api/leads/:id', async (req, res) => {
   const { id } = req.params;
   const user = req.user;
   if (!user) {
     return res.status(401).json({ success: false, message: 'Authentication required to delete leads.' });
+  }
+
+  const isSuper = isSuperAdminEmailOrName(user) || user.role === 'admin';
+  if (!isSuper) {
+    return res.status(403).json({ success: false, message: 'Access denied. Only Super Admin can delete leads.' });
   }
 
   const allLeads = await getLeads();
@@ -2100,48 +2117,44 @@ app.delete('/api/leads/:id', async (req, res) => {
     return res.status(404).json({ success: false, message: 'Lead not found.' });
   }
 
-  const isSuper = isSuperAdminEmailOrName(user);
-  const isOwner = (targetLead.owner || '').trim().toLowerCase() === (user.name || '').trim().toLowerCase();
-  const canDeleteAny = isSuper || 
-                       user.role === 'admin' || 
-                       user.packageTier === 'enterprise' || 
-                       user.permissions?.canDeleteLeads === true;
-
-  if (!isOwner && !canDeleteAny) {
-    return res.status(403).json({ success: false, message: 'Access denied. You do not have permission to delete this lead.' });
-  }
-
   const deleted = await removeLead(id);
   res.json({ success: true, lead: deleted, message: 'Lead deleted successfully.' });
 });
 
-// Bulk Sync Endpoint
+// Bulk Sync Endpoint: Strict role-isolated synchronization
 app.post('/api/sync/bulk', async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: 'Authentication required for synchronization.' });
   }
 
   const { leads, users } = req.body;
-  const isSuper = isSuperAdminEmailOrName(req.user);
-  const canSyncAny = isSuper || 
-                     req.user.role === 'admin' || 
-                     req.user.packageTier === 'enterprise' || 
-                     req.user.permissions?.canViewAllLeads === true || 
-                     req.user.permissions?.canEditLeads === true;
+  const isSuper = isSuperAdminEmailOrName(req.user) || req.user.role === 'admin';
+  const isManager = req.user.role === 'manager';
 
-  if (!canSyncAny) {
-    // Sales reps with strict isolation can sync ONLY their own leads
-    const repLeads = Array.isArray(leads) 
-      ? leads.filter(l => (l.owner || '').trim().toLowerCase() === (req.user.name || '').trim().toLowerCase()) 
-      : [];
-    if (repLeads.length > 0) {
-      await syncBulkData(repLeads, null);
+  if (!isSuper) {
+    let allowedLeads = [];
+    if (isManager) {
+      const managerNameLower = (req.user.name || '').trim().toLowerCase();
+      const allUsers = await getUsers();
+      const reportingUsers = allUsers.filter(u => {
+        const uReportsTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+        return uReportsTo === managerNameLower || u.managerId === req.user.id;
+      }).map(u => (u.name || '').trim().toLowerCase());
+      const allowedOwners = new Set([managerNameLower, ...reportingUsers]);
+      allowedLeads = (leads || []).filter(l => allowedOwners.has((l.owner || '').trim().toLowerCase()));
+    } else {
+      // Employee strictly syncs only their own leads
+      allowedLeads = (leads || []).filter(l => (l.owner || '').trim().toLowerCase() === (req.user.name || '').trim().toLowerCase());
     }
-    return res.json({ success: true, message: 'Assigned leads synchronized successfully!' });
+
+    if (allowedLeads.length > 0) {
+      await syncBulkData(allowedLeads, null);
+    }
+    return res.json({ success: true, message: 'Leads synchronized successfully!' });
   }
 
-  // Authorized user / Admin syncs all leads
-  await syncBulkData(leads, isSuper || req.user.role === 'admin' ? users : null);
+  // Super Admin syncs all leads and users
+  await syncBulkData(leads, users);
   res.json({ success: true, message: 'Bulk data synchronized successfully!' });
 });
 

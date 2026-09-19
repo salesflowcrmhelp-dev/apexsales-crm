@@ -972,6 +972,8 @@ export const EMPLOYEE_PACKAGES = {
         });
       });
       allTrue.canAccessTeam = false; // Only Super Admin has Team RBAC
+      allTrue.canViewAllLeads = false; // Strict RBAC: Managers see only their assigned & reporting team leads
+      allTrue.canDeleteLeads = false; // Leads deletion is strictly restricted to Super Admin
       return allTrue;
     })()
   },
@@ -1039,11 +1041,19 @@ export function getUserEffectivePermissions(user) {
     if (saved) localOverrides = JSON.parse(saved);
   } catch(e) {}
 
-  return {
+  const merged = {
     ...pkgDefaults,
     ...(user.permissions || {}),
     ...localOverrides
   };
+
+  // 🛡️ AIRTIGHT ROLE-BASED ACCESS CONTROL (RBAC) FOR NON-SUPERADMINS:
+  // Non-admins can NEVER view global company leads, delete leads, or access Team RBAC settings
+  merged.canViewAllLeads = false;
+  merged.canDeleteLeads = false;
+  merged.canAccessTeam = false;
+
+  return merged;
 }
 
 export function formatLeadRevenue(val, user) {
@@ -2817,9 +2827,8 @@ export default function App() {
             syncLeadsToBackend(sanitized);
           }
 
-          // 🛡️ REP / MANAGER CACHING (Respects canViewAllLeads permission):
-          const userPerms = getUserEffectivePermissions(activeUser);
-          const canViewAll = isSuper || activeUser.role === "admin" || userPerms.canViewAllLeads === true;
+          // 🛡️ REP / MANAGER CACHING (Strict 3-tier RBAC isolation):
+          const canViewAll = isSuper || activeUser.role === "admin";
 
           if (!canViewAll) {
             if (!isManager) {
@@ -3875,8 +3884,7 @@ export default function App() {
     const isManager = currentUser?.role === "manager";
     let scoped = leads;
 
-    const userPerms = getUserEffectivePermissions(currentUser);
-    const canViewAll = isSuper || currentUser?.role === "admin" || userPerms.canViewAllLeads === true;
+    const canViewAll = isSuper || currentUser?.role === "admin";
 
     if (!canViewAll) {
       if (isManager) {
@@ -5891,18 +5899,20 @@ export default function App() {
 
   // Trigger manual CSV download of the grid
   const exportToCSV = () => {
+    const isSuper = checkIsSuperAdmin(currentUser) || currentUser?.role === "admin";
     const effectivePerms = getUserEffectivePermissions(currentUser);
-    if (!effectivePerms.canExportCSV) {
+    if (!isSuper && !effectivePerms.canExportCSV) {
       showToast("🔒 Anti-Theft Protection: Your package tier does not permit exporting lead database. Contact Super Admin.", "error");
       return;
     }
-    if (!leads.length) return;
+    const leadsToExport = ownerScopedLeads;
+    if (!leadsToExport.length) return;
     
     // CSV Header row
     const headers = COLUMNS.map(c => c.label).join(",");
     
     // CSV Content rows
-    const rows = leads.map(lead => {
+    const rows = leadsToExport.map(lead => {
       return COLUMNS.map(c => {
         let val = lead[c.field] ?? "";
         // Clean values of commas to prevent cell break
@@ -7113,23 +7123,23 @@ export default function App() {
       );
   }
   const todayStr = new Date().toISOString().split('T')[0];
-  const dueTodayLeads = leads.filter(l => l.next_follow_up === todayStr && isActiveStatus(l.status));
-  const overdueLeads = leads.filter(l => l.next_follow_up && l.next_follow_up < todayStr && isActiveStatus(l.status));
+  const dueTodayLeads = ownerScopedLeads.filter(l => l.next_follow_up === todayStr && isActiveStatus(l.status));
+  const overdueLeads = ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < todayStr && isActiveStatus(l.status));
   const overdue = overdueLeads.length;
-  const upcomingLeads = leads.filter(l => l.next_follow_up && l.next_follow_up > todayStr && isActiveStatus(l.status));
+  const upcomingLeads = ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up > todayStr && isActiveStatus(l.status));
   const upcoming = upcomingLeads.length;
-  const noScheduleLeads = leads.filter(l => !l.next_follow_up && isActiveStatus(l.status));
+  const noScheduleLeads = ownerScopedLeads.filter(l => !l.next_follow_up && isActiveStatus(l.status));
   const noSchedule = noScheduleLeads.length;
-  const hotLeads = leads.filter(l => (l.score || "").toLowerCase() === "hot" && isActiveStatus(l.status));
-  const readyToCloseLeads = leads.filter(l => ["negotiation", "payment follow up", "proposal sent"].includes((l.status || "").toLowerCase()) && isActiveStatus(l.status));
-  const renewalLeads = leads.filter(l => (l.status || "").toLowerCase() === "renewal");
+  const hotLeads = ownerScopedLeads.filter(l => (l.score || "").toLowerCase() === "hot" && isActiveStatus(l.status));
+  const readyToCloseLeads = ownerScopedLeads.filter(l => ["negotiation", "payment follow up", "proposal sent"].includes((l.status || "").toLowerCase()) && isActiveStatus(l.status));
+  const renewalLeads = ownerScopedLeads.filter(l => (l.status || "").toLowerCase() === "renewal");
   const expectedValueToday = dueTodayLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
 
-  const wonLeadsList = leads
+  const wonLeadsList = ownerScopedLeads
     .filter(l => isWonStatus(l.status))
     .sort((a, b) => ((getLeadWonDate(b) || getLeadCreationDate(b))?.getTime() || 0) - ((getLeadWonDate(a) || getLeadCreationDate(a))?.getTime() || 0));
 
-  const recentLeadsList = [...leads]
+  const recentLeadsList = [...ownerScopedLeads]
     .sort((a, b) => (getLeadCreationDate(b)?.getTime() || 0) - (getLeadCreationDate(a)?.getTime() || 0))
     .slice(0, 4);
 
@@ -12604,7 +12614,7 @@ export default function App() {
                         <div style={{ maxHeight: "240px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
                           {STATUS_OPTIONS.map(s => {
                             const isChecked = selectedFilterStages.includes(s);
-                            const count = leads.filter(l => (l.status || "").toLowerCase() === s.toLowerCase()).length;
+                            const count = ownerScopedLeads.filter(l => (l.status || "").toLowerCase() === s.toLowerCase()).length;
                             return (
                               <label
                                 key={s}
@@ -12705,11 +12715,13 @@ export default function App() {
                     const isRepOnly = !isSuper && !isManager;
 
                     const myName = currentLoggedInUser || currentUser?.name || "Harsh Goyal";
-                    const otherOwners = Array.from(new Set([
-                      ...teamMembers,
-                      ...allUsersList.map(u => u.name),
-                      ...leads.map(l => l.owner).filter(Boolean)
-                    ])).filter(m => m && m.toLowerCase() !== myName.toLowerCase());
+                    const otherOwners = isManager
+                      ? allUsersList.filter(u => u.name && u.name.toLowerCase() !== myName.toLowerCase()).map(u => u.name)
+                      : Array.from(new Set([
+                          ...teamMembers,
+                          ...allUsersList.map(u => u.name),
+                          ...leads.map(l => l.owner).filter(Boolean)
+                        ])).filter(m => m && m.toLowerCase() !== myName.toLowerCase());
 
                     return (
                       <div style={{ position: "relative" }}>
@@ -13707,7 +13719,7 @@ export default function App() {
               /* 🖥️ Modern 360° Split-Screen Workspace (HubSpot Style) */
               (() => {
                 const searchLower = (splitLeadSearch || "").toLowerCase().trim();
-                const filteredSplitLeads = leads.filter(l => {
+                const filteredSplitLeads = ownerScopedLeads.filter(l => {
                   if (splitLeadFilterStage !== "all") {
                     if (splitLeadFilterStage === "hot") {
                       if ((l.score || "").toLowerCase() !== "hot") return false;
@@ -13738,8 +13750,8 @@ export default function App() {
                   return true;
                 });
 
-                const activeLead = leads.find(l => l.id === selectedSplitLeadId) || filteredSplitLeads[0] || leads[0];
-                const activeLeadIndex = leads.findIndex(l => l.id === activeLead?.id);
+                const activeLead = ownerScopedLeads.find(l => l.id === selectedSplitLeadId) || filteredSplitLeads[0] || ownerScopedLeads[0];
+                const activeLeadIndex = ownerScopedLeads.findIndex(l => l.id === activeLead?.id);
 
                 const handleUpdateActiveLead = (field, val) => {
                   if (!activeLead) return;
@@ -16233,7 +16245,7 @@ export default function App() {
 
                       {/* Card 3: Hot Deals Value */}
                       {(() => {
-                        const hotLeads = leads.filter(l => (l.score || "").toLowerCase() === "hot" && l.status !== "Won" && l.status !== "Lost");
+                        const hotLeads = ownerScopedLeads.filter(l => (l.score || "").toLowerCase() === "hot" && l.status !== "Won" && l.status !== "Lost");
                         const hotCount = hotLeads.length || 8;
                         const hotVal = hotLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0) || 120000;
 
@@ -16337,7 +16349,7 @@ export default function App() {
                         const limitMs = trendDays * 24 * 60 * 60 * 1000;
                         const nowTs = Date.now();
 
-                        const targetLeads = trendDays === 0 ? leads : leads.filter(l => {
+                        const targetLeads = trendDays === 0 ? ownerScopedLeads : ownerScopedLeads.filter(l => {
                           const created = getLeadCreationDate(l).getTime();
                           return (nowTs - created) <= limitMs;
                         });
@@ -19390,7 +19402,7 @@ export default function App() {
                     ₹{(stats.totalPipeline || 0).toLocaleString("en-IN")}
                   </div>
                   <span style={{ fontSize: "12px", color: "#64748b", marginTop: "4px", display: "block" }}>
-                    Across {leads.length} Total Leads
+                    Across {ownerScopedLeads.length} Total Leads
                   </span>
                 </div>
 
@@ -19403,7 +19415,7 @@ export default function App() {
                     ₹{(stats.wonPipeline || 0).toLocaleString("en-IN")}
                   </div>
                   <span style={{ fontSize: "12px", color: "#166534", marginTop: "4px", display: "block" }}>
-                    {leads.filter(l => isWonStatus(l.status)).length} Closed Won Deals
+                    {ownerScopedLeads.filter(l => isWonStatus(l.status)).length} Closed Won Deals
                   </span>
                 </div>
 
@@ -19426,7 +19438,7 @@ export default function App() {
                     <Target className="w-4 h-4 text-purple-600" />
                   </div>
                   <div style={{ fontSize: "20px", fontWeight: "900", color: "#2563eb", letterSpacing: "-0.5px" }}>
-                    ₹{leads.length > 0 ? Math.round(stats.totalPipeline / leads.length).toLocaleString("en-IN") : 0}
+                    ₹{ownerScopedLeads.length > 0 ? Math.round(stats.totalPipeline / ownerScopedLeads.length).toLocaleString("en-IN") : 0}
                   </div>
                   <span style={{ fontSize: "12px", color: "#2563eb", marginTop: "4px", display: "block" }}>
                     Per Lead Average
@@ -19456,7 +19468,7 @@ export default function App() {
                     </thead>
                     <tbody>
                       {STAGE_OPTIONS.map((stg) => {
-                        const stageLeads = leads.filter(l => (l.status || "").toLowerCase() === stg.toLowerCase());
+                        const stageLeads = ownerScopedLeads.filter(l => (l.status || "").toLowerCase() === stg.toLowerCase());
                         const totalVal = stageLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
                         const sharePct = stats.totalPipeline > 0 ? ((totalVal / stats.totalPipeline) * 100).toFixed(1) : 0;
                         const avgVal = stageLeads.length > 0 ? Math.round(totalVal / stageLeads.length) : 0;
@@ -19510,7 +19522,7 @@ export default function App() {
                     </thead>
                     <tbody>
                       {["Google Ads", "Meta Ads", "Referral", "WhatsApp", "Cold Outreach", "Website"].map((src) => {
-                        const srcLeads = leads.filter(l => (l.source || "").toLowerCase().includes(src.toLowerCase()));
+                        const srcLeads = ownerScopedLeads.filter(l => (l.source || "").toLowerCase().includes(src.toLowerCase()));
                         const wonSrcLeads = srcLeads.filter(l => isWonStatus(l.status));
                         const wonRev = wonSrcLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
                         const convRate = srcLeads.length > 0 ? ((wonSrcLeads.length / srcLeads.length) * 100).toFixed(1) : 0;
@@ -19562,7 +19574,7 @@ export default function App() {
 
                   <button 
                     onClick={() => {
-                      const wonLeads = leads.filter(l => isWonStatus(l.status));
+                      const wonLeads = ownerScopedLeads.filter(l => isWonStatus(l.status));
                       if (wonLeads.length === 0) {
                         showToast("No won deals to export.", "error");
                         return;
@@ -19588,7 +19600,7 @@ export default function App() {
 
                   <button 
                     onClick={() => {
-                      const overdueList = leads.filter(l => l.next_follow_up && l.next_follow_up < todayStr && isActiveStatus(l.status));
+                      const overdueList = ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < todayStr && isActiveStatus(l.status));
                       if (overdueList.length === 0) {
                         showToast("No overdue follow-ups to export.");
                         return;

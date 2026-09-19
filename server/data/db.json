@@ -33,7 +33,7 @@
       "pin": "Admin@123",
       "role": "sales_rep",
       "username": "kashish",
-      "packageTier": "enterprise",
+      "packageTier": "starter",
       "permissions": {
         "canViewKpiRevenue": true,
         "canViewKpiDeals": true,
@@ -54,35 +54,35 @@
         "canAccessDealsHub": true,
         "canAccessSplitView": true,
         "canAccessCalendar": true,
-        "canAccessReports": true,
-        "canAccessAnalytics": true,
-        "canAccessAuditLogs": true,
-        "canAccessSettings": true,
-        "canAccessTeam": true,
+        "canAccessReports": false,
+        "canAccessAnalytics": false,
+        "canAccessAuditLogs": false,
+        "canAccessSettings": false,
+        "canAccessTeam": false,
         "canViewSpreadsheetGrid": true,
         "canViewKanbanDeals": true,
         "canViewSplitViewLayout": true,
         "canViewAnalyticsDashboard": true,
-        "canViewAllLeads": true,
+        "canViewAllLeads": false,
         "canCreateLeads": true,
         "canEditLeads": true,
-        "canDeleteLeads": true,
-        "canReassignLeads": true,
+        "canDeleteLeads": false,
+        "canReassignLeads": false,
         "canChangeLeadScore": true,
         "canViewRevenue": true,
         "canEditDealValue": true,
-        "canEditTarget": true,
-        "canEditIncentive": true,
-        "canExportCSV": true,
-        "canBulkImport": true,
-        "canSyncGoogleSheets": true,
+        "canEditTarget": false,
+        "canEditIncentive": false,
+        "canExportCSV": false,
+        "canBulkImport": false,
+        "canSyncGoogleSheets": false,
         "canUseWhatsApp": true,
         "canMakeCalls": true,
         "canSendEmail": true,
         "canUseAI": true,
         "canUseAudioChimes": true
       },
-      "maxLeadsLimit": 1000
+      "maxLeadsLimit": 50
     }
   ],
   "leads": [
@@ -345,10 +345,10 @@
       "next_follow_up": "2026-09-01",
       "notes": "Payment follow-up pending. Review invoice terms for ₹10,000-₹15,000.",
       "owner": "Harsh Goyal",
-      "won_date": "2026-09-17",
       "deal_type": "new",
       "previous_stage": "Payment Follow Up",
-      "stageUpdatedAt": "2026-09-17T04:56:11.844Z"
+      "stageUpdatedAt": "2026-09-17T04:56:11.844Z",
+      "won_date": "2026-09-17"
     },
     {
       "id": "lead_anshul_lodha",
@@ -651,6 +651,14 @@
       "id": "lead_1789381475433",
       "activities": [
         {
+          "id": "act_1789712376902_96mc",
+          "type": "stage_change",
+          "title": "Deal Closed Lost",
+          "desc": "Marked deal as Lost.",
+          "timestamp": "2026-09-18T06:19:36.902Z",
+          "performedBy": "Kashish"
+        },
+        {
           "id": "act_1789381599139_jrj5",
           "type": "stage_change",
           "title": "Deal Stage Changed",
@@ -684,14 +692,14 @@
       "phone": "93270 98589",
       "score": "Warm",
       "source": "Manual",
-      "status": "Demo Done",
+      "status": "Lost",
       "value": 15000,
       "deal_type": "new",
       "previous_stage": "Won",
-      "stageUpdatedAt": "2026-09-14T10:26:39.137Z",
+      "stageUpdatedAt": "2026-09-18T06:19:36.900Z",
       "won_date": "2026-09-14",
       "follow_up_time": "10:00",
-      "lastActivityAt": "2026-09-14T10:26:39.140Z",
+      "lastActivityAt": "2026-09-18T06:19:36.902Z",
       "updatedAt": "2026-09-14T10:26:39.536Z"
     },
     {
@@ -993,6 +1001,173 @@
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T12:13:26.493Z",
       "won_date": "2026-09-14"
+    },
+    {
+      "id": "lead_1789817705320",
+      "activities": [
+        {
+          "id": "act_1789817705320",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-09-19T11:35:05.320Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "agrawal.chintan05@gmail.com",
+      "name": "Chintan Agrawal",
+      "next_follow_up": "2026-09-19",
+      "next_follow_up_time": "11:00 AM",
+      "notes": "Payment follow-up active. Client promised payment for 19 Sept.",
+      "owner": "Harsh Goyal",
+      "packageId": "pkg_silver",
+      "phone": "918435542500",
+      "score": "Warm",
+      "source": "Google Ads",
+      "status": "Payment Follow Up",
+      "value": 10000
+    },
+    {
+      "id": "lead_1789818687592",
+      "activities": [
+        {
+          "id": "act_1789818687593",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-09-19T11:51:27.593Z",
+          "performedBy": "Harsh Goyal"
+        },
+        {
+          "id": "act_note_1789818687593",
+          "type": "note",
+          "title": "Initial Note Added",
+          "desc": "demo done payment follow up",
+          "timestamp": "2026-09-19T11:51:27.593Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "trthakkar@gmail.com",
+      "name": "Tushar Thakkar",
+      "next_follow_up": "2026-09-21",
+      "next_follow_up_time": "11:00 AM",
+      "notes": "demo done payment follow up",
+      "owner": "Harsh Goyal",
+      "packageId": "",
+      "phone": "919737003111",
+      "score": "Warm",
+      "source": "Facebook",
+      "status": "Payment Follow Up",
+      "value": 11000
+    },
+    {
+      "id": "lead_1789818827047",
+      "activities": [
+        {
+          "id": "act_1789818827047",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-09-19T11:53:47.047Z",
+          "performedBy": "Harsh Goyal"
+        },
+        {
+          "id": "act_note_1789818827047",
+          "type": "note",
+          "title": "Initial Note Added",
+          "desc": "demo done payment follow up",
+          "timestamp": "2026-09-19T11:53:47.047Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "company": "",
+      "custom_fields": {},
+      "email": "shreemahalaxmiagrotec555@gmail.com",
+      "name": "vikas chougule",
+      "next_follow_up": "2026-09-21",
+      "next_follow_up_time": "11:00 AM",
+      "notes": "demo done payment follow up",
+      "owner": "Harsh Goyal",
+      "packageId": "",
+      "phone": "917030547555",
+      "score": "Warm",
+      "source": "Facebook",
+      "status": "Payment Follow Up",
+      "value": 6000
+    },
+    {
+      "id": "lead_1789819063408",
+      "name": "deepak",
+      "company": "",
+      "status": "Payment Follow Up",
+      "value": 10000,
+      "packageId": "",
+      "email": "deepakmanwani960@gmail.com",
+      "phone": "918104681341",
+      "source": "Facebook",
+      "score": "Warm",
+      "owner": "Harsh Goyal",
+      "next_follow_up": "2026-09-21",
+      "next_follow_up_time": "11:00 AM",
+      "custom_fields": {},
+      "activities": [
+        {
+          "id": "act_1789819063408",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-09-19T11:57:43.408Z",
+          "performedBy": "Harsh Goyal"
+        },
+        {
+          "id": "act_note_1789819063408",
+          "type": "note",
+          "title": "Initial Note Added",
+          "desc": "demo done payment follow up",
+          "timestamp": "2026-09-19T11:57:43.408Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "notes": "demo done payment follow up"
+    },
+    {
+      "id": "lead_1789819261967",
+      "name": "Kiran shinde",
+      "company": "",
+      "status": "Payment Follow Up",
+      "value": 15000,
+      "packageId": "",
+      "email": "kirankshindeandco@gmail.com",
+      "phone": "+91 75066 47791",
+      "source": "Google Ads",
+      "score": "Warm",
+      "owner": "Harsh Goyal",
+      "next_follow_up": "2026-10-01",
+      "next_follow_up_time": "11:00 AM",
+      "custom_fields": {},
+      "activities": [
+        {
+          "id": "act_1789819261967",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-09-19T12:01:01.967Z",
+          "performedBy": "Harsh Goyal"
+        },
+        {
+          "id": "act_note_1789819261967",
+          "type": "note",
+          "title": "Initial Note Added",
+          "desc": "demo done 1 oct ko connect krna hai",
+          "timestamp": "2026-09-19T12:01:01.967Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "notes": "demo done 1 oct ko connect krna hai"
     }
   ]
 }
