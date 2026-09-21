@@ -8042,32 +8042,32 @@ export default function App() {
                 </button>
               )}
 
-              {/* Primary Call To Action (Issue 11) */}
+              {/* Global Utility Action (Issue 5: Restyled as secondary brand outline to avoid competing with primary Add Lead CTA) */}
               <button 
                 onClick={() => setShowStartMyDay(true)}
-                className="btn-primary"
+                className="header-vault-btn"
                 style={{ 
                   height: "32px", 
                   boxSizing: "border-box", 
                   display: "inline-flex", 
                   alignItems: "center", 
                   gap: "6px", 
-                  padding: "0 14px", 
+                  padding: "0 13px", 
                   margin: 0,
-                  backgroundColor: "#2563eb", 
-                  border: "1px solid #1d4ed8", 
+                  backgroundColor: "#eff6ff", 
+                  border: "1px solid #bfdbfe", 
                   borderRadius: "6px", 
                   fontSize: "12px", 
                   fontWeight: "700", 
-                  color: "#ffffff", 
+                  color: "#2563eb", 
                   cursor: "pointer", 
-                  boxShadow: "0 1px 3px rgba(37, 99, 235, 0.3)", 
+                  boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)", 
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                   transition: "all 0.15s ease",
                   whiteSpace: "nowrap"
                 }}
               >
-                <Sun size={14} color="#ffffff" />
+                <Sun size={14} color="#2563eb" />
                 <span>Start My Day</span>
               </button>
             </div>
@@ -12584,42 +12584,62 @@ export default function App() {
                     })}
                   </div>
 
-                  {/* View Modes Switcher (Guarded per employee permissions) */}
-                  <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "6px", border: "1px solid #e2e8f0", gap: "2px" }}>
+                  {/* View Modes Switcher (Issue 8: Segmented Control with role="tablist" and unified tab styling) */}
+                  <div 
+                    role="tablist" 
+                    aria-label="Pipeline view modes" 
+                    style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "6px", border: "1px solid #e2e8f0", gap: "2px" }}
+                  >
                     {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewAnalyticsDashboard !== false) && (
                       <button
                         type="button"
+                        role="tab"
+                        id="view-tab-analytics"
+                        aria-selected={pipelineView === "analytics"}
+                        tabIndex={pipelineView === "analytics" ? 0 : -1}
                         onClick={() => setPipelineView("analytics")}
-                        style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#475569", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
                       >
-                        <TrendingUp size={14} /> Dashboard
+                        <TrendingUp size={13} /> Dashboard
                       </button>
                     )}
                     {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewSpreadsheetGrid !== false) && (
                       <button
                         type="button"
+                        role="tab"
+                        id="view-tab-sheet"
+                        aria-selected={pipelineView === "sheet"}
+                        tabIndex={pipelineView === "sheet" ? 0 : -1}
                         onClick={() => setPipelineView("sheet")}
-                        style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#2563eb" : "#475569", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
                       >
-                        <Grid size={14} /> Spreadsheet
+                        <Grid size={13} /> Spreadsheet
                       </button>
                     )}
                     {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewSplitView !== false) && (
                       <button
                         type="button"
+                        role="tab"
+                        id="view-tab-split"
+                        aria-selected={pipelineView === "split"}
+                        tabIndex={pipelineView === "split" ? 0 : -1}
                         onClick={() => setPipelineView("split")}
-                        style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#475569", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
                       >
-                        <Layers size={14} /> Split 360°
+                        <Layers size={13} /> Split 360°
                       </button>
                     )}
                     {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKanbanDeals !== false) && (
                       <button
                         type="button"
+                        role="tab"
+                        id="view-tab-deals"
+                        aria-selected={pipelineView === "deals"}
+                        tabIndex={pipelineView === "deals" ? 0 : -1}
                         onClick={() => setPipelineView("deals")}
-                        style={{ height: "32px", padding: "5px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#16a34a" : "#475569", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
                       >
-                        <Award size={14} /> Deals Hub
+                        <Award size={13} /> Deals Hub
                       </button>
                     )}
                   </div>
@@ -13211,8 +13231,8 @@ export default function App() {
                   ) : (
                     <table className="leads-data-table" style={{ minWidth: "1120px", width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       <thead>
-                        <tr style={{ backgroundColor: "#fcfdfe", borderBottom: "1px solid #edf2f7", color: "#475569", fontWeight: "650", height: "32px" }}>
-                          <th style={{ width: "32px", padding: "4px 2px 4px 8px", textAlign: "center" }}>
+                        <tr style={{ backgroundColor: "#fcfdfe", borderBottom: "1px solid #edf2f7", color: "#475569", fontWeight: "650", height: "38px" }}>
+                          <th style={{ width: "36px", padding: "6px 2px 6px 10px", textAlign: "center", verticalAlign: "middle" }}>
                             <input 
                               type="checkbox" 
                               checked={paginatedLeads.length > 0 && paginatedLeads.every(l => selectedLeadIds.includes(l.id))}
@@ -13226,20 +13246,21 @@ export default function App() {
                                   setSelectedLeadIds(prev => Array.from(new Set([...prev, ...pageIds])));
                                 }
                               }}
-                              style={{ borderRadius: "6px", cursor: "pointer", accentColor: "#2563eb", width: "13px", height: "13px" }} 
+                              style={{ borderRadius: "4px", cursor: "pointer", accentColor: "#2563eb", width: "16px", height: "16px", margin: 0, verticalAlign: "middle" }} 
                               title="Select all leads on this page"
+                              aria-label="Select all leads on this page"
                             />
                           </th>
-                          <th style={{ width: "14%", minWidth: "140px", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px" }}>Lead Name</th>
-                          <th style={{ width: "14%", minWidth: "130px", padding: "4px 10px 4px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px" }}>Deal Stage</th>
-                          <th style={{ width: "10%", minWidth: "90px", padding: "4px 8px 4px 10px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px" }}>Deal Value</th>
-                          <th style={{ width: "22%", minWidth: "220px", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px" }}>Contact</th>
-                          <th style={{ width: "11%", minWidth: "100px", padding: "4px 14px 4px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px" }}>Owner</th>
+                          <th style={{ width: "14%", minWidth: "140px", padding: "8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Lead Name</th>
+                          <th style={{ width: "14%", minWidth: "130px", padding: "8px 10px 8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Deal Stage</th>
+                          <th style={{ width: "10%", minWidth: "90px", padding: "8px 8px 8px 10px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Deal Value</th>
+                          <th style={{ width: "22%", minWidth: "220px", padding: "8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Contact</th>
+                          <th style={{ width: "11%", minWidth: "100px", padding: "8px 14px 8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Owner</th>
                           {customFields.filter(cf => cf.showInTable).map(cf => (
-                            <th key={cf.id} style={{ width: "10%", minWidth: "90px", padding: "4px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px" }}>{cf.name}</th>
+                            <th key={cf.id} style={{ width: "10%", minWidth: "90px", padding: "8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>{cf.name}</th>
                           ))}
-                          <th style={{ width: "16%", minWidth: "140px", padding: "4px 8px 4px 16px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Next Follow-up</th>
-                          <th style={{ width: "13%", minWidth: "125px", padding: "4px 8px 4px 4px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", textAlign: "right", verticalAlign: "middle" }}>Actions</th>
+                          <th style={{ width: "16%", minWidth: "140px", padding: "8px 8px 8px 16px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Next Follow-up</th>
+                          <th style={{ width: "13%", minWidth: "125px", padding: "8px 8px 8px 4px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", textAlign: "right", verticalAlign: "middle" }}>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -13296,11 +13317,11 @@ export default function App() {
                                 borderBottom: "1px solid #f1f5f9", 
                                 transition: "background-color 0.12s ease",
                                 backgroundColor: isRowSelected ? "#eff6ff" : (isHovered ? "#f8fafc" : "#ffffff"),
-                                height: "38px"
+                                height: "46px"
                               }}
                             >
-                              {/* Checkbox */}
-                              <td style={{ padding: "2px 2px 2px 8px", textAlign: "center", verticalAlign: "middle" }}>
+                              {/* Checkbox (Issue 6 & 7: Comfortable 46px row height + 16px accessible checkbox target) */}
+                              <td style={{ padding: "8px 2px 8px 10px", textAlign: "center", verticalAlign: "middle" }}>
                                 <input 
                                   type="checkbox" 
                                   checked={selectedLeadIds.includes(lead.id) || isRowSelected}
@@ -13314,7 +13335,8 @@ export default function App() {
                                       setSelectedCell({ rowIndex: rIdx, colIndex: 0 });
                                     }
                                   }}
-                                  style={{ borderRadius: "6px", cursor: "pointer", accentColor: "#2563eb", width: "13px", height: "13px" }} 
+                                  style={{ borderRadius: "4px", cursor: "pointer", accentColor: "#2563eb", width: "16px", height: "16px", margin: 0, verticalAlign: "middle" }} 
+                                  aria-label={`Select lead ${lead.name || "item"}`}
                                 />
                               </td>
 
@@ -13322,7 +13344,7 @@ export default function App() {
                               <td 
                                 onClick={() => setSelectedCell({ rowIndex: rIdx, colIndex: 0 })}
                                 onDoubleClick={() => startEditing(rIdx, 0)}
-                                style={{ padding: "3px 8px", verticalAlign: "middle", overflow: "hidden" }}
+                                style={{ padding: "8px 8px", verticalAlign: "middle", overflow: "hidden" }}
                               >
                                 {editingCell?.rowIndex === rIdx && editingCell?.colIndex === 0 ? (
                                   <input 
@@ -13332,14 +13354,14 @@ export default function App() {
                                     onChange={(e) => setEditValue(e.target.value)}
                                     onBlur={() => saveCellChange(rIdx, 0, editValue)}
                                     onKeyDown={handleInputKeyDown}
-                                    style={{ width: "100%", padding: "2px 4px", fontSize: "12px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                                    style={{ width: "100%", padding: "4px 6px", fontSize: "12px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
                                   />
                                 ) : (
-                                  <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
                                     {/* Circle Avatar */}
                                     <div style={{
-                                      width: "22px",
-                                      height: "22px",
+                                      width: "24px",
+                                      height: "24px",
                                       borderRadius: "50%",
                                       backgroundColor: avatarPalette.bg,
                                       color: avatarPalette.text,
@@ -13347,7 +13369,7 @@ export default function App() {
                                       display: "flex",
                                       alignItems: "center",
                                       justifyContent: "center",
-                                      fontSize: "10px",
+                                      fontSize: "10.5px",
                                       fontWeight: "750",
                                       flexShrink: 0
                                     }}>
@@ -13374,7 +13396,7 @@ export default function App() {
                               <td 
                                 onClick={() => setSelectedCell({ rowIndex: rIdx, colIndex: 1 })}
                                 onDoubleClick={() => startEditing(rIdx, 1)}
-                                style={{ padding: "3px 12px 3px 8px", verticalAlign: "middle" }}
+                                style={{ padding: "8px 10px 8px 8px", verticalAlign: "middle" }}
                               >
                                 {editingCell?.rowIndex === rIdx && editingCell?.colIndex === 1 ? (
                                   <select 
@@ -13385,7 +13407,7 @@ export default function App() {
                                       saveCellChange(rIdx, 1, e.target.value);
                                     }}
                                     onBlur={() => setEditingCell(null)}
-                                    style={{ width: "100%", padding: "3px 5px", fontSize: "12px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", fontFamily: "inherit" }}
+                                    style={{ width: "100%", padding: "4px 6px", fontSize: "12px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", fontFamily: "inherit" }}
                                   >
                                     {STATUS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                                   </select>
@@ -13395,25 +13417,25 @@ export default function App() {
                                     style={{
                                       backgroundColor: stageStyle.bg,
                                       color: stageStyle.text,
-                                      padding: "2px 8px",
+                                      padding: "3px 9px",
                                       borderRadius: "9999px",
-                                      fontSize: "10px",
+                                      fontSize: "11px",
                                       fontWeight: "600",
                                       display: "inline-flex",
                                       alignItems: "center",
-                                      gap: "4.5px",
+                                      gap: "5px",
                                       whiteSpace: "nowrap",
                                       cursor: "pointer"
                                     }}
                                     title="Click to change stage"
                                   >
-                                    <span style={{ width: "4.5px", height: "4.5px", borderRadius: "50%", backgroundColor: stageStyle.dot, flexShrink: 0 }} />
+                                    <span style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: stageStyle.dot, flexShrink: 0 }} />
                                     {stageStyle.label}
                                   </span>
                                 )}
                               </td>
 
-                              {/* Deal Value with GST Badge (Col 2) */}
+                              {/* Deal Value with GST Badge (Col 2 - Issue 4: Added breathing room between value & GST) */}
                               <td 
                                 onClick={() => setSelectedCell({ rowIndex: rIdx, colIndex: 2 })}
                                 onDoubleClick={() => {
@@ -13423,7 +13445,7 @@ export default function App() {
                                   }
                                   startEditing(rIdx, 2);
                                 }}
-                                style={{ padding: "3px 8px 3px 12px", verticalAlign: "middle", whiteSpace: "nowrap" }}
+                                style={{ padding: "8px 8px 8px 10px", verticalAlign: "middle", whiteSpace: "nowrap" }}
                               >
                                 {editingCell?.rowIndex === rIdx && editingCell?.colIndex === 2 ? (
                                   <input 
@@ -13433,14 +13455,14 @@ export default function App() {
                                     onChange={(e) => setEditValue(e.target.value)}
                                     onBlur={() => saveCellChange(rIdx, 2, editValue)}
                                     onKeyDown={handleInputKeyDown}
-                                    style={{ width: "85px", padding: "3px 6px", fontSize: "12px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                                    style={{ width: "85px", padding: "4px 6px", fontSize: "12px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
                                   />
                                 ) : (
-                                  <div style={{ display: "flex", alignItems: "center", gap: "5px", cursor: "pointer" }} title="Double-click to edit value">
+                                  <div style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }} title="Double-click to edit value">
                                     <span style={{ fontSize: "12px", fontWeight: "750", color: "#0f172a" }}>
                                       {formatLeadRevenue(lead.value, currentUser)}
                                     </span>
-                                    <span style={{ fontSize: "10px", padding: "1px 4px", backgroundColor: "#f1f5f9", color: "#64748b", borderRadius: "6px", fontWeight: "700" }}>
+                                    <span style={{ fontSize: "10px", padding: "1.5px 6px", backgroundColor: "#f1f5f9", color: "#64748b", borderRadius: "4px", fontWeight: "700", letterSpacing: "0.2px", marginLeft: "2px" }}>
                                       GST
                                     </span>
                                   </div>
@@ -13450,7 +13472,7 @@ export default function App() {
                               {/* Contact Email & Phone (Col 3 & Col 4) */}
                               <td 
                                 onClick={() => setSelectedCell({ rowIndex: rIdx, colIndex: 3 })}
-                                style={{ padding: "3px 8px", verticalAlign: "middle", overflow: "hidden" }}
+                                style={{ padding: "8px 8px", verticalAlign: "middle", overflow: "hidden" }}
                               >
                                 {editingCell?.rowIndex === rIdx && editingCell?.colIndex === 3 ? (
                                   <input 
@@ -13461,7 +13483,7 @@ export default function App() {
                                     onBlur={() => saveCellChange(rIdx, 3, editValue)}
                                     onKeyDown={handleInputKeyDown}
                                     placeholder="Enter email..."
-                                    style={{ width: "100%", padding: "2px 4px", fontSize: "10px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                                    style={{ width: "100%", padding: "3px 6px", fontSize: "11px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
                                   />
                                 ) : editingCell?.rowIndex === rIdx && editingCell?.colIndex === 4 ? (
                                   <input 
@@ -13473,10 +13495,10 @@ export default function App() {
                                     onKeyDown={handleInputKeyDown}
                                     placeholder="Enter phone..."
                                     autoFocus
-                                    style={{ width: "100%", padding: "2px 4px", fontSize: "10px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                                    style={{ width: "100%", padding: "3px 6px", fontSize: "11px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
                                   />
                                 ) : (
-                                  <div style={{ display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden", gap: "1px" }}>
+                                  <div style={{ display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden", gap: "2px" }}>
                                     <span 
                                       onDoubleClick={(e) => {
                                         e.stopPropagation();
@@ -13534,10 +13556,10 @@ export default function App() {
                                 )}
                               </td>
 
-                              {/* 👤 Lead Owner Cell */}
-                              <td style={{ padding: "3px 14px 3px 8px", verticalAlign: "middle", whiteSpace: "nowrap" }}>
-                                <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                                  <div style={{ width: "18px", height: "18px", borderRadius: "50%", backgroundColor: "#eef2ff", color: "#2563eb", border: "1px solid #c7d2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "800", flexShrink: 0 }}>
+                              {/* 👤 Lead Owner Cell (Issue 3 & 10: Vertically centered avatar + comfortable dropdown hit area) */}
+                              <td style={{ padding: "8px 14px 8px 8px", verticalAlign: "middle", whiteSpace: "nowrap" }}>
+                                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", verticalAlign: "middle" }}>
+                                  <div style={{ width: "22px", height: "22px", borderRadius: "50%", backgroundColor: "#eef2ff", color: "#2563eb", border: "1px solid #c7d2fe", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "800", flexShrink: 0 }}>
                                     {(lead.owner || "Admin").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                   </div>
                                   {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canReassignLeads) ? (
@@ -13546,26 +13568,29 @@ export default function App() {
                                       onChange={(e) => reassignLeadOwner(lead.id, e.target.value)}
                                       onClick={(e) => e.stopPropagation()}
                                       style={{
-                                        padding: "1.5px 3px",
+                                        padding: "3px 8px",
                                         borderRadius: "6px",
-                                        fontSize: "10px",
+                                        fontSize: "11px",
                                         fontWeight: "600",
-                                        color: "#475569",
+                                        color: "#334155",
                                         backgroundColor: "#ffffff",
-                                        border: "1px solid #e2e8f0",
+                                        border: "1px solid #cbd5e1",
                                         cursor: "pointer",
                                         outline: "none",
-                                        maxWidth: "76px",
-                                        textOverflow: "ellipsis"
+                                        height: "26px",
+                                        minWidth: "90px",
+                                        boxSizing: "border-box",
+                                        fontFamily: "'Plus Jakarta Sans', sans-serif"
                                       }}
                                       title="Click to reassign owner"
+                                      aria-label="Reassign Lead Owner"
                                     >
                                       {teamMembers.map(m => (
                                         <option key={m} value={m}>{m}</option>
                                       ))}
                                     </select>
                                   ) : (
-                                    <span style={{ fontSize: "10px", fontWeight: "600", color: "#475569" }}>
+                                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#475569" }}>
                                       {lead.owner || currentUser?.name || "You"}
                                     </span>
                                   )}
@@ -13576,7 +13601,7 @@ export default function App() {
                               {customFields.filter(cf => cf.showInTable).map(cf => (
                                 <td 
                                   key={cf.id} 
-                                  style={{ padding: "4px 8px", verticalAlign: "middle", whiteSpace: "nowrap" }}
+                                  style={{ padding: "8px 8px", verticalAlign: "middle", whiteSpace: "nowrap" }}
                                   title={`Custom field: ${cf.name}`}
                                 >
                                   <input
@@ -13587,9 +13612,9 @@ export default function App() {
                                     onClick={(e) => e.stopPropagation()}
                                     style={{
                                       width: "80px",
-                                      padding: "2px 5px",
+                                      padding: "3px 6px",
                                       fontSize: "12px",
-                                      border: "1px solid #e2e8f0",
+                                      border: "1px solid #cbd5e1",
                                       borderRadius: "6px",
                                       backgroundColor: "#ffffff",
                                       outline: "none",
@@ -13603,7 +13628,7 @@ export default function App() {
                               <td 
                                 onClick={() => setSelectedCell({ rowIndex: rIdx, colIndex: 7 })}
                                 onDoubleClick={() => startEditing(rIdx, 7)}
-                                style={{ padding: "3px 8px 3px 16px", verticalAlign: "middle", whiteSpace: "nowrap" }}
+                                style={{ padding: "8px 8px 8px 16px", verticalAlign: "middle", whiteSpace: "nowrap" }}
                               >
                                 {editingCell?.rowIndex === rIdx && editingCell?.colIndex === 7 ? (
                                   <input 
@@ -13613,10 +13638,10 @@ export default function App() {
                                     onChange={(e) => setEditValue(e.target.value)}
                                     onBlur={() => saveCellChange(rIdx, 7, editValue)}
                                     onKeyDown={handleInputKeyDown}
-                                    style={{ padding: "2px 4px", fontSize: "10px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", fontFamily: "inherit" }}
+                                    style={{ padding: "3px 6px", fontSize: "11px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", fontFamily: "inherit" }}
                                   />
                                 ) : (
-                                  <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", whiteSpace: "nowrap" }}>
+                                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}>
                                     {isValidDate ? (
                                       <>
                                         <span style={{ color: "#0f172a", fontWeight: "600", fontSize: "12px", whiteSpace: "nowrap" }}>
@@ -13636,7 +13661,7 @@ export default function App() {
                                             {(lead.won_date || "").startsWith("2026-08") ? "🗓️ Aug '26 Won" : "🗓️ Sep '26 Won"}
                                           </span>
                                         ) : isOverdue ? (
-                                          <span style={{ fontSize: "10px", fontWeight: "700", color: "#dc2626", backgroundColor: "#fee2e2", padding: "1px 4px", borderRadius: "6px", whiteSpace: "nowrap" }}>
+                                          <span style={{ fontSize: "10px", fontWeight: "700", color: "#dc2626", backgroundColor: "#fee2e2", padding: "1.5px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>
                                             Overdue
                                           </span>
                                         ) : null}
@@ -13648,9 +13673,9 @@ export default function App() {
                                 )}
                               </td>
 
-                              {/* Dedicated Actions Column (Issue 9: Primary 1-2 actions + Kebab More Menu) */}
-                              <td style={{ padding: "4px 8px", verticalAlign: "middle", textAlign: "right", whiteSpace: "nowrap", position: "relative" }}>
-                                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: "6px", whiteSpace: "nowrap" }}>
+                              {/* Dedicated Actions Column (Issue 11: Increased button target to 34px and gap to 8px) */}
+                              <td style={{ padding: "8px 8px", verticalAlign: "middle", textAlign: "right", whiteSpace: "nowrap", position: "relative" }}>
+                                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: "8px", whiteSpace: "nowrap" }}>
                                   {lead.phone && (
                                     <a
                                       href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${lead.name || ""}, connecting regarding your inquiry.`)}`}
@@ -13660,9 +13685,9 @@ export default function App() {
                                         display: "inline-flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        width: "32px",
-                                        height: "32px",
-                                        minWidth: "32px",
+                                        width: "34px",
+                                        height: "34px",
+                                        minWidth: "34px",
                                         borderRadius: "6px",
                                         backgroundColor: "#f0fdf4",
                                         border: "1px solid #bbf7d0",
@@ -13677,7 +13702,7 @@ export default function App() {
                                         logLeadActivity(lead.id, "whatsapp", "WhatsApp Chat Opened", `Initiated WhatsApp follow-up with ${lead.name}`);
                                       }}
                                     >
-                                      <MessageCircle size={15} />
+                                      <MessageCircle size={16} />
                                     </a>
                                   )}
                                   {lead.phone && (
@@ -13687,9 +13712,9 @@ export default function App() {
                                         display: "inline-flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        width: "32px",
-                                        height: "32px",
-                                        minWidth: "32px",
+                                        width: "34px",
+                                        height: "34px",
+                                        minWidth: "34px",
                                         borderRadius: "6px",
                                         backgroundColor: "#eff6ff",
                                         border: "1px solid #bfdbfe",
@@ -13704,7 +13729,7 @@ export default function App() {
                                         logLeadActivity(lead.id, "call", "Call Dialed", `Dialed call to ${lead.name} (${lead.phone || 'No phone'})`);
                                       }}
                                     >
-                                      <Phone size={15} />
+                                      <Phone size={16} />
                                     </a>
                                   )}
 
@@ -13720,12 +13745,12 @@ export default function App() {
                                         display: "inline-flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        width: "32px",
-                                        height: "32px",
-                                        minWidth: "32px",
+                                        width: "34px",
+                                        height: "34px",
+                                        minWidth: "34px",
                                         borderRadius: "6px",
                                         backgroundColor: activeRowMenuId === lead.id ? "#f1f5f9" : "#ffffff",
-                                        border: "1px solid #e2e8f0",
+                                        border: "1px solid #cbd5e1",
                                         color: "#475569",
                                         cursor: "pointer",
                                         boxSizing: "border-box",
@@ -13734,7 +13759,7 @@ export default function App() {
                                       title="More Actions"
                                       aria-label="More Actions"
                                     >
-                                      <MoreVertical size={15} />
+                                      <MoreVertical size={16} />
                                     </button>
 
                                     {activeRowMenuId === lead.id && (
@@ -13908,18 +13933,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Center: Metric summary badges */}
-                  <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", fontSize: "12px" }}>
-                    <span>Active: <strong style={{ color: "#2563eb" }}>₹{ownerScopedLeads.filter(l => isActiveStatus(l.status)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
-                    <span>Won: <strong style={{ color: "#166534" }}>₹{ownerScopedLeads.filter(l => isWonStatus(l.status)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
-                    {ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && isActiveStatus(l.status)).length > 0 && (
-                      <span style={{ color: "#dc2626", fontWeight: "700" }}>
-                        Overdue: {ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && isActiveStatus(l.status)).length}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Right: Page Navigation Controls */}
+                  {/* Right: Page Navigation Controls (Issue 9: Clean, single-row consolidated pagination footer) */}
                   <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
                     {/* First Page Button */}
                     <button
@@ -14173,32 +14187,48 @@ export default function App() {
 
                       {/* View Modes Switcher */}
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+                        <div 
+                          role="tablist" 
+                          aria-label="Pipeline view modes" 
+                          style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "6px", border: "1px solid #e2e8f0", gap: "2px" }}
+                        >
                           <button
                             type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "analytics"}
+                            tabIndex={pipelineView === "analytics" ? 0 : -1}
                             onClick={() => setPipelineView("analytics")}
-                            style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                            style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
                           >
                             <TrendingUp size={12} /> Dashboard
                           </button>
                           <button
                             type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "sheet"}
+                            tabIndex={pipelineView === "sheet" ? 0 : -1}
                             onClick={() => setPipelineView("sheet")}
-                            style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                            style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
                           >
                             <Grid size={12} /> Spreadsheet
                           </button>
                           <button
                             type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "split"}
+                            tabIndex={pipelineView === "split" ? 0 : -1}
                             onClick={() => setPipelineView("split")}
-                            style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: "600", color: "#2563eb", border: "none", backgroundColor: "#ffffff", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
+                            style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
                           >
                             <Layers size={12} /> Split 360°
                           </button>
                           <button
                             type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "deals"}
+                            tabIndex={pipelineView === "deals" ? 0 : -1}
                             onClick={() => setPipelineView("deals")}
-                            style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: "600", color: "#166534", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                            style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
                           >
                             <Award size={12} /> Deals Hub
                           </button>
@@ -15100,32 +15130,48 @@ export default function App() {
 
                       {/* Right View Switcher & Actions */}
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <div style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "6px", border: "1px solid #e2e8f0", gap: "2px" }}>
+                        <div 
+                          role="tablist" 
+                          aria-label="Pipeline view modes" 
+                          style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "6px", border: "1px solid #e2e8f0", gap: "2px" }}
+                        >
                           <button
                             type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "analytics"}
+                            tabIndex={pipelineView === "analytics" ? 0 : -1}
                             onClick={() => setPipelineView("analytics")}
-                            style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
                             <TrendingUp size={13} /> Dashboard
                           </button>
                           <button
                             type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "sheet"}
+                            tabIndex={pipelineView === "sheet" ? 0 : -1}
                             onClick={() => setPipelineView("sheet")}
-                            style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
                             <Grid size={13} /> Spreadsheet
                           </button>
                           <button
                             type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "split"}
+                            tabIndex={pipelineView === "split" ? 0 : -1}
                             onClick={() => setPipelineView("split")}
-                            style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: "600", color: "#475569", border: "none", backgroundColor: "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
                             <Layers size={13} /> Split 360°
                           </button>
                           <button
                             type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "deals"}
+                            tabIndex={pipelineView === "deals" ? 0 : -1}
                             onClick={() => setPipelineView("deals")}
-                            style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: "600", color: "#166534", border: "none", backgroundColor: "#ffffff", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
                             <Award size={13} /> Deals Hub
                           </button>
