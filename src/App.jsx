@@ -7744,11 +7744,11 @@ export default function App() {
                   className="sidebar-badge" 
                   style={{ 
                     fontSize: "10px", 
-                    fontWeight: "600", 
-                    color: activeWorkspace === "team" ? "#1d4ed8" : "#64748b", 
-                    backgroundColor: activeWorkspace === "team" ? "#dbeafe" : "#f1f5f9", 
-                    border: `1px solid ${activeWorkspace === "team" ? "#bfdbfe" : "#e2e8f0"}`, 
-                    padding: "2px 7px", 
+                    fontWeight: "750", 
+                    color: "#b45309", 
+                    backgroundColor: "#fef3c7", 
+                    border: "1px solid #fde68a", 
+                    padding: "2px 8px", 
                     borderRadius: "6px", 
                     marginLeft: "auto", 
                     letterSpacing: "0.3px", 
@@ -12798,7 +12798,7 @@ export default function App() {
                             color: isActive ? "#0f172a" : "#64748b",
                             border: "none",
                             backgroundColor: isActive ? "#ffffff" : "transparent",
-                            borderRadius: "5px",
+                            borderRadius: "6px",
                             cursor: "pointer",
                             display: "inline-flex",
                             alignItems: "center",
@@ -12815,7 +12815,7 @@ export default function App() {
                             fontWeight: "700",
                             fontSize: "11px",
                             padding: "1px 6px",
-                            borderRadius: "8px",
+                            borderRadius: "6px",
                             lineHeight: "1.2"
                           }}>
                             {tab.count}
@@ -12825,12 +12825,24 @@ export default function App() {
                     })}
                   </div>
 
-                  {/* View Modes Switcher (Issue 8: Segmented Control with role="tablist" and unified tab styling) */}
-                  <div 
-                    role="tablist" 
-                    aria-label="Pipeline view modes" 
-                    style={{ display: "inline-flex", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "6px", border: "1px solid #e2e8f0", gap: "2px" }}
-                  >
+                  {/* View Modes Switcher (Issue 9: Visually differentiated with Layout label and elevated segmented styling) */}
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "11px", fontWeight: "750", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                      View:
+                    </span>
+                    <div 
+                      role="tablist" 
+                      aria-label="Pipeline view modes" 
+                      style={{ 
+                        display: "inline-flex", 
+                        backgroundColor: "#f8fafc", 
+                        padding: "3px", 
+                        borderRadius: "8px", 
+                        border: "1px solid #cbd5e1", 
+                        gap: "3px",
+                        boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                      }}
+                    >
                     {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewAnalyticsDashboard !== false) && (
                       <button
                         type="button"
@@ -12839,7 +12851,7 @@ export default function App() {
                         aria-selected={pipelineView === "analytics"}
                         tabIndex={pipelineView === "analytics" ? 0 : -1}
                         onClick={() => setPipelineView("analytics")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "750" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: pipelineView === "analytics" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
                       >
                         <TrendingUp size={13} /> Dashboard
                       </button>
@@ -12852,7 +12864,7 @@ export default function App() {
                         aria-selected={pipelineView === "sheet"}
                         tabIndex={pipelineView === "sheet" ? 0 : -1}
                         onClick={() => setPipelineView("sheet")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "750" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: pipelineView === "sheet" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
                       >
                         <Grid size={13} /> Spreadsheet
                       </button>
@@ -12865,7 +12877,7 @@ export default function App() {
                         aria-selected={pipelineView === "split"}
                         tabIndex={pipelineView === "split" ? 0 : -1}
                         onClick={() => setPipelineView("split")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "750" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: pipelineView === "split" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
                       >
                         <Layers size={13} /> Split 360°
                       </button>
@@ -12878,11 +12890,12 @@ export default function App() {
                         aria-selected={pipelineView === "deals"}
                         tabIndex={pipelineView === "deals" ? 0 : -1}
                         onClick={() => setPipelineView("deals")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "750" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: pipelineView === "deals" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
                       >
                         <Award size={13} /> Deals Hub
                       </button>
                     )}
+                    </div>
                   </div>
                 </div>
 
@@ -13124,13 +13137,14 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Tier 2: Refinement & Filter Strip with Visual Grouping */}
+                  {/* Tier 2: Refinement & Filter Strip with Visual Grouping (Issue 10: Generous vertical padding and consistent alignment) */}
                   <div style={{
                     display: "flex",
                     gap: "8px",
                     alignItems: "center",
-                    padding: "7px 16px",
+                    padding: "10px 16px",
                     backgroundColor: "#fafbfc",
+                    borderBottom: "1px solid #f1f5f9",
                     flexWrap: "wrap"
                   }}>
 
@@ -21981,6 +21995,9 @@ export default function App() {
           style={{ backdropFilter: "blur(4px)", backgroundColor: "rgba(15, 23, 42, 0.55)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}
         >
           <div 
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="bulk-import-modal-title"
             className="modal-content" 
             onClick={(e) => e.stopPropagation()} 
             style={{ 
@@ -21997,16 +22014,16 @@ export default function App() {
               border: "1px solid #e2e8f0" 
             }}
           >
-            {/* Header */}
-            <div style={{ padding: "16px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", backgroundColor: "#ffffff" }}>
+            {/* Header (Issue 4: Semantic H2 to prevent skipped heading levels from H1) */}
+            <div style={{ padding: "16px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", backgroundColor: "#ffffff", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <div style={{ width: "36px", height: "36px", borderRadius: "8px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Upload size={20} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
+                  <h2 id="bulk-import-modal-title" style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
                     Bulk Import Leads via CSV / Excel
-                  </h3>
+                  </h2>
                   <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
                     Upload your leads list easily with automatic column mapping
                   </span>
@@ -22046,11 +22063,11 @@ export default function App() {
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: "16px", overflowY: "auto", flex: 1 }}>
+            {/* Modal Body (Issue 6: minHeight: 0 ensures flex container shrinks properly preventing layout artifacts) */}
+            <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: "16px", overflowY: "auto", flex: "1 1 auto", minHeight: 0 }}>
               
-              {/* Step 1: Download Sample File Card */}
-              <div style={{ backgroundColor: "#f8fafc", border: "1.5px dashed #93c5fd", borderRadius: "12px", padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+              {/* Step 1: Download Sample File Card (Issue 7: Increased internal padding to 20px 24px for generous breathing room) */}
+              <div style={{ backgroundColor: "#f8fafc", border: "1.5px dashed #93c5fd", borderRadius: "12px", padding: "20px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
                   <div style={{ width: "36px", height: "36px", borderRadius: "8px", backgroundColor: "#dbeafe", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "2px" }}>
                     <FileSpreadsheet size={18} />
@@ -22209,8 +22226,8 @@ export default function App() {
               )}
             </div>
 
-            {/* Modal Footer */}
-            <div style={{ padding: "14px 22px", borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc" }}>
+            {/* Modal Footer (Issue 6: Strict single-render bottom positioning with flexShrink: 0 to eliminate overflow artifacts) */}
+            <div style={{ padding: "14px 22px", borderTop: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#f8fafc", flexShrink: 0, borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px", position: "relative", zIndex: 10 }}>
               <button
                 type="button"
                 onClick={() => setShowImportLeadsModal(false)}
