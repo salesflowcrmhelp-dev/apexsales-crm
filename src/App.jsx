@@ -8022,13 +8022,14 @@ export default function App() {
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "6px",
-                    padding: "0 11px",
+                    padding: "0 12px",
+                    margin: 0,
                     backgroundColor: "#ffffff",
-                    border: "1px solid #e2e8f0",
+                    border: "1px solid #cbd5e1",
                     borderRadius: "6px",
                     fontSize: "12px",
                     fontWeight: "600",
-                    color: "#2563eb",
+                    color: "#475569",
                     cursor: "pointer",
                     boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
@@ -8041,27 +8042,32 @@ export default function App() {
                 </button>
               )}
 
+              {/* Primary Call To Action (Issue 11) */}
               <button 
                 onClick={() => setShowStartMyDay(true)}
+                className="btn-primary"
                 style={{ 
                   height: "32px", 
                   boxSizing: "border-box", 
                   display: "inline-flex", 
                   alignItems: "center", 
                   gap: "6px", 
-                  padding: "0 12px", 
-                  backgroundColor: "#ffffff", 
-                  border: "1px solid #cbd5e1", 
+                  padding: "0 14px", 
+                  margin: 0,
+                  backgroundColor: "#2563eb", 
+                  border: "1px solid #1d4ed8", 
                   borderRadius: "6px", 
                   fontSize: "12px", 
-                  fontWeight: "600", 
-                  color: "#2563eb", 
+                  fontWeight: "700", 
+                  color: "#ffffff", 
                   cursor: "pointer", 
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.02)", 
-                  fontFamily: "'Plus Jakarta Sans', sans-serif" 
+                  boxShadow: "0 1px 3px rgba(37, 99, 235, 0.3)", 
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  transition: "all 0.15s ease",
+                  whiteSpace: "nowrap"
                 }}
               >
-                <Sun size={14} color="#2563eb" />
+                <Sun size={14} color="#ffffff" />
                 <span>Start My Day</span>
               </button>
             </div>
@@ -12370,22 +12376,23 @@ export default function App() {
                     >
                       <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, flex: 1 }}>
                             <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                               <Target size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
                             </div>
-                            <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                            <span title="Sales Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                               Sales Target
                             </span>
                           </div>
                           {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canEditTarget) && (
-                            <span style={{ fontSize: "12px", color: "#ea580c", fontWeight: "700", marginLeft: "4px" }}>
-                              Edit ✎
-                            </span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "12px", color: "#ea580c", fontWeight: "700", marginLeft: "6px", flexShrink: 0 }}>
+                              <Pencil size={11} color="#ea580c" />
+                              <span>Edit</span>
+                            </div>
                           )}
                         </div>
                         
-                        <div style={{ fontSize: targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <div style={{ fontSize: targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {targetValue > 0 ? <AnimatedNumber value={targetValue} isCurrency /> : "Pending ⏳"}
                         </div>
                         <span style={{ fontSize: "12px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#64748b", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -12426,11 +12433,11 @@ export default function App() {
                           <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                             <Clock size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
                           </div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <span title="Daily Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                             Daily Target
                           </span>
                         </div>
-                        <div style={{ fontSize: selectedPeriodMonth === "2026-08" ? "14.5px" : targetValue > 0 ? "17px" : "14.5px", fontWeight: "800", color: selectedPeriodMonth === "2026-08" ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <div style={{ fontSize: selectedPeriodMonth === "2026-08" ? "14px" : targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: selectedPeriodMonth === "2026-08" ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {selectedPeriodMonth === "2026-08" ? "Month Ended" : targetValue > 0 ? <AnimatedNumber value={targetStats.dailyRequired} isCurrency /> : "-- / day"}
                         </div>
                         <span style={{ fontSize: "12px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -15666,40 +15673,45 @@ export default function App() {
               <div className="analytics-dashboard-grid animate-fade-in" style={{ marginTop: "8px" }}>
                 {analyticsSubTab === "overview" ? (
                   <div className="overview-tab-wrapper">
-                    {/* Dashboard View Section Filter Toggle (Issue 16: Excessive Scrolling Resolution) */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#f1f5f9", padding: "4px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    {/* Dashboard View Section Filter Tab Bar (Issue 9, 10, 7) */}
+                    <nav 
+                      className="dashboard-section-nav" 
+                      aria-label="Dashboard views"
+                    >
+                      <div 
+                        role="tablist" 
+                        aria-label="Select dashboard section" 
+                        className="dashboard-tablist"
+                      >
                         {[
                           { id: "all", label: "📋 All Sections" },
                           { id: "cockpit", label: "⚡ Cockpit & Action Items" },
                           { id: "analytics", label: "📊 Revenue Analytics & Charts" }
-                        ].map(sec => (
-                          <button
-                            key={sec.id}
-                            type="button"
-                            onClick={() => setOverviewSectionFilter(sec.id)}
-                            style={{
-                              border: "none",
-                              backgroundColor: overviewSectionFilter === sec.id ? "#ffffff" : "transparent",
-                              color: overviewSectionFilter === sec.id ? "#0f172a" : "#64748b",
-                              boxShadow: overviewSectionFilter === sec.id ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
-                              padding: "6px 14px",
-                              fontSize: "12px",
-                              fontWeight: "700",
-                              borderRadius: "6px",
-                              cursor: "pointer",
-                              transition: "all 0.15s ease",
-                              fontFamily: "'Plus Jakarta Sans', sans-serif"
-                            }}
-                          >
-                            {sec.label}
-                          </button>
-                        ))}
+                        ].map(sec => {
+                          const isActive = overviewSectionFilter === sec.id;
+                          return (
+                            <button
+                              key={sec.id}
+                              role="tab"
+                              id={`tab-${sec.id}`}
+                              aria-selected={isActive}
+                              tabIndex={isActive ? 0 : -1}
+                              type="button"
+                              onClick={() => setOverviewSectionFilter(sec.id)}
+                              className="dashboard-tab-item"
+                            >
+                              {sec.label}
+                            </button>
+                          );
+                        })}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>
-                        Active View: <strong style={{ color: "#0f172a" }}>{overviewSectionFilter === "all" ? "Complete Overview" : overviewSectionFilter === "cockpit" ? "Sales Cockpit & Tasks" : "Revenue Analytics"}</strong>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#475569", fontWeight: "500" }}>
+                        <span>Active View:</span>
+                        <span style={{ color: "#0f172a", fontWeight: "700", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", padding: "3px 9px", borderRadius: "6px" }}>
+                          {overviewSectionFilter === "all" ? "Complete Overview" : overviewSectionFilter === "cockpit" ? "Sales Cockpit & Tasks" : "Revenue Analytics"}
+                        </span>
                       </div>
-                    </div>
+                    </nav>
 
                     {(overviewSectionFilter === "all" || overviewSectionFilter === "cockpit") && (
                       <div className="cockpit-and-actions-block">
@@ -15748,7 +15760,7 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Follow-ups Due Today"
-                                  style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "4px 10px", borderRadius: "6px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", transition: "all 0.15s ease" }}
+                                  className="btn-card-action"
                                 >
                                   View →
                                 </button>
@@ -15788,7 +15800,7 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Overdue Follow-ups"
-                                  style={{ fontSize: "12px", fontWeight: "600", color: "#dc2626", backgroundColor: "#fee2e2", border: "1px solid #fca5a5", padding: "4px 10px", borderRadius: "6px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", transition: "all 0.15s ease" }}
+                                  className="btn-card-action btn-card-action-danger"
                                 >
                                   View →
                                 </button>
@@ -15828,7 +15840,7 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Hot Priority Deals"
-                                  style={{ fontSize: "12px", fontWeight: "600", color: "#b45309", backgroundColor: "#fef3c7", border: "1px solid #fde68a", padding: "4px 10px", borderRadius: "6px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", transition: "all 0.15s ease" }}
+                                  className="btn-card-action"
                                 >
                                   View →
                                 </button>
@@ -15868,7 +15880,7 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Expected Revenue"
-                                  style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "4px 10px", borderRadius: "6px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", transition: "all 0.15s ease" }}
+                                  className="btn-card-action"
                                 >
                                   View →
                                 </button>
@@ -15908,7 +15920,7 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Deals Ready to Close"
-                                  style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "4px 10px", borderRadius: "6px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", transition: "all 0.15s ease" }}
+                                  className="btn-card-action"
                                 >
                                   View →
                                 </button>
@@ -15948,7 +15960,7 @@ export default function App() {
                                 <button 
                                   type="button"
                                   aria-label="View Renewal Leads"
-                                  style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "4px 10px", borderRadius: "6px", whiteSpace: "nowrap", flexShrink: 0, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", transition: "all 0.15s ease" }}
+                                  className="btn-card-action"
                                 >
                                   View →
                                 </button>
@@ -16066,7 +16078,7 @@ export default function App() {
                               </div>
                               <span 
                                 onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); }}
-                                style={{ fontSize: "10px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "2px 8px", borderRadius: "6px", cursor: "pointer" }}
+                                style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "2px 8px", borderRadius: "6px", cursor: "pointer" }}
                               >
                                 View All →
                               </span>
@@ -16076,7 +16088,7 @@ export default function App() {
                               {recentLeadsList.map((lead) => {
                                 const isWon = isWonStatus(lead.status);
                                 const isLost = isLostStatus(lead.status);
-                                const badgeColor = isWon ? "#059669" : isLost ? "#dc2626" : "#2563eb";
+                                const badgeColor = isWon ? "#166534" : isLost ? "#dc2626" : "#2563eb";
                                 const badgeBg = isWon ? "#ecfdf5" : isLost ? "#fef2f2" : "#eff6ff";
                                 const statusLabel = isWon ? "Won" : isLost ? "Lost" : (lead.status || "Active");
 
@@ -16092,12 +16104,12 @@ export default function App() {
                                       </div>
                                       <div>
                                         <strong style={{ color: "#0f172a", display: "block", fontSize: "12px", fontWeight: "600" }}>{lead.name || lead.company || "Unnamed Lead"}</strong>
-                                        <span style={{ fontSize: "10px", color: "#64748b", fontWeight: "400" }}>
+                                        <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
                                           ₹{(Number(lead.value) || 0).toLocaleString("en-IN")} • {lead.source || "Direct"}
                                         </span>
                                       </div>
                                     </div>
-                                    <span style={{ fontSize: "10px", fontWeight: "600", color: badgeColor, backgroundColor: badgeBg, padding: "2px 8px", borderRadius: "12px", whiteSpace: "nowrap" }}>
+                                    <span style={{ fontSize: "11px", fontWeight: "600", color: badgeColor, backgroundColor: badgeBg, padding: "2px 8px", borderRadius: "9999px", whiteSpace: "nowrap" }}>
                                       {statusLabel}
                                     </span>
                                   </div>

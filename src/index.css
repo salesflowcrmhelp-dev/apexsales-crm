@@ -145,6 +145,103 @@
   color: var(--color-text-primary, #0f172a);
 }
 
+/* Standardized Card Navigation Action Button (Issue 13 & 14) */
+.btn-card-action {
+  height: 32px;
+  min-width: 72px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.btn-card-action:hover {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+}
+.btn-card-action.btn-card-action-danger {
+  color: #dc2626;
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+.btn-card-action.btn-card-action-danger:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+}
+.btn-card-action.btn-card-action-warning {
+  color: #ea580c;
+  background-color: #fff7ed;
+  border-color: #fed7aa;
+}
+.btn-card-action.btn-card-action-warning:hover {
+  background-color: #ffedd5;
+  border-color: #fdba74;
+}
+
+/* Full-width Aligned Section Navigation Tab Bar (Issue 9 & 10) */
+.dashboard-section-nav {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+}
+
+.dashboard-tablist {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #f1f5f9;
+  padding: 3px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.dashboard-tab-item {
+  border: 1px solid transparent;
+  background-color: transparent;
+  color: #64748b;
+  padding: 5px 14px;
+  height: 30px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.dashboard-tab-item[aria-selected="true"] {
+  background-color: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #cbd5e1;
+}
+
+.dashboard-tab-item:hover:not([aria-selected="true"]) {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
