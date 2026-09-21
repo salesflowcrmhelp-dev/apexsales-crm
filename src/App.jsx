@@ -19,12 +19,19 @@ const isWonStatus = (status) => {
 
 const isLostStatus = (status) => {
   const s = (status || "").trim().toLowerCase();
-  return s === "lost" || s === "junk" || s === "closed lost";
+  return s === "lost" || s === "junk" || s === "closed lost" || s === "deal lost" || s === "dropped" || s === "disqualified" || s.includes("lost");
 };
 
 const isActiveStatus = (status) => {
   const s = (status || "").trim().toLowerCase();
   return s !== "" && !isWonStatus(status) && !isLostStatus(status);
+};
+
+const isTaskLinkedToLostLead = (task, leadsList) => {
+  if (!task || !leadsList || leadsList.length === 0) return false;
+  const linked = (task.linkedLeadId && leadsList.find(l => l.id === task.linkedLeadId)) ||
+                 (task.title && leadsList.find(l => l.name && l.name.length > 2 && task.title.toLowerCase().includes(l.name.toLowerCase())));
+  return linked ? isLostStatus(linked.status) : false;
 };
 
 const isRenewalLead = (lead) => {
@@ -4015,19 +4022,45 @@ export default function App() {
     
     leads.forEach(lead => {
       const isWon = isWonStatus(lead.status);
+      const isLost = isLostStatus(lead.status);
 
-      // 1. AUTO-COMPLETE tasks when deal is WON / Payment Received
-      if (isWon) {
+      // 1. AUTO-COMPLETE tasks when deal is WON or LOST
+      if (isWon || isLost) {
         newTasks.forEach((t, idx) => {
           const matchesLead = (t.linkedLeadId && t.linkedLeadId === lead.id) || 
                               (lead.name && lead.name.length > 2 && t.title.toLowerCase().includes(lead.name.toLowerCase()));
           if (matchesLead && !t.completed) {
+            const outcomeText = isWon ? (t.outcome || "Deal Won") : "Deal Lost - Closed";
+            const remarkText = isWon ? (t.completionRemark || "Auto-closed: Deal Won") : "Auto-closed: Lead marked as Lost";
             newTasks[idx] = {
               ...t,
               completed: true,
-              completedAt: new Date().toISOString()
+              completedAt: new Date().toISOString(),
+              outcome: outcomeText,
+              completionRemark: remarkText
             };
             tasksUpdated = true;
+
+            // Central backend sync
+            try {
+              const headers = { "Content-Type": "application/json" };
+              if (currentUser) {
+                const isSuper = checkIsSuperAdmin(currentUser);
+                headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+                headers["x-user-name"] = currentUser.name || "";
+                headers["x-user-id"] = currentUser.id || "";
+              }
+              fetch(`/api/tasks/${t.id}`, {
+                method: "PUT",
+                headers,
+                body: JSON.stringify({
+                  completed: true,
+                  completedAt: new Date().toISOString(),
+                  outcome: outcomeText,
+                  completionRemark: remarkText
+                })
+              }).catch(() => {});
+            } catch(e) {}
           }
         });
       }
@@ -4066,7 +4099,6 @@ export default function App() {
     
     if (tasksUpdated) {
       saveTasksToStorage(newTasks);
-      showToast("Tasks synchronized! Won deal tasks auto-completed! 🎉");
     }
   }, [leads, tasks]);
 
@@ -5857,7 +5889,7 @@ export default function App() {
         return;
       }
 
-      // If marked as Lost: save status directly
+      // If marked as Lost: save status directly & immediately auto-close all linked tasks
       if (isNowLost) {
         const updatedLeads = [...leads];
         const updatedLeadObj = {
@@ -5867,6 +5899,48 @@ export default function App() {
         };
         updatedLeads[actualIndex] = updatedLeadObj;
         saveLeadsToStorage(updatedLeads);
+
+        // Auto-complete & close all open tasks linked to this lost lead
+        let tasksChanged = false;
+        const updatedTasksList = tasks.map(t => {
+          const matchesLead = (t.linkedLeadId && t.linkedLeadId === lead.id) || 
+                              (lead.name && lead.name.length > 2 && t.title.toLowerCase().includes(lead.name.toLowerCase()));
+          if (matchesLead && !t.completed) {
+            tasksChanged = true;
+            try {
+              const headers = { "Content-Type": "application/json" };
+              if (currentUser) {
+                const isSuper = checkIsSuperAdmin(currentUser);
+                headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+                headers["x-user-name"] = currentUser.name || "";
+                headers["x-user-id"] = currentUser.id || "";
+              }
+              fetch(`/api/tasks/${t.id}`, {
+                method: "PUT",
+                headers,
+                body: JSON.stringify({
+                  completed: true,
+                  completedAt: new Date().toISOString(),
+                  outcome: "Deal Lost - Closed",
+                  completionRemark: "Auto-closed: Lead marked as Lost"
+                })
+              }).catch(() => {});
+            } catch(e) {}
+
+            return {
+              ...t,
+              completed: true,
+              completedAt: new Date().toISOString(),
+              outcome: "Deal Lost - Closed",
+              completionRemark: "Auto-closed: Lead marked as Lost"
+            };
+          }
+          return t;
+        });
+
+        if (tasksChanged) {
+          saveTasksToStorage(updatedTasksList);
+        }
 
         if (webhookUrl) {
           syncWithGoogleSheetWebhook(updatedLeadObj);
@@ -8159,7 +8233,7 @@ export default function App() {
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: "10px", fontWeight: "500", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.2px" }}>Overdue Calls</div>
                     <div style={{ fontSize: "16px", fontWeight: "600", color: "#dc2626", lineHeight: "1.2", marginTop: "1px" }}>
-                      {calendarAllowedLeads.filter(l => l.next_follow_up && l.next_follow_up < todayStr && !isWonStatus(l.status)).length}
+                      {calendarAllowedLeads.filter(l => l.next_follow_up && l.next_follow_up < todayStr && isActiveStatus(l.status)).length}
                     </div>
                   </div>
                 </div>
@@ -13201,7 +13275,7 @@ export default function App() {
                           const followDate = lead.next_follow_up ? new Date(lead.next_follow_up) : null;
                           const isValidDate = followDate && !isNaN(followDate.getTime());
                           const todayStr = new Date().toISOString().split('T')[0];
-                          const isOverdue = lead.next_follow_up && lead.next_follow_up < todayStr && !isWon;
+                          const isOverdue = lead.next_follow_up && lead.next_follow_up < todayStr && isActiveStatus(lead.status);
 
                           const isRowSelected = selectedCell?.rowIndex === rIdx;
                           const isHovered = hoveredRowIndex === rIdx;
@@ -13831,9 +13905,9 @@ export default function App() {
                   <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap", fontSize: "12px" }}>
                     <span>Active: <strong style={{ color: "#2563eb" }}>₹{ownerScopedLeads.filter(l => isActiveStatus(l.status)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
                     <span>Won: <strong style={{ color: "#166534" }}>₹{ownerScopedLeads.filter(l => isWonStatus(l.status)).reduce((acc, l) => acc + (Number(l.value) || 0), 0).toLocaleString("en-IN")}</strong></span>
-                    {ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && !isWonStatus(l.status)).length > 0 && (
+                    {ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && isActiveStatus(l.status)).length > 0 && (
                       <span style={{ color: "#dc2626", fontWeight: "700" }}>
-                        Overdue: {ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && !isWonStatus(l.status)).length}
+                        Overdue: {ownerScopedLeads.filter(l => l.next_follow_up && l.next_follow_up < new Date().toISOString().split('T')[0] && isActiveStatus(l.status)).length}
                       </span>
                     )}
                   </div>
@@ -14014,6 +14088,48 @@ export default function App() {
                     return l;
                   });
                   saveLeadsToStorage(updatedLeads);
+
+                  if (field === "status" && isLostStatus(val)) {
+                    let tasksChanged = false;
+                    const updatedTasksList = tasks.map(t => {
+                      const matchesLead = (t.linkedLeadId && t.linkedLeadId === activeLead.id) || 
+                                          (activeLead.name && activeLead.name.length > 2 && t.title.toLowerCase().includes(activeLead.name.toLowerCase()));
+                      if (matchesLead && !t.completed) {
+                        tasksChanged = true;
+                        try {
+                          const headers = { "Content-Type": "application/json" };
+                          if (currentUser) {
+                            const isSuper = checkIsSuperAdmin(currentUser);
+                            headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+                            headers["x-user-name"] = currentUser.name || "";
+                            headers["x-user-id"] = currentUser.id || "";
+                          }
+                          fetch(`/api/tasks/${t.id}`, {
+                            method: "PUT",
+                            headers,
+                            body: JSON.stringify({
+                              completed: true,
+                              completedAt: new Date().toISOString(),
+                              outcome: "Deal Lost - Closed",
+                              completionRemark: "Auto-closed: Lead marked as Lost"
+                            })
+                          }).catch(() => {});
+                        } catch(e) {}
+
+                        return {
+                          ...t,
+                          completed: true,
+                          completedAt: new Date().toISOString(),
+                          outcome: "Deal Lost - Closed",
+                          completionRemark: "Auto-closed: Lead marked as Lost"
+                        };
+                      }
+                      return t;
+                    });
+                    if (tasksChanged) {
+                      saveTasksToStorage(updatedTasksList);
+                    }
+                  }
                 };
 
                 const handleAddSplitNote = () => {
@@ -17490,7 +17606,7 @@ export default function App() {
               <div style={{ backgroundColor: "#fff7ed", border: "1px solid #ffedd5", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", textTransform: "uppercase", letterSpacing: "0.3px" }}>Pending Action</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#ea580c", marginTop: "2px" }}>{ownerScopedTasks.filter(t => !t.completed).length}</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#ea580c", marginTop: "2px" }}>{ownerScopedTasks.filter(t => !t.completed && !isTaskLinkedToLostLead(t, leads)).length}</div>
                 </div>
                 <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#ffedd5", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Clock size={15} color="#ea580c" />
@@ -17500,7 +17616,7 @@ export default function App() {
               <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <span style={{ fontSize: "12px", fontWeight: "600", color: "#166534", textTransform: "uppercase", letterSpacing: "0.3px" }}>Completed</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#166534", marginTop: "2px" }}>{ownerScopedTasks.filter(t => t.completed).length}</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#166534", marginTop: "2px" }}>{ownerScopedTasks.filter(t => t.completed || isTaskLinkedToLostLead(t, leads)).length}</div>
                 </div>
                 <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <CheckCircle2 size={15} color="#16a34a" />
@@ -17510,7 +17626,7 @@ export default function App() {
               <div style={{ backgroundColor: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <span style={{ fontSize: "12px", fontWeight: "600", color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.3px" }}>High Priority</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#dc2626", marginTop: "2px" }}>{ownerScopedTasks.filter(t => !t.completed && t.priority === "High").length}</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#dc2626", marginTop: "2px" }}>{ownerScopedTasks.filter(t => !t.completed && t.priority === "High" && !isTaskLinkedToLostLead(t, leads)).length}</div>
                 </div>
                 <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Flame size={15} color="#dc2626" />
@@ -17604,7 +17720,7 @@ export default function App() {
                       <CheckSquare size={14} color="#475569" />
                     </div>
                     <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center" }}>
-                      Action Items ({ownerScopedTasks.filter(t => !t.completed).length} Pending)
+                      Action Items ({ownerScopedTasks.filter(t => !t.completed && !isTaskLinkedToLostLead(t, leads)).length} Pending)
                     </h3>
                   </div>
 
@@ -17671,9 +17787,11 @@ export default function App() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {(() => {
                     const filteredTasks = ownerScopedTasks.filter(t => {
-                      if (taskFilter === "Pending" && t.completed) return false;
-                      if (taskFilter === "Completed" && !t.completed) return false;
-                      if (taskFilter === "High" && (t.completed || t.priority !== "High")) return false;
+                      const isLostTask = isTaskLinkedToLostLead(t, leads);
+                      const isDone = t.completed || isLostTask;
+                      if (taskFilter === "Pending" && isDone) return false;
+                      if (taskFilter === "Completed" && !isDone) return false;
+                      if (taskFilter === "High" && (isDone || t.priority !== "High")) return false;
                       if (taskSearchQuery.trim()) {
                         const q = taskSearchQuery.toLowerCase();
                         const titleMatch = (t.title || "").toLowerCase().includes(q);
@@ -17699,6 +17817,8 @@ export default function App() {
                       const cleanTitle = (task.title || "").replace(" (No Company)", "").replace("(No Company)", "").trim();
                       const isHigh = task.priority === "High";
                       const isMed = task.priority === "Medium";
+                      const isLostTask = isTaskLinkedToLostLead(task, leads);
+                      const isDone = task.completed || isLostTask;
 
                       return (
                         <div 
@@ -17708,43 +17828,43 @@ export default function App() {
                             alignItems: "center",
                             justifyContent: "space-between",
                             padding: "9px 12px",
-                            backgroundColor: task.completed ? "#f8fafc" : "#ffffff",
-                            border: task.completed ? "1px solid #f1f5f9" : "1px solid #e2e8f0",
+                            backgroundColor: isDone ? "#f8fafc" : "#ffffff",
+                            border: isDone ? "1px solid #f1f5f9" : "1px solid #e2e8f0",
                             borderRadius: "6px",
                             transition: "all 0.15s ease",
-                            opacity: task.completed ? 0.75 : 1
+                            opacity: isDone ? 0.75 : 1
                           }}
                         >
                           <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
                             {/* Modern Custom Checkbox */}
                             <button
-                              onClick={() => handleToggleTask(task.id)}
-                              title={task.completed ? "Mark Pending" : "Mark Completed"}
-                              aria-label={task.completed ? "Mark Pending" : "Mark Completed"}
+                              onClick={() => isLostTask ? showToast("This task is auto-closed because the linked lead is marked as Lost.", "info") : handleToggleTask(task.id)}
+                              title={isLostTask ? "Closed: Lead Lost" : (task.completed ? "Mark Pending" : "Mark Completed")}
+                              aria-label={isLostTask ? "Closed: Lead Lost" : (task.completed ? "Mark Pending" : "Mark Completed")}
                               style={{
                                 width: "18px",
                                 height: "18px",
                                 borderRadius: "6px",
-                                border: task.completed ? "none" : "1.5px solid #cbd5e1",
-                                backgroundColor: task.completed ? "#16a34a" : "#ffffff",
+                                border: isDone ? "none" : "1.5px solid #cbd5e1",
+                                backgroundColor: isDone ? (isLostTask ? "#94a3b8" : "#16a34a") : "#ffffff",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                cursor: "pointer",
+                                cursor: isLostTask ? "default" : "pointer",
                                 flexShrink: 0,
                                 transition: "all 0.15s ease",
                                 padding: 0
                               }}
                             >
-                              {task.completed && <Check size={11} color="#ffffff" strokeWidth={3} />}
+                              {isDone && <Check size={11} color="#ffffff" strokeWidth={3} />}
                             </button>
 
                             <div style={{ minWidth: 0, flex: 1 }}>
                               <div style={{ 
                                 fontSize: "12px", 
-                                fontWeight: task.completed ? "400" : "600", 
-                                color: task.completed ? "#94a3b8" : "#0f172a",
-                                textDecoration: task.completed ? "line-through" : "none",
+                                fontWeight: isDone ? "400" : "600", 
+                                color: isDone ? "#94a3b8" : "#0f172a",
+                                textDecoration: isDone ? "line-through" : "none",
                                 whiteSpace: "nowrap",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis"
@@ -17753,6 +17873,11 @@ export default function App() {
                               </div>
 
                               <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "4px", flexWrap: "wrap" }}>
+                                {isLostTask && (
+                                  <span style={{ fontSize: "11px", color: "#b91c1c", backgroundColor: "#fef2f2", border: "1px solid #fecaca", padding: "1px 6px", borderRadius: "5px", display: "inline-flex", alignItems: "center", gap: "3px", fontWeight: "600" }}>
+                                    Lead Lost (Closed)
+                                  </span>
+                                )}
                                 {/* Priority Tag with SVG */}
                                 <span style={{
                                   fontSize: "12px",
