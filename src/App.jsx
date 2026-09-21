@@ -8021,70 +8021,76 @@ export default function App() {
                 )}
               </div>
 
-              {/* 🛡️ ADMIN DATA VAULT & BACKUP (Strictly Visible to Admin Harsh) */}
-              {checkIsSuperAdmin(currentUser) && (
-                <button
-                  type="button"
+              {/* Vertical divider separating temporal scope from operational utilities */}
+              <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 2px" }} aria-hidden="true" />
+
+              {/* Sub-group: Operational Utilities (Vault Backup & Start My Day) */}
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                {/* 🛡️ ADMIN DATA VAULT & BACKUP (Strictly Visible to Admin Harsh) */}
+                {checkIsSuperAdmin(currentUser) && (
+                  <button
+                    type="button"
+                    className="header-vault-btn"
+                    onClick={() => setShowAdminVaultModal(true)}
+                    style={{
+                      height: "32px",
+                      boxSizing: "border-box",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "0 12px",
+                      margin: 0,
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      color: "#475569",
+                      cursor: "pointer",
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      whiteSpace: "nowrap"
+                    }}
+                    title="Admin Data Vault: 15 Verified Real Deals Safe"
+                  >
+                    <Shield size={14} color="#2563eb" />
+                    <span>Vault Backup ({leads.length})</span>
+                  </button>
+                )}
+
+                {/* Global Utility Action (Start My Day) */}
+                <button 
+                  onClick={() => setShowStartMyDay(true)}
                   className="header-vault-btn"
-                  onClick={() => setShowAdminVaultModal(true)}
-                  style={{
-                    height: "32px",
-                    boxSizing: "border-box",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    padding: "0 12px",
+                  style={{ 
+                    height: "32px", 
+                    boxSizing: "border-box", 
+                    display: "inline-flex", 
+                    alignItems: "center", 
+                    gap: "6px", 
+                    padding: "0 13px", 
                     margin: 0,
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    color: "#475569",
-                    cursor: "pointer",
-                    boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
+                    backgroundColor: "#eff6ff", 
+                    border: "1px solid #bfdbfe", 
+                    borderRadius: "6px", 
+                    fontSize: "12px", 
+                    fontWeight: "700", 
+                    color: "#2563eb", 
+                    cursor: "pointer", 
+                    boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)", 
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    transition: "all 0.15s ease",
                     whiteSpace: "nowrap"
                   }}
-                  title="Admin Data Vault: 15 Verified Real Deals Safe"
                 >
-                  <Shield size={14} color="#2563eb" />
-                  <span>Vault Backup ({leads.length})</span>
+                  <Sun size={14} color="#2563eb" />
+                  <span>Start My Day</span>
                 </button>
-              )}
-
-              {/* Global Utility Action (Issue 5: Restyled as secondary brand outline to avoid competing with primary Add Lead CTA) */}
-              <button 
-                onClick={() => setShowStartMyDay(true)}
-                className="header-vault-btn"
-                style={{ 
-                  height: "32px", 
-                  boxSizing: "border-box", 
-                  display: "inline-flex", 
-                  alignItems: "center", 
-                  gap: "6px", 
-                  padding: "0 13px", 
-                  margin: 0,
-                  backgroundColor: "#eff6ff", 
-                  border: "1px solid #bfdbfe", 
-                  borderRadius: "6px", 
-                  fontSize: "12px", 
-                  fontWeight: "700", 
-                  color: "#2563eb", 
-                  cursor: "pointer", 
-                  boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)", 
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  transition: "all 0.15s ease",
-                  whiteSpace: "nowrap"
-                }}
-              >
-                <Sun size={14} color="#2563eb" />
-                <span>Start My Day</span>
-              </button>
+              </div>
             </div>
 
-            {/* Visual Divider */}
-            <div style={{ width: "1px", height: "20px", backgroundColor: "#e2e8f0", margin: "0 2px" }} />
+            {/* Visual Divider separating utilities from user account actions */}
+            <div style={{ width: "1px", height: "20px", backgroundColor: "#e2e8f0", margin: "0 4px" }} aria-hidden="true" />
 
             {/* Cluster 2: User Account & System Actions */}
             <div className="header-user-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
@@ -12537,20 +12543,35 @@ export default function App() {
                   fontFamily: "'Plus Jakarta Sans', sans-serif"
                 }}
               >
+                {/* Accessible H1 Heading for Spreadsheet View (Issue 4) */}
+                <h1 className="sr-only">Sales Pipeline & Lead Management Spreadsheet</h1>
+
                 {/* 1. HubSpot-Style Top Pipeline Tabs & View Mode Switcher */}
                 <div style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
                   borderBottom: "1px solid #edf2f7",
-                  padding: "0 16px",
-                  minHeight: "42px",
+                  padding: "8px 16px",
+                  minHeight: "46px",
                   backgroundColor: "#ffffff",
                   flexWrap: "wrap",
-                  gap: "8px"
+                  gap: "10px"
                 }}>
-                  {/* Pipeline Tabs */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+                  {/* Pipeline Tabs - Unified Segmented Control Styling (Issue 6) */}
+                  <div 
+                    role="tablist"
+                    aria-label="Lead pipeline stages"
+                    style={{ 
+                      display: "inline-flex", 
+                      alignItems: "center", 
+                      backgroundColor: "#f1f5f9", 
+                      padding: "3px", 
+                      borderRadius: "6px", 
+                      border: "1px solid #e2e8f0", 
+                      gap: "2px" 
+                    }}
+                  >
                     {[
                       { label: "Active Pipeline", count: ownerScopedLeads.filter(l => isActiveStatus(l.status)).length },
                       { label: "Won Deals", count: ownerScopedLeads.filter(l => isWonStatus(l.status)).length },
@@ -12561,34 +12582,42 @@ export default function App() {
                       return (
                         <button
                           key={tab.label}
+                          type="button"
+                          role="tab"
+                          aria-selected={isActive}
                           onClick={() => {
                             setCurrentTab(tab.label);
                             setCurrentPage(1);
                           }}
                           style={{
+                            height: "30px",
+                            padding: "4px 12px",
+                            fontSize: "12px",
+                            fontWeight: isActive ? "700" : "600",
+                            color: isActive ? "#0f172a" : "#64748b",
+                            border: "none",
+                            backgroundColor: isActive ? "#ffffff" : "transparent",
+                            borderRadius: "5px",
+                            cursor: "pointer",
                             display: "inline-flex",
                             alignItems: "center",
-                            gap: "5px",
-                            padding: "11px 13px 9px 13px",
-                            border: "none",
-                            borderBottom: isActive ? "2px solid #2563eb" : "2px solid transparent",
-                            backgroundColor: "transparent",
-                            color: isActive ? "#2563eb" : "#475569",
-                            fontWeight: isActive ? "650" : "500",
-                            cursor: "pointer",
-                            fontSize: "12px",
+                            gap: "6px",
+                            boxShadow: isActive ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
                             fontFamily: "'Plus Jakarta Sans', sans-serif",
-                            transition: "all 0.15s ease",
-                            marginBottom: "-1px"
+                            transition: "all 0.15s ease"
                           }}
                         >
                           <span>{tab.label}</span>
                           <span style={{
+                            backgroundColor: isActive ? "#eff6ff" : "#e2e8f0",
                             color: isActive ? "#2563eb" : "#64748b",
-                            fontWeight: isActive ? "700" : "500",
-                            fontSize: "12px"
+                            fontWeight: "700",
+                            fontSize: "11px",
+                            padding: "1px 6px",
+                            borderRadius: "8px",
+                            lineHeight: "1.2"
                           }}>
-                            ({tab.count})
+                            {tab.count}
                           </span>
                         </button>
                       );
@@ -13265,8 +13294,8 @@ export default function App() {
                           <th style={{ width: "14%", minWidth: "140px", padding: "8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Lead Name</th>
                           <th style={{ width: "14%", minWidth: "130px", padding: "8px 10px 8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Deal Stage</th>
                           <th style={{ width: "10%", minWidth: "90px", padding: "8px 8px 8px 10px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Deal Value</th>
-                          <th style={{ width: "22%", minWidth: "220px", padding: "8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Contact</th>
-                          <th style={{ width: "11%", minWidth: "100px", padding: "8px 14px 8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Owner</th>
+                          <th style={{ width: "21%", minWidth: "210px", padding: "8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Contact</th>
+                          <th style={{ width: "12%", minWidth: "135px", padding: "8px 10px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>Owner</th>
                           {customFields.filter(cf => cf.showInTable).map(cf => (
                             <th key={cf.id} style={{ width: "10%", minWidth: "90px", padding: "8px 8px", whiteSpace: "nowrap", fontSize: "12px", letterSpacing: "0.2px", verticalAlign: "middle" }}>{cf.name}</th>
                           ))}
@@ -13567,10 +13596,10 @@ export default function App() {
                                 )}
                               </td>
 
-                              {/* 👤 Lead Owner Cell (Issue 3 & 10: Vertically centered avatar + comfortable dropdown hit area) */}
-                              <td style={{ padding: "8px 14px 8px 8px", verticalAlign: "middle", whiteSpace: "nowrap" }}>
-                                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", verticalAlign: "middle" }}>
-                                  <div style={{ width: "22px", height: "22px", borderRadius: "50%", backgroundColor: "#eef2ff", color: "#2563eb", border: "1px solid #c7d2fe", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "800", flexShrink: 0 }}>
+                              {/* 👤 Lead Owner Cell (Issue 7: Aligned strictly within column with solid vertical axis) */}
+                              <td style={{ width: "12%", minWidth: "135px", padding: "8px 10px", verticalAlign: "middle", whiteSpace: "nowrap" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px", width: "100%", maxWidth: "135px" }}>
+                                  <div style={{ width: "22px", height: "22px", borderRadius: "50%", backgroundColor: "#eef2ff", color: "#2563eb", border: "1px solid #c7d2fe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "800", flexShrink: 0 }}>
                                     {(lead.owner || "Admin").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                   </div>
                                   {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canReassignLeads) ? (
@@ -13579,7 +13608,10 @@ export default function App() {
                                       onChange={(e) => reassignLeadOwner(lead.id, e.target.value)}
                                       onClick={(e) => e.stopPropagation()}
                                       style={{
-                                        padding: "3px 8px",
+                                        flex: 1,
+                                        width: "100%",
+                                        minWidth: 0,
+                                        padding: "3px 6px",
                                         borderRadius: "6px",
                                         fontSize: "11px",
                                         fontWeight: "600",
@@ -13588,8 +13620,7 @@ export default function App() {
                                         border: "1px solid #cbd5e1",
                                         cursor: "pointer",
                                         outline: "none",
-                                        height: "26px",
-                                        minWidth: "90px",
+                                        height: "28px",
                                         boxSizing: "border-box",
                                         fontFamily: "'Plus Jakarta Sans', sans-serif"
                                       }}
@@ -13601,7 +13632,7 @@ export default function App() {
                                       ))}
                                     </select>
                                   ) : (
-                                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#475569" }}>
+                                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                       {lead.owner || currentUser?.name || "You"}
                                     </span>
                                   )}
@@ -21043,11 +21074,36 @@ export default function App() {
                 </div>
               </div>
               <button 
+                type="button"
+                aria-label="Close modal"
                 onClick={() => setShowAddLeadModal(false)}
-                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "6px" }}
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "8px",
+                  border: "1px solid #e2e8f0",
+                  backgroundColor: "#f8fafc",
+                  color: "#64748b",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  flexShrink: 0
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f1f5f9";
+                  e.currentTarget.style.color = "#0f172a";
+                  e.currentTarget.style.borderColor = "#cbd5e1";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.color = "#64748b";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                }}
                 title="Close"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
@@ -21459,11 +21515,36 @@ export default function App() {
                 </div>
               </div>
               <button 
+                type="button"
+                aria-label="Close modal"
                 onClick={() => setTaskToComplete(null)}
-                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "6px" }}
-                title="Cancel"
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "8px",
+                  border: "1px solid #e2e8f0",
+                  backgroundColor: "#f8fafc",
+                  color: "#64748b",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  flexShrink: 0
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f1f5f9";
+                  e.currentTarget.style.color = "#0f172a";
+                  e.currentTarget.style.borderColor = "#cbd5e1";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.color = "#64748b";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                }}
+                title="Close"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
@@ -21694,11 +21775,36 @@ export default function App() {
                 </div>
               </div>
               <button 
+                type="button"
+                aria-label="Close modal"
                 onClick={() => setShowImportLeadsModal(false)}
-                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "4px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "6px" }}
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "8px",
+                  border: "1px solid #e2e8f0",
+                  backgroundColor: "#f8fafc",
+                  color: "#64748b",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  flexShrink: 0
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f1f5f9";
+                  e.currentTarget.style.color = "#0f172a";
+                  e.currentTarget.style.borderColor = "#cbd5e1";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.color = "#64748b";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                }}
                 title="Close"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
 
@@ -21727,22 +21833,29 @@ export default function App() {
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "6px",
-                    backgroundColor: "#2563eb",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "8px",
-                    padding: "9px 16px",
+                    backgroundColor: "#ffffff",
+                    color: "#334155",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "6px",
+                    padding: "8px 14px",
                     fontSize: "12px",
-                    fontWeight: "750",
+                    fontWeight: "600",
                     cursor: "pointer",
                     whiteSpace: "nowrap",
-                    boxShadow: "0 2px 8px rgba(37, 99, 235, 0.25)",
-                    flexShrink: 0
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                    flexShrink: 0,
+                    transition: "all 0.15s ease"
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#1d4ed8"}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#2563eb"}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f8fafc";
+                    e.currentTarget.style.borderColor = "#94a3b8";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#ffffff";
+                    e.currentTarget.style.borderColor = "#cbd5e1";
+                  }}
                 >
-                  <Download size={14} />
+                  <Download size={14} color="#64748b" />
                   <span>Download Sample CSV</span>
                 </button>
               </div>
@@ -21885,15 +21998,16 @@ export default function App() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",
-                  backgroundColor: importPreviewLeads.length === 0 || isImportingLeads ? "#94a3b8" : "#10b981",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "8px",
+                  backgroundColor: (importPreviewLeads.length === 0 || isImportingLeads) ? "#f1f5f9" : "#10b981",
+                  color: (importPreviewLeads.length === 0 || isImportingLeads) ? "#64748b" : "#ffffff",
+                  border: (importPreviewLeads.length === 0 || isImportingLeads) ? "1px solid #cbd5e1" : "1px solid #059669",
+                  borderRadius: "6px",
                   padding: "9px 22px",
                   fontSize: "13px",
-                  fontWeight: "750",
+                  fontWeight: "700",
                   cursor: importPreviewLeads.length === 0 || isImportingLeads ? "not-allowed" : "pointer",
-                  boxShadow: importPreviewLeads.length > 0 && !isImportingLeads ? "0 4px 12px rgba(16, 185, 129, 0.35)" : "none"
+                  boxShadow: importPreviewLeads.length > 0 && !isImportingLeads ? "0 4px 12px rgba(16, 185, 129, 0.35)" : "none",
+                  transition: "all 0.15s ease"
                 }}
               >
                 {isImportingLeads ? (
@@ -22099,10 +22213,36 @@ export default function App() {
                   <Maximize2 size={13} /> Full Window
                 </button>
                 <button 
+                  type="button"
+                  aria-label="Close modal"
                   onClick={() => { setShowUserManagementModal(false); setShowAddUserSubModal(false); }}
-                  style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "4px" }}
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                    backgroundColor: "#f8fafc",
+                    color: "#64748b",
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                    flexShrink: 0
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f1f5f9";
+                    e.currentTarget.style.color = "#0f172a";
+                    e.currentTarget.style.borderColor = "#cbd5e1";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f8fafc";
+                    e.currentTarget.style.color = "#64748b";
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                  }}
+                  title="Close"
                 >
-                  <X size={18} />
+                  <X size={20} />
                 </button>
               </div>
             </div>
@@ -22632,10 +22772,35 @@ export default function App() {
               </div>
               <button 
                 type="button"
+                aria-label="Close modal"
                 onClick={() => setShowAdminVaultModal(false)}
-                style={{ width: "28px", height: "28px", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: "#f8fafc", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "8px",
+                  border: "1px solid #e2e8f0",
+                  backgroundColor: "#f8fafc",
+                  color: "#64748b",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  flexShrink: 0
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f1f5f9";
+                  e.currentTarget.style.color = "#0f172a";
+                  e.currentTarget.style.borderColor = "#cbd5e1";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.color = "#64748b";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                }}
+                title="Close"
               >
-                ✕
+                <X size={20} />
               </button>
             </div>
 
