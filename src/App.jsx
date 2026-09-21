@@ -7607,54 +7607,12 @@ export default function App() {
           <span className="nav-group-title">WORKSPACE</span>
           <div className="sidebar-nav-list">
             <button 
-              onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("overview"); }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" && analyticsSubTab === "overview" ? "active" : ""}`}
-              title="Sales Dashboard"
-            >
-              <TrendingUp className="nav-item-icon" />
-              <span>Sales Dashboard</span>
-            </button>
-
-            <button 
-              onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("intelligence"); }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" && analyticsSubTab === "intelligence" ? "active" : ""}`}
-              title="Sales Intelligence"
-            >
-              <Sparkles className="nav-item-icon" />
-              <span>Sales Intelligence</span>
-            </button>
-
-            <button 
-              onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
-              title="Pipeline Spreadsheet"
+              onClick={() => { setActiveWorkspace("pipeline"); }} 
+              className={`sidebar-nav-item ${activeWorkspace === "pipeline" ? "active" : ""}`}
+              title="Sales Pipeline & Deals"
             >
               <Grid className="nav-item-icon" />
-              <span>Pipeline Spreadsheet</span>
-            </button>
-
-            <button 
-              onClick={() => { 
-                setActiveWorkspace("pipeline"); 
-                setPipelineView("split"); 
-              }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "split" ? "active" : ""}`}
-              title="Pipeline Board 360°"
-            >
-              <Layers className="nav-item-icon" />
-              <span>Pipeline 360°</span>
-            </button>
-
-            <button 
-              onClick={() => { 
-                setActiveWorkspace("pipeline"); 
-                setPipelineView("deals"); 
-              }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
-              title="Deals Hub"
-            >
-              <Award className="nav-item-icon" />
-              <span>Deals Hub</span>
+              <span>Sales Pipeline</span>
             </button>
 
             {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessTasks !== false) && (
@@ -12839,7 +12797,7 @@ export default function App() {
                         aria-selected={pipelineView === "analytics"}
                         tabIndex={pipelineView === "analytics" ? 0 : -1}
                         onClick={() => setPipelineView("analytics")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
                       >
                         <TrendingUp size={13} /> Dashboard
                       </button>
@@ -12852,7 +12810,7 @@ export default function App() {
                         aria-selected={pipelineView === "sheet"}
                         tabIndex={pipelineView === "sheet" ? 0 : -1}
                         onClick={() => setPipelineView("sheet")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
                       >
                         <Grid size={13} /> Spreadsheet
                       </button>
@@ -12865,7 +12823,7 @@ export default function App() {
                         aria-selected={pipelineView === "split"}
                         tabIndex={pipelineView === "split" ? 0 : -1}
                         onClick={() => setPipelineView("split")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
                       >
                         <Layers size={13} /> Split 360°
                       </button>
@@ -12878,7 +12836,7 @@ export default function App() {
                         aria-selected={pipelineView === "deals"}
                         tabIndex={pipelineView === "deals" ? 0 : -1}
                         onClick={() => setPipelineView("deals")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", transition: "all 0.15s ease" }}
                       >
                         <Award size={13} /> Deals Hub
                       </button>
@@ -18459,13 +18417,13 @@ export default function App() {
 
         return (
           <div className="modal-overlay" onClick={() => { setSelectedLeadForDetails(null); setIsEditingFollowUp(false); }} style={{ backdropFilter: "blur(4px)", backgroundColor: "rgba(15, 23, 42, 0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "760px", width: "92%", maxHeight: "92vh", borderRadius: "12px", overflow: "hidden", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", padding: 0, display: "flex", flexDirection: "column", backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "780px", width: "94%", maxHeight: "90vh", borderRadius: "8px", overflow: "hidden", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", padding: 0, display: "flex", flexDirection: "column", backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
               
               {/* Header Bar */}
               <div style={{ padding: "12px 20px 10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#ffffff", borderBottom: "1px solid #f1f5f9" }}>
-                <h3 style={{ fontSize: "16px", fontWeight: "750", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
+                <h2 style={{ fontSize: "16px", fontWeight: "750", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
                   Lead Details
-                </h3>
+                </h2>
                 <button 
                   onClick={() => { setSelectedLeadForDetails(null); setIsEditingFollowUp(false); }}
                   style={{
@@ -18486,10 +18444,10 @@ export default function App() {
               </div>
 
               {/* 2-Column Main Body */}
-              <div style={{ display: "flex", minHeight: 0, flex: 1, overflow: "hidden" }}>
+              <div style={{ display: "flex", minHeight: 0, flex: 1, overflowY: "auto" }}>
                 
-                {/* 👈 LEFT COLUMN: Profile & Contact Snapshot (35% width, compact & scrollable if needed) */}
-                <div style={{ width: "35%", backgroundColor: "#f0f4f8", padding: "14px 18px 16px 18px", display: "flex", flexDirection: "column", overflowY: "auto", scrollbarWidth: "none" }}>
+                {/* 👈 LEFT COLUMN: Profile & Contact Snapshot (38% width, fully scrollable with bottom breathing room) */}
+                <div style={{ width: "38%", backgroundColor: "#f8fafc", borderRight: "1px solid #e2e8f0", padding: "16px 18px 24px 18px", display: "flex", flexDirection: "column", overflowY: "auto", boxSizing: "border-box" }}>
                   
                   {/* Avatar & Name Block */}
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "12px" }}>
@@ -18509,9 +18467,9 @@ export default function App() {
                     }}>
                       {initials}
                     </div>
-                    <h4 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: "0 0 2px 0", lineHeight: 1.2 }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: "0 0 2px 0", lineHeight: 1.2 }}>
                       {selectedLeadForDetails.name || "Lead Name"}
-                    </h4>
+                    </h3>
                     <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
                       {selectedLeadForDetails.company && selectedLeadForDetails.company.trim() ? selectedLeadForDetails.company : "Business Development Manager"}
                     </span>
@@ -18557,7 +18515,7 @@ export default function App() {
                         ))}
                       </select>
 
-                      {/* ❌ Direct Mark as Lost Button */}
+                      {/* ❌ Direct Mark as Lost Button (Secondary Outlined) */}
                       {!isLostStatus(selectedLeadForDetails.status) ? (
                         <button
                           type="button"
@@ -18571,21 +18529,32 @@ export default function App() {
                             }
                           }}
                           style={{
-                            padding: "2px 7px",
+                            padding: "3px 8px",
                             borderRadius: "6px",
-                            fontSize: "10px",
-                            fontWeight: "750",
-                            backgroundColor: "#fef2f2",
-                            color: "#dc2626",
-                            border: "1px solid #fecaca",
+                            fontSize: "11px",
+                            fontWeight: "600",
+                            backgroundColor: "#ffffff",
+                            color: "#64748b",
+                            border: "1px solid #cbd5e1",
                             cursor: "pointer",
                             display: "inline-flex",
                             alignItems: "center",
-                            gap: "3px"
+                            gap: "4px",
+                            transition: "all 0.15s ease"
                           }}
                           title="Click to mark deal as Lost"
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = "#dc2626";
+                            e.currentTarget.style.borderColor = "#fca5a5";
+                            e.currentTarget.style.backgroundColor = "#fef2f2";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = "#64748b";
+                            e.currentTarget.style.borderColor = "#cbd5e1";
+                            e.currentTarget.style.backgroundColor = "#ffffff";
+                          }}
                         >
-                          <span>✕</span>
+                          <span aria-hidden="true">✕</span>
                           <span>Mark Lost</span>
                         </button>
                       ) : (
@@ -18678,10 +18647,23 @@ export default function App() {
                                 setEditModalPhoneVal(selectedLeadForDetails.phone || "");
                                 setIsEditingModalPhone(true);
                               }}
-                              style={{ background: "none", border: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontSize: "10px", display: "flex", alignItems: "center", gap: "2px" }}
+                              style={{
+                                background: "#eff6ff",
+                                border: "1px solid #bfdbfe",
+                                borderRadius: "4px",
+                                color: "#1d4ed8",
+                                cursor: "pointer",
+                                padding: "2px 7px",
+                                fontSize: "11px",
+                                fontWeight: "600",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "3px",
+                                transition: "all 0.15s ease"
+                              }}
                               title="Edit phone number"
                             >
-                              <Pencil size={9} />
+                              <Pencil size={10} aria-hidden="true" />
                               <span>Edit</span>
                             </button>
                           )}
@@ -18798,10 +18780,23 @@ export default function App() {
                                 setEditModalEmailVal(selectedLeadForDetails.email || "");
                                 setIsEditingModalEmail(true);
                               }}
-                              style={{ background: "none", border: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontSize: "10px", display: "flex", alignItems: "center", gap: "2px" }}
-                              title="Edit email"
+                              style={{
+                                background: "#eff6ff",
+                                border: "1px solid #bfdbfe",
+                                borderRadius: "4px",
+                                color: "#1d4ed8",
+                                cursor: "pointer",
+                                padding: "2px 7px",
+                                fontSize: "11px",
+                                fontWeight: "600",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "3px",
+                                transition: "all 0.15s ease"
+                              }}
+                              title="Edit email address"
                             >
-                              <Pencil size={9} />
+                              <Pencil size={10} aria-hidden="true" />
                               <span>Edit</span>
                             </button>
                           )}
@@ -19107,20 +19102,20 @@ export default function App() {
 
                 </div>
 
-                {/* 👉 RIGHT COLUMN: Activity & Notes Hub (65% width) */}
-                <div style={{ width: "65%", backgroundColor: "#ffffff", padding: "20px 26px 24px 26px", display: "flex", flexDirection: "column" }}>
+                {/* 👉 RIGHT COLUMN: Activity & Notes Hub (62% width) */}
+                <div style={{ width: "62%", backgroundColor: "#ffffff", padding: "20px 24px 24px 24px", display: "flex", flexDirection: "column" }}>
                   
                   {/* Section Title */}
                   <div style={{ marginBottom: "14px" }}>
-                    <h4 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: "0 0 2px 0" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: "0 0 2px 0" }}>
                       Activity & Notes
-                    </h4>
+                    </h3>
                     <span style={{ fontSize: "12px", color: "#64748b" }}>
                       Log calls, WhatsApp interactions, notes and view timeline
                     </span>
                   </div>
 
-                  {/* Quick Actions Header & Compact Buttons in one sleek row */}
+                  {/* Quick Actions Header & Prominent Action Buttons */}
                   <div style={{
                     display: "flex",
                     alignItems: "center",
@@ -19148,19 +19143,19 @@ export default function App() {
                           display: "inline-flex",
                           alignItems: "center",
                           gap: "5px",
-                          padding: "5px 10px",
+                          padding: "5px 12px",
                           borderRadius: "6px",
-                          border: activeQuickAction === "call" ? "1.5px solid #2563eb" : "1px solid #cbd5e1",
-                          backgroundColor: activeQuickAction === "call" ? "#eff6ff" : "#ffffff",
-                          color: activeQuickAction === "call" ? "#1d4ed8" : "#334155",
+                          border: activeQuickAction === "call" ? "1.5px solid #2563eb" : "1px solid #bfdbfe",
+                          backgroundColor: activeQuickAction === "call" ? "#2563eb" : "#eff6ff",
+                          color: activeQuickAction === "call" ? "#ffffff" : "#1d4ed8",
                           cursor: "pointer",
                           fontSize: "12px",
-                          fontWeight: "600",
+                          fontWeight: "700",
                           transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
                         }}
                       >
-                        <Phone size={12} color={activeQuickAction === "call" ? "#2563eb" : "#475569"} />
+                        <Phone size={12} color={activeQuickAction === "call" ? "#ffffff" : "#2563eb"} />
                         <span>Call</span>
                       </button>
 
@@ -19175,19 +19170,19 @@ export default function App() {
                           display: "inline-flex",
                           alignItems: "center",
                           gap: "5px",
-                          padding: "5px 10px",
+                          padding: "5px 12px",
                           borderRadius: "6px",
-                          border: activeQuickAction === "whatsapp" ? "1.5px solid #16a34a" : "1px solid #cbd5e1",
-                          backgroundColor: activeQuickAction === "whatsapp" ? "#f0fdf4" : "#ffffff",
-                          color: activeQuickAction === "whatsapp" ? "#15803d" : "#334155",
+                          border: activeQuickAction === "whatsapp" ? "1.5px solid #16a34a" : "1px solid #bbf7d0",
+                          backgroundColor: activeQuickAction === "whatsapp" ? "#16a34a" : "#f0fdf4",
+                          color: activeQuickAction === "whatsapp" ? "#ffffff" : "#15803d",
                           cursor: "pointer",
                           fontSize: "12px",
-                          fontWeight: "600",
+                          fontWeight: "700",
                           transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
                         }}
                       >
-                        <MessageCircle size={12} color={activeQuickAction === "whatsapp" ? "#16a34a" : "#475569"} />
+                        <MessageCircle size={12} color={activeQuickAction === "whatsapp" ? "#ffffff" : "#16a34a"} />
                         <span>WhatsApp</span>
                       </button>
 
@@ -19202,19 +19197,19 @@ export default function App() {
                           display: "inline-flex",
                           alignItems: "center",
                           gap: "5px",
-                          padding: "5px 10px",
+                          padding: "5px 12px",
                           borderRadius: "6px",
-                          border: activeQuickAction === "meeting" ? "1.5px solid #7c3aed" : "1px solid #cbd5e1",
-                          backgroundColor: activeQuickAction === "meeting" ? "#f5f3ff" : "#ffffff",
-                          color: activeQuickAction === "meeting" ? "#6d28d9" : "#334155",
+                          border: activeQuickAction === "meeting" ? "1.5px solid #7c3aed" : "1px solid #ddd6fe",
+                          backgroundColor: activeQuickAction === "meeting" ? "#7c3aed" : "#f5f3ff",
+                          color: activeQuickAction === "meeting" ? "#ffffff" : "#6d28d9",
                           cursor: "pointer",
                           fontSize: "12px",
-                          fontWeight: "600",
+                          fontWeight: "700",
                           transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
                         }}
                       >
-                        <Calendar size={12} color={activeQuickAction === "meeting" ? "#7c3aed" : "#475569"} />
+                        <Calendar size={12} color={activeQuickAction === "meeting" ? "#ffffff" : "#7c3aed"} />
                         <span>Meeting</span>
                       </button>
 
@@ -19229,19 +19224,19 @@ export default function App() {
                           display: "inline-flex",
                           alignItems: "center",
                           gap: "5px",
-                          padding: "5px 10px",
+                          padding: "5px 12px",
                           borderRadius: "6px",
-                          border: activeQuickAction === "note" ? "1.5px solid #ea580c" : "1px solid #cbd5e1",
-                          backgroundColor: activeQuickAction === "note" ? "#fff7ed" : "#ffffff",
-                          color: activeQuickAction === "note" ? "#c2410c" : "#334155",
+                          border: activeQuickAction === "note" ? "1.5px solid #ea580c" : "1px solid #fed7aa",
+                          backgroundColor: activeQuickAction === "note" ? "#ea580c" : "#fff7ed",
+                          color: activeQuickAction === "note" ? "#ffffff" : "#c2410c",
                           cursor: "pointer",
                           fontSize: "12px",
-                          fontWeight: "600",
+                          fontWeight: "700",
                           transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
                         }}
                       >
-                        <Pencil size={12} color={activeQuickAction === "note" ? "#ea580c" : "#475569"} />
+                        <Pencil size={12} color={activeQuickAction === "note" ? "#ffffff" : "#ea580c"} />
                         <span>Add Note</span>
                       </button>
                     </div>
