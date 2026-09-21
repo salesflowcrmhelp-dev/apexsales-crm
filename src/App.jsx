@@ -7851,10 +7851,10 @@ export default function App() {
             <div />
           )}
 
-          <div className="header-action-row" style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
+          <div className="header-action-row" style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "auto" }}>
             
             {/* Cluster 1: Global Utilities (Period Selector, Backup, Start My Day) */}
-            <div className="header-utilities-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+            <div className="header-utilities-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
               {/* Global Monthly Period Selector Dropdown */}
               <div style={{ position: "relative" }}>
                 <button 
@@ -8006,10 +8006,10 @@ export default function App() {
               </div>
 
               {/* Vertical divider separating temporal scope from operational utilities */}
-              <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 2px" }} aria-hidden="true" />
+              <div style={{ width: "1px", height: "20px", backgroundColor: "#e2e8f0", margin: "0 6px" }} aria-hidden="true" />
 
               {/* Sub-group: Operational Utilities (Vault Backup & Start My Day) */}
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
                 {/* 🛡️ ADMIN DATA VAULT & BACKUP (Strictly Visible to Admin Harsh) */}
                 {checkIsSuperAdmin(currentUser) && (
                   <button
@@ -8075,10 +8075,10 @@ export default function App() {
             </div>
 
             {/* Visual Divider separating utilities from user account actions */}
-            <div style={{ width: "1px", height: "20px", backgroundColor: "#e2e8f0", margin: "0 4px" }} aria-hidden="true" />
+            <div style={{ width: "1px", height: "22px", backgroundColor: "#cbd5e1", margin: "0 8px" }} aria-hidden="true" />
 
             {/* Cluster 2: User Account & System Actions */}
-            <div className="header-user-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+            <div className="header-user-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
               <div className="header-notification-btn" onClick={() => setShowStartMyDay(true)} title="3 Pending Follow-ups" style={{ width: "32px", height: "32px" }}>
                 <Bell className="w-4 h-4 text-slate-600" />
                 <span className="notification-badge-dot">3</span>
@@ -8092,7 +8092,7 @@ export default function App() {
                   boxSizing: "border-box",
                   display: "flex",
                   alignItems: "center",
-                  gap: "7px",
+                  gap: "8px",
                   padding: "0 10px 0 6px",
                   backgroundColor: "#ffffff",
                   border: "1px solid #e2e8f0",
@@ -15373,7 +15373,7 @@ export default function App() {
                             <Award size={16} color="#16a34a" /> Deals & Revenue Hub
                           </h1>
                           <span style={{ fontSize: "12px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "2px 8px", borderRadius: "6px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                            CLOSED REVENUE LEDGER
+                            Closed Revenue Ledger
                           </span>
                         </div>
                         <p style={{ fontSize: "12px", color: "#475569", margin: "4px 0 0 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -15426,7 +15426,7 @@ export default function App() {
                             onClick={() => setPipelineView("deals")}
                             style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                           >
-                            <Award size={13} /> Deals Hub
+                            <Award size={13} /> Deals Board
                           </button>
                         </div>
 
@@ -15484,9 +15484,9 @@ export default function App() {
                         style={{
                           height: "32px",
                           padding: "0 12px",
-                          backgroundColor: "#16a34a",
-                          color: "#ffffff",
-                          border: "none",
+                          backgroundColor: "#ffffff",
+                          color: "#0f172a",
+                          border: "1px solid #cbd5e1",
                           borderRadius: "6px",
                           fontSize: "12px",
                           fontWeight: "600",
@@ -15495,10 +15495,10 @@ export default function App() {
                           alignItems: "center",
                           gap: "5px",
                           fontFamily: "inherit",
-                          boxShadow: "0 1px 3px rgba(22, 163, 74, 0.25)"
+                          boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04)"
                         }}
                       >
-                        <Grid size={13} /> View All {ownerScopedLeads.length} Leads in Spreadsheet →
+                        <Grid size={13} color="#475569" /> View All {ownerScopedLeads.length} Leads in Spreadsheet →
                       </button>
                     </div>
 
@@ -15850,8 +15850,25 @@ export default function App() {
                                     {/* Email Address */}
                                     <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                                       {deal.email ? (
-                                        <a href={`mailto:${deal.email}`} style={{ color: "#2563eb", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                                          <Mail size={12} color="#2563eb" /> {deal.email}
+                                        <a 
+                                          href={`mailto:${deal.email}`} 
+                                          title={deal.email}
+                                          aria-label={`Email ${deal.email}`}
+                                          style={{ 
+                                            color: "#2563eb", 
+                                            textDecoration: "none", 
+                                            display: "inline-flex", 
+                                            alignItems: "center", 
+                                            gap: "4px", 
+                                            fontSize: "12px", 
+                                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                            maxWidth: "160px"
+                                          }}
+                                        >
+                                          <Mail size={12} color="#2563eb" style={{ flexShrink: 0 }} />
+                                          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                            {deal.email}
+                                          </span>
                                         </a>
                                       ) : (
                                         <span style={{ color: "#64748b" }}>-</span>
@@ -15883,7 +15900,7 @@ export default function App() {
                             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                               <Award size={18} color="#059669" />
                               <div>
-                                <h3 style={{ fontSize: "13px", fontWeight: "800", color: "#0f172a", margin: 0 }}>OFFICIAL PAYMENT RECEIPT</h3>
+                                <h3 style={{ fontSize: "13px", fontWeight: "800", color: "#0f172a", margin: 0 }}>Official Payment Receipt</h3>
                                 <span style={{ fontSize: "10px", color: "#64748b" }}>Receipt #REC-{String(selectedReceiptDeal.id).slice(-4) || "1084"}</span>
                               </div>
                             </div>
