@@ -7678,15 +7678,7 @@ export default function App() {
                 <span>Sales Calendar</span>
               </button>
             )}
-          </div>
-        </div>
 
-        {/* Section 4: SETTINGS */}
-        <div className="sidebar-nav-group">
-          <span className="nav-group-title" style={{ fontSize: "12px", fontWeight: "700", color: "#64748b", letterSpacing: "0.5px" }}>
-            SETTINGS
-          </span>
-          <div className="sidebar-nav-list" style={{ marginTop: "6px" }}>
             {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessReports !== false) && (
               <button 
                 onClick={() => { setActiveWorkspace("reports"); setShowReportsModal(false); }} 
@@ -7695,26 +7687,6 @@ export default function App() {
               >
                 <BarChart2 className="nav-item-icon" />
                 <span>Reports</span>
-              </button>
-            )}
-
-            <button 
-              onClick={() => { setActiveWorkspace("users"); setShowReportsModal(false); }} 
-              className={`sidebar-nav-item ${activeWorkspace === "users" ? "active" : ""}`}
-              title={isSidebarCollapsed ? "User Profile" : undefined}
-            >
-              <User className="nav-item-icon" />
-              <span>User Profile</span>
-            </button>
-
-            {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessSettings !== false) && (
-              <button 
-                onClick={() => setActiveWorkspace("settings")} 
-                className={`sidebar-nav-item ${activeWorkspace === "settings" ? "active" : ""}`}
-                title="Settings"
-              >
-                <Settings className="nav-item-icon" />
-                <span>Settings</span>
               </button>
             )}
 
@@ -12860,7 +12832,7 @@ export default function App() {
                         tabIndex={pipelineView === "analytics" ? 0 : -1}
                         onClick={() => setPipelineView("analytics")}
                         title="Dashboard View"
-                        style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "750" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: pipelineView === "analytics" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "analytics" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "750" : "600", color: pipelineView === "analytics" ? "#2563eb" : "#64748b", border: pipelineView === "analytics" ? "1px solid #bfdbfe" : "1px solid transparent", backgroundColor: pipelineView === "analytics" ? "#eff6ff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(37, 99, 235, 0.12)" : "none", transition: "all 0.15s ease" }}
                       >
                         <TrendingUp size={13} />
                         <span className="view-mode-label">Dashboard</span>
@@ -12875,7 +12847,7 @@ export default function App() {
                         tabIndex={pipelineView === "sheet" ? 0 : -1}
                         onClick={() => setPipelineView("sheet")}
                         title="Spreadsheet Grid"
-                        style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "750" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: pipelineView === "sheet" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "sheet" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "750" : "600", color: pipelineView === "sheet" ? "#2563eb" : "#64748b", border: pipelineView === "sheet" ? "1px solid #bfdbfe" : "1px solid transparent", backgroundColor: pipelineView === "sheet" ? "#eff6ff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(37, 99, 235, 0.12)" : "none", transition: "all 0.15s ease" }}
                       >
                         <Grid size={13} />
                         <span className="view-mode-label">Sheet</span>
@@ -12890,7 +12862,7 @@ export default function App() {
                         tabIndex={pipelineView === "split" ? 0 : -1}
                         onClick={() => setPipelineView("split")}
                         title="Split 360° Board"
-                        style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: pipelineView === "split" ? "750" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: pipelineView === "split" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "split" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", fontWeight: pipelineView === "split" ? "750" : "600", color: pipelineView === "split" ? "#2563eb" : "#64748b", border: pipelineView === "split" ? "1px solid #bfdbfe" : "1px solid transparent", backgroundColor: pipelineView === "split" ? "#eff6ff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(37, 99, 235, 0.12)" : "none", transition: "all 0.15s ease" }}
                       >
                         <Layers size={13} />
                         <span className="view-mode-label">Split 360°</span>
@@ -12905,7 +12877,7 @@ export default function App() {
                         tabIndex={pipelineView === "deals" ? 0 : -1}
                         onClick={() => setPipelineView("deals")}
                         title="Deals Hub"
-                        style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "750" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: pipelineView === "deals" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "deals" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
+                        style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "750" : "600", color: pipelineView === "deals" ? "#2563eb" : "#64748b", border: pipelineView === "deals" ? "1px solid #bfdbfe" : "1px solid transparent", backgroundColor: pipelineView === "deals" ? "#eff6ff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(37, 99, 235, 0.12)" : "none", transition: "all 0.15s ease" }}
                       >
                         <Award size={13} />
                         <span className="view-mode-label">Deals</span>
@@ -12917,7 +12889,7 @@ export default function App() {
 
                 {/* 2. Structured Two-Tier Toolbar: Resolves Filter Bar Density (Issue 9) */}
                 <div style={{ display: "flex", flexDirection: "column", backgroundColor: "#ffffff" }}>
-                  {/* Tier 1: Search Bar & Primary Action Controls */}
+                  {/* Tier 1: Search Bar & Primary Action Controls (Issue 5: Standardized 32px height across all buttons) */}
                   <div style={{
                     display: "flex",
                     alignItems: "center",
@@ -12931,7 +12903,7 @@ export default function App() {
                     <div style={{ position: "relative", flex: "1", minWidth: "220px", maxWidth: "420px" }}>
                       <Search size={13} style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none" }} />
                       <input 
-                        type="search"
+                        type="search" 
                         name="leads_quick_search"
                         role="searchbox"
                         autoComplete="off"
@@ -12942,7 +12914,7 @@ export default function App() {
                         placeholder="Search leads by name, company..." 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{ width: "100%", padding: searchQuery ? "5px 28px 5px 30px" : "5px 10px 5px 30px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
+                        style={{ width: "100%", padding: searchQuery ? "0 28px 0 30px" : "0 10px 0 30px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
                       />
                       {searchQuery && (
                         <button
@@ -12971,7 +12943,7 @@ export default function App() {
                     </div>
 
                     {/* Right Actions: 'Delete Lead' (if selected) + '+ Add Lead' + 'Import Leads' + 'Actions ▾' */}
-                    <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "6px", position: "relative" }}>
+                    <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "8px", position: "relative" }}>
                       {(selectedLeadIds.length > 0 || selectedCell !== null) && (
                         <button 
                           type="button"
@@ -12984,14 +12956,15 @@ export default function App() {
                             color: "#dc2626", 
                             border: "1px solid #fca5a5", 
                             borderRadius: "6px", 
-                            padding: "5px 12px", 
+                            padding: "0 12px", 
                             fontSize: "12px", 
                             fontWeight: "700", 
                             cursor: "pointer", 
                             boxShadow: "0 1px 2px rgba(220, 38, 38, 0.15)", 
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
-                            height: "32px",
-                            transition: "all 0.15s ease"
+                            fontFamily: "'Plus Jakarta Sans', sans-serif", 
+                            height: "32px", 
+                            boxSizing: "border-box",
+                            transition: "all 0.15s ease" 
                           }}
                           onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#fecaca"; }}
                           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#fee2e2"; }}
@@ -13016,9 +12989,9 @@ export default function App() {
                           fontWeight: "600", 
                           cursor: "pointer", 
                           boxShadow: "0 1px 2px rgba(37, 99, 235, 0.25)", 
-                          fontFamily: "'Plus Jakarta Sans', sans-serif",
-                          height: "34px",
-                          boxSizing: "border-box"
+                          fontFamily: "'Plus Jakarta Sans', sans-serif", 
+                          height: "32px", 
+                          boxSizing: "border-box" 
                         }}
                       >
                         <Plus size={14} /> Add Lead
@@ -13041,14 +13014,15 @@ export default function App() {
                           color: "#0f172a", 
                           border: "1px solid #cbd5e1", 
                           borderRadius: "6px", 
-                          padding: "5px 12px", 
+                          padding: "0 12px", 
                           fontSize: "12px", 
                           fontWeight: "650", 
                           cursor: "pointer", 
                           boxShadow: "0 1px 2px rgba(0,0,0,0.04)", 
-                          fontFamily: "'Plus Jakarta Sans', sans-serif",
-                          height: "32px",
-                          transition: "all 0.15s ease"
+                          fontFamily: "'Plus Jakarta Sans', sans-serif", 
+                          height: "32px", 
+                          boxSizing: "border-box",
+                          transition: "all 0.15s ease" 
                         }}
                         onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#f8fafc"; e.currentTarget.style.borderColor = "#94a3b8"; }}
                         onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#ffffff"; e.currentTarget.style.borderColor = "#cbd5e1"; }}
@@ -13071,11 +13045,12 @@ export default function App() {
                             color: "#475569",
                             border: "1px solid #e2e8f0",
                             borderRadius: "6px",
-                            padding: "5px 10px",
+                            padding: "0 10px",
                             fontSize: "12px",
                             fontWeight: "600",
                             cursor: "pointer",
                             height: "32px",
+                            boxSizing: "border-box",
                             fontFamily: "'Plus Jakarta Sans', sans-serif"
                           }}
                         >
@@ -13321,7 +13296,7 @@ export default function App() {
                     <ChevronDown size={12} style={{ position: "absolute", right: "7px", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none" }} />
                   </div>
 
-                  {/* Min Value Filter (Issue 9: Standardized 125px width with currency prefix to match adjacent dropdowns) */}
+                  {/* Min Value Filter (Issue 8: Widen to 140px to eliminate placeholder clipping) */}
                   <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
                     <span style={{ position: "absolute", left: "9px", fontSize: "12px", fontWeight: "700", color: "#64748b", pointerEvents: "none" }}>
                       ₹
@@ -13333,8 +13308,9 @@ export default function App() {
                       value={filterMinVal}
                       onChange={(e) => setFilterMinVal(e.target.value)}
                       style={{ 
-                        width: "125px", 
-                        padding: "4px 10px 4px 22px", 
+                        width: "140px", 
+                        minWidth: "140px",
+                        padding: "0 10px 0 24px", 
                         border: filterMinVal ? "1px solid #3b82f6" : "1px solid #e2e8f0", 
                         borderRadius: "6px", 
                         fontSize: "12px", 
@@ -13824,9 +13800,9 @@ export default function App() {
                                         }}
                                         style={{
                                           background: "#eff6ff",
-                                          border: "1px dashed #bfdbfe",
+                                          border: "1px solid #bfdbfe",
                                           borderRadius: "6px",
-                                          padding: "3px 8px",
+                                          padding: "0 10px",
                                           marginTop: "2px",
                                           color: "#2563eb",
                                           fontSize: "12px",
@@ -13837,7 +13813,8 @@ export default function App() {
                                           alignItems: "center",
                                           gap: "3px",
                                           whiteSpace: "nowrap",
-                                          minHeight: "22px",
+                                          height: "26px",
+                                          boxSizing: "border-box",
                                           fontFamily: "'Plus Jakarta Sans', sans-serif"
                                         }}
                                         onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#dbeafe"; e.currentTarget.style.borderColor = "#93c5fd"; }}
@@ -13970,9 +13947,9 @@ export default function App() {
                                 )}
                               </td>
 
-                              {/* Dedicated Actions Column (Issue 11: Increased button target to 34px and gap to 8px) */}
-                              <td style={{ padding: "8px 8px", verticalAlign: "middle", textAlign: "right", whiteSpace: "nowrap", position: "relative" }}>
-                                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: "8px", whiteSpace: "nowrap" }}>
+                              {/* Dedicated Actions Column (Issue 6: Increased icon gap to 10px and cell padding to 8px 12px) */}
+                              <td style={{ padding: "8px 12px", verticalAlign: "middle", textAlign: "right", whiteSpace: "nowrap", position: "relative" }}>
+                                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "flex-end", gap: "10px", whiteSpace: "nowrap" }}>
                                   {lead.phone && (
                                     <a
                                       href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${lead.name || ""}, connecting regarding your inquiry.`)}`}
