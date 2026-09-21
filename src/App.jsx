@@ -12759,20 +12759,27 @@ export default function App() {
                   flexWrap: "wrap",
                   gap: "10px"
                 }}>
-                  {/* Pipeline Tabs - Unified Segmented Control Styling (Issue 6) */}
-                  <div 
-                    role="tablist"
-                    aria-label="Lead pipeline stages"
-                    style={{ 
-                      display: "inline-flex", 
-                      alignItems: "center", 
-                      backgroundColor: "#f1f5f9", 
-                      padding: "3px", 
-                      borderRadius: "6px", 
-                      border: "1px solid #e2e8f0", 
-                      gap: "2px" 
-                    }}
-                  >
+                  {/* Left Side: Parent-Child Breadcrumb & Stage Filter Tabs (Issue 7: Resolves wayfinding conflict) */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: "700", color: "#64748b" }}>
+                      <Grid size={14} color="#2563eb" />
+                      <span>Pipeline Spreadsheet</span>
+                      <span style={{ color: "#94a3b8" }}>›</span>
+                    </div>
+
+                    <div 
+                      role="tablist"
+                      aria-label="Filter pipeline leads by status"
+                      style={{ 
+                        display: "inline-flex", 
+                        alignItems: "center", 
+                        backgroundColor: "#f1f5f9", 
+                        padding: "3px", 
+                        borderRadius: "6px", 
+                        border: "1px solid #e2e8f0", 
+                        gap: "2px" 
+                      }}
+                    >
                     {[
                       { label: "Active Pipeline", count: ownerScopedLeads.filter(l => isActiveStatus(l.status)).length },
                       { label: "Won Deals", count: ownerScopedLeads.filter(l => isWonStatus(l.status)).length },
@@ -12823,12 +12830,13 @@ export default function App() {
                         </button>
                       );
                     })}
+                    </div>
                   </div>
 
-                  {/* View Modes Switcher (Issue 9: Visually differentiated with Layout label and elevated segmented styling) */}
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
+                  {/* Right Side: Compact View Layout Switcher (Issue 8: Compact icons with tooltips to prevent choice overload and sidebar duplication) */}
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
                     <span style={{ fontSize: "11px", fontWeight: "750", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                      View:
+                      Layout:
                     </span>
                     <div 
                       role="tablist" 
@@ -12839,7 +12847,7 @@ export default function App() {
                         padding: "3px", 
                         borderRadius: "8px", 
                         border: "1px solid #cbd5e1", 
-                        gap: "3px",
+                        gap: "2px",
                         boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
                       }}
                     >
@@ -12851,9 +12859,11 @@ export default function App() {
                         aria-selected={pipelineView === "analytics"}
                         tabIndex={pipelineView === "analytics" ? 0 : -1}
                         onClick={() => setPipelineView("analytics")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "750" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: pipelineView === "analytics" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "analytics" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
+                        title="Dashboard View"
+                        style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "750" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: pipelineView === "analytics" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "analytics" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
                       >
-                        <TrendingUp size={13} /> Dashboard
+                        <TrendingUp size={13} />
+                        <span className="view-mode-label">Dashboard</span>
                       </button>
                     )}
                     {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewSpreadsheetGrid !== false) && (
@@ -12864,9 +12874,11 @@ export default function App() {
                         aria-selected={pipelineView === "sheet"}
                         tabIndex={pipelineView === "sheet" ? 0 : -1}
                         onClick={() => setPipelineView("sheet")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "750" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: pipelineView === "sheet" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "sheet" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
+                        title="Spreadsheet Grid"
+                        style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "750" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: pipelineView === "sheet" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "sheet" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
                       >
-                        <Grid size={13} /> Spreadsheet
+                        <Grid size={13} />
+                        <span className="view-mode-label">Sheet</span>
                       </button>
                     )}
                     {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewSplitView !== false) && (
@@ -12877,9 +12889,11 @@ export default function App() {
                         aria-selected={pipelineView === "split"}
                         tabIndex={pipelineView === "split" ? 0 : -1}
                         onClick={() => setPipelineView("split")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "750" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: pipelineView === "split" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "split" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
+                        title="Split 360° Board"
+                        style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: pipelineView === "split" ? "750" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: pipelineView === "split" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "split" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
                       >
-                        <Layers size={13} /> Split 360°
+                        <Layers size={13} />
+                        <span className="view-mode-label">Split 360°</span>
                       </button>
                     )}
                     {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKanbanDeals !== false) && (
@@ -12890,9 +12904,11 @@ export default function App() {
                         aria-selected={pipelineView === "deals"}
                         tabIndex={pipelineView === "deals" ? 0 : -1}
                         onClick={() => setPipelineView("deals")}
-                        style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "750" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: pipelineView === "deals" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: pipelineView === "deals" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
+                        title="Deals Hub"
+                        style={{ height: "30px", padding: "4px 10px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "750" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: pipelineView === "deals" ? "1px solid #e2e8f0" : "1px solid transparent", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "deals" ? "0 1px 3px rgba(0,0,0,0.08)" : "none", transition: "all 0.15s ease" }}
                       >
-                        <Award size={13} /> Deals Hub
+                        <Award size={13} />
+                        <span className="view-mode-label">Deals</span>
                       </button>
                     )}
                     </div>
@@ -13305,14 +13321,32 @@ export default function App() {
                     <ChevronDown size={12} style={{ position: "absolute", right: "7px", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none" }} />
                   </div>
 
-                  {/* Min Value */}
-                  <div style={{ position: "relative" }}>
+                  {/* Min Value Filter (Issue 9: Standardized 125px width with currency prefix to match adjacent dropdowns) */}
+                  <div style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+                    <span style={{ position: "absolute", left: "9px", fontSize: "12px", fontWeight: "700", color: "#64748b", pointerEvents: "none" }}>
+                      ₹
+                    </span>
                     <input 
                       type="number" 
-                      placeholder="Value ₹..." 
+                      placeholder="Min Value..." 
+                      aria-label="Filter by minimum lead value in rupees"
                       value={filterMinVal}
                       onChange={(e) => setFilterMinVal(e.target.value)}
-                      style={{ width: "85px", padding: "4px 8px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: filterMinVal ? "#eff6ff" : "#ffffff", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px", boxSizing: "border-box" }}
+                      style={{ 
+                        width: "125px", 
+                        padding: "4px 10px 4px 22px", 
+                        border: filterMinVal ? "1px solid #3b82f6" : "1px solid #e2e8f0", 
+                        borderRadius: "6px", 
+                        fontSize: "12px", 
+                        fontWeight: "600",
+                        color: filterMinVal ? "#1d4ed8" : "#0f172a", 
+                        backgroundColor: filterMinVal ? "#eff6ff" : "#ffffff", 
+                        outline: "none", 
+                        fontFamily: "'Plus Jakarta Sans', sans-serif", 
+                        height: "32px", 
+                        boxSizing: "border-box",
+                        transition: "all 0.15s ease"
+                      }}
                     />
                   </div>
 
@@ -13438,33 +13472,39 @@ export default function App() {
 
                   return (
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", padding: "0 16px 10px 16px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <div>
-                          <span style={{ fontSize: "10px", fontWeight: "700", color: "#166534", textTransform: "uppercase" }}>Total Closed Value</span>
+                          {/* Issue 4: Title Case instead of all-caps text */}
+                          <span style={{ fontSize: "11px", fontWeight: "700", color: "#166534" }}>Total Closed Value</span>
                           <strong style={{ fontSize: "14px", fontWeight: "800", color: "#166534", display: "block" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
-                          <span style={{ fontSize: "10px", color: "#64748b" }}>{wonLeadsList.length} Deals Won</span>
+                          {/* Issue 5: Minimum 12px body font size */}
+                          <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>{wonLeadsList.length} Deals Won</span>
                         </div>
                         <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#dcfce7", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <Award size={12} color="#15803d" />
                         </div>
                       </div>
 
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <div>
-                          <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b", textTransform: "uppercase" }}>Average Deal Size</span>
+                          {/* Issue 4: Title Case instead of all-caps text */}
+                          <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b" }}>Average Deal Size</span>
                           <strong style={{ fontSize: "14px", fontWeight: "800", color: "#0f172a", display: "block" }}>₹{avgDealVal.toLocaleString("en-IN")}</strong>
-                          <span style={{ fontSize: "10px", color: "#64748b" }}>Per Closed Won Deal</span>
+                          {/* Issue 5: Minimum 12px body font size */}
+                          <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>Per Closed Won Deal</span>
                         </div>
                         <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <TrendingUp size={12} color="#2563eb" />
                         </div>
                       </div>
 
-                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "6px", padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <div>
-                          <span style={{ fontSize: "10px", fontWeight: "700", color: "#b45309", textTransform: "uppercase" }}>Avg Closing Speed</span>
+                          {/* Issue 4: Title Case instead of all-caps text */}
+                          <span style={{ fontSize: "11px", fontWeight: "700", color: "#b45309" }}>Avg Closing Speed</span>
                           <strong style={{ fontSize: "14px", fontWeight: "800", color: "#b45309", display: "block" }}>{avgClosingSpeed} Days</strong>
-                          <span style={{ fontSize: "10px", color: "#64748b" }}>Lead to Closed Turnaround</span>
+                          {/* Issue 5: Minimum 12px body font size */}
+                          <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>Lead to Closed Turnaround</span>
                         </div>
                         <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <Clock size={12} color="#ea580c" />
