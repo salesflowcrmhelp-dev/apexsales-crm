@@ -12207,8 +12207,8 @@ export default function App() {
                         }}
                       >
                         <div>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                            <span style={{ fontSize: "12px", fontWeight: "750", color: pkg.color, padding: "3px 8px", backgroundColor: pkg.bg, borderRadius: "6px", border: `1px solid ${pkg.border}` }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                            <span style={{ fontSize: "11px", fontWeight: "700", color: pkg.color, padding: "2px 7px", backgroundColor: pkg.bg, borderRadius: "6px", border: `1px solid ${pkg.border}` }}>
                               {pkg.badge}
                             </span>
                             <span style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a" }}>
@@ -12216,17 +12216,17 @@ export default function App() {
                             </span>
                           </div>
 
-                          <h3 style={{ fontSize: "15px", fontWeight: "700", color: "#0f172a", margin: "6px 0 2px 0" }}>
+                          <h3 style={{ fontSize: "15px", fontWeight: "700", color: "#0f172a", margin: "0 0 2px 0" }}>
                             {pkg.name}
                           </h3>
-                          <p style={{ fontSize: "11px", color: "#64748b", margin: "0 0 10px 0" }}>
+                          <p style={{ fontSize: "12px", color: "#64748b", margin: "0 0 10px 0" }}>
                             Target: <strong>{pkg.targetAudience}</strong>
                           </p>
 
-                          <div style={{ padding: "8px 10px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0", marginBottom: "12px" }}>
-                            <span style={{ fontSize: "11px", color: "#475569", display: "block" }}>Pipeline Quota</span>
-                            <strong style={{ fontSize: "14px", color: "#0f172a" }}>
-                              {pkg.quota > 9999 ? "Unlimited Lifetime" : `${pkg.quota} Active Leads`}
+                          <div style={{ padding: "6px 10px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0", marginBottom: "10px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: "12px", color: "#64748b" }}>Pipeline Quota</span>
+                            <strong style={{ fontSize: "12px", color: "#0f172a" }}>
+                              {pkg.quota > 9999 ? "Unlimited" : `${pkg.quota.toLocaleString()} Leads`}
                             </strong>
                           </div>
 
@@ -12235,31 +12235,31 @@ export default function App() {
                           </p>
 
                           {/* Key Capabilities List */}
-                          <div style={{ display: "flex", flexDirection: "column", gap: "5px", fontSize: "11px", color: "#475569" }}>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "12px", color: "#475569" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                              {pkg.permissions.canViewAllLeads ? <Check size={13} color="#16a34a" /> : <X size={13} color="#94a3b8" />}
+                              {pkg.permissions.canViewAllLeads ? <Check size={14} color="#16a34a" /> : <X size={14} color="#94a3b8" />}
                               <span>{pkg.permissions.canViewAllLeads ? "View All Team Leads" : "Isolated Own Data Only"}</span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                              {pkg.permissions.canViewRevenue ? <Check size={13} color="#16a34a" /> : <X size={13} color="#dc2626" />}
+                              {pkg.permissions.canViewRevenue ? <Check size={14} color="#16a34a" /> : <X size={14} color="#dc2626" />}
                               <span>{pkg.permissions.canViewRevenue ? "Deal Values Visible" : "Revenue Masked (₹••••)"}</span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                              {pkg.permissions.canExportCSV ? <Check size={13} color="#16a34a" /> : <X size={13} color="#dc2626" />}
+                              {pkg.permissions.canExportCSV ? <Check size={14} color="#16a34a" /> : <X size={14} color="#dc2626" />}
                               <span>{pkg.permissions.canExportCSV ? "CSV Database Export" : "Anti-Theft Export Locked"}</span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                              {pkg.permissions.canDeleteLeads ? <Check size={13} color="#16a34a" /> : <X size={13} color="#94a3b8" />}
+                              {pkg.permissions.canDeleteLeads ? <Check size={14} color="#16a34a" /> : <X size={14} color="#94a3b8" />}
                               <span>{pkg.permissions.canDeleteLeads ? "Delete Leads Allowed" : "Lead Deletion Protected"}</span>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                              {pkg.permissions.canUseAI ? <Check size={13} color="#7c3aed" /> : <X size={13} color="#94a3b8" />}
+                              {pkg.permissions.canUseAI ? <Check size={14} color="#7c3aed" /> : <X size={14} color="#94a3b8" />}
                               <span>{pkg.permissions.canUseAI ? "AI Pitch & Scripts" : "No AI Access"}</span>
                             </div>
                           </div>
                         </div>
 
-                        <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #f1f5f9", display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #f1f5f9", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                           <button
                             type="button"
                             onClick={() => {
@@ -12278,10 +12278,10 @@ export default function App() {
                               });
                               setShowEditPackageModal(true);
                             }}
-                            style={{ width: "100%", height: "30px", borderRadius: "6px", border: "1.5px solid #cbd5e1", backgroundColor: "#ffffff", color: "#0f172a", fontSize: "11px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
+                            style={{ height: "32px", borderRadius: "6px", border: "1.5px solid #cbd5e1", backgroundColor: "#ffffff", color: "#334155", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "5px" }}
                             title="Decide custom rate and pipeline quota for this tier"
                           >
-                            <Pencil size={12} /> Edit Tier Rate & Quota
+                            <Pencil size={12} /> Edit Rate
                           </button>
                           <button
                             type="button"
@@ -12289,9 +12289,10 @@ export default function App() {
                               setTeamTab("members");
                               showToast(`Assign ${pkg.name} package to any member via the '⚙️ Access' button in the members table.`, "info");
                             }}
-                            style={{ width: "100%", height: "30px", borderRadius: "6px", border: `1px solid ${pkg.border}`, backgroundColor: pkg.bg, color: pkg.color, fontSize: "11px", fontWeight: "700", cursor: "pointer" }}
+                            style={{ height: "32px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#f8fafc", color: "#334155", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
+                            title={`Assign ${pkg.name} to team members`}
                           >
-                            Assign to Team Member →
+                            Assign →
                           </button>
                         </div>
                       </div>
@@ -12307,11 +12308,11 @@ export default function App() {
                       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", textAlign: "left" }}>
                         <thead>
                           <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                            <th style={{ padding: "8px 12px", color: "#475569" }}>FEATURE / PERMISSION</th>
-                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#2563eb" }}>STARTER REP</th>
-                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#166534" }}>GROWTH CLOSER</th>
-                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#7c3aed" }}>ENTERPRISE</th>
-                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#b45309" }}>SUPER ADMIN</th>
+                            <th style={{ padding: "8px 12px", color: "#475569", fontWeight: "700" }}>FEATURE / PERMISSION</th>
+                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#475569", fontWeight: "700" }}>STARTER REP</th>
+                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#475569", fontWeight: "700" }}>GROWTH CLOSER</th>
+                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#475569", fontWeight: "700" }}>ENTERPRISE</th>
+                            <th style={{ padding: "8px 12px", textAlign: "center", color: "#475569", fontWeight: "700" }}>SUPER ADMIN</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -12319,20 +12320,20 @@ export default function App() {
                             { label: "Active Leads Quota", starter: "50 Leads", growth: "250 Leads", enterprise: "1,000 Leads", admin: "Unlimited" },
                             { label: "Pipeline Scope", starter: "Own Leads Only", growth: "Own Leads Only", enterprise: "Full Team Leads", admin: "Full Master Vault" },
                             { label: "Deal Revenue & Pricing", starter: "Masked (₹••••)", growth: "Full Visibility", enterprise: "Full Visibility", admin: "Full Visibility" },
-                            { label: "Anti-Theft CSV Export", starter: "❌ Blocked", growth: "❌ Blocked", enterprise: "✅ Enabled", admin: "✅ Enabled" },
-                            { label: "Bulk CSV Import", starter: "❌ Blocked", growth: "✅ Enabled", enterprise: "✅ Enabled", admin: "✅ Enabled" },
-                            { label: "Lead Deletion Protection", starter: "🔒 Protected", growth: "🔒 Protected", enterprise: "✅ Enabled", admin: "✅ Enabled" },
-                            { label: "Target Quota Editing", starter: "❌ Read-Only", growth: "❌ Read-Only", enterprise: "✅ Editable", admin: "✅ Master Override" },
-                            { label: "AI Sales Pitch Bot", starter: "❌ Disabled", growth: "✅ AI Assistant", enterprise: "✅ Full AI Suite", admin: "✅ Master AI" },
-                            { label: "WhatsApp & Call Integration", starter: "✅ Direct Dial", growth: "✅ Direct Dial", enterprise: "✅ Direct Dial", admin: "✅ Direct Dial" },
-                            { label: "RBAC & User Management", starter: "❌ None", growth: "❌ None", enterprise: "❌ None", admin: "👑 Full Management" }
+                            { label: "Anti-Theft CSV Export", starter: "—", growth: "—", enterprise: "Enabled", admin: "Enabled" },
+                            { label: "Bulk CSV Import", starter: "—", growth: "Enabled", enterprise: "Enabled", admin: "Enabled" },
+                            { label: "Lead Deletion Protection", starter: "Protected", growth: "Protected", enterprise: "Enabled", admin: "Enabled" },
+                            { label: "Target Quota Editing", starter: "—", growth: "—", enterprise: "Editable", admin: "Master Override" },
+                            { label: "AI Sales Pitch Bot", starter: "—", growth: "AI Assistant", enterprise: "Full AI Suite", admin: "Master AI" },
+                            { label: "WhatsApp & Call Integration", starter: "Direct Dial", growth: "Direct Dial", enterprise: "Direct Dial", admin: "Direct Dial" },
+                            { label: "RBAC & User Management", starter: "—", growth: "—", enterprise: "—", admin: "Full Management" }
                           ].map((row, idx) => (
                             <tr key={idx} style={{ borderBottom: "1px solid #f1f5f9" }}>
                               <td style={{ padding: "8px 12px", fontWeight: "600", color: "#0f172a" }}>{row.label}</td>
-                              <td style={{ padding: "8px 12px", textAlign: "center", color: "#475569" }}>{row.starter}</td>
-                              <td style={{ padding: "8px 12px", textAlign: "center", color: "#475569" }}>{row.growth}</td>
-                              <td style={{ padding: "8px 12px", textAlign: "center", color: "#475569" }}>{row.enterprise}</td>
-                              <td style={{ padding: "8px 12px", textAlign: "center", color: "#b45309", fontWeight: "700" }}>{row.admin}</td>
+                              <td style={{ padding: "8px 12px", textAlign: "center", color: row.starter === "—" ? "#94a3b8" : "#334155" }}>{row.starter}</td>
+                              <td style={{ padding: "8px 12px", textAlign: "center", color: row.growth === "—" ? "#94a3b8" : "#334155" }}>{row.growth}</td>
+                              <td style={{ padding: "8px 12px", textAlign: "center", color: row.enterprise === "—" ? "#94a3b8" : "#334155" }}>{row.enterprise}</td>
+                              <td style={{ padding: "8px 12px", textAlign: "center", color: row.admin === "—" ? "#94a3b8" : "#0f172a", fontWeight: "600" }}>{row.admin}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -12399,7 +12400,7 @@ export default function App() {
                             <span style={{ fontSize: "12px", fontWeight: "750", color: pkg.color, padding: "3px 8px", backgroundColor: pkg.bg, borderRadius: "6px", border: `1px solid ${pkg.border}` }}>
                               {pkg.name}
                             </span>
-                            <span style={{ fontSize: "11px", fontWeight: "600", color: "#64748b" }}>
+                            <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b" }}>
                               {pkg.duration}
                             </span>
                           </div>
@@ -12414,7 +12415,7 @@ export default function App() {
                           </div>
 
                           <div style={{ padding: "6px 10px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0", marginBottom: "12px" }}>
-                            <span style={{ fontSize: "11px", color: "#475569" }}>Included Capacity: <strong>{pkg.quota}</strong></span>
+                            <span style={{ fontSize: "12px", color: "#475569" }}>Included Capacity: <strong>{pkg.quota}</strong></span>
                           </div>
 
                           <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "12px", color: "#475569", lineHeight: "1.6" }}>
