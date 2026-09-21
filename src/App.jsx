@@ -7607,12 +7607,54 @@ export default function App() {
           <span className="nav-group-title">WORKSPACE</span>
           <div className="sidebar-nav-list">
             <button 
-              onClick={() => { setActiveWorkspace("pipeline"); }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" ? "active" : ""}`}
-              title="Sales Pipeline & Deals"
+              onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("overview"); }} 
+              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" && analyticsSubTab === "overview" ? "active" : ""}`}
+              title="Sales Dashboard"
+            >
+              <TrendingUp className="nav-item-icon" />
+              <span>Sales Dashboard</span>
+            </button>
+
+            <button 
+              onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("intelligence"); }} 
+              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" && analyticsSubTab === "intelligence" ? "active" : ""}`}
+              title="Sales Intelligence"
+            >
+              <Sparkles className="nav-item-icon" />
+              <span>Sales Intelligence</span>
+            </button>
+
+            <button 
+              onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
+              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
+              title="Pipeline Spreadsheet"
             >
               <Grid className="nav-item-icon" />
-              <span>Sales Pipeline</span>
+              <span>Pipeline Spreadsheet</span>
+            </button>
+
+            <button 
+              onClick={() => { 
+                setActiveWorkspace("pipeline"); 
+                setPipelineView("split"); 
+              }} 
+              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "split" ? "active" : ""}`}
+              title="Pipeline Board 360°"
+            >
+              <Layers className="nav-item-icon" />
+              <span>Pipeline 360°</span>
+            </button>
+
+            <button 
+              onClick={() => { 
+                setActiveWorkspace("pipeline"); 
+                setPipelineView("deals"); 
+              }} 
+              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
+              title="Deals Hub"
+            >
+              <Award className="nav-item-icon" />
+              <span>Deals Hub</span>
             </button>
 
             {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessTasks !== false) && (
