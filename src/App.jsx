@@ -7084,11 +7084,11 @@ export default function App() {
             ) : (
               /* Regular Login Card */
               <>
-                {/* Header: Logo & Title */}
+                {/* Header: Logo & Title (Issue 1: Set badge text explicitly to 12px minimum) */}
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "rgba(37, 99, 235, 0.15)", border: "1px solid rgba(59, 130, 246, 0.3)", padding: "4px 12px", borderRadius: "9999px", color: "#2563eb", fontSize: "12px", fontWeight: "750", letterSpacing: "0.5px", marginBottom: "12px" }}>
-                    <Sparkles size={13} color="#60a5fa" />
-                    <span>OFFICIAL WORKSPACE PORTAL</span>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "rgba(37, 99, 235, 0.15)", border: "1px solid rgba(59, 130, 246, 0.3)", padding: "4px 12px", borderRadius: "9999px", color: "#38bdf8", fontSize: "12px", fontWeight: "750", letterSpacing: "0.5px", marginBottom: "12px" }}>
+                    <Sparkles size={13} color="#38bdf8" />
+                    <span style={{ fontSize: "12px", fontWeight: "750", letterSpacing: "0.5px" }}>OFFICIAL WORKSPACE PORTAL</span>
                   </div>
                   <h1 style={{ margin: "0 0 6px 0", fontSize: "24px", fontWeight: "850", letterSpacing: "-0.5px", color: "#ffffff" }}>
                     ApexSales CRM
@@ -7106,19 +7106,22 @@ export default function App() {
                   </div>
                 )}
 
-
-
                 {/* Login Form */}
                 <form onSubmit={handleEmailPasswordLogin} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                   
-                  {/* Email Input */}
+                  {/* Email Input (Issue 3: Placed secondary descriptor directly adjacent to primary label, eliminating horizontal gap) */}
                   <div>
-                    <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", fontWeight: "700", color: "#64748b", marginBottom: "6px" }}>
+                    <label 
+                      htmlFor="login-email-input" 
+                      style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", fontWeight: "700", color: "#64748b", marginBottom: "6px" }}
+                    >
                       <span>Email Address or Username <span style={{ color: "#dc2626" }}>*</span></span>
+                      <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: "500" }}>(Authorized user ID)</span>
                     </label>
                     <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                       <Mail size={16} style={{ position: "absolute", left: "14px", color: loginEmail ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
                       <input
+                        id="login-email-input"
                         type="text"
                         placeholder="name@company.com or username"
                         value={loginEmail}
@@ -7147,24 +7150,17 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Password / PIN Input */}
+                  {/* Password / PIN Input (Issue 2: Removed redundant 14px Show button above field, keeping accessible 36px eye icon inside field) */}
                   <div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-                      <label style={{ fontSize: "12px", fontWeight: "700", color: "#64748b" }}>
+                    <div style={{ display: "flex", alignItems: "center", marginBottom: "6px" }}>
+                      <label htmlFor="login-password-input" style={{ fontSize: "12px", fontWeight: "700", color: "#64748b" }}>
                         Password <span style={{ color: "#dc2626" }}>*</span>
                       </label>
-                      <button
-                        type="button"
-                        onClick={() => setShowPinText(!showPinText)}
-                        style={{ background: "none", border: "none", color: "#64748b", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
-                      >
-                        {showPinText ? <EyeOff size={13} /> : <Eye size={13} />}
-                        <span>{showPinText ? "Hide" : "Show"}</span>
-                      </button>
                     </div>
                     <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                       <Lock size={16} style={{ position: "absolute", left: "14px", color: passwordInput ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
                       <input
+                        id="login-password-input"
                         type={showPinText ? "text" : "password"}
                         placeholder="Enter your password"
                         value={passwordInput}
@@ -7175,7 +7171,7 @@ export default function App() {
                         required
                         style={{
                           width: "100%",
-                          padding: "12px 42px 12px 42px",
+                          padding: "12px 46px 12px 42px",
                           fontSize: "14px",
                           fontWeight: "650",
                           letterSpacing: showPinText ? "normal" : "2px",
@@ -7193,10 +7189,25 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => setShowPinText(!showPinText)}
-                        style={{ position: "absolute", right: "12px", background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: "4px" }}
-                        title={showPinText ? "Hide Password" : "Show Password"}
+                        style={{ 
+                          position: "absolute", 
+                          right: "8px", 
+                          width: "36px",
+                          height: "36px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "none", 
+                          border: "none", 
+                          color: "#94a3b8", 
+                          cursor: "pointer", 
+                          borderRadius: "6px",
+                          padding: 0
+                        }}
+                        title={showPinText ? "Hide password" : "Show password"}
+                        aria-label={showPinText ? "Hide password" : "Show password"}
                       >
-                        {showPinText ? <EyeOff size={16} color="#cbd5e1" /> : <Eye size={16} color="#94a3b8" />}
+                        {showPinText ? <EyeOff size={18} color="#cbd5e1" /> : <Eye size={18} color="#94a3b8" />}
                       </button>
                     </div>
                   </div>
