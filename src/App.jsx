@@ -6484,7 +6484,7 @@ export default function App() {
                         <Mail size={16} style={{ position: "absolute", left: "14px", color: forgotEmail ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
                         <input
                           type="email"
-                          placeholder="e.g. salesflowcrmhelp@gmail.com"
+                          placeholder="name@company.com"
                           value={forgotEmail}
                           onChange={(e) => {
                             setForgotEmail(e.target.value);
@@ -6804,13 +6804,12 @@ export default function App() {
                   <div>
                     <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", fontWeight: "700", color: "#64748b", marginBottom: "6px" }}>
                       <span>Email Address or Username <span style={{ color: "#dc2626" }}>*</span></span>
-                      <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>harsh / admin / email</span>
                     </label>
                     <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                       <Mail size={16} style={{ position: "absolute", left: "14px", color: loginEmail ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
                       <input
                         type="text"
-                        placeholder="e.g. harsh.accomation@gmail.com or admin"
+                        placeholder="name@company.com or username"
                         value={loginEmail}
                         onChange={(e) => {
                           setLoginEmail(e.target.value);
@@ -6841,7 +6840,7 @@ export default function App() {
                   <div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
                       <label style={{ fontSize: "12px", fontWeight: "700", color: "#64748b" }}>
-                        Password / Secret PIN <span style={{ color: "#dc2626" }}>*</span>
+                        Password <span style={{ color: "#dc2626" }}>*</span>
                       </label>
                       <button
                         type="button"
@@ -6856,7 +6855,7 @@ export default function App() {
                       <Lock size={16} style={{ position: "absolute", left: "14px", color: passwordInput ? "#38bdf8" : "#64748b", pointerEvents: "none" }} />
                       <input
                         type={showPinText ? "text" : "password"}
-                        placeholder="Enter 4-6 digit PIN or Password"
+                        placeholder="Enter your password"
                         value={passwordInput}
                         onChange={(e) => {
                           setPasswordInput(e.target.value);
@@ -10461,7 +10460,7 @@ export default function App() {
                             type="text" 
                             value={userProfile.fullName}
                             onChange={(e) => setUserProfile({ ...userProfile, fullName: e.target.value })}
-                            placeholder="e.g. Harsh Goyal"
+                            placeholder="Full Name"
                             style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
@@ -10471,7 +10470,7 @@ export default function App() {
                             type="text" 
                             value={userProfile.displayName}
                             onChange={(e) => setUserProfile({ ...userProfile, displayName: e.target.value })}
-                            placeholder="e.g. Admin"
+                            placeholder="Display Name"
                             style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                           />
                         </div>
@@ -10483,7 +10482,7 @@ export default function App() {
                           type="email" 
                           value={userProfile.email}
                           onChange={(e) => setUserProfile({ ...userProfile, email: e.target.value })}
-                          placeholder="e.g. admin@pipeline.crm"
+                          placeholder="name@company.com"
                           style={{ width: "100%", padding: "0 10px", height: "34px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box" }}
                         />
                       </div>
@@ -22196,7 +22195,7 @@ export default function App() {
                     Admin Data Vault & Permanent Backup 👑
                   </h3>
                   <p style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0 0" }}>
-                    Restricted exclusively to Super Admin ({currentUser?.email || "harsh.accomation@gmail.com"}). Zero risk of data loss.
+                    Restricted exclusively to Super Admin ({currentUser?.email || "Authorized Super Admin"}). Zero risk of data loss.
                   </p>
                 </div>
               </div>
