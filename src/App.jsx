@@ -1681,6 +1681,7 @@ export default function App() {
   const [editingPackageData, setEditingPackageData] = useState(null);
   const [permSearchQuery, setPermSearchQuery] = useState("");
   const [permCategoryFilter, setPermCategoryFilter] = useState("all");
+  const [collapsedCategories, setCollapsedCategories] = useState({});
   const [showUserManagementModal, setShowUserManagementModal] = useState(() => {
     try {
       return new URLSearchParams(window.location.search).get("modal") === "team";
@@ -11439,13 +11440,13 @@ export default function App() {
                         {/* Scrollable Body */}
                         <div style={{ padding: "18px 22px", overflowY: "auto", flex: 1, display: "flex", flexDirection: "column", gap: "16px" }}>
                           
-                          {/* Step 1: Quick Select Package Tier */}
+                          {/* Step 1: Quick Select Package Tier (Issue 10: Grouped directly with Current Tier indicator) */}
                           <div>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px", flexWrap: "wrap" }}>
                               <span style={{ fontSize: "12px", fontWeight: "750", color: "#0f172a" }}>
                                 1. Quick Select Package Tier (Auto-Configures Defaults)
                               </span>
-                              <span style={{ fontSize: "11px", color: "#64748b" }}>
+                              <span style={{ fontSize: "12px", color: "#64748b", display: "inline-flex", alignItems: "center", gap: "5px", backgroundColor: "#f1f5f9", padding: "2px 8px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
                                 Current Tier: <strong style={{ color: "#2563eb" }}>{(employeePackagesList[accessFormData.packageTier] || EMPLOYEE_PACKAGES[accessFormData.packageTier])?.name || accessFormData.packageTier}</strong>
                               </span>
                             </div>
@@ -11483,7 +11484,7 @@ export default function App() {
                                     <div style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a" }}>
                                       {pkg.price}
                                     </div>
-                                    <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
+                                    <div style={{ fontSize: "12px", color: "#64748b", marginTop: "2px" }}>
                                       Quota: {pkg.quota > 9999 ? 'Unlimited' : `${pkg.quota} Leads`}
                                     </div>
                                   </div>
@@ -11492,22 +11493,120 @@ export default function App() {
                             </div>
                           </div>
 
-                          {/* Quick Global Action Presets */}
-                          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", padding: "10px 12px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", alignItems: "center" }}>
-                            <span style={{ fontSize: "11px", fontWeight: "700", color: "#475569", marginRight: "4px" }}>
-                              ⚡ Quick Actions:
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const allOn = {};
-                                ALL_PERMISSION_CATEGORIES.forEach(c => c.items.forEach(i => { allOn[i.key] = true; }));
-                                setAccessFormData(prev => ({ ...prev, permissions: allOn }));
-                              }}
-                              style={{ padding: "4px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #bfdbfe", backgroundColor: "#eff6ff", color: "#1d4ed8", cursor: "pointer" }}
-                            >
-                              ✅ Grant All Permissions (38)
-                            </button>
+                          {/* Quick Global Action Presets (Issues 7, 8, 9, 12: Unified button styling, clear affordances, distinct destructive styling & separation) */}
+                          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", padding: "10px 12px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0", alignItems: "center", justifyContent: "space-between" }}>
+                            {/* Left Group: Label & Safe Presets */}
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                              <span style={{ fontSize: "12px", fontWeight: "750", color: "#475569", marginRight: "2px" }}>
+                                ⚡ Quick Actions:
+                              </span>
+                              
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const allOn = {};
+                                  ALL_PERMISSION_CATEGORIES.forEach(c => c.items.forEach(i => { allOn[i.key] = true; }));
+                                  setAccessFormData(prev => ({ ...prev, permissions: allOn }));
+                                }}
+                                style={{
+                                  height: "30px",
+                                  padding: "4px 12px",
+                                  fontSize: "12px",
+                                  fontWeight: "600",
+                                  borderRadius: "6px",
+                                  border: "1px solid #bfdbfe",
+                                  backgroundColor: "#eff6ff",
+                                  color: "#1d4ed8",
+                                  cursor: "pointer",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "5px",
+                                  boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)",
+                                  transition: "all 0.15s ease"
+                                }}
+                              >
+                                ✅ Grant All Permissions (38)
+                              </button>
+
+                              {/* Subtle divider separating global grant from security presets */}
+                              <div style={{ width: "1px", height: "18px", backgroundColor: "#e2e8f0", margin: "0 2px" }} aria-hidden="true" />
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAccessFormData(prev => ({
+                                    ...prev,
+                                    permissions: {
+                                      ...prev.permissions,
+                                      canExportCSV: false,
+                                      canBulkImport: false,
+                                      canDeleteLeads: false,
+                                      canViewRevenue: false,
+                                      canEditTarget: false,
+                                      canViewKpiSalesTarget: false,
+                                      canViewKpiIncentive: false,
+                                      canAccessReports: false,
+                                      canAccessSettings: false
+                                    }
+                                  }));
+                                }}
+                                style={{
+                                  height: "30px",
+                                  padding: "4px 12px",
+                                  fontSize: "12px",
+                                  fontWeight: "600",
+                                  borderRadius: "6px",
+                                  border: "1px solid #cbd5e1",
+                                  backgroundColor: "#ffffff",
+                                  color: "#334155",
+                                  cursor: "pointer",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "5px",
+                                  boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                                  transition: "all 0.15s ease"
+                                }}
+                              >
+                                🔒 Anti-Theft Lockdown
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAccessFormData(prev => ({
+                                    ...prev,
+                                    permissions: {
+                                      ...prev.permissions,
+                                      canViewRevenue: !prev.permissions.canViewRevenue,
+                                      canViewKpiTotalPipeline: !prev.permissions.canViewRevenue,
+                                      canViewKpiSalesTarget: !prev.permissions.canViewRevenue,
+                                      canViewKpiDailyTarget: !prev.permissions.canViewRevenue,
+                                      canViewKpiIncentive: !prev.permissions.canViewRevenue
+                                    }
+                                  }));
+                                }}
+                                style={{
+                                  height: "30px",
+                                  padding: "4px 12px",
+                                  fontSize: "12px",
+                                  fontWeight: "600",
+                                  borderRadius: "6px",
+                                  border: "1px solid #cbd5e1",
+                                  backgroundColor: "#ffffff",
+                                  color: "#334155",
+                                  cursor: "pointer",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "5px",
+                                  boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                                  transition: "all 0.15s ease"
+                                }}
+                              >
+                                🙈 Toggle Revenue & Financial Cards
+                              </button>
+                            </div>
+
+                            {/* Right Group: Destructive Action Separated with Warning Affordance (Issues 8 & 12) */}
                             <button
                               type="button"
                               onClick={() => {
@@ -11515,73 +11614,77 @@ export default function App() {
                                 ALL_PERMISSION_CATEGORIES.forEach(c => c.items.forEach(i => { allOff[i.key] = false; }));
                                 setAccessFormData(prev => ({ ...prev, permissions: allOff }));
                               }}
-                              style={{ padding: "4px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: "#ffffff", color: "#475569", cursor: "pointer" }}
+                              style={{
+                                height: "30px",
+                                padding: "4px 12px",
+                                fontSize: "12px",
+                                fontWeight: "600",
+                                borderRadius: "6px",
+                                border: "1px solid #fecaca",
+                                backgroundColor: "#ffffff",
+                                color: "#dc2626",
+                                cursor: "pointer",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "5px",
+                                boxShadow: "0 1px 2px rgba(220, 38, 38, 0.05)",
+                                transition: "all 0.15s ease"
+                              }}
+                              title="Revoke all 38 permissions for this user"
+                              aria-label="Deselect all permissions"
                             >
                               ❌ Deselect All
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setAccessFormData(prev => ({
-                                  ...prev,
-                                  permissions: {
-                                    ...prev.permissions,
-                                    canExportCSV: false,
-                                    canBulkImport: false,
-                                    canDeleteLeads: false,
-                                    canViewRevenue: false,
-                                    canEditTarget: false,
-                                    canViewKpiSalesTarget: false,
-                                    canViewKpiIncentive: false,
-                                    canAccessReports: false,
-                                    canAccessSettings: false
-                                  }
-                                }));
-                              }}
-                              style={{ padding: "4px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #fed7aa", backgroundColor: "#fff7ed", color: "#c2410c", cursor: "pointer" }}
-                            >
-                              🔒 Anti-Theft Lockdown
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setAccessFormData(prev => ({
-                                  ...prev,
-                                  permissions: {
-                                    ...prev.permissions,
-                                    canViewRevenue: !prev.permissions.canViewRevenue,
-                                    canViewKpiTotalPipeline: !prev.permissions.canViewRevenue,
-                                    canViewKpiSalesTarget: !prev.permissions.canViewRevenue,
-                                    canViewKpiDailyTarget: !prev.permissions.canViewRevenue,
-                                    canViewKpiIncentive: !prev.permissions.canViewRevenue
-                                  }
-                                }));
-                              }}
-                              style={{ padding: "4px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #fde68a", backgroundColor: "#fffbeb", color: "#b45309", cursor: "pointer" }}
-                            >
-                              🙈 Toggle Revenue & Financial Cards
                             </button>
                           </div>
 
                           {/* Step 2: Search & Filter Toolbar */}
                           <div>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", flexWrap: "wrap", gap: "8px" }}>
-                              <span style={{ fontSize: "12px", fontWeight: "750", color: "#0f172a" }}>
-                                2. Granular Permissions & Card Controls (38 Available)
-                              </span>
+                              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                <span style={{ fontSize: "12px", fontWeight: "750", color: "#0f172a" }}>
+                                  2. Granular Permissions & Card Controls (38 Available)
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const allCollapsed = ALL_PERMISSION_CATEGORIES.every(c => !!collapsedCategories[c.id]);
+                                    const next = {};
+                                    if (!allCollapsed) {
+                                      ALL_PERMISSION_CATEGORIES.forEach(c => { next[c.id] = true; });
+                                    }
+                                    setCollapsedCategories(next);
+                                  }}
+                                  style={{
+                                    height: "26px",
+                                    padding: "2px 10px",
+                                    fontSize: "11px",
+                                    fontWeight: "600",
+                                    borderRadius: "6px",
+                                    border: "1px solid #cbd5e1",
+                                    backgroundColor: "#ffffff",
+                                    color: "#475569",
+                                    cursor: "pointer",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "4px"
+                                  }}
+                                >
+                                  {ALL_PERMISSION_CATEGORIES.every(c => !!collapsedCategories[c.id]) ? "📂 Expand All" : "📁 Collapse All"}
+                                </button>
+                              </div>
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                 <input 
                                   type="text"
                                   placeholder="🔍 Search cards, permissions, tools..."
                                   value={permSearchQuery}
                                   onChange={(e) => setPermSearchQuery(e.target.value)}
-                                  style={{ width: "240px", height: "30px", padding: "4px 10px", fontSize: "11px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none" }}
+                                  style={{ width: "240px", height: "30px", padding: "4px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none" }}
                                 />
                                 {permSearchQuery && (
                                   <button
                                     type="button"
                                     onClick={() => setPermSearchQuery("")}
-                                    style={{ height: "30px", padding: "0 8px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", cursor: "pointer", color: "#64748b" }}
+                                    style={{ height: "30px", padding: "0 10px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", cursor: "pointer", color: "#64748b" }}
                                   >
                                     Clear
                                   </button>
@@ -11589,49 +11692,82 @@ export default function App() {
                               </div>
                             </div>
 
-                            {/* Category Filter Pills */}
-                            <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "4px", marginBottom: "12px" }}>
+                            {/* Category Filter Pills (Issue 11: Comfortable touch targets & clean badges) */}
+                            <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "6px", marginBottom: "12px" }}>
                               <button
                                 type="button"
                                 onClick={() => setPermCategoryFilter("all")}
                                 style={{
-                                  padding: "4px 10px",
-                                  fontSize: "11px",
+                                  height: "32px",
+                                  padding: "4px 12px",
+                                  fontSize: "12px",
                                   fontWeight: "600",
                                   borderRadius: "6px",
-                                  border: permCategoryFilter === "all" ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                                  border: permCategoryFilter === "all" ? "1px solid #2563eb" : "1px solid #cbd5e1",
                                   backgroundColor: permCategoryFilter === "all" ? "#eff6ff" : "#ffffff",
                                   color: permCategoryFilter === "all" ? "#1d4ed8" : "#475569",
                                   cursor: "pointer",
-                                  whiteSpace: "nowrap"
+                                  whiteSpace: "nowrap",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
                                 }}
                               >
-                                All Categories (38)
+                                <span>All Categories</span>
+                                <span style={{
+                                  marginLeft: "6px",
+                                  fontSize: "11px",
+                                  fontWeight: "700",
+                                  padding: "1px 6px",
+                                  borderRadius: "10px",
+                                  backgroundColor: permCategoryFilter === "all" ? "#2563eb" : "#e2e8f0",
+                                  color: permCategoryFilter === "all" ? "#ffffff" : "#475569"
+                                }}>
+                                  38
+                                </span>
                               </button>
-                              {ALL_PERMISSION_CATEGORIES.map(cat => (
-                                <button
-                                  key={cat.id}
-                                  type="button"
-                                  onClick={() => setPermCategoryFilter(cat.id)}
-                                  style={{
-                                    padding: "4px 10px",
-                                    fontSize: "11px",
-                                    fontWeight: "600",
-                                    borderRadius: "6px",
-                                    border: permCategoryFilter === cat.id ? `1px solid ${cat.color}` : "1px solid #e2e8f0",
-                                    backgroundColor: permCategoryFilter === cat.id ? cat.bg : "#ffffff",
-                                    color: permCategoryFilter === cat.id ? cat.color : "#475569",
-                                    cursor: "pointer",
-                                    whiteSpace: "nowrap"
-                                  }}
-                                >
-                                  {cat.name.split(' ')[0]} {cat.name.split(' ').slice(1).join(' ')} ({cat.items.length})
-                                </button>
-                              ))}
+                              {ALL_PERMISSION_CATEGORIES.map(cat => {
+                                const isSelected = permCategoryFilter === cat.id;
+                                return (
+                                  <button
+                                    key={cat.id}
+                                    type="button"
+                                    onClick={() => setPermCategoryFilter(cat.id)}
+                                    style={{
+                                      height: "32px",
+                                      padding: "4px 12px",
+                                      fontSize: "12px",
+                                      fontWeight: "600",
+                                      borderRadius: "6px",
+                                      border: isSelected ? `1.5px solid ${cat.color}` : "1px solid #cbd5e1",
+                                      backgroundColor: isSelected ? cat.bg : "#ffffff",
+                                      color: isSelected ? cat.color : "#475569",
+                                      cursor: "pointer",
+                                      whiteSpace: "nowrap",
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                                    }}
+                                  >
+                                    <span>{cat.name}</span>
+                                    <span style={{
+                                      marginLeft: "6px",
+                                      fontSize: "11px",
+                                      fontWeight: "700",
+                                      padding: "1px 6px",
+                                      borderRadius: "10px",
+                                      backgroundColor: isSelected ? cat.color : "#e2e8f0",
+                                      color: isSelected ? "#ffffff" : "#475569"
+                                    }}>
+                                      {cat.items.length}
+                                    </span>
+                                  </button>
+                                );
+                              })}
                             </div>
 
-                            {/* Render Filtered Categories */}
-                            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                            {/* Render Filtered Categories (Issue 6: Collapsible Accordion) */}
+                            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                               {ALL_PERMISSION_CATEGORIES
                                 .filter(cat => permCategoryFilter === "all" || permCategoryFilter === cat.id)
                                 .map(cat => {
@@ -11644,31 +11780,53 @@ export default function App() {
                                   if (filteredItems.length === 0) return null;
 
                                   const activeCount = filteredItems.filter(i => !!accessFormData.permissions[i.key]).length;
+                                  const isCollapsed = !!collapsedCategories[cat.id];
 
                                   return (
                                     <div 
                                       key={cat.id} 
                                       style={{ 
                                         border: "1px solid #e2e8f0", 
-                                        borderRadius: "10px", 
+                                        borderRadius: "8px", 
                                         backgroundColor: "#ffffff",
                                         overflow: "hidden",
                                         boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
                                       }}
                                     >
-                                      {/* Category Header */}
-                                      <div style={{ padding: "10px 14px", backgroundColor: cat.bg, borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
-                                        <div>
-                                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                            <strong style={{ fontSize: "13px", color: cat.color }}>{cat.name}</strong>
-                                            <span style={{ fontSize: "11px", fontWeight: "700", padding: "1px 6px", borderRadius: "9999px", backgroundColor: "#ffffff", color: cat.color, border: `1px solid ${cat.color}40` }}>
-                                              {activeCount} / {filteredItems.length} Enabled
-                                            </span>
+                                      {/* Category Accordion Header */}
+                                      <div 
+                                        onClick={() => setCollapsedCategories(prev => ({ ...prev, [cat.id]: !prev[cat.id] }))}
+                                        style={{ 
+                                          padding: "10px 14px", 
+                                          backgroundColor: cat.bg, 
+                                          borderBottom: isCollapsed ? "none" : "1px solid #e2e8f0", 
+                                          display: "flex", 
+                                          justifyContent: "space-between", 
+                                          alignItems: "center", 
+                                          flexWrap: "wrap", 
+                                          gap: "8px",
+                                          cursor: "pointer",
+                                          userSelect: "none"
+                                        }}
+                                        title="Click to collapse / expand this category"
+                                      >
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                          <div style={{ transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)", transition: "transform 0.2s ease", display: "flex", alignItems: "center" }}>
+                                            <ChevronDown size={16} color={cat.color} />
                                           </div>
-                                          <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>{cat.desc}</p>
+                                          <div>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                              <strong style={{ fontSize: "13px", color: cat.color }}>{cat.name}</strong>
+                                              <span style={{ fontSize: "11px", fontWeight: "700", padding: "1px 7px", borderRadius: "9999px", backgroundColor: "#ffffff", color: cat.color, border: `1px solid ${cat.color}40` }}>
+                                                {activeCount} / {filteredItems.length} Enabled
+                                              </span>
+                                            </div>
+                                            {/* Body text updated from 11px to 12px (Issue 4) */}
+                                            <p style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0 0" }}>{cat.desc}</p>
+                                          </div>
                                         </div>
 
-                                        <div style={{ display: "flex", gap: "6px" }}>
+                                        <div style={{ display: "flex", gap: "6px" }} onClick={(e) => e.stopPropagation()}>
                                           <button
                                             type="button"
                                             onClick={() => {
@@ -11676,7 +11834,7 @@ export default function App() {
                                               filteredItems.forEach(i => { updated[i.key] = true; });
                                               setAccessFormData(prev => ({ ...prev, permissions: updated }));
                                             }}
-                                            style={{ padding: "2px 8px", fontSize: "11px", fontWeight: "600", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#ffffff", color: "#0f172a", cursor: "pointer" }}
+                                            style={{ height: "26px", padding: "2px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#ffffff", color: "#0f172a", cursor: "pointer" }}
                                           >
                                             Select All
                                           </button>
@@ -11687,56 +11845,59 @@ export default function App() {
                                               filteredItems.forEach(i => { updated[i.key] = false; });
                                               setAccessFormData(prev => ({ ...prev, permissions: updated }));
                                             }}
-                                            style={{ padding: "2px 8px", fontSize: "11px", fontWeight: "600", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#ffffff", color: "#64748b", cursor: "pointer" }}
+                                            style={{ height: "26px", padding: "2px 10px", fontSize: "11px", fontWeight: "600", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#ffffff", color: "#64748b", cursor: "pointer" }}
                                           >
                                             Clear
                                           </button>
                                         </div>
                                       </div>
 
-                                      {/* Items Grid */}
-                                      <div style={{ padding: "12px 14px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "10px" }}>
-                                        {filteredItems.map(item => {
-                                          const isChecked = !!accessFormData.permissions[item.key];
-                                          return (
-                                            <label 
-                                              key={item.key}
-                                              style={{ 
-                                                display: "flex", 
-                                                alignItems: "flex-start", 
-                                                gap: "10px", 
-                                                padding: "8px 10px", 
-                                                borderRadius: "6px", 
-                                                border: isChecked ? `1px solid ${cat.color}60` : "1px solid #f1f5f9",
-                                                backgroundColor: isChecked ? `${cat.bg}50` : "#fafafa",
-                                                cursor: "pointer",
-                                                transition: "all 0.12s ease"
-                                              }}
-                                            >
-                                              <input 
-                                                type="checkbox"
-                                                checked={isChecked}
-                                                onChange={(e) => {
-                                                  const val = e.target.checked;
-                                                  setAccessFormData(prev => ({
-                                                    ...prev,
-                                                    permissions: { ...prev.permissions, [item.key]: val }
-                                                  }));
+                                      {/* Items Grid (Accordion Body) */}
+                                      {!isCollapsed && (
+                                        <div style={{ padding: "12px 14px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "10px" }}>
+                                          {filteredItems.map(item => {
+                                            const isChecked = !!accessFormData.permissions[item.key];
+                                            return (
+                                              <label 
+                                                key={item.key}
+                                                style={{ 
+                                                  display: "flex", 
+                                                  alignItems: "flex-start", 
+                                                  gap: "10px", 
+                                                  padding: "8px 10px", 
+                                                  borderRadius: "6px", 
+                                                  border: isChecked ? `1px solid ${cat.color}60` : "1px solid #f1f5f9",
+                                                  backgroundColor: isChecked ? `${cat.bg}50` : "#fafafa",
+                                                  cursor: "pointer",
+                                                  transition: "all 0.12s ease"
                                                 }}
-                                                style={{ accentColor: cat.color, marginTop: "3px", width: "15px", height: "15px", flexShrink: 0 }}
-                                              />
-                                              <div style={{ minWidth: 0, flex: 1 }}>
-                                                <div style={{ fontSize: "12px", fontWeight: "700", color: isChecked ? "#0f172a" : "#475569" }}>
-                                                  {item.label}
+                                              >
+                                                <input 
+                                                  type="checkbox"
+                                                  checked={isChecked}
+                                                  onChange={(e) => {
+                                                    const val = e.target.checked;
+                                                    setAccessFormData(prev => ({
+                                                      ...prev,
+                                                      permissions: { ...prev.permissions, [item.key]: val }
+                                                    }));
+                                                  }}
+                                                  style={{ accentColor: cat.color, marginTop: "3px", width: "15px", height: "15px", flexShrink: 0 }}
+                                                />
+                                                <div style={{ minWidth: 0, flex: 1 }}>
+                                                  <div style={{ fontSize: "12px", fontWeight: "700", color: isChecked ? "#0f172a" : "#475569" }}>
+                                                    {item.label}
+                                                  </div>
+                                                  {/* Body text updated from 11px to 12px (Issue 4) */}
+                                                  <div style={{ fontSize: "12px", color: isChecked ? "#475569" : "#64748b", lineHeight: "1.3", marginTop: "1px" }}>
+                                                    {item.desc}
+                                                  </div>
                                                 </div>
-                                                <div style={{ fontSize: "11px", color: isChecked ? "#475569" : "#94a3b8", lineHeight: "1.3", marginTop: "1px" }}>
-                                                  {item.desc}
-                                                </div>
-                                              </div>
-                                            </label>
-                                          );
-                                        })}
-                                      </div>
+                                              </label>
+                                            );
+                                          })}
+                                        </div>
+                                      )}
                                     </div>
                                   );
                                 })}
@@ -11744,10 +11905,10 @@ export default function App() {
                           </div>
 
                           {/* Step 3: Quota Limit Setting with Quick Boost Buttons */}
-                          <div style={{ padding: "14px 16px", border: "1px solid #e2e8f0", borderRadius: "10px", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                          <div style={{ padding: "14px 16px", border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
                             <div>
                               <strong style={{ fontSize: "13px", color: "#0f172a" }}>3. Active Pipeline Leads Quota Cap</strong>
-                              <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>
+                              <p style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0 0" }}>
                                 Maximum active leads this employee can hold concurrently. Creating beyond this requires upgrade.
                               </p>
                             </div>
@@ -11973,7 +12134,7 @@ export default function App() {
                       <ShieldCheck size={16} color="#16a34a" />
                       <span><strong>Super Admin Enforcement:</strong> Sales reps can only view their own leads, cannot steal/export CSV database, and financial metrics are protected.</span>
                     </div>
-                    <span style={{ fontSize: "11px", color: "#64748b" }}>Role-Based Access Control • Active</span>
+                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Role-Based Access Control • Active</span>
                   </div>
                 </div>
               )}
