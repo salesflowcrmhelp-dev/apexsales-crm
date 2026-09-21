@@ -7938,22 +7938,22 @@ export default function App() {
                         textAlign: "left",
                         padding: "8px 10px",
                         borderRadius: "6px",
-                        backgroundColor: selectedPeriodMonth === "2026-09" ? "#f0fdf4" : "transparent",
+                        backgroundColor: selectedPeriodMonth === "2026-09" ? "#f1f5f9" : "transparent",
                         border: "none",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
                         cursor: "pointer",
                         fontSize: "12px",
-                        fontWeight: selectedPeriodMonth === "2026-09" ? "800" : "600",
-                        color: selectedPeriodMonth === "2026-09" ? "#166534" : "#1e293b"
+                        fontWeight: selectedPeriodMonth === "2026-09" ? "700" : "600",
+                        color: selectedPeriodMonth === "2026-09" ? "#0f172a" : "#334155"
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#22c55e" }} />
                         <span>September 2026</span>
                       </div>
-                      <span style={{ fontSize: "10px", fontWeight: "800", backgroundColor: "#dcfce7", color: "#166534", padding: "1px 6px", borderRadius: "8px" }}>Current</span>
+                      <span style={{ fontSize: "10px", fontWeight: "700", backgroundColor: "#e2e8f0", color: "#475569", padding: "1px 6px", borderRadius: "6px" }}>Current</span>
                     </button>
 
                     {/* Historical: August 2026 */}
@@ -7964,22 +7964,22 @@ export default function App() {
                         textAlign: "left",
                         padding: "8px 10px",
                         borderRadius: "6px",
-                        backgroundColor: selectedPeriodMonth === "2026-08" ? "#fff7ed" : "transparent",
+                        backgroundColor: selectedPeriodMonth === "2026-08" ? "#f1f5f9" : "transparent",
                         border: "none",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
                         cursor: "pointer",
                         fontSize: "12px",
-                        fontWeight: selectedPeriodMonth === "2026-08" ? "800" : "600",
-                        color: selectedPeriodMonth === "2026-08" ? "#9a3412" : "#1e293b"
+                        fontWeight: selectedPeriodMonth === "2026-08" ? "700" : "600",
+                        color: selectedPeriodMonth === "2026-08" ? "#0f172a" : "#334155"
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         <Archive size={13} color="#ea580c" />
                         <span>August 2026</span>
                       </div>
-                      <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b" }}>Archived</span>
+                      <span style={{ fontSize: "10px", fontWeight: "600", color: "#64748b" }}>Archived</span>
                     </button>
 
                     {/* All-Time */}
@@ -7990,15 +7990,15 @@ export default function App() {
                         textAlign: "left",
                         padding: "8px 10px",
                         borderRadius: "6px",
-                        backgroundColor: selectedPeriodMonth === "all" ? "#eff6ff" : "transparent",
+                        backgroundColor: selectedPeriodMonth === "all" ? "#f1f5f9" : "transparent",
                         border: "none",
                         display: "flex",
                         alignItems: "center",
                         gap: "8px",
                         cursor: "pointer",
                         fontSize: "12px",
-                        fontWeight: selectedPeriodMonth === "all" ? "800" : "600",
-                        color: selectedPeriodMonth === "all" ? "#1e40af" : "#1e293b"
+                        fontWeight: selectedPeriodMonth === "all" ? "700" : "600",
+                        color: selectedPeriodMonth === "all" ? "#0f172a" : "#334155"
                       }}
                     >
                       <Globe size={13} color="#3b82f6" />
@@ -8073,30 +8073,30 @@ export default function App() {
                 {/* Global Utility Action (Start My Day) */}
                 <button 
                   onClick={() => setShowStartMyDay(true)}
-                  className="header-primary-btn"
+                  className="header-vault-btn"
                   style={{ 
                     height: "32px", 
                     boxSizing: "border-box", 
                     display: "inline-flex", 
                     alignItems: "center", 
                     gap: "6px", 
-                    padding: "0 14px", 
+                    padding: "0 12px", 
                     margin: 0,
-                    backgroundColor: "#2563eb", 
-                    border: "1px solid #1d4ed8", 
+                    backgroundColor: "#ffffff", 
+                    border: "1px solid #cbd5e1", 
                     borderRadius: "6px", 
                     fontSize: "12px", 
                     fontWeight: "600", 
-                    color: "#ffffff", 
+                    color: "#334155", 
                     cursor: "pointer", 
-                    boxShadow: "0 1px 2px rgba(37, 99, 235, 0.15)", 
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.02)", 
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
                     transition: "all 0.15s ease",
                     whiteSpace: "nowrap"
                   }}
                   title="Start My Day Workflow"
                 >
-                  <Sun size={14} color="#ffffff" />
+                  <Sun size={14} color="#f59e0b" />
                   <span>Start My Day</span>
                 </button>
               </div>
@@ -11995,7 +11995,7 @@ export default function App() {
 
                   {/* Members List Table */}
                   <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
-                    <table className="responsive-table" style={{ width: "100%", minWidth: "920px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
+                    <table className="responsive-table" style={{ width: "100%", minWidth: "960px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
                       <thead>
                         <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: "700" }}>
                           <th style={{ padding: "9px 12px" }}>TEAM MEMBER</th>
@@ -12003,7 +12003,7 @@ export default function App() {
                           <th style={{ padding: "9px 12px" }}>ACTIVE PERMISSIONS</th>
                           <th style={{ padding: "9px 12px" }}>LOGIN PIN</th>
                           <th style={{ padding: "9px 12px", textAlign: "center" }}>ASSIGNED LEADS / QUOTA</th>
-                          <th style={{ padding: "9px 12px", textAlign: "left", width: "230px" }}>ACTIONS</th>
+                          <th style={{ padding: "9px 12px", textAlign: "left", width: "260px", minWidth: "260px" }}>ACTIONS</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -12076,7 +12076,7 @@ export default function App() {
                                     type="button"
                                     onClick={() => setUserPinVisibilityMap(prev => ({ ...prev, [usr.id]: !prev[usr.id] }))}
                                     style={{ width: "24px", height: "24px", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: "0", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
-                                    title={isPinVisible ? "Hide PIN" : "Reveal PIN"}
+                                    title={isPinVisible ? "Hide PIN" : "Reveal PIN (View)"}
                                     aria-label={isPinVisible ? "Hide PIN" : "Reveal PIN"}
                                   >
                                     {isPinVisible ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -12090,9 +12090,13 @@ export default function App() {
                                   <span style={{ padding: "2px 8px", borderRadius: "9999px", backgroundColor: quotaPercent >= 90 ? "#fef2f2" : "#f1f5f9", fontWeight: "700", color: quotaPercent >= 90 ? "#dc2626" : "#475569", fontSize: "11px", border: "1px solid #e2e8f0" }}>
                                     {leadsCount} / {quota > 9999 ? '∞' : quota} Leads
                                   </span>
-                                  {quota <= 9999 && (
+                                  {quota <= 9999 ? (
                                     <div style={{ width: "70px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "9999px", overflow: "hidden", marginTop: "2px" }}>
                                       <div style={{ width: `${quotaPercent}%`, height: "100%", borderRadius: "9999px", backgroundColor: quotaPercent >= 90 ? "#dc2626" : quotaPercent >= 70 ? "#f59e0b" : "#2563eb" }} />
+                                    </div>
+                                  ) : (
+                                    <div style={{ width: "70px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "9999px", overflow: "hidden", marginTop: "2px" }} title="Unlimited Capacity">
+                                      <div style={{ width: "100%", height: "100%", borderRadius: "9999px", backgroundColor: "#cbd5e1" }} />
                                     </div>
                                   )}
                                 </div>
@@ -12100,7 +12104,7 @@ export default function App() {
 
                               {/* Actions */}
                               <td style={{ padding: "8px 12px" }}>
-                                <div style={{ display: "grid", gridTemplateColumns: "84px 62px 64px", alignItems: "center", gap: "6px", width: "216px" }}>
+                                <div style={{ display: "grid", gridTemplateColumns: "78px 90px 72px", alignItems: "center", gap: "6px", width: "246px" }}>
                                   <button
                                     type="button"
                                     onClick={() => handleOpenAccessModal(usr)}
@@ -12115,12 +12119,34 @@ export default function App() {
                                     style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#334155", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "3px" }}
                                     title="Reset login PIN"
                                   >
-                                    🔑 PIN
+                                    🔑 Reset PIN
                                   </button>
-                                  {checkIsSuperAdmin(usr) || usr.id === "usr_admin" ? (
-                                    <span style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#64748b", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
-                                      🔒 Admin
-                                    </span>
+                                  {checkIsSuperAdmin(usr) || usr.id === "usr_admin" || usr.role === "admin" ? (
+                                    <button
+                                      type="button"
+                                      disabled
+                                      style={{
+                                        width: "100%",
+                                        height: "30px",
+                                        padding: "0 6px",
+                                        backgroundColor: "#f8fafc",
+                                        border: "1px solid #e2e8f0",
+                                        borderRadius: "6px",
+                                        fontSize: "11px",
+                                        fontWeight: "600",
+                                        color: "#94a3b8",
+                                        cursor: "not-allowed",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        gap: "3px",
+                                        opacity: 0.65
+                                      }}
+                                      title="Admin accounts are protected and cannot be deleted"
+                                      aria-label={`Delete ${usr.name} (Protected Account)`}
+                                    >
+                                      🗑️ Delete
+                                    </button>
                                   ) : (
                                     <button
                                       type="button"
