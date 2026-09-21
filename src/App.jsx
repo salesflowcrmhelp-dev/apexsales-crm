@@ -2877,10 +2877,68 @@ export default function App() {
     return [];
   };
 
-  // Auto-fetch leads and users on initial component mount
+  // 🛡️ Load Tasks from Central Backend with Strict RBAC & Tenant Isolation
+  const loadTasksFromBackend = async (userToUse) => {
+    try {
+      let activeUser = userToUse || currentUser;
+      if (!activeUser) {
+        try {
+          const saved = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
+          if (saved) activeUser = JSON.parse(saved);
+        } catch(e) {}
+      }
+      if (!activeUser) {
+        setTasks([]);
+        return [];
+      }
+
+      const isSuper = checkIsSuperAdmin(activeUser);
+      const isManager = activeUser.role === "manager";
+      const effectiveRole = isSuper ? "admin" : (isManager ? "manager" : "sales_rep");
+
+      const headers = {};
+      headers["x-user-role"] = effectiveRole;
+      headers["x-user-name"] = activeUser.name || "";
+      headers["x-user-id"] = activeUser.id || "";
+      const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch("/api/tasks", { headers });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && Array.isArray(data.tasks)) {
+          setTasks(data.tasks);
+          try {
+            localStorage.setItem(`salesflow_tasks_${activeUser.id || activeUser.email}`, JSON.stringify(data.tasks));
+          } catch(e) {}
+          return data.tasks;
+        }
+      }
+    } catch(err) {
+      console.warn("Failed to load tasks from backend:", err);
+      // Fallback to user-isolated storage
+      const u = userToUse || currentUser;
+      if (u) {
+        const cached = localStorage.getItem(`salesflow_tasks_${u.id || u.email}`);
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed)) {
+              setTasks(parsed);
+              return parsed;
+            }
+          } catch(e) {}
+        }
+      }
+    }
+    return [];
+  };
+
+  // Auto-fetch leads, users, and tasks on initial component mount
   useEffect(() => {
     loadLeadsFromBackend();
     loadUsersFromBackend();
+    loadTasksFromBackend();
   }, []);
 
   // 🛡️ ZERO-DATA-LOSS CONTINUOUS AUTO-RECOVERY GUARD:
@@ -3279,11 +3337,13 @@ export default function App() {
     setCurrentLoggedInUser("");
     setCurrentUserRole("sales_rep");
     setLeads([]);
+    setTasks([]); // 🛡️ Flush active tasks so next user never sees prior user's tasks!
     try {
       sessionStorage.removeItem("crm_auth_user");
       sessionStorage.removeItem("crm_auth_token");
       localStorage.removeItem("crm_auth_user");
       localStorage.removeItem("crm_auth_token");
+      localStorage.removeItem("salesflow_standalone_tasks");
     } catch(e) {}
     showToast("Logged out successfully.", "info");
   };
@@ -3623,23 +3683,31 @@ export default function App() {
 
   const saveTasksToStorage = (updatedTasks) => {
     setTasks(updatedTasks);
-    localStorage.setItem("salesflow_standalone_tasks", JSON.stringify(updatedTasks));
+    if (currentUser) {
+      try {
+        localStorage.setItem(`salesflow_tasks_${currentUser.id || currentUser.email}`, JSON.stringify(updatedTasks));
+      } catch(e) {}
+    }
   };
 
-  const handleAddTask = (e) => {
+  const handleAddTask = async (e) => {
     e.preventDefault();
     if (!taskTitle.trim()) {
       showToast("Task title cannot be empty.", "error");
       return;
     }
     const newTask = {
-      id: "task_" + Date.now(),
+      id: "task_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
       title: taskTitle.trim(),
       priority: taskPriority,
       dueDate: taskDueDate || new Date().toISOString().split('T')[0],
       linkedLeadId: taskLinkedLeadId,
       completed: false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      ownerId: currentUser?.id || "",
+      ownerEmail: (currentUser?.email || "").trim().toLowerCase(),
+      owner: currentUser?.name || currentUser?.displayName || "Harsh Goyal",
+      ownerName: currentUser?.name || currentUser?.displayName || "Harsh Goyal"
     };
     const updated = [newTask, ...tasks];
     saveTasksToStorage(updated);
@@ -3647,7 +3715,25 @@ export default function App() {
     setTaskPriority("Medium");
     setTaskDueDate("");
     setTaskLinkedLeadId("");
-    showToast("Task added successfully!");
+    showToast("Task added successfully!", "success");
+
+    // Central backend sync
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (currentUser) {
+        const isSuper = checkIsSuperAdmin(currentUser);
+        headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+        headers["x-user-name"] = currentUser.name || "";
+        headers["x-user-id"] = currentUser.id || "";
+      }
+      await fetch("/api/tasks", {
+        method: "POST",
+        headers,
+        body: JSON.stringify(newTask)
+      });
+    } catch(err) {
+      console.warn("Task backend sync error:", err);
+    }
   };
 
   const handleToggleTask = (taskId) => {
@@ -3675,7 +3761,7 @@ export default function App() {
     }
   };
 
-  const confirmCompleteTaskAction = () => {
+  const confirmCompleteTaskAction = async () => {
     if (!taskToComplete) return;
     const { task, lead, outcome, remarks, scheduleNext, nextDate, nextTime, nextTitle } = taskToComplete;
 
@@ -3694,7 +3780,7 @@ export default function App() {
 
     if (scheduleNext && nextDate) {
       const newTask = {
-        id: "task_" + Date.now(),
+        id: "task_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5),
         title: nextTitle || (lead ? `Follow-up with ${lead.name}` : "Follow-up"),
         priority: "Medium",
         dueDate: nextDate,
@@ -3702,7 +3788,10 @@ export default function App() {
         completed: false,
         completedAt: null,
         createdAt: new Date().toISOString(),
-        owner: currentLoggedInUser || "Harsh Goyal"
+        ownerId: currentUser?.id || "",
+        ownerEmail: (currentUser?.email || "").trim().toLowerCase(),
+        owner: currentUser?.name || currentUser?.displayName || "Harsh Goyal",
+        ownerName: currentUser?.name || currentUser?.displayName || "Harsh Goyal"
       };
       updatedTasks = [newTask, ...updatedTasks];
 
@@ -3719,9 +3808,46 @@ export default function App() {
         });
         saveLeadsToStorage(updatedLeads);
       }
+
+      // Sync follow up task to backend
+      try {
+        const headers = { "Content-Type": "application/json" };
+        if (currentUser) {
+          const isSuper = checkIsSuperAdmin(currentUser);
+          headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+          headers["x-user-name"] = currentUser.name || "";
+          headers["x-user-id"] = currentUser.id || "";
+        }
+        fetch("/api/tasks", {
+          method: "POST",
+          headers,
+          body: JSON.stringify(newTask)
+        }).catch(() => {});
+      } catch(e) {}
     }
 
     saveTasksToStorage(updatedTasks);
+
+    // Sync task completion to backend
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (currentUser) {
+        const isSuper = checkIsSuperAdmin(currentUser);
+        headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+        headers["x-user-name"] = currentUser.name || "";
+        headers["x-user-id"] = currentUser.id || "";
+      }
+      fetch(`/api/tasks/${task.id}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({
+          completed: true,
+          completedAt: new Date().toISOString(),
+          outcome: outcome || "Completed",
+          completionRemark: remarks || ""
+        })
+      }).catch(() => {});
+    } catch(e) {}
 
     if (lead) {
       const cleanTitle = (task.title || "").replace(" (No Company)", "").replace("(No Company)", "").trim();
@@ -3733,7 +3859,7 @@ export default function App() {
     setTaskToComplete(null);
   };
 
-  const confirmReopenTaskAction = () => {
+  const confirmReopenTaskAction = async () => {
     if (!taskToReopen) return;
     const updated = tasks.map(t => {
       if (t.id === taskToReopen.id) {
@@ -3747,13 +3873,46 @@ export default function App() {
     });
     saveTasksToStorage(updated);
     showToast("Task marked pending.", "info");
+
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (currentUser) {
+        const isSuper = checkIsSuperAdmin(currentUser);
+        headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+        headers["x-user-name"] = currentUser.name || "";
+        headers["x-user-id"] = currentUser.id || "";
+      }
+      fetch(`/api/tasks/${taskToReopen.id}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({
+          completed: false,
+          completedAt: null
+        })
+      }).catch(() => {});
+    } catch(e) {}
+
     setTaskToReopen(null);
   };
 
-  const handleDeleteTask = (taskId) => {
+  const handleDeleteTask = async (taskId) => {
     const updated = tasks.filter(t => t.id !== taskId);
     saveTasksToStorage(updated);
     showToast("Task deleted.", "error");
+
+    try {
+      const headers = {};
+      if (currentUser) {
+        const isSuper = checkIsSuperAdmin(currentUser);
+        headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+        headers["x-user-name"] = currentUser.name || "";
+        headers["x-user-id"] = currentUser.id || "";
+      }
+      fetch(`/api/tasks/${taskId}`, {
+        method: "DELETE",
+        headers
+      }).catch(() => {});
+    } catch(e) {}
   };
 
   const createTaskFromAction = (title, priority, dueDate, leadId) => {
@@ -3769,11 +3928,30 @@ export default function App() {
       dueDate: dueDate || new Date().toISOString().split('T')[0],
       linkedLeadId: leadId,
       completed: false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      ownerId: currentUser?.id || "",
+      ownerEmail: (currentUser?.email || "").trim().toLowerCase(),
+      owner: currentUser?.name || currentUser?.displayName || "Harsh Goyal",
+      ownerName: currentUser?.name || currentUser?.displayName || "Harsh Goyal"
     };
     const updated = [newTask, ...tasks];
     saveTasksToStorage(updated);
     showToast(`Task "${title}" added successfully!`);
+
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (currentUser) {
+        const isSuper = checkIsSuperAdmin(currentUser);
+        headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+        headers["x-user-name"] = currentUser.name || "";
+        headers["x-user-id"] = currentUser.id || "";
+      }
+      fetch("/api/tasks", {
+        method: "POST",
+        headers,
+        body: JSON.stringify(newTask)
+      }).catch(() => {});
+    } catch(err) {}
   };
 
   const handleAddNote = () => {
@@ -3930,6 +4108,61 @@ export default function App() {
 
     return scoped;
   }, [leads, filterOwner, currentLoggedInUser, currentUser, isLoggedIn, allUsersList]);
+
+  // 🛡️ Strict Owner-Scoped Tasks: dynamically resolves tasks based on active user role
+  // Guarantees that employees NEVER see another user's or admin's tasks
+  const ownerScopedTasks = useMemo(() => {
+    if (!isLoggedIn || !currentUser) return [];
+    const isSuper = checkIsSuperAdmin(currentUser);
+    const isManager = currentUser?.role === "manager";
+    const canViewAll = isSuper || currentUser?.role === "admin";
+
+    if (canViewAll) {
+      return tasks;
+    }
+
+    const userNameLower = (currentUser.name || "").trim().toLowerCase();
+    const userDisplayNameLower = (currentUser.displayName || "").trim().toLowerCase();
+    const userEmailLower = (currentUser.email || "").trim().toLowerCase();
+    const userId = String(currentUser.id || "").trim();
+
+    // Set of lead IDs that this employee/manager owns
+    const myLeadIds = new Set(ownerScopedLeads.map(l => String(l.id)));
+
+    if (isManager) {
+      const reportingEmployees = allUsersList.filter(u => {
+        const repTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+        return repTo === userNameLower || (userDisplayNameLower && repTo === userDisplayNameLower) || u.managerId === currentUser.id;
+      }).map(u => (u.name || '').trim().toLowerCase());
+
+      const allowedOwners = new Set([userNameLower, userDisplayNameLower, userEmailLower, userId, ...reportingEmployees]);
+
+      return tasks.filter(t => {
+        const tOwner = (t.owner || t.ownerName || "").trim().toLowerCase();
+        const tEmail = (t.ownerEmail || "").trim().toLowerCase();
+        const tId = String(t.ownerId || "").trim();
+        const isMyLead = t.linkedLeadId && myLeadIds.has(String(t.linkedLeadId));
+        return allowedOwners.has(tOwner) || allowedOwners.has(tEmail) || allowedOwners.has(tId) || isMyLead;
+      });
+    }
+
+    // Sales Rep (Employee): Strictly their own tasks or tasks linked to their assigned leads
+    return tasks.filter(t => {
+      const tOwner = (t.owner || t.ownerName || "").trim().toLowerCase();
+      const tEmail = (t.ownerEmail || "").trim().toLowerCase();
+      const tId = String(t.ownerId || "").trim();
+
+      const isDirectOwner = (
+        (tId && tId === userId) ||
+        (tEmail && tEmail === userEmailLower) ||
+        (tOwner && (tOwner === userNameLower || (userDisplayNameLower && tOwner === userDisplayNameLower)))
+      );
+
+      const isMyLead = t.linkedLeadId && myLeadIds.has(String(t.linkedLeadId));
+
+      return isDirectOwner || isMyLead;
+    });
+  }, [tasks, currentUser, isLoggedIn, allUsersList, ownerScopedLeads]);
 
   // Visual Analytics Calculations Memo
   const analyticsData = useMemo(() => {
@@ -4480,7 +4713,7 @@ export default function App() {
     const avgClosingTime = closingDays.length > 0 ? (closingDays.reduce((s, x) => s + x, 0) / closingDays.length).toFixed(1) : "N/A";
 
     // Followup -> Won
-    const leadsWithFollowup = periodLeads.filter(l => l.next_follow_up || tasks.some(t => t.linkedLeadId === l.id));
+    const leadsWithFollowup = periodLeads.filter(l => l.next_follow_up || ownerScopedTasks.some(t => t.linkedLeadId === l.id));
     const wonWithFollowup = leadsWithFollowup.filter(l => isWonStatus(l.status));
     const followupWonConversion = leadsWithFollowup.length > 0 ? ((wonWithFollowup.length / leadsWithFollowup.length) * 100).toFixed(1) : "0.0";
 
@@ -4546,7 +4779,7 @@ export default function App() {
     const thisWeekWon = thisWeekWonLeads.length;
     const thisWeekRevenue = thisWeekWonLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
     const thisWeekLost = ownerScopedLeads.filter(l => isLostStatus(l.status) && getLeadCreationDate(l) >= mondayThisWeek && getLeadCreationDate(l) <= sundayThisWeek).length;
-    const thisWeekFollowups = tasks.filter(t => t.completed && t.completedAt && new Date(t.completedAt) >= mondayThisWeek && new Date(t.completedAt) <= sundayThisWeek).length;
+    const thisWeekFollowups = ownerScopedTasks.filter(t => t.completed && t.completedAt && new Date(t.completedAt) >= mondayThisWeek && new Date(t.completedAt) <= sundayThisWeek).length;
     const thisWeekConv = thisWeekAdded > 0 ? ((thisWeekWon / thisWeekAdded) * 100).toFixed(1) : "0.0";
 
     // Previous Calendar Week (Mon 03 Aug - Sun 09 Aug)
@@ -4563,7 +4796,7 @@ export default function App() {
     });
     const prevWeekWon = prevWeekWonLeads.length;
     const prevWeekRevenue = prevWeekWonLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
-    const prevWeekFollowups = tasks.filter(t => {
+    const prevWeekFollowups = ownerScopedTasks.filter(t => {
       if (!t.completed || !t.completedAt) return false;
       const tDate = new Date(t.completedAt);
       return tDate >= mondayPrevWeek && tDate <= sundayPrevWeek;
@@ -4603,8 +4836,8 @@ export default function App() {
     ];
 
     // Activity correlation
-    const dealsWithActivity = ownerScopedLeads.filter(l => tasks.some(t => t.linkedLeadId === l.id));
-    const dealsNoActivity = ownerScopedLeads.filter(l => !tasks.some(t => t.linkedLeadId === l.id));
+    const dealsWithActivity = ownerScopedLeads.filter(l => ownerScopedTasks.some(t => t.linkedLeadId === l.id));
+    const dealsNoActivity = ownerScopedLeads.filter(l => !ownerScopedTasks.some(t => t.linkedLeadId === l.id));
     
     const wonWithActivity = dealsWithActivity.filter(l => isWonStatus(l.status)).length;
     const wonNoActivity = dealsNoActivity.filter(l => isWonStatus(l.status)).length;
@@ -4665,7 +4898,7 @@ export default function App() {
       stagesList,
       dynamicInsights
     };
-  }, [ownerScopedLeads, tasks, intelTimeframe, targetValue]);
+  }, [ownerScopedLeads, ownerScopedTasks, intelTimeframe, targetValue]);
 
   // Filter leads based on current active tab and dashboard filter criteria
   const filteredLeads = useMemo(() => {
@@ -5390,24 +5623,28 @@ export default function App() {
     // 2. Fetch leads strictly for authenticated user
     if (currentUser) {
       loadLeadsFromBackend(currentUser);
+      loadTasksFromBackend(currentUser);
     } else {
       setLeads([]);
+      setTasks([]);
     }
     const savedUrl = localStorage.getItem("salesflow_standalone_webhook") || "";
     setWebhookUrl(savedUrl);
 
     const pwd = localStorage.getItem("salesflow_login_password") || "";
     setSavedPassword(pwd);
-
-    const savedTasks = localStorage.getItem("salesflow_standalone_tasks");
-    if (savedTasks) {
-      try {
-        setTasks(JSON.parse(savedTasks));
-      } catch (e) {
-        setTasks([]);
-      }
-    }
   }, []);
+
+  // 🛡️ Auto sync leads and tasks whenever authenticated user changes
+  useEffect(() => {
+    if (currentUser && isLoggedIn) {
+      loadLeadsFromBackend(currentUser);
+      loadTasksFromBackend(currentUser);
+    } else if (!isLoggedIn) {
+      setLeads([]);
+      setTasks([]);
+    }
+  }, [currentUser?.id, isLoggedIn]);
 
   const saveLeadsToStorage = (updatedLeads) => {
     const cleaned = Array.isArray(updatedLeads) ? updatedLeads.map(sanitizeLeadObject) : [];
@@ -17243,7 +17480,7 @@ export default function App() {
               <div style={{ backgroundColor: "#eff6ff", border: "1px solid #dbeafe", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb", textTransform: "uppercase", letterSpacing: "0.3px" }}>Total Tasks</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#2563eb", marginTop: "2px" }}>{tasks.length}</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#2563eb", marginTop: "2px" }}>{ownerScopedTasks.length}</div>
                 </div>
                 <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <ListTodo size={15} color="#2563eb" />
@@ -17253,7 +17490,7 @@ export default function App() {
               <div style={{ backgroundColor: "#fff7ed", border: "1px solid #ffedd5", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", textTransform: "uppercase", letterSpacing: "0.3px" }}>Pending Action</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#ea580c", marginTop: "2px" }}>{tasks.filter(t => !t.completed).length}</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#ea580c", marginTop: "2px" }}>{ownerScopedTasks.filter(t => !t.completed).length}</div>
                 </div>
                 <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#ffedd5", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Clock size={15} color="#ea580c" />
@@ -17263,7 +17500,7 @@ export default function App() {
               <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <span style={{ fontSize: "12px", fontWeight: "600", color: "#166534", textTransform: "uppercase", letterSpacing: "0.3px" }}>Completed</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#166534", marginTop: "2px" }}>{tasks.filter(t => t.completed).length}</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#166534", marginTop: "2px" }}>{ownerScopedTasks.filter(t => t.completed).length}</div>
                 </div>
                 <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <CheckCircle2 size={15} color="#16a34a" />
@@ -17273,7 +17510,7 @@ export default function App() {
               <div style={{ backgroundColor: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <span style={{ fontSize: "12px", fontWeight: "600", color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.3px" }}>High Priority</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#dc2626", marginTop: "2px" }}>{tasks.filter(t => !t.completed && t.priority === "High").length}</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#dc2626", marginTop: "2px" }}>{ownerScopedTasks.filter(t => !t.completed && t.priority === "High").length}</div>
                 </div>
                 <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Flame size={15} color="#dc2626" />
@@ -17340,7 +17577,7 @@ export default function App() {
                       style={{ width: "100%", height: "34px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
                     >
                       <option value="">-- No Lead Linked --</option>
-                      {leads.map(lead => (
+                      {ownerScopedLeads.map(lead => (
                         <option key={lead.id} value={lead.id}>
                           {lead.name}{lead.company ? ` • ${lead.company}` : ""}
                         </option>
@@ -17367,7 +17604,7 @@ export default function App() {
                       <CheckSquare size={14} color="#475569" />
                     </div>
                     <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center" }}>
-                      Action Items ({tasks.filter(t => !t.completed).length} Pending)
+                      Action Items ({ownerScopedTasks.filter(t => !t.completed).length} Pending)
                     </h3>
                   </div>
 
@@ -17433,14 +17670,14 @@ export default function App() {
                 {/* Task Cards List */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {(() => {
-                    const filteredTasks = tasks.filter(t => {
+                    const filteredTasks = ownerScopedTasks.filter(t => {
                       if (taskFilter === "Pending" && t.completed) return false;
                       if (taskFilter === "Completed" && !t.completed) return false;
                       if (taskFilter === "High" && (t.completed || t.priority !== "High")) return false;
                       if (taskSearchQuery.trim()) {
                         const q = taskSearchQuery.toLowerCase();
                         const titleMatch = (t.title || "").toLowerCase().includes(q);
-                        const linkedLead = leads.find(l => l.id === t.linkedLeadId);
+                        const linkedLead = ownerScopedLeads.find(l => l.id === t.linkedLeadId);
                         const leadMatch = linkedLead && (linkedLead.name || "").toLowerCase().includes(q);
                         if (!titleMatch && !leadMatch) return false;
                       }
@@ -17458,7 +17695,7 @@ export default function App() {
                     }
 
                     return filteredTasks.map(task => {
-                      const linkedLead = leads.find(l => l.id === task.linkedLeadId);
+                      const linkedLead = ownerScopedLeads.find(l => l.id === task.linkedLeadId);
                       const cleanTitle = (task.title || "").replace(" (No Company)", "").replace("(No Company)", "").trim();
                       const isHigh = task.priority === "High";
                       const isMed = task.priority === "Medium";

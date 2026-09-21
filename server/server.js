@@ -462,16 +462,18 @@ function readLocalDB() {
         writeLocalDB(b);
         return b;
       }
-      return { users: [], leads: [] };
+      return { users: [], leads: [], tasks: [] };
     }
     const raw = fs.readFileSync(DB_FILE, 'utf8');
     const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed.tasks)) parsed.tasks = [];
     if ((!parsed.leads || parsed.leads.length === 0) && fs.existsSync(BACKUP_FILE)) {
       console.log('🛡️ Zero leads in db.json: Auto-healing from db_backup.json');
       const b = JSON.parse(fs.readFileSync(BACKUP_FILE, 'utf8'));
       if (b.leads && b.leads.length > 0) {
         parsed.leads = b.leads;
         if (!parsed.users || parsed.users.length === 0) parsed.users = b.users || [];
+        if (!parsed.tasks || parsed.tasks.length === 0) parsed.tasks = b.tasks || [];
         writeLocalDB(parsed);
       }
     }
@@ -480,10 +482,12 @@ function readLocalDB() {
     console.error('Error reading db.json:', err);
     if (fs.existsSync(BACKUP_FILE)) {
       try {
-        return JSON.parse(fs.readFileSync(BACKUP_FILE, 'utf8'));
+        const backup = JSON.parse(fs.readFileSync(BACKUP_FILE, 'utf8'));
+        if (!Array.isArray(backup.tasks)) backup.tasks = [];
+        return backup;
       } catch(e) {}
     }
-    return { users: [], leads: [] };
+    return { users: [], leads: [], tasks: [] };
   }
 }
 
@@ -540,6 +544,12 @@ async function autoSeedMongoIfEmpty() {
     if (leadsCount === 0 && local.leads.length > 0) {
       await mongoDb.collection('leads').insertMany(local.leads);
       console.log(`✅ Auto-seeded MongoDB Atlas with ${local.leads.length} initial pipeline leads from db.json.`);
+    }
+
+    const tasksCount = await mongoDb.collection('tasks').countDocuments().catch(() => 0);
+    if (tasksCount === 0 && local.tasks && local.tasks.length > 0) {
+      await mongoDb.collection('tasks').insertMany(local.tasks);
+      console.log(`✅ Auto-seeded MongoDB Atlas with ${local.tasks.length} initial tasks from db.json.`);
     }
 
     // Synchronize users from db.json to MongoDB if they have explicit packageTier or permissions
@@ -778,6 +788,92 @@ async function syncBulkData(leads, users) {
       }, null, 2), 'utf8');
     } catch(e) {}
   }
+}
+
+// --- TASK DATA ACCESS METHODS (MongoDB Atlas + Local Fallback) ---
+
+async function getTasks() {
+  if (isMongoConnected && mongoDb) {
+    try {
+      const docs = await mongoDb.collection('tasks').find({}).toArray();
+      if (docs && docs.length > 0) {
+        return docs.map(d => {
+          const { _id, ...rest } = d;
+          return {
+            id: rest.id || (_id ? _id.toString() : ''),
+            ...rest
+          };
+        });
+      }
+    } catch (e) {
+      console.error('MongoDB getTasks error:', e);
+    }
+  }
+  const local = readLocalDB();
+  return local.tasks || [];
+}
+
+async function saveTask(task) {
+  if (!task || !task.id) return;
+  if (isMongoConnected && mongoDb) {
+    try {
+      const { _id, ...clean } = task;
+      await mongoDb.collection('tasks').updateOne(
+        { id: String(clean.id) },
+        { $set: clean },
+        { upsert: true }
+      );
+    } catch (e) {
+      console.error('MongoDB saveTask error:', e);
+    }
+  }
+  const local = readLocalDB();
+  if (!Array.isArray(local.tasks)) local.tasks = [];
+  const idx = local.tasks.findIndex(t => String(t.id) === String(task.id));
+  if (idx !== -1) {
+    local.tasks[idx] = task;
+  } else {
+    local.tasks.unshift(task);
+  }
+  writeLocalDB(local);
+}
+
+async function deleteTask(taskId) {
+  if (!taskId) return;
+  if (isMongoConnected && mongoDb) {
+    try {
+      await mongoDb.collection('tasks').deleteOne({ id: String(taskId) });
+    } catch (e) {
+      console.error('MongoDB deleteTask error:', e);
+    }
+  }
+  const local = readLocalDB();
+  if (Array.isArray(local.tasks)) {
+    local.tasks = local.tasks.filter(t => String(t.id) !== String(taskId));
+    writeLocalDB(local);
+  }
+}
+
+// 🏢 Multi-Tenant Company Isolation Helper
+export function getUserTenantId(user) {
+  if (!user) return 'tenant_accomation';
+  if (user.companyId) return String(user.companyId).trim().toLowerCase();
+  if (user.tenantId) return String(user.tenantId).trim().toLowerCase();
+  if (user.company && user.company.trim()) {
+    return 'tenant_' + user.company.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+  }
+  if (user.organization && user.organization.trim()) {
+    return 'tenant_' + user.organization.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+  }
+  const email = (user.email || '').trim().toLowerCase();
+  if (email.includes('accomation') || email.includes('salesflow')) {
+    return 'tenant_accomation';
+  }
+  const domain = email.split('@')[1];
+  if (domain && domain !== 'gmail.com' && domain !== 'yahoo.com' && domain !== 'outlook.com' && domain !== 'hotmail.com') {
+    return 'tenant_' + domain.replace(/[^a-z0-9]/g, '_');
+  }
+  return 'tenant_accomation';
 }
 
 // Helper to check super admin status across all routes
@@ -1856,13 +1952,20 @@ app.get('/api/leads', async (req, res) => {
   const allUsers = await getUsers();
   const { owner } = req.query;
 
+  const userTenant = getUserTenantId(user);
+  // Multi-tenant company isolation: only leads belonging to user's company/tenant
+  const tenantLeads = allLeads.filter(l => {
+    const lTenant = l.tenantId || 'tenant_accomation';
+    return lTenant === userTenant;
+  });
+
   const isSuperAdmin = isSuperAdminEmailOrName(user) || user.role === 'admin';
   const isManager = user.role === 'manager';
   const hasFullLeadAccess = isSuperAdmin;
 
-  // 1. If user is Super Admin: Full CRM Master Access
+  // 1. If user is Super Admin: Full CRM Master Access within company
   if (hasFullLeadAccess) {
-    let resultLeads = allLeads;
+    let resultLeads = tenantLeads;
     if (owner && owner !== 'All' && owner !== 'all') {
       resultLeads = resultLeads.filter(l => (l.owner || '').trim().toLowerCase() === owner.trim().toLowerCase());
     }
@@ -1900,7 +2003,7 @@ app.get('/api/leads', async (req, res) => {
       ...reportingUsers.map(u => (u.username || '').trim().toLowerCase())
     ].filter(Boolean));
 
-    let managerTeamLeads = allLeads.filter(l => {
+    let managerTeamLeads = tenantLeads.filter(l => {
       const leadOwner = (l.owner || '').trim().toLowerCase();
       const leadAssigned = (l.assigned_to || '').trim().toLowerCase();
       return allowedOwners.has(leadOwner) || allowedOwners.has(leadAssigned);
@@ -1926,7 +2029,7 @@ app.get('/api/leads', async (req, res) => {
   const userDisplayNameLower = (user.displayName || '').trim().toLowerCase();
   const userEmailLower = (user.email || '').trim().toLowerCase();
 
-  const userLeads = allLeads.filter(l => {
+  const userLeads = tenantLeads.filter(l => {
     const leadOwner = (l.owner || '').trim().toLowerCase();
     const leadAssigned = (l.assigned_to || '').trim().toLowerCase();
     return (
@@ -2037,6 +2140,7 @@ app.post('/api/leads', async (req, res) => {
     ...leadData,
     id: leadData.id || `lead_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
     owner: assignedOwner,
+    tenantId: getUserTenantId(user),
     createdAt: leadData.createdAt || new Date().toISOString(),
     status: leadData.status || 'Contacted'
   };
@@ -2061,6 +2165,7 @@ app.post('/api/leads/bulk-import', async (req, res) => {
   const isSuper = isSuperAdminEmailOrName(user);
   const validIncoming = [];
   const defaultOwner = isSuper ? 'Harsh Goyal' : (user.name || 'Sales Rep');
+  const userTenant = getUserTenantId(user);
 
   for (let i = 0; i < incomingLeads.length; i++) {
     const raw = incomingLeads[i];
@@ -2088,6 +2193,7 @@ app.post('/api/leads/bulk-import', async (req, res) => {
       won_date: String(raw.won_date || '').trim(),
       notes: typeof raw.notes === 'string' ? raw.notes : Array.isArray(raw.notes) ? raw.notes : '',
       owner: leadOwner,
+      tenantId: userTenant,
       createdAt: raw.createdAt || new Date().toISOString()
     };
 
@@ -2208,6 +2314,250 @@ app.post('/api/sync/bulk', async (req, res) => {
   // Super Admin syncs all leads and users
   await syncBulkData(leads, users);
   res.json({ success: true, message: 'Bulk data synchronized successfully!' });
+});
+
+// --- TASK MANAGEMENT ENDPOINTS (Strict 3-Tier RBAC & Tenant Isolated) ---
+
+// 1. GET /api/tasks: Admin gets company tasks; Manager gets team tasks; Employee gets strictly own tasks
+app.get('/api/tasks', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required to access tasks.', tasks: [] });
+  }
+
+  const allTasks = await getTasks();
+  const allUsers = await getUsers();
+  const allLeads = await getLeads();
+
+  const userTenant = getUserTenantId(user);
+  const isSuperAdmin = isSuperAdminEmailOrName(user) || user.role === 'admin';
+  const isManager = user.role === 'manager';
+
+  // Scope to user's company/tenant
+  let tenantTasks = allTasks.filter(t => {
+    const taskTenant = t.tenantId || 'tenant_accomation';
+    return taskTenant === userTenant;
+  });
+
+  // 1. Super Admin: Full master access within company
+  if (isSuperAdmin) {
+    return res.json({
+      success: true,
+      role: 'admin',
+      count: tenantTasks.length,
+      tasks: tenantTasks
+    });
+  }
+
+  // 2. Manager: Own tasks + reporting team tasks
+  if (isManager) {
+    const managerNameLower = (user.name || '').trim().toLowerCase();
+    const managerDisplayNameLower = (user.displayName || '').trim().toLowerCase();
+    const managerEmailLower = (user.email || '').trim().toLowerCase();
+    const managerId = String(user.id || '');
+
+    const reportingUsers = allUsers.filter(u => {
+      if (u.active === false) return false;
+      const uReportsTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+      const uManagerId = String(u.managerId || '');
+      return uReportsTo === managerNameLower || (managerDisplayNameLower && uReportsTo === managerDisplayNameLower) || (uManagerId && uManagerId === managerId);
+    });
+
+    const allowedOwners = new Set([
+      managerNameLower,
+      managerDisplayNameLower,
+      managerEmailLower,
+      managerId,
+      ...reportingUsers.map(u => (u.name || '').trim().toLowerCase()),
+      ...reportingUsers.map(u => (u.displayName || '').trim().toLowerCase()),
+      ...reportingUsers.map(u => (u.email || '').trim().toLowerCase()),
+      ...reportingUsers.map(u => (u.username || '').trim().toLowerCase()),
+      ...reportingUsers.map(u => String(u.id || ''))
+    ].filter(Boolean));
+
+    const managerTasks = tenantTasks.filter(t => {
+      const tOwner = (t.owner || t.ownerName || '').trim().toLowerCase();
+      const tEmail = (t.ownerEmail || '').trim().toLowerCase();
+      const tId = String(t.ownerId || '');
+      return allowedOwners.has(tOwner) || allowedOwners.has(tEmail) || allowedOwners.has(tId);
+    });
+
+    return res.json({
+      success: true,
+      role: 'manager',
+      count: managerTasks.length,
+      tasks: managerTasks
+    });
+  }
+
+  // 3. Employee (sales_rep): STRICT DATA ISOLATION
+  // Can only see tasks they own OR tasks linked to leads assigned to them
+  const userNameLower = (user.name || '').trim().toLowerCase();
+  const userDisplayNameLower = (user.displayName || '').trim().toLowerCase();
+  const userEmailLower = (user.email || '').trim().toLowerCase();
+  const userId = String(user.id || '');
+
+  // Leads owned by this rep
+  const repLeadIds = new Set(
+    allLeads.filter(l => {
+      const lOwner = (l.owner || '').trim().toLowerCase();
+      const lAssigned = (l.assigned_to || '').trim().toLowerCase();
+      return (
+        lOwner === userNameLower ||
+        (userDisplayNameLower && lOwner === userDisplayNameLower) ||
+        (userEmailLower && lOwner === userEmailLower) ||
+        lAssigned === userNameLower ||
+        (userDisplayNameLower && lAssigned === userDisplayNameLower)
+      );
+    }).map(l => String(l.id))
+  );
+
+  const repTasks = tenantTasks.filter(t => {
+    const tOwner = (t.owner || t.ownerName || '').trim().toLowerCase();
+    const tEmail = (t.ownerEmail || '').trim().toLowerCase();
+    const tId = String(t.ownerId || '');
+
+    const isDirectOwner = (
+      (tId && tId === userId) ||
+      (tEmail && tEmail === userEmailLower) ||
+      (tOwner && (tOwner === userNameLower || (userDisplayNameLower && tOwner === userDisplayNameLower)))
+    );
+
+    const isLinkedToMyLead = t.linkedLeadId && repLeadIds.has(String(t.linkedLeadId));
+
+    return isDirectOwner || isLinkedToMyLead;
+  });
+
+  return res.json({
+    success: true,
+    role: 'sales_rep',
+    count: repTasks.length,
+    tasks: repTasks
+  });
+});
+
+// 2. POST /api/tasks: Create task with explicit owner and tenant metadata
+app.post('/api/tasks', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required to create a task.' });
+  }
+
+  const { title, priority, dueDate, linkedLeadId, completed, outcome, completionRemark } = req.body;
+  if (!title || !title.trim()) {
+    return res.status(400).json({ success: false, message: 'Task description is required.' });
+  }
+
+  const newTask = {
+    id: req.body.id || `task_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+    title: title.trim(),
+    priority: priority || 'Medium',
+    dueDate: dueDate || new Date().toISOString().split('T')[0],
+    linkedLeadId: linkedLeadId || '',
+    completed: Boolean(completed),
+    completedAt: completed ? new Date().toISOString() : null,
+    outcome: outcome || '',
+    completionRemark: completionRemark || '',
+    createdAt: req.body.createdAt || new Date().toISOString(),
+    ownerId: String(user.id || ''),
+    ownerEmail: (user.email || '').trim().toLowerCase(),
+    owner: user.name || user.displayName || 'Authorized User',
+    ownerName: user.name || user.displayName || 'Authorized User',
+    tenantId: getUserTenantId(user)
+  };
+
+  await saveTask(newTask);
+
+  return res.json({
+    success: true,
+    message: 'Task created successfully.',
+    task: newTask
+  });
+});
+
+// 3. PUT /api/tasks/:id: Update task status/fields with ownership authorization
+app.put('/api/tasks/:id', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
+
+  const taskId = req.params.id;
+  const allTasks = await getTasks();
+  const existing = allTasks.find(t => String(t.id) === String(taskId));
+
+  if (!existing) {
+    return res.status(404).json({ success: false, message: 'Task not found.' });
+  }
+
+  const isSuper = isSuperAdminEmailOrName(user) || user.role === 'admin';
+  const isOwner = (
+    String(existing.ownerId) === String(user.id) ||
+    (existing.ownerEmail && existing.ownerEmail.toLowerCase() === (user.email || '').toLowerCase()) ||
+    (existing.owner && existing.owner.toLowerCase() === (user.name || '').toLowerCase())
+  );
+
+  if (!isSuper && !isOwner && user.role !== 'manager') {
+    return res.status(403).json({ success: false, message: 'Unauthorized to update this task.' });
+  }
+
+  const updatedTask = {
+    ...existing,
+    ...req.body,
+    id: existing.id,
+    ownerId: existing.ownerId,
+    ownerEmail: existing.ownerEmail,
+    owner: existing.owner,
+    tenantId: existing.tenantId || getUserTenantId(user),
+    updatedAt: new Date().toISOString()
+  };
+
+  if (req.body.completed !== undefined) {
+    updatedTask.completed = Boolean(req.body.completed);
+    updatedTask.completedAt = updatedTask.completed ? (req.body.completedAt || new Date().toISOString()) : null;
+  }
+
+  await saveTask(updatedTask);
+
+  return res.json({
+    success: true,
+    message: 'Task updated successfully.',
+    task: updatedTask
+  });
+});
+
+// 4. DELETE /api/tasks/:id: Delete task with authorization
+app.delete('/api/tasks/:id', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
+
+  const taskId = req.params.id;
+  const allTasks = await getTasks();
+  const existing = allTasks.find(t => String(t.id) === String(taskId));
+
+  if (!existing) {
+    return res.status(404).json({ success: false, message: 'Task not found.' });
+  }
+
+  const isSuper = isSuperAdminEmailOrName(user) || user.role === 'admin';
+  const isOwner = (
+    String(existing.ownerId) === String(user.id) ||
+    (existing.ownerEmail && existing.ownerEmail.toLowerCase() === (user.email || '').toLowerCase()) ||
+    (existing.owner && existing.owner.toLowerCase() === (user.name || '').toLowerCase())
+  );
+
+  if (!isSuper && !isOwner) {
+    return res.status(403).json({ success: false, message: 'Unauthorized to delete this task.' });
+  }
+
+  await deleteTask(taskId);
+
+  return res.json({
+    success: true,
+    message: 'Task deleted successfully.'
+  });
 });
 
 // SMS Gateway Proxy Endpoint (Fast2SMS & MSG91)
