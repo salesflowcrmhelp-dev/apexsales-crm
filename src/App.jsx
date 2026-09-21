@@ -7731,19 +7731,30 @@ export default function App() {
                   alignItems: "center",
                   justifyContent: "space-between",
                   width: "100%",
-                  color: activeWorkspace === "team" ? "#1d4ed8" : "#2563eb",
-                  backgroundColor: activeWorkspace === "team" ? "#eff6ff" : "transparent",
-                  borderLeft: activeWorkspace === "team" ? "3px solid #2563eb" : "3px solid transparent",
-                  borderRadius: activeWorkspace === "team" ? "0 6px 6px 0" : "6px",
-                  padding: "9px 12px 9px 9px",
-                  fontWeight: "700"
+                  padding: "9px 12px",
+                  borderRadius: "6px",
+                  transition: "all 0.15s ease"
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
-                  <ShieldCheck className="nav-item-icon" style={{ color: activeWorkspace === "team" ? "#1d4ed8" : "#2563eb" }} />
+                  <ShieldCheck className="nav-item-icon" />
                   <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Team & Roles</span>
                 </div>
-                <span className="sidebar-badge" style={{ fontSize: "10px", fontWeight: "700", color: "#475569", backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", padding: "1.5px 6px", borderRadius: "6px", marginLeft: "8px", letterSpacing: "0.3px", flexShrink: 0 }}>
+                <span 
+                  className="sidebar-badge" 
+                  style={{ 
+                    fontSize: "10px", 
+                    fontWeight: "600", 
+                    color: activeWorkspace === "team" ? "#1d4ed8" : "#64748b", 
+                    backgroundColor: activeWorkspace === "team" ? "#dbeafe" : "#f1f5f9", 
+                    border: `1px solid ${activeWorkspace === "team" ? "#bfdbfe" : "#e2e8f0"}`, 
+                    padding: "2px 7px", 
+                    borderRadius: "6px", 
+                    marginLeft: "auto", 
+                    letterSpacing: "0.3px", 
+                    flexShrink: 0 
+                  }}
+                >
                   Admin
                 </span>
               </button>
@@ -7883,13 +7894,13 @@ export default function App() {
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "6px",
-                    backgroundColor: selectedPeriodMonth === "2026-09" ? "#f0fdf4" : selectedPeriodMonth === "all" ? "#eff6ff" : "#fff7ed",
-                    border: selectedPeriodMonth === "2026-09" ? "1.5px solid #86efac" : selectedPeriodMonth === "all" ? "1.5px solid #bfdbfe" : "1.5px solid #fed7aa",
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #cbd5e1",
                     padding: "0 12px",
                     borderRadius: "6px",
                     fontSize: "12px",
                     fontWeight: "600",
-                    color: selectedPeriodMonth === "2026-09" ? "#166534" : selectedPeriodMonth === "all" ? "#1e40af" : "#9a3412",
+                    color: "#334155",
                     cursor: "pointer",
                     boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
                     whiteSpace: "nowrap"
@@ -7910,7 +7921,7 @@ export default function App() {
                       ? "August 2026 (Archived)" 
                       : "All-Time Lifetime"}
                   </span>
-                  <ChevronDown size={12} style={{ flexShrink: 0 }} />
+                  <ChevronDown size={12} style={{ flexShrink: 0, color: "#64748b" }} />
                 </button>
 
                 {isPeriodDropdownOpen && (
@@ -8062,29 +8073,30 @@ export default function App() {
                 {/* Global Utility Action (Start My Day) */}
                 <button 
                   onClick={() => setShowStartMyDay(true)}
-                  className="header-vault-btn"
+                  className="header-primary-btn"
                   style={{ 
                     height: "32px", 
                     boxSizing: "border-box", 
                     display: "inline-flex", 
                     alignItems: "center", 
                     gap: "6px", 
-                    padding: "0 13px", 
+                    padding: "0 14px", 
                     margin: 0,
-                    backgroundColor: "#eff6ff", 
-                    border: "1px solid #bfdbfe", 
+                    backgroundColor: "#2563eb", 
+                    border: "1px solid #1d4ed8", 
                     borderRadius: "6px", 
                     fontSize: "12px", 
-                    fontWeight: "700", 
-                    color: "#2563eb", 
+                    fontWeight: "600", 
+                    color: "#ffffff", 
                     cursor: "pointer", 
-                    boxShadow: "0 1px 2px rgba(37, 99, 235, 0.08)", 
+                    boxShadow: "0 1px 2px rgba(37, 99, 235, 0.15)", 
                     fontFamily: "'Plus Jakarta Sans', sans-serif",
                     transition: "all 0.15s ease",
                     whiteSpace: "nowrap"
                   }}
+                  title="Start My Day Workflow"
                 >
-                  <Sun size={14} color="#2563eb" />
+                  <Sun size={14} color="#ffffff" />
                   <span>Start My Day</span>
                 </button>
               </div>
@@ -11983,7 +11995,7 @@ export default function App() {
 
                   {/* Members List Table */}
                   <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
-                    <table className="responsive-table" style={{ width: "100%", minWidth: "820px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
+                    <table className="responsive-table" style={{ width: "100%", minWidth: "920px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
                       <thead>
                         <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: "700" }}>
                           <th style={{ padding: "9px 12px" }}>TEAM MEMBER</th>
@@ -11991,7 +12003,7 @@ export default function App() {
                           <th style={{ padding: "9px 12px" }}>ACTIVE PERMISSIONS</th>
                           <th style={{ padding: "9px 12px" }}>LOGIN PIN</th>
                           <th style={{ padding: "9px 12px", textAlign: "center" }}>ASSIGNED LEADS / QUOTA</th>
-                          <th style={{ padding: "9px 12px", textAlign: "right" }}>ACTIONS</th>
+                          <th style={{ padding: "9px 12px", textAlign: "left", width: "230px" }}>ACTIONS</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -12035,19 +12047,19 @@ export default function App() {
                               {/* Active Permissions Summary Pills */}
                               <td style={{ padding: "8px 12px" }}>
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                                  <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", backgroundColor: effectivePerms.canViewAllLeads ? "#eff6ff" : "#f1f5f9", color: effectivePerms.canViewAllLeads ? "#1e40af" : "#475569", fontWeight: "600" }}>
+                                  <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#334155", border: "1px solid #e2e8f0", fontWeight: "600" }}>
                                     {effectivePerms.canViewAllLeads ? "👁️ All Leads" : "🔒 Own Leads"}
                                   </span>
-                                  <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", backgroundColor: effectivePerms.canExportCSV ? "#f0fdf4" : "#fef2f2", color: effectivePerms.canExportCSV ? "#166534" : "#b91c1c", fontWeight: "600" }}>
+                                  <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: effectivePerms.canExportCSV ? "#f1f5f9" : "#fef2f2", color: effectivePerms.canExportCSV ? "#334155" : "#991b1b", border: `1px solid ${effectivePerms.canExportCSV ? "#e2e8f0" : "#fecaca"}`, fontWeight: "600" }}>
                                     {effectivePerms.canExportCSV ? "📥 Export OK" : "🚫 No Export"}
                                   </span>
                                   {!effectivePerms.canViewRevenue && (
-                                    <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", backgroundColor: "#fffbeb", color: "#b45309", fontWeight: "600" }}>
+                                    <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#fffbeb", color: "#92400e", border: "1px solid #fde68a", fontWeight: "600" }}>
                                       🙈 Revenue Masked
                                     </span>
                                   )}
                                   {effectivePerms.canUseAI && (
-                                    <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "4px", backgroundColor: "#faf5ff", color: "#7c3aed", fontWeight: "600" }}>
+                                    <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#334155", border: "1px solid #e2e8f0", fontWeight: "600" }}>
                                       🤖 AI Enabled
                                     </span>
                                   )}
@@ -12079,44 +12091,45 @@ export default function App() {
                                     {leadsCount} / {quota > 9999 ? '∞' : quota} Leads
                                   </span>
                                   {quota <= 9999 && (
-                                    <div style={{ width: "70px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "2px", overflow: "hidden", marginTop: "2px" }}>
-                                      <div style={{ width: `${quotaPercent}%`, height: "100%", backgroundColor: quotaPercent >= 90 ? "#dc2626" : quotaPercent >= 70 ? "#f59e0b" : "#2563eb" }} />
+                                    <div style={{ width: "70px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "9999px", overflow: "hidden", marginTop: "2px" }}>
+                                      <div style={{ width: `${quotaPercent}%`, height: "100%", borderRadius: "9999px", backgroundColor: quotaPercent >= 90 ? "#dc2626" : quotaPercent >= 70 ? "#f59e0b" : "#2563eb" }} />
                                     </div>
                                   )}
                                 </div>
                               </td>
 
                               {/* Actions */}
-                              <td style={{ padding: "8px 12px", textAlign: "right" }}>
-                                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", justifyContent: "flex-end" }}>
+                              <td style={{ padding: "8px 12px" }}>
+                                <div style={{ display: "grid", gridTemplateColumns: "84px 62px 64px", alignItems: "center", gap: "6px", width: "216px" }}>
                                   <button
                                     type="button"
                                     onClick={() => handleOpenAccessModal(usr)}
-                                    style={{ height: "30px", padding: "0 10px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "11px", fontWeight: "700", color: "#1e40af", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                                    style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "11px", fontWeight: "700", color: "#1d4ed8", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
                                     title="Configure permissions & package"
                                   >
-                                    <Sliders size={13} /> ⚙️ Access
+                                    <Sliders size={12} /> Access
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleUpdateUserPin(usr.id, usr.name)}
-                                    style={{ height: "30px", padding: "0 8px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#0f172a", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                                    style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#334155", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "3px" }}
                                     title="Reset login PIN"
                                   >
                                     🔑 PIN
                                   </button>
                                   {checkIsSuperAdmin(usr) || usr.id === "usr_admin" ? (
-                                    <span style={{ height: "30px", padding: "0 8px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#64748b", display: "inline-flex", alignItems: "center" }}>
+                                    <span style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#64748b", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
                                       🔒 Admin
                                     </span>
                                   ) : (
                                     <button
                                       type="button"
                                       onClick={() => handleDeleteUser(usr.id, usr.name, usr.email, usr.role)}
-                                      style={{ height: "30px", padding: "0 8px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center" }}
+                                      style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "3px" }}
                                       title={`Permanently delete ${usr.name}`}
+                                      aria-label={`Permanently delete ${usr.name}`}
                                     >
-                                      🗑️
+                                      🗑️ Delete
                                     </button>
                                   )}
                                 </div>
