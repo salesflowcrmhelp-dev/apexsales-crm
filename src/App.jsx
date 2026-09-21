@@ -1962,7 +1962,7 @@ export default function App() {
   const [reportSearchQuery, setReportSearchQuery] = useState("");
   const [reportPageSize, setReportPageSize] = useState(10); // 10 | 20 | 30 | 50 | "all"
   const [reportCurrentPage, setReportCurrentPage] = useState(1);
-  const [reportActiveTab, setReportActiveTab] = useState("all");
+  const [reportActiveTab, setReportActiveTab] = useState("analytics");
   const [showMoreFilters, setShowMoreFilters] = useState(false);
 
   // Click-outside listener to close Stage Multi-Select Dropdowns cleanly
@@ -8824,19 +8824,19 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Search Bar + Actions */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                  {/* Search Bar + Actions (Issue 5: Elevated Print PDF & Export CSV to 32px primary actions) */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                     <div style={{ position: "relative", width: "160px", display: "flex", alignItems: "center" }}>
-                      <Search size={11} color="#94a3b8" style={{ position: "absolute", left: "7px", pointerEvents: "none" }} />
+                      <Search size={12} color="#94a3b8" style={{ position: "absolute", left: "8px", pointerEvents: "none" }} />
                       <input
                         type="text"
                         placeholder="Search lead, phone..."
                         value={reportSearchQuery}
                         onChange={(e) => setReportSearchQuery(e.target.value)}
-                        style={{ width: "100%", height: "24px", padding: "2px 18px 2px 24px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "400", outline: "none", color: "#0f172a" }}
+                        style={{ width: "100%", height: "32px", boxSizing: "border-box", padding: "0 18px 0 26px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "400", outline: "none", color: "#0f172a" }}
                       />
                       {reportSearchQuery && (
-                        <button onClick={() => setReportSearchQuery("")} style={{ position: "absolute", right: "5px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px", padding: 0 }}>✕</button>
+                        <button onClick={() => setReportSearchQuery("")} style={{ position: "absolute", right: "6px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px", padding: 0 }}>✕</button>
                       )}
                     </div>
 
@@ -8855,16 +8855,16 @@ export default function App() {
                         setReportSearchQuery("");
                         showToast("Reset all report filters!");
                       }}
-                      style={{ fontSize: "12px", fontWeight: "500", color: "#ea580c", backgroundColor: "#fff7ed", border: "1px solid #ffedd5", padding: "2px 7px", height: "24px", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                      style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", border: "1px solid #ffedd5", padding: "0 10px", height: "32px", boxSizing: "border-box", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
                     >
-                      <RotateCcw size={10} color="#ea580c" /> Reset
+                      <RotateCcw size={12} color="#ea580c" /> Reset
                     </button>
 
                     <button 
                       onClick={() => window.print()}
-                      style={{ padding: "2px 8px", height: "24px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      style={{ padding: "0 12px", height: "32px", boxSizing: "border-box", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }}
                     >
-                      <Printer size={11} color="#38bdf8" /> Print PDF
+                      <Printer size={13} color="#38bdf8" /> Print PDF
                     </button>
 
                     <button 
@@ -8879,45 +8879,45 @@ export default function App() {
                         a.click();
                         showToast(`Exported ${filteredReportLeads.length} filtered leads!`);
                       }}
-                      style={{ padding: "2px 8px", height: "24px", backgroundColor: "#f8fafc", color: "#0f172a", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      style={{ padding: "0 12px", height: "32px", boxSizing: "border-box", backgroundColor: "#ffffff", color: "#0f172a", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}
                     >
-                      <Download size={11} color="#2563eb" /> Export CSV ({filteredReportLeads.length})
+                      <Download size={13} color="#2563eb" /> Export CSV ({filteredReportLeads.length})
                     </button>
                   </div>
                 </div>
 
-                
-                  {/* Reports Section Switcher Tabs to reduce cognitive density */}
-                  <div style={{ display: "flex", gap: "8px", borderTop: "1px solid #f1f5f9", paddingTop: "10px", flexWrap: "wrap" }}>
-                    {[
-                      { id: "all", label: "All Reports & KPIs" },
-                      { id: "analytics", label: "Revenue Velocity & Pipeline" },
-                      { id: "team", label: "Rep Leaderboard & Digest" },
-                      { id: "table", label: "Audit Ledger & Records" }
-                    ].map(t => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => setReportActiveTab(t.id)}
-                        style={{
-                          padding: "4px 12px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: reportActiveTab === t.id ? "700" : "500",
-                          border: reportActiveTab === t.id ? "1px solid #ea580c" : "1px solid #cbd5e1",
-                          backgroundColor: reportActiveTab === t.id ? "#ea580c" : "#f8fafc",
-                          color: reportActiveTab === t.id ? "#ffffff" : "#475569",
-                          cursor: "pointer",
-                          transition: "all 0.15s ease",
-                          height: "28px",
-                          display: "inline-flex",
-                          alignItems: "center"
-                        }}
-                      >
-                        {t.label}
-                      </button>
-                    ))}
-                  </div>
+                {/* Reports Section Switcher Tabs to reduce cognitive density (Issue 4) */}
+                <div style={{ display: "flex", gap: "8px", borderTop: "1px solid #f1f5f9", paddingTop: "8px", flexWrap: "wrap" }}>
+                  {[
+                    { id: "analytics", label: "📊 Revenue Velocity & Pipeline" },
+                    { id: "team", label: "👥 Rep Leaderboard & Digest" },
+                    { id: "table", label: "📋 Audit Ledger & Records" },
+                    { id: "all", label: "📑 All Reports & Overview" }
+                  ].map(t => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setReportActiveTab(t.id)}
+                      style={{
+                        padding: "0 12px",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        fontWeight: reportActiveTab === t.id ? "700" : "600",
+                        border: reportActiveTab === t.id ? "1px solid #bfdbfe" : "1px solid #e2e8f0",
+                        backgroundColor: reportActiveTab === t.id ? "#eff6ff" : "#f8fafc",
+                        color: reportActiveTab === t.id ? "#2563eb" : "#475569",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                        height: "32px",
+                        boxSizing: "border-box",
+                        display: "inline-flex",
+                        alignItems: "center"
+                      }}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
 
 
                 {/* Row 2: Date Field Selector & Timeframe Presets */}
@@ -9700,14 +9700,11 @@ export default function App() {
                 <div className="reports-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                   <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                        <div style={{ width: "22px", height: "22px", borderRadius: "6px", backgroundColor: "#0f172a", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <Mail size={12} color="#38bdf8" />
-                        </div>
-                        <div>
-                          <h3 style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", margin: 0 }}>Weekly Digest</h3>
-                          <span style={{ fontSize: "12px", color: "#475569" }}>Automated Executive Email</span>
-                        </div>
+                      <div>
+                        <h3 style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                          <Mail size={13} color="#2563eb" /> Weekly Digest
+                        </h3>
+                        <span style={{ fontSize: "12px", color: "#475569" }}>Automated Executive Email</span>
                       </div>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: "3px", fontSize: "12px", fontWeight: "600", color: "#166534", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "1px 5px", borderRadius: "6px" }}>
                         <span style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: "#10b981", display: "inline-block" }} /> Scheduled
@@ -9833,12 +9830,9 @@ export default function App() {
               {/* RENEWAL & CLIENT RETENTION HEALTH AUDIT CARD */}
               <div style={{ backgroundColor: "#fff7ed", border: "1px solid #fed7aa", borderRadius: "8px", padding: "12px 14px", marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#ea580c", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <RefreshCw size={13} className="text-white" />
-                    </div>
+                  <div>
                     <h2 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
-                      Client Renewal & Retention Audit
+                      <RefreshCw size={15} color="#ea580c" /> Client Renewal & Retention Audit
                     </h2>
                   </div>
 
@@ -9848,7 +9842,7 @@ export default function App() {
                       setReportStatusFilter("Renewal");
                       showToast("Filtered view to Renewal stage!");
                     }}
-                    style={{ padding: "3px 7px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer" }}
+                    style={{ padding: "0 12px", height: "32px", boxSizing: "border-box", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center" }}
                   >
                     Filter Renewal Stage
                   </button>
@@ -9868,7 +9862,7 @@ export default function App() {
                       a.click();
                       showToast("Exported Renewal Deals CSV Report!");
                     }}
-                    style={{ padding: "4px 10px", backgroundColor: "#ffffff", color: "#ea580c", border: "1px solid #fdba74", borderRadius: "6px", fontSize: "12px", fontWeight: "500", cursor: "pointer" }}
+                    style={{ padding: "0 12px", height: "32px", boxSizing: "border-box", backgroundColor: "#ffffff", color: "#0f172a", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center" }}
                   >
                     Export Renewal CSV
                   </button>
@@ -9990,7 +9984,7 @@ export default function App() {
                     <div style={{ width: "20px", height: "20px", borderRadius: "6px", backgroundColor: "#f0fdf4", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <Table size={11} color="#16a34a" />
                     </div>
-                    <h3 style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a", margin: 0, textTransform: "uppercase", letterSpacing: "0.2px" }}>
+                    <h3 style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
                       Filtered Records List ({filteredReportLeads.length} Deals)
                     </h3>
                   </div>
@@ -10004,7 +9998,7 @@ export default function App() {
                           setReportPageSize(e.target.value === "all" ? "all" : Number(e.target.value));
                           setReportCurrentPage(1);
                         }}
-                        style={{ padding: "1px 4px", height: "20px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer" }}
+                        style={{ padding: "0 6px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer" }}
                       >
                         <option value={10}>10 per page</option>
                         <option value={20}>20 per page</option>
@@ -10024,14 +10018,14 @@ export default function App() {
                   <table style={{ width: "100%", minWidth: "750px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
                     <thead>
                       <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
-                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500", width: "35px" }}>#</th>
-                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Lead Name & Company</th>
-                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Phone / Email</th>
-                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Stage</th>
-                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Deal Value</th>
-                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Sale / Won Date</th>
-                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Source</th>
-                        <th style={{ padding: "6px 8px", color: "#475569", fontWeight: "500" }}>Score</th>
+                        <th style={{ padding: "8px 12px", color: "#475569", fontWeight: "600", width: "35px" }}>#</th>
+                        <th style={{ padding: "8px 12px", color: "#475569", fontWeight: "600" }}>Lead Name & Company</th>
+                        <th style={{ padding: "8px 12px", color: "#475569", fontWeight: "600" }}>Phone / Email</th>
+                        <th style={{ padding: "8px 12px", color: "#475569", fontWeight: "600" }}>Stage</th>
+                        <th style={{ padding: "8px 12px", color: "#475569", fontWeight: "600" }}>Deal Value</th>
+                        <th style={{ padding: "8px 12px", color: "#475569", fontWeight: "600" }}>Sale / Won Date</th>
+                        <th style={{ padding: "8px 12px", color: "#475569", fontWeight: "600" }}>Source</th>
+                        <th style={{ padding: "8px 12px", color: "#475569", fontWeight: "600" }}>Score</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -10056,36 +10050,36 @@ export default function App() {
                                 transition: "background-color 0.15s ease"
                               }}
                             >
-                              <td style={{ padding: "6px 8px", color: "#64748b", fontWeight: "400", fontSize: "12px" }}>
+                              <td style={{ padding: "8px 12px", color: "#64748b", fontWeight: "400", fontSize: "12px" }}>
                                 {rowNum}
                               </td>
-                              <td style={{ padding: "6px 8px", fontWeight: "500", color: "#0f172a" }}>
+                              <td style={{ padding: "8px 12px", fontWeight: "500", color: "#0f172a" }}>
                                 {l.name || "Untitled Lead"}
                                 {l.company && (
                                   <span style={{ display: "block", fontSize: "12px", color: "#475569", fontWeight: "400" }}>{l.company}</span>
                                 )}
                               </td>
-                              <td style={{ padding: "6px 8px", color: "#475569", fontSize: "12px", fontWeight: "400" }}>
+                              <td style={{ padding: "8px 12px", color: "#475569", fontSize: "12px", fontWeight: "400" }}>
                                 {l.phone && <span style={{ display: "block" }}>{l.phone}</span>}
                                 {l.email && <span style={{ display: "block", color: "#475569", fontSize: "12px" }}>{l.email}</span>}
                               </td>
-                              <td style={{ padding: "6px 8px" }}>
+                              <td style={{ padding: "8px 12px" }}>
                                 {isRenewalWonLead(l) ? (
-                                  <span className="sheet-status-pill" style={{ fontSize: "12px", padding: "1px 6px", backgroundColor: "#fff7ed", color: "#ea580c", border: "1px solid #fed7aa" }}>
+                                  <span className="sheet-status-pill" style={{ fontSize: "12px", padding: "3px 8px", backgroundColor: "#fff7ed", color: "#ea580c", border: "1px solid #fed7aa", borderRadius: "6px", fontWeight: "600", display: "inline-block" }}>
                                     Won (Renewal)
                                   </span>
                                 ) : (
-                                  <span className={`sheet-status-pill sheet-status-${(l.status || "").toLowerCase().replace(/ /g, "-")}`} style={{ fontSize: "12px", padding: "1px 6px" }}>
+                                  <span className={`sheet-status-pill sheet-status-${(l.status || "").toLowerCase().replace(/ /g, "-")}`} style={{ fontSize: "12px", padding: "3px 8px", borderRadius: "6px", fontWeight: "600", display: "inline-block" }}>
                                     {l.status || "New"}
                                   </span>
                                 )}
                               </td>
-                              <td style={{ padding: "6px 8px", fontWeight: "600", color: isWon ? "#16a34a" : "#0f172a" }}>
+                              <td style={{ padding: "8px 12px", fontWeight: "600", color: isWon ? "#16a34a" : "#0f172a" }}>
                                 ₹{(Number(l.value) || 0).toLocaleString("en-IN")}
                               </td>
-                              <td style={{ padding: "6px 8px", fontSize: "12px", fontWeight: "400" }}>
+                              <td style={{ padding: "8px 12px", fontSize: "12px", fontWeight: "400" }}>
                                 {l.won_date ? (
-                                  <span style={{ backgroundColor: "#ecfdf5", color: "#166534", border: "1px solid #a7f3d0", padding: "1px 5px", borderRadius: "6px", fontWeight: "500", fontSize: "12px" }}>
+                                  <span style={{ backgroundColor: "#ecfdf5", color: "#166534", border: "1px solid #a7f3d0", padding: "2px 6px", borderRadius: "6px", fontWeight: "600", fontSize: "12px", display: "inline-block" }}>
                                     {l.won_date}
                                   </span>
                                 ) : l.next_follow_up ? (
@@ -10096,15 +10090,16 @@ export default function App() {
                                   <span style={{ color: "#64748b" }}>--</span>
                                 )}
                               </td>
-                              <td style={{ padding: "6px 8px", color: "#475569", fontWeight: "400" }}>
+                              <td style={{ padding: "8px 12px", color: "#475569", fontWeight: "400" }}>
                                 {l.source || "--"}
                               </td>
-                              <td style={{ padding: "6px 8px" }}>
+                              <td style={{ padding: "8px 12px" }}>
                                 <span style={{
                                   fontSize: "12px",
-                                  fontWeight: "500",
-                                  padding: "1px 5px",
+                                  fontWeight: "600",
+                                  padding: "3px 8px",
                                   borderRadius: "6px",
+                                  display: "inline-block",
                                   backgroundColor: (l.score || "").toLowerCase() === "hot" ? "#fef2f2" : (l.score || "").toLowerCase() === "warm" ? "#fff7ed" : "#f1f5f9",
                                   color: (l.score || "").toLowerCase() === "hot" ? "#dc2626" : (l.score || "").toLowerCase() === "warm" ? "#ea580c" : "#475569",
                                   border: (l.score || "").toLowerCase() === "hot" ? "1px solid #fecaca" : (l.score || "").toLowerCase() === "warm" ? "1px solid #fed7aa" : "1px solid #e2e8f0"
@@ -10187,13 +10182,13 @@ export default function App() {
                 )}
               </div>
 
-              {/* EXPORT & DOWNLOAD CENTER CARD */}
-              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                <span style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a", display: "flex", alignItems: "center", gap: "5px" }}>
-                  <Download className="w-3.5 h-3.5 text-emerald-600" /> Export & Download Reports
+              {/* EXPORT & DOWNLOAD CENTER (Issue 5: Compact standard secondary action buttons) */}
+              <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+                <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "flex", alignItems: "center", gap: "5px" }}>
+                  <Download className="w-3.5 h-3.5 text-slate-500" /> Download Specialized CSVs:
                 </span>
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                   <button 
                     onClick={() => {
                       const csvHeader = "Lead Name,Company,Phone,Email,Deal Value,Status,Source\n";
@@ -10206,13 +10201,9 @@ export default function App() {
                       a.click();
                       showToast("Exported Filtered Pipeline CSV Report!");
                     }}
-                    style={{ backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "8px 10px", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", textAlign: "left" }}
+                    style={{ height: "32px", boxSizing: "border-box", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "0 10px", display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "12px", fontWeight: "600", color: "#0f172a" }}
                   >
-                    <Download className="w-4 h-4 text-blue-600" />
-                    <div>
-                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block", fontWeight: "500" }}>Filtered Pipeline CSV</strong>
-                      <span style={{ fontSize: "12px", color: "#475569", fontWeight: "400" }}>Export {filteredReportLeads.length} matching leads</span>
-                    </div>
+                    <Download size={13} color="#2563eb" /> Filtered Pipeline CSV
                   </button>
 
                   <button 
@@ -10232,13 +10223,9 @@ export default function App() {
                       a.click();
                       showToast("Exported Won Deals Performance Report!");
                     }}
-                    style={{ backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", textAlign: "left" }}
+                    style={{ height: "32px", boxSizing: "border-box", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "0 10px", display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "12px", fontWeight: "600", color: "#0f172a" }}
                   >
-                    <Award className="w-4.5 h-4.5 text-emerald-600" />
-                    <div>
-                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Won Deals CSV</strong>
-                      <span style={{ fontSize: "12px", color: "#475569" }}>Closed revenue records</span>
-                    </div>
+                    <Award size={13} color="#16a34a" /> Won Deals CSV
                   </button>
 
                   <button 
@@ -10257,13 +10244,9 @@ export default function App() {
                       a.click();
                       showToast("Exported Renewal Deals CSV Report!");
                     }}
-                    style={{ backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", textAlign: "left" }}
+                    style={{ height: "32px", boxSizing: "border-box", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "0 10px", display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "12px", fontWeight: "600", color: "#0f172a" }}
                   >
-                    <RefreshCw className="w-4.5 h-4.5 text-orange-600" />
-                    <div>
-                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Renewal Deals CSV</strong>
-                      <span style={{ fontSize: "12px", color: "#475569" }}>{reportStats.renewalCount} renewal accounts</span>
-                    </div>
+                    <RefreshCw size={13} color="#ea580c" /> Renewal Deals CSV
                   </button>
 
                   <button 
@@ -10284,13 +10267,9 @@ export default function App() {
                       a.click();
                       showToast("Exported Overdue Follow-ups List!");
                     }}
-                    style={{ backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", textAlign: "left" }}
+                    style={{ height: "32px", boxSizing: "border-box", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "0 10px", display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "12px", fontWeight: "600", color: "#0f172a" }}
                   >
-                    <AlertTriangle className="w-4.5 h-4.5 text-red-500" />
-                    <div>
-                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Overdue Leads CSV</strong>
-                      <span style={{ fontSize: "12px", color: "#475569" }}>Stuck follow-up alerts</span>
-                    </div>
+                    <AlertTriangle size={13} color="#dc2626" /> Overdue Leads CSV
                   </button>
                 </div>
               </div>
