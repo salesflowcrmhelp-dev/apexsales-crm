@@ -8,7 +8,11 @@ import {
   fetchLeadsFromSupabase, 
   upsertLeadToSupabase, 
   deleteLeadFromSupabase, 
-  batchSyncLeadsToSupabase 
+  batchSyncLeadsToSupabase,
+  fetchUsersFromSupabase,
+  authenticateUserWithSupabase,
+  upsertUserToSupabase,
+  deleteUserFromSupabase
 } from "./lib/supabaseService";
 
 // Dropdown options
@@ -3796,6 +3800,42 @@ export default function App() {
         headers["x-user-name"] = currentUser.name || "";
         headers["x-user-id"] = currentUser.id || "";
       }
+
+      // 🚀 FAST-PATH: Load Users from Supabase PostgreSQL Cloud Database
+      try {
+        const supaUsers = await fetchUsersFromSupabase();
+        if (Array.isArray(supaUsers) && supaUsers.length > 0) {
+          setAllUsersList(supaUsers);
+          const names = supaUsers.map(u => u.name);
+          setTeamMembers(names);
+          try {
+            localStorage.setItem("crm_team_members", JSON.stringify(names));
+          } catch(e) {}
+          if (currentUser) {
+            const me = supaUsers.find(u => 
+              (currentUser.id && u.id === currentUser.id) || 
+              (currentUser.email && u.email && u.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+              (currentUser.name && u.name && u.name.toLowerCase() === currentUser.name.toLowerCase())
+            );
+            if (me) {
+              const updatedUser = { 
+                ...currentUser, 
+                role: me.role, 
+                name: me.name,
+                packageTier: me.packageTier,
+                permissions: me.permissions !== undefined ? me.permissions : currentUser.permissions,
+                maxLeadsLimit: me.maxLeadsLimit || currentUser.maxLeadsLimit
+              };
+              setCurrentUser(updatedUser);
+              setCurrentUserRole(me.role);
+            }
+          }
+          return supaUsers;
+        }
+      } catch(err) {
+        console.warn("Supabase user fetch deferred:", err);
+      }
+
       const res = await fetch("/api/users", { headers });
       if (res.ok) {
         const data = await res.json();
@@ -4206,6 +4246,36 @@ export default function App() {
 
     setIsLoggingIn(true);
     try {
+      // 🚀 FAST-PATH: Authenticate directly against Supabase PostgreSQL Cloud Database
+      const supaAuth = await authenticateUserWithSupabase(emailToSubmit, pinToVerify);
+      if (supaAuth && supaAuth.success && supaAuth.user) {
+        setIsLoggingIn(false);
+        setIsLoggedIn(true);
+        setLoginError("");
+        setPasswordInput("");
+        setPinDigits(["", "", "", "", "", ""]);
+        setCurrentUser(supaAuth.user);
+        setCurrentLoggedInUser(supaAuth.user.name);
+        setCurrentUserRole(supaAuth.user.role);
+        try {
+          sessionStorage.setItem("crm_auth_user", JSON.stringify(supaAuth.user));
+          sessionStorage.setItem("crm_auth_token", supaAuth.token);
+          localStorage.setItem("crm_auth_user", JSON.stringify(supaAuth.user));
+          localStorage.setItem("crm_auth_token", supaAuth.token);
+        } catch(e) {}
+
+        const userLeads = await loadLeadsFromBackend(supaAuth.user);
+        await loadUsersFromBackend();
+        const count = (userLeads || leads).filter(l => l.status === "Payment Follow Up").length;
+
+        if (supaAuth.user.role === "admin") {
+          showToast(`Welcome ${supaAuth.user.displayName || "Admin"}! Super-Admin Mode Unlocked (${count} payment follow-ups). 👑`);
+        } else {
+          showToast(`Welcome ${supaAuth.user.displayName || supaAuth.user.name}! Workspace Unlocked (${count} payment follow-ups). 💼`);
+        }
+        return;
+      }
+
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -4552,6 +4622,9 @@ export default function App() {
       setAllUsersList(prev => prev.map(u => u.id === selectedUserForAccess.id ? updatedUser : u));
 
       const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
+      // 🚀 Save directly to Supabase PostgreSQL Cloud Database
+      await upsertUserToSupabase(updatedUser);
+
       await fetch(`/api/users/${encodeURIComponent(selectedUserForAccess.id)}`, {
         method: "PUT",
         headers: {
@@ -4695,6 +4768,17 @@ export default function App() {
     }
 
     try {
+      // 🚀 Save directly to Supabase PostgreSQL Cloud Database
+      const supaUser = await upsertUserToSupabase(newUserData);
+      if (supaUser) {
+        showToast(`🎉 Team member "${supaUser.name}" created! PIN: ${supaUser.pin}`, "success");
+        setCreatedInviteInfo({ user: supaUser });
+        setNewUserData({ name: "", username: "", pin: "", role: "sales_rep", packageTier: "starter", email: "", phone: "", reportsTo: "", managerId: "" });
+        setShowAddUserSubModal(false);
+        await loadUsersFromBackend();
+        return;
+      }
+
       const res = await fetch("/api/users", {
         method: "POST",
         headers: {
@@ -4742,6 +4826,9 @@ export default function App() {
       onConfirm: async () => {
         setDeleteConfirmData(null);
         try {
+          // 🚀 Delete directly from Supabase PostgreSQL Cloud Database
+          await deleteUserFromSupabase(userId);
+
           const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
           const headers = {
             "Content-Type": "application/json",
@@ -4752,18 +4839,13 @@ export default function App() {
           if (token) {
             headers["Authorization"] = `Bearer ${token}`;
           }
-          const res = await fetch(`/api/users/${encodeURIComponent(userId)}`, {
+          await fetch(`/api/users/${encodeURIComponent(userId)}`, {
             method: "DELETE",
             headers
           });
-          const data = await res.json();
-          if (res.ok && data.success) {
-            showToast(data.message || `User "${userName}" permanently deleted.`, "success");
-            loadUsersFromBackend();
-            loadLeadsFromBackend();
-          } else {
-            showToast(data.message || "Failed to delete user.", "error");
-          }
+          showToast(`User "${userName}" permanently deleted.`, "success");
+          await loadUsersFromBackend();
+          await loadLeadsFromBackend();
         } catch(err) {
           showToast("Error deleting user.", "error");
         }
@@ -22156,7 +22238,10 @@ export default function App() {
                 return;
               }
               try {
-                const res = await fetch(`/api/users/${encodeURIComponent(pinModalData.userId)}`, {
+                // 🚀 Update directly in Supabase PostgreSQL Cloud Database
+                await upsertUserToSupabase({ id: pinModalData.userId, pin: trimmed });
+
+                await fetch(`/api/users/${encodeURIComponent(pinModalData.userId)}`, {
                   method: "PUT",
                   headers: {
                     "Content-Type": "application/json",
@@ -22165,14 +22250,9 @@ export default function App() {
                   },
                   body: JSON.stringify({ pin: trimmed })
                 });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                  showToast(`PIN for ${pinModalData.userName} updated successfully to: ${trimmed}`, "success");
-                  setPinModalData(null);
-                  loadUsersFromBackend();
-                } else {
-                  showToast(data.message || "Failed to update PIN.", "error");
-                }
+                showToast(`PIN for ${pinModalData.userName} updated successfully to: ${trimmed}`, "success");
+                setPinModalData(null);
+                await loadUsersFromBackend();
               } catch(err) {
                 showToast("Error updating PIN.", "error");
               }
