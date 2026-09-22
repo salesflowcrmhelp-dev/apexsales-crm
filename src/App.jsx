@@ -17720,18 +17720,34 @@ export default function App() {
                           >
                             {/* Column Header */}
                             <div className="kanban-column-header">
-                              <div className="kanban-column-title">
-                                <span style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: stage.color }}></span>
-                                  {stage.name}
-                                </span>
-                                <span style={{ fontSize: "11px", fontWeight: "800", color: stage.color, backgroundColor: stage.bg, border: `1px solid ${stage.borderColor}`, padding: "1px 7px", borderRadius: "9999px" }}>
+                              <div className="kanban-column-header-top">
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <button
+                                    type="button"
+                                    className="kanban-col-add-btn"
+                                    onClick={() => {
+                                      setIsAddLeadModalOpen(true);
+                                    }}
+                                    title={`Add lead to ${stage.name}`}
+                                  >
+                                    <Plus size={11} />
+                                  </button>
+                                  <span className="kanban-column-title-text">{stage.name}</span>
+                                </div>
+                                <span 
+                                  className="kanban-column-count-badge" 
+                                  style={{ color: stage.color, backgroundColor: stage.bg, borderColor: stage.borderColor }}
+                                >
                                   {colLeads.length}
                                 </span>
                               </div>
-                              <span className="kanban-column-stats">
-                                ₹{colValue.toLocaleString("en-IN")} • {colLeads.length} {colLeads.length === 1 ? "lead" : "leads"}
-                              </span>
+                              <div className="kanban-column-accent-line" style={{ backgroundColor: stage.color }} />
+                              <div className="kanban-column-stats-row">
+                                <span>{colLeads.length} {colLeads.length === 1 ? "lead" : "leads"}</span>
+                                <span style={{ fontWeight: "800", color: stage.id === "Won" ? "#16a34a" : "#475569" }}>
+                                  ₹{colValue.toLocaleString("en-IN")}
+                                </span>
+                              </div>
                             </div>
 
                             {/* Cards Scrollable List */}
@@ -17743,16 +17759,15 @@ export default function App() {
                               )}
 
                               {colLeads.length === 0 && dragOverStageId !== stage.id ? (
-                                <div style={{ textAlign: "center", padding: "40px 10px", color: "#94a3b8", fontSize: "12px" }}>
+                                <div style={{ textAlign: "center", padding: "30px 10px", color: "#94a3b8", fontSize: "11px" }}>
                                   <span>No leads in {stage.name}</span>
                                 </div>
                               ) : (
                                 colLeads.map(lead => {
                                   const scoreLower = (lead.score || "warm").toLowerCase();
-                                  const todayStr = new Date().toISOString().slice(0, 10);
-                                  const isToday = lead.next_follow_up === todayStr;
-                                  const isOverdue = lead.next_follow_up && lead.next_follow_up < todayStr && isActiveStatus(lead.status);
                                   const cleanPhone = String(lead.phone || "").replace(/[^0-9]/g, "");
+                                  const starsCount = scoreLower === "hot" ? 3 : scoreLower === "cold" ? 1 : 2;
+                                  const isWon = stage.id === "Won" || (lead.status || "").toLowerCase() === "won";
 
                                   return (
                                     <div 
@@ -17767,114 +17782,78 @@ export default function App() {
                                         setDraggingCardId(null);
                                         setDragOverStageId(null);
                                       }}
+                                      onClick={() => {
+                                        setSelectedSplitLeadId(lead.id);
+                                        setPipelineView("split");
+                                      }}
                                       className={`kanban-card ${draggingCardId === lead.id ? "is-dragging" : ""}`}
+                                      title="Click to view 360° dossier"
                                     >
-                                      <div className="kanban-card-title-row">
-                                        <span 
-                                          className="kanban-card-name"
-                                          onClick={() => {
-                                            setSelectedSplitLeadId(lead.id);
-                                            setPipelineView("split");
-                                          }}
-                                          title="Click to view 360° dossier"
-                                        >
-                                          {lead.name || "Untitled Lead"}
-                                        </span>
-                                        <span className={`kanban-score-badge score-${scoreLower === "hot" ? "hot" : scoreLower === "cold" ? "cold" : "warm"}`}>
-                                          {lead.score || "WARM"}
-                                        </span>
-                                      </div>
-
-                                      <div className="kanban-card-company">
-                                        {lead.company || lead.source || "Direct Client"}
-                                      </div>
-
-                                      <div className="kanban-card-info-row">
-                                        <span className="kanban-card-value">
-                                          ₹{(Number(lead.value) || 0).toLocaleString("en-IN")}
-                                        </span>
-                                        {lead.next_follow_up && (
-                                          <span 
-                                            className="kanban-card-due"
-                                            style={
-                                              isOverdue ? { color: "#dc2626", backgroundColor: "#fef2f2", borderColor: "#fecaca" } :
-                                              isToday ? { color: "#d97706", backgroundColor: "#fffbeb", borderColor: "#fde68a" } :
-                                              {}
-                                            }
-                                          >
-                                            <Clock size={10} />
-                                            {isOverdue ? "Overdue" : isToday ? "Due Today" : new Date(lead.next_follow_up).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}
+                                      <div className="kanban-card-main">
+                                        {/* Row 1: Lead Name + Value if Won */}
+                                        <div className="kanban-card-row1">
+                                          <span className="kanban-card-name">
+                                            {lead.name || "Untitled Lead"}
                                           </span>
-                                        )}
-                                      </div>
-
-                                      {/* Aging Row */}
-                                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-                                        <span className="kanban-aging-badge">
-                                          <Clock size={9} />
-                                          {getDaysInStage(lead)}
-                                        </span>
-                                      </div>
-
-                                      <div className="kanban-card-footer">
-                                        {/* Stage select dropdown */}
-                                        <select
-                                          className="kanban-status-select"
-                                          value={lead.status || "New"}
-                                          onChange={(e) => handleQuickStageChange(lead.id, e.target.value)}
-                                          title="Move stage"
-                                        >
-                                          {STATUS_OPTIONS.map(opt => (
-                                            <option key={opt} value={opt}>{opt}</option>
-                                          ))}
-                                        </select>
-
-                                        <div className="kanban-card-actions">
-                                          {lead.phone && (
-                                            <a
-                                              href={`tel:${lead.phone}`}
-                                              className="kanban-card-btn"
-                                              title={`Call ${lead.phone}`}
-                                              style={{ textDecoration: "none" }}
-                                              onClick={(e) => e.stopPropagation()}
-                                            >
-                                              <Phone size={15} />
-                                            </a>
-                                          )}
-                                          {cleanPhone && (
-                                            <a
-                                              href={`https://wa.me/${cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone}?text=${encodeURIComponent(`Hello ${lead.name || ""}, connecting regarding your enquiry with ApexSales.`)}`}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="kanban-card-btn wa"
-                                              title={`WhatsApp ${lead.phone}`}
-                                              style={{ textDecoration: "none" }}
-                                              onClick={(e) => e.stopPropagation()}
-                                            >
-                                              <MessageCircle size={15} />
-                                            </a>
-                                          )}
-                                          <button
-                                            type="button"
-                                            className="kanban-card-btn"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              setSelectedSplitLeadId(lead.id);
-                                              setPipelineView("split");
-                                            }}
-                                            title="Open 360° Dossier"
-                                          >
-                                            <Eye size={15} />
-                                          </button>
-                                          {lead.owner && (
-                                            <span 
-                                              className="kanban-rep-avatar"
-                                              title={`Assigned: ${lead.owner}`}
-                                            >
-                                              {getRepInitials(lead.owner)}
+                                          {isWon && lead.value ? (
+                                            <span className="kanban-card-won-val">
+                                              ₹{(Number(lead.value) || 0).toLocaleString("en-IN")}
                                             </span>
-                                          )}
+                                          ) : null}
                                         </div>
+
+                                        {/* Row 2: Subtitle (Company / Source) */}
+                                        <div className="kanban-card-subtitle">
+                                          {lead.company || lead.source || "Direct Client"}
+                                        </div>
+
+                                        {/* Row 3: Stars & Quick Contact */}
+                                        <div className="kanban-card-meta-row">
+                                          <div className="kanban-card-stars" title={`Priority Score: ${scoreLower.toUpperCase()}`}>
+                                            {[1, 2, 3].map(s => (
+                                              <span key={s} style={{ color: s <= starsCount ? "#f59e0b" : "#cbd5e1" }}>★</span>
+                                            ))}
+                                          </div>
+
+                                          <div className="kanban-card-mini-actions" onClick={(e) => e.stopPropagation()}>
+                                            {lead.phone && (
+                                              <a
+                                                href={`tel:${lead.phone}`}
+                                                className="kanban-card-mini-btn"
+                                                title={`Call ${lead.phone}`}
+                                              >
+                                                <Phone size={11} />
+                                              </a>
+                                            )}
+                                            {cleanPhone && (
+                                              <a
+                                                href={`https://wa.me/${cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone}?text=${encodeURIComponent(`Hello ${lead.name || ""}, connecting regarding your enquiry with ApexSales.`)}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="kanban-card-mini-btn wa"
+                                                title={`WhatsApp ${lead.phone}`}
+                                              >
+                                                <MessageCircle size={11} />
+                                              </a>
+                                            )}
+                                            {lead.owner && (
+                                              <span 
+                                                className="kanban-rep-avatar-mini" 
+                                                title={`Owner: ${lead.owner}`}
+                                              >
+                                                {getRepInitials(lead.owner)}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {/* Right Edge: Square Score Badge [ H ] / [ W ] / [ C ] */}
+                                      <div 
+                                        className={`kanban-score-square-badge score-${scoreLower === "hot" ? "h" : scoreLower === "cold" ? "c" : "w"}`}
+                                        title={`Score: ${scoreLower.toUpperCase()}`}
+                                      >
+                                        {scoreLower === "hot" ? "H" : scoreLower === "cold" ? "C" : "W"}
                                       </div>
                                     </div>
                                   );
