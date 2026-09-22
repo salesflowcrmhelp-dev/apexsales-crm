@@ -321,7 +321,11 @@ export const sanitizeLeadObject = (lead) => {
   let finalNotes = cleanJunkGoogleSheetsText(rawNotes);
 
   let wonDate = lead.won_date;
-  if ((lead.id === 'lead_prashant' || (rawName && rawName.toLowerCase().includes('prashant gautam'))) && (!lead.isUserEditedWonDate && wonDate === '2026-09-08')) {
+  if (!isWonStatus(lead.status)) {
+    // Only Closed Won or Renewal Won deals can carry a won_date.
+    // Clears won_date from open pipeline leads (Payment Follow Up, Qualified, etc.) and Lost deals.
+    wonDate = "";
+  } else if ((lead.id === 'lead_prashant' || (rawName && rawName.toLowerCase().includes('prashant gautam'))) && (!lead.isUserEditedWonDate && wonDate === '2026-09-08')) {
     wonDate = '2026-08-08';
   }
 
@@ -753,7 +757,7 @@ const INITIAL_LEADS = [
     "source": "Manual",
     "score": "Warm",
     "next_follow_up": "2026-09-20",
-    "won_date": "2026-09-09",
+    "won_date": "",
     "notes": "20 ko payment kre ga",
     "owner": "Harsh Goyal",
     "stageUpdatedAt": "2026-09-14T06:36:15.052Z"
@@ -769,7 +773,7 @@ const INITIAL_LEADS = [
     "source": "Manual",
     "score": "Hot",
     "next_follow_up": "",
-    "won_date": "2026-08-28",
+    "won_date": "",
     "notes": "15k+GST for 5 co. | 9910158681 Santosh",
     "owner": "Harsh Goyal",
     "stageUpdatedAt": "2026-09-14T06:36:09.412Z"
@@ -785,7 +789,7 @@ const INITIAL_LEADS = [
     "source": "Manual",
     "score": "Hot",
     "next_follow_up": "",
-    "won_date": "2026-08-20",
+    "won_date": "",
     "notes": "15k+GST for unlimited co.",
     "owner": "Harsh Goyal",
     "stageUpdatedAt": "2026-09-14T06:35:16.940Z"
@@ -1185,7 +1189,7 @@ const INITIAL_LEADS = [
     "deal_type": "new",
     "previous_stage": "Won",
     "stageUpdatedAt": "2026-09-18T06:19:36.900Z",
-    "won_date": "2026-09-14",
+    "won_date": "",
     "follow_up_time": "10:00",
     "lastActivityAt": "2026-09-18T06:19:36.902Z",
     "updatedAt": "2026-09-14T10:26:39.536Z"
@@ -3463,7 +3467,7 @@ export default function App() {
         notes: updatedNotes,
         activities: updatedActivities,
         stageUpdatedAt: new Date().toISOString(),
-        ...(isNowWon && !targetLead.won_date ? { won_date: todayYmd } : {})
+        won_date: isNowWon ? (targetLead.won_date || todayYmd) : ""
       };
 
       updatedLeads[actualIndex] = updatedLeadObj;
@@ -3504,6 +3508,7 @@ export default function App() {
   const [kanbanSearchQuery, setKanbanSearchQuery] = useState("");
   const [kanbanOwnerFilter, setKanbanOwnerFilter] = useState("all");
   const [kanbanScoreFilter, setKanbanScoreFilter] = useState("all");
+  const [kanbanMonthFilter, setKanbanMonthFilter] = useState("all"); // "all", "2026-09", "2026-08"
   const [draggingCardId, setDraggingCardId] = useState(null);
   const [dragOverStageId, setDragOverStageId] = useState(null);
 
@@ -7100,7 +7105,8 @@ export default function App() {
         const updatedLeadObj = {
           ...lead,
           status: processedValue,
-          stageUpdatedAt: new Date().toISOString()
+          stageUpdatedAt: new Date().toISOString(),
+          won_date: ""
         };
         updatedLeads[actualIndex] = updatedLeadObj;
         saveLeadsToStorage(updatedLeads);
@@ -7167,7 +7173,7 @@ export default function App() {
       [col.field]: processedValue,
       ...(col.field === "status" ? { 
         stageUpdatedAt: new Date().toISOString(),
-        ...(isNowWon && !lead.won_date ? { won_date: todayYmd } : {})
+        won_date: isNowWon ? (lead.won_date || todayYmd) : ""
       } : {}),
       ...(col.field === "won_date" ? { isUserEditedWonDate: true, lastModifiedAt: new Date().toISOString() } : {})
     };
@@ -17523,6 +17529,15 @@ export default function App() {
                   if (kanbanScoreFilter !== "all" && (l.score || "warm").toLowerCase() !== kanbanScoreFilter.toLowerCase()) {
                     return false;
                   }
+                  if (kanbanMonthFilter !== "all") {
+                    if (isWonStatus(l.status)) {
+                      const wDate = l.won_date || "";
+                      if (!wDate.startsWith(kanbanMonthFilter)) return false;
+                    } else {
+                      const activeDate = l.stageUpdatedAt || l.lastModified || l.created_at || l.date || "2026-09";
+                      if (!String(activeDate).startsWith(kanbanMonthFilter)) return false;
+                    }
+                  }
                   return true;
                 });
 
@@ -17531,24 +17546,32 @@ export default function App() {
                   .reduce((acc, l) => acc + (Number(l.value) || 0), 0);
 
                 const handleQuickStageChange = (leadId, newStg) => {
+                  const isNowWon = isWonStatus(newStg);
+                  let prevStatus = "";
                   const updated = leads.map(l => {
                     if (l.id === leadId) {
+                      prevStatus = l.status;
                       const u = { 
                         ...l, 
                         status: newStg, 
                         stageUpdatedAt: new Date().toISOString(), 
                         lastModified: new Date().toISOString() 
                       };
-                      if (isWonStatus(newStg) && !l.won_date) {
-                        u.won_date = new Date().toISOString().slice(0, 10);
+                      if (isNowWon) {
+                        u.won_date = l.won_date || new Date().toISOString().slice(0, 10);
+                      } else {
+                        // CRITICAL: When moving out of Closed Won to an open stage or Lost, clear won_date!
+                        u.won_date = "";
                       }
                       return u;
                     }
                     return l;
                   });
                   saveLeadsToStorage(updated);
-                  if (isWonStatus(newStg)) {
+                  if (isNowWon) {
                     showToast(`🎉 Deal marked as WON!`, "success");
+                  } else if (isWonStatus(prevStatus)) {
+                    showToast(`Reopened deal: Moved from Won to ${newStg}`, "info");
                   } else {
                     showToast(`Moved to ${newStg}`);
                   }
@@ -17573,6 +17596,18 @@ export default function App() {
                             <button onClick={() => setKanbanSearchQuery("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", color: "#94a3b8" }}>✕</button>
                           )}
                         </div>
+
+                        {/* Month / Timeline Filter */}
+                        <select
+                          value={kanbanMonthFilter}
+                          onChange={(e) => setKanbanMonthFilter(e.target.value)}
+                          style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#334155", fontWeight: "600", outline: "none", cursor: "pointer", verticalAlign: "middle", margin: 0 }}
+                          title="Filter Kanban by Timeline"
+                        >
+                          <option value="all">📅 All Time Pipeline</option>
+                          <option value="2026-09">⚡ September 2026 (Current)</option>
+                          <option value="2026-08">⏮️ August 2026 (Last Month)</option>
+                        </select>
 
                         {/* Owner Filter (if Super Admin or Manager) */}
                         {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && (
