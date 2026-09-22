@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { 
   Download, Plus, Save, RefreshCw, FileSpreadsheet, 
   HelpCircle, X, Check, AlertCircle, TrendingUp, IndianRupee, Award, Grid, Upload, Trash2, Target, Pencil, Gift, Lock, Unlock, KeyRound, Calendar, Phone, AlertTriangle, Flame, CheckCircle2, MessageCircle, Clock, Bell, Sparkles, RotateCcw,
-  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders
+  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders, Columns
 } from "lucide-react";
 import { 
   fetchLeadsFromSupabase, 
@@ -3499,7 +3499,10 @@ export default function App() {
     } catch(e) {
       return "analytics";
     }
-  }); // "sheet", "analytics", "split", or "deals"
+  }); // "sheet", "analytics", "split", "deals", or "kanban"
+  const [isLeadsMenuOpen, setIsLeadsMenuOpen] = useState(true);
+  const [kanbanSearchQuery, setKanbanSearchQuery] = useState("");
+  const [kanbanOwnerFilter, setKanbanOwnerFilter] = useState("all");
 
   // Auto-close mobile sidebar drawer on workspace/tab changes
   useEffect(() => {
@@ -8688,6 +8691,9 @@ export default function App() {
         }
         return { name: "Sales Dashboard", icon: <TrendingUp size={15} strokeWidth={2.2} />, category: "Analytics" };
       }
+      if (pipelineView === "kanban") {
+        return { name: "Kanban Board", icon: <Columns size={15} strokeWidth={2.2} />, category: "Leads", badge: "New" };
+      }
       if (pipelineView === "split") {
         return { name: "Pipeline Board", icon: <Layers size={15} strokeWidth={2.2} />, badge: "360°" };
       }
@@ -8822,38 +8828,80 @@ export default function App() {
               <span>Sales Intelligence</span>
             </button>
 
-            <button 
-              onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
-              title="Pipeline Spreadsheet"
-            >
-              <Grid className="nav-item-icon" />
-              <span>Pipeline Spreadsheet</span>
-            </button>
+            {/* Collapsible Leads Parent & Sub-Navigation */}
+            <div className="sidebar-nav-parent-group">
+              <button 
+                onClick={() => {
+                  if (activeWorkspace !== "pipeline" || pipelineView === "analytics") {
+                    setActiveWorkspace("pipeline");
+                    if (!["sheet", "split", "deals", "kanban"].includes(pipelineView)) {
+                      setPipelineView("sheet");
+                    }
+                  }
+                  setIsLeadsMenuOpen(prev => !prev);
+                }} 
+                className={`sidebar-nav-item sidebar-parent-item ${activeWorkspace === "pipeline" && ["sheet", "split", "deals", "kanban"].includes(pipelineView) ? "active" : ""}`}
+                title="Leads Workspace"
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "9px", minWidth: 0 }}>
+                  <Users className="nav-item-icon" />
+                  <span>Leads</span>
+                </div>
+                <span className="sidebar-chevron" style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+                  {isLeadsMenuOpen ? <ChevronDown size={13} color="#94a3b8" /> : <ChevronRight size={13} color="#94a3b8" />}
+                </span>
+              </button>
 
-            <button 
-              onClick={() => { 
-                setActiveWorkspace("pipeline"); 
-                setPipelineView("split"); 
-              }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "split" ? "active" : ""}`}
-              title="Pipeline Board 360°"
-            >
-              <Layers className="nav-item-icon" />
-              <span>Pipeline 360°</span>
-            </button>
+              {isLeadsMenuOpen && (
+                <div className="sidebar-submenu-list">
+                  <button 
+                    onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
+                    className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
+                    title="Pipeline Spreadsheet"
+                  >
+                    <Grid size={13} className="sub-item-icon" />
+                    <span>Pipeline Spreadsheet</span>
+                  </button>
 
-            <button 
-              onClick={() => { 
-                setActiveWorkspace("pipeline"); 
-                setPipelineView("deals"); 
-              }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
-              title="Deals Hub"
-            >
-              <Award className="nav-item-icon" />
-              <span>Deals Hub</span>
-            </button>
+                  <button 
+                    onClick={() => { 
+                      setActiveWorkspace("pipeline"); 
+                      setPipelineView("split"); 
+                    }} 
+                    className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "split" ? "active" : ""}`}
+                    title="Pipeline 360°"
+                  >
+                    <Layers size={13} className="sub-item-icon" />
+                    <span>Pipeline 360°</span>
+                  </button>
+
+                  <button 
+                    onClick={() => { 
+                      setActiveWorkspace("pipeline"); 
+                      setPipelineView("deals"); 
+                    }} 
+                    className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
+                    title="Deals Hub"
+                  >
+                    <Award size={13} className="sub-item-icon" />
+                    <span>Deals Hub</span>
+                  </button>
+
+                  <button 
+                    onClick={() => { 
+                      setActiveWorkspace("pipeline"); 
+                      setPipelineView("kanban"); 
+                    }} 
+                    className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "kanban" ? "active" : ""}`}
+                    title="Kanban Board"
+                  >
+                    <Columns size={13} className="sub-item-icon" />
+                    <span>Kanban Board</span>
+                    <span className="sidebar-sub-badge">New</span>
+                  </button>
+                </div>
+              )}
+            </div>
 
             {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessTasks !== false) && (
               <button 
@@ -14272,6 +14320,19 @@ export default function App() {
                         <span className="view-mode-label">Deals</span>
                       </button>
                     )}
+                    <button
+                      type="button"
+                      role="tab"
+                      id="view-tab-kanban"
+                      aria-selected={pipelineView === "kanban"}
+                      tabIndex={pipelineView === "kanban" ? 0 : -1}
+                      onClick={() => setPipelineView("kanban")}
+                      title="Kanban Board View"
+                      style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", fontWeight: pipelineView === "kanban" ? "750" : "600", color: pipelineView === "kanban" ? "#2563eb" : "#64748b", border: pipelineView === "kanban" ? "1px solid #bfdbfe" : "1px solid transparent", backgroundColor: pipelineView === "kanban" ? "#eff6ff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "kanban" ? "0 1px 2px rgba(37, 99, 235, 0.12)" : "none", transition: "all 0.15s ease" }}
+                    >
+                      <Columns size={13} />
+                      <span className="view-mode-label">Kanban</span>
+                    </button>
                     </div>
                   </div>
                 </div>
@@ -15908,6 +15969,16 @@ export default function App() {
                           >
                             <Award size={12} /> Deals Hub
                           </button>
+                          <button
+                            type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "kanban"}
+                            tabIndex={pipelineView === "kanban" ? 0 : -1}
+                            onClick={() => setPipelineView("kanban")}
+                            style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: pipelineView === "kanban" ? "700" : "600", color: pipelineView === "kanban" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "kanban" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: pipelineView === "kanban" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
+                          >
+                            <Columns size={12} /> Kanban
+                          </button>
                         </div>
 
                         <button
@@ -16853,6 +16924,16 @@ export default function App() {
                           >
                             <Award size={13} /> Deals Board
                           </button>
+                          <button
+                            type="button"
+                            role="tab"
+                            aria-selected={pipelineView === "kanban"}
+                            tabIndex={pipelineView === "kanban" ? 0 : -1}
+                            onClick={() => setPipelineView("kanban")}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "kanban" ? "700" : "600", color: pipelineView === "kanban" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "kanban" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "kanban" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                          >
+                            <Columns size={13} /> Kanban
+                          </button>
                         </div>
 
                         <button
@@ -17408,6 +17489,274 @@ export default function App() {
                       </div>
                     )}
 
+                  </div>
+                );
+              })()
+            ) : pipelineView === "kanban" ? (
+              /* ================================================================ */
+              /* 📋 MODERN DRAG-AND-DROP KANBAN BOARD VIEW                        */
+              /* ================================================================ */
+              (() => {
+                const KANBAN_STAGES = [
+                  { id: "New", name: "New Leads", color: "#3b82f6", bg: "#eff6ff", borderColor: "#bfdbfe" },
+                  { id: "Contacted", name: "Contacted", color: "#8b5cf6", bg: "#f5f3ff", borderColor: "#ddd6fe" },
+                  { id: "Qualified", name: "Qualified & Demo", color: "#0ea5e9", bg: "#f0f9ff", borderColor: "#bae6fd", includes: ["Qualified", "Demo Booked", "Demo Done"] },
+                  { id: "Proposal Sent", name: "Proposal & Neg.", color: "#f59e0b", bg: "#fffbeb", borderColor: "#fde68a", includes: ["Proposal Sent", "Negotiation"] },
+                  { id: "Payment Follow Up", name: "Payment Follow-up", color: "#ea580c", bg: "#fff7ed", borderColor: "#fed7aa" },
+                  { id: "Won", name: "Closed Won", color: "#166534", bg: "#f0fdf4", borderColor: "#bbf7d0", includes: ["Won", "Renewal Won"] },
+                ];
+
+                const filteredKanbanLeads = ownerScopedLeads.filter(l => {
+                  if (kanbanSearchQuery.trim()) {
+                    const q = kanbanSearchQuery.toLowerCase().trim();
+                    const match = (l.name || "").toLowerCase().includes(q) ||
+                                  (l.company || "").toLowerCase().includes(q) ||
+                                  (l.phone || "").toLowerCase().includes(q) ||
+                                  (l.email || "").toLowerCase().includes(q);
+                    if (!match) return false;
+                  }
+                  if (kanbanOwnerFilter !== "all" && l.owner !== kanbanOwnerFilter) {
+                    return false;
+                  }
+                  return true;
+                });
+
+                const totalPipelineValue = filteredKanbanLeads
+                  .filter(l => !isLostStatus(l.status))
+                  .reduce((acc, l) => acc + (Number(l.value) || 0), 0);
+
+                const handleQuickStageChange = (leadId, newStg) => {
+                  const updated = leads.map(l => {
+                    if (l.id === leadId) {
+                      const u = { ...l, status: newStg, stageUpdatedAt: new Date().toISOString(), lastModified: new Date().toISOString() };
+                      if (isWonStatus(newStg) && !l.won_date) {
+                        u.won_date = new Date().toISOString().slice(0, 10);
+                      }
+                      return u;
+                    }
+                    return l;
+                  });
+                  saveLeadsToStorage(updated);
+                  if (isWonStatus(newStg)) {
+                    showToast(`🎉 Deal marked as WON!`, "success");
+                  } else {
+                    showToast(`Moved to ${newStg}`);
+                  }
+                };
+
+                return (
+                  <div className="kanban-workspace-wrapper animate-fade-in" style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+                    {/* Kanban Top Toolbar */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", padding: "10px 14px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                        {/* Search Input */}
+                        <div style={{ position: "relative", width: "220px" }}>
+                          <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)" }} />
+                          <input
+                            type="text"
+                            placeholder="Search board leads..."
+                            value={kanbanSearchQuery}
+                            onChange={(e) => setKanbanSearchQuery(e.target.value)}
+                            style={{ width: "100%", height: "32px", padding: "0 10px 0 30px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
+                          />
+                          {kanbanSearchQuery && (
+                            <button onClick={() => setKanbanSearchQuery("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", color: "#94a3b8" }}>✕</button>
+                          )}
+                        </div>
+
+                        {/* Owner Filter (if Super Admin or Manager) */}
+                        {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && (
+                          <select
+                            value={kanbanOwnerFilter}
+                            onChange={(e) => setKanbanOwnerFilter(e.target.value)}
+                            style={{ height: "32px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#334155", fontWeight: "600", outline: "none", cursor: "pointer" }}
+                          >
+                            <option value="all">All Sales Reps</option>
+                            {users.map(u => (
+                              <option key={u.id} value={u.name}>{u.name} ({u.role})</option>
+                            ))}
+                          </select>
+                        )}
+
+                        {/* Total Pipeline Pill */}
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 10px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "12px", fontWeight: "700", color: "#1e40af" }}>
+                          <span>Total Pipeline:</span>
+                          <span style={{ color: "#2563eb", fontWeight: "800" }}>₹{totalPipelineValue.toLocaleString("en-IN")}</span>
+                          <span style={{ fontSize: "10px", color: "#64748b", fontWeight: "600" }}>({filteredKanbanLeads.length} leads)</span>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        {/* View switcher tabs */}
+                        <div style={{ display: "flex", alignItems: "center", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "7px" }}>
+                          <button
+                            type="button"
+                            onClick={() => setPipelineView("sheet")}
+                            style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "transparent", color: "#64748b", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
+                          >
+                            <Grid size={13} /> Sheet
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPipelineView("split")}
+                            style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "transparent", color: "#64748b", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
+                          >
+                            <Layers size={13} /> Split 360°
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPipelineView("deals")}
+                            style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "transparent", color: "#64748b", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
+                          >
+                            <Award size={13} /> Deals
+                          </button>
+                          <button
+                            type="button"
+                            style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "#ffffff", color: "#2563eb", fontSize: "12px", fontWeight: "750", borderRadius: "5px", cursor: "default", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
+                          >
+                            <Columns size={13} /> Kanban
+                          </button>
+                        </div>
+
+                        {/* Add Lead CTA */}
+                        <button
+                          type="button"
+                          onClick={() => setIsAddLeadModalOpen(true)}
+                          style={{ height: "32px", padding: "0 12px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)" }}
+                        >
+                          <Plus size={14} /> Add Lead
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Kanban Board Columns Container */}
+                    <div className="kanban-board" style={{ flex: 1, minHeight: 0 }}>
+                      {KANBAN_STAGES.map(stage => {
+                        const colLeads = filteredKanbanLeads.filter(l => {
+                          if (stage.includes) {
+                            return stage.includes.includes(l.status);
+                          }
+                          return (l.status || "New").toLowerCase() === stage.id.toLowerCase();
+                        });
+
+                        const colValue = colLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+
+                        return (
+                          <div 
+                            key={stage.id} 
+                            className="kanban-column"
+                            style={{ "--column-color": stage.color }}
+                          >
+                            {/* Column Header */}
+                            <div className="kanban-column-header">
+                              <div className="kanban-column-title">
+                                <span style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: stage.color }}></span>
+                                  {stage.name}
+                                </span>
+                                <span style={{ fontSize: "11px", fontWeight: "800", color: stage.color, backgroundColor: stage.bg, border: `1px solid ${stage.borderColor}`, padding: "1px 7px", borderRadius: "9999px" }}>
+                                  {colLeads.length}
+                                </span>
+                              </div>
+                              <span className="kanban-column-stats">
+                                ₹{colValue.toLocaleString("en-IN")} • {colLeads.length} {colLeads.length === 1 ? "lead" : "leads"}
+                              </span>
+                            </div>
+
+                            {/* Cards Scrollable List */}
+                            <div className="kanban-cards-list">
+                              {colLeads.length === 0 ? (
+                                <div style={{ textAlign: "center", padding: "40px 10px", color: "#94a3b8", fontSize: "12px" }}>
+                                  <span>No leads in {stage.name}</span>
+                                </div>
+                              ) : (
+                                colLeads.map(lead => {
+                                  const scoreLower = (lead.score || "warm").toLowerCase();
+                                  const isOverdue = lead.next_follow_up && lead.next_follow_up < new Date().toISOString().slice(0, 10) && isActiveStatus(lead.status);
+
+                                  return (
+                                    <div key={lead.id} className="kanban-card">
+                                      <div className="kanban-card-title-row">
+                                        <span 
+                                          className="kanban-card-name"
+                                          onClick={() => {
+                                            setSelectedSplitLeadId(lead.id);
+                                            setPipelineView("split");
+                                          }}
+                                          title="Click to view 360° dossier"
+                                        >
+                                          {lead.name || "Untitled Lead"}
+                                        </span>
+                                        <span className={`kanban-score-badge score-${scoreLower === "hot" ? "hot" : scoreLower === "cold" ? "cold" : "warm"}`}>
+                                          {lead.score || "WARM"}
+                                        </span>
+                                      </div>
+
+                                      <div className="kanban-card-company">
+                                        {lead.company || lead.source || "Direct Client"}
+                                      </div>
+
+                                      <div className="kanban-card-info-row">
+                                        <span className="kanban-card-value">
+                                          ₹{(Number(lead.value) || 0).toLocaleString("en-IN")}
+                                        </span>
+                                        {lead.next_follow_up && (
+                                          <span 
+                                            className="kanban-card-due"
+                                            style={isOverdue ? { color: "#dc2626", backgroundColor: "#fef2f2", borderColor: "#fecaca" } : {}}
+                                          >
+                                            <Clock size={10} />
+                                            {new Date(lead.next_follow_up).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}
+                                          </span>
+                                        )}
+                                      </div>
+
+                                      <div className="kanban-card-footer">
+                                        {/* Stage select dropdown */}
+                                        <select
+                                          className="kanban-status-select"
+                                          value={lead.status || "New"}
+                                          onChange={(e) => handleQuickStageChange(lead.id, e.target.value)}
+                                          title="Move stage"
+                                        >
+                                          {STATUS_OPTIONS.map(opt => (
+                                            <option key={opt} value={opt}>{opt}</option>
+                                          ))}
+                                        </select>
+
+                                        <div className="kanban-card-actions">
+                                          {lead.phone && (
+                                            <a
+                                              href={`tel:${lead.phone}`}
+                                              className="kanban-card-btn"
+                                              title={`Call ${lead.phone}`}
+                                              style={{ textDecoration: "none" }}
+                                            >
+                                              <Phone size={12} />
+                                            </a>
+                                          )}
+                                          <button
+                                            type="button"
+                                            className="kanban-card-btn"
+                                            onClick={() => {
+                                              setSelectedSplitLeadId(lead.id);
+                                              setPipelineView("split");
+                                            }}
+                                            title="Open 360° Dossier"
+                                          >
+                                            <Eye size={12} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 );
               })()

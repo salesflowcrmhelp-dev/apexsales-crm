@@ -680,6 +680,85 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   flex-shrink: 0;
 }
 
+/* Sidebar Submenu & Tree Hierarchy */
+.sidebar-nav-parent-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.sidebar-parent-item {
+  justify-content: space-between;
+}
+
+.sidebar-parent-item.parent-active {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.sidebar-submenu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 17px;
+  padding-left: 10px;
+  border-left: 1.5px solid #e2e8f0;
+  margin-top: 3px;
+  margin-bottom: 5px;
+}
+
+.sidebar-sub-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  min-height: 32px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.sidebar-sub-item:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.sidebar-sub-item.active {
+  background-color: #eff6ff;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.sidebar-sub-item .sub-item-icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.sidebar-sub-badge {
+  font-size: 9px;
+  font-weight: 800;
+  color: #ffffff;
+  background: #2563eb;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  margin-left: auto;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.crm-sidebar.collapsed .sidebar-submenu-list,
+.crm-sidebar.collapsed .sidebar-chevron {
+  display: none !important;
+}
+
 .sidebar-help-widget {
   margin: 0;
   background-color: #fff7ed;
