@@ -8901,7 +8901,8 @@ export default function App() {
                   alignItems: "center",
                   justifyContent: "space-between",
                   width: "100%",
-                  padding: "9px 12px",
+                  padding: "7px 10px",
+                  minHeight: "35px",
                   borderRadius: "6px",
                   transition: "all 0.15s ease"
                 }}
@@ -8933,21 +8934,23 @@ export default function App() {
             )}
           </div>
         </div>
-
-        {/* Bottom Help Widget Card */}
-        <div 
-          className="sidebar-help-widget" 
-          onClick={() => showToast("Help Center & Documentation")}
-          title="Need Help? Visit our help center"
-        >
-          <div className="sidebar-help-widget-full">
-            <div className="help-widget-title">Need Help?</div>
-            <div className="help-widget-sub">Visit our help center ↗</div>
-          </div>
-          <div className="sidebar-help-widget-mini" style={{ display: "none", alignItems: "center", justifyContent: "center" }}>
-            <HelpCircle size={17} color="#ea580c" />
-          </div>
         </div>
+
+        {/* Pinned Bottom Footer - Never gets cut off */}
+        <div className="sidebar-footer">
+          <div 
+            className="sidebar-help-widget" 
+            onClick={() => showToast("Help Center & Documentation")}
+            title="Need Help? Visit our help center"
+          >
+            <div className="sidebar-help-widget-full">
+              <div className="help-widget-title">Need Help?</div>
+              <div className="help-widget-sub">Visit our help center ↗</div>
+            </div>
+            <div className="sidebar-help-widget-mini" style={{ display: "none", alignItems: "center", justifyContent: "center" }}>
+              <HelpCircle size={17} color="#ea580c" />
+            </div>
+          </div>
         </div>
       </aside>
 

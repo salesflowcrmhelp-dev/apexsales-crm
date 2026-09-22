@@ -305,16 +305,15 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   border-right: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  max-height: 100vh;
-  position: sticky;
+  height: 100% !important;
+  max-height: 100% !important;
+  position: relative;
   top: 0;
   flex-shrink: 0;
-  align-self: flex-start;
+  align-self: stretch;
   padding: 0 !important;
   z-index: 25;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   box-sizing: border-box;
@@ -409,32 +408,61 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .crm-sidebar.collapsed .sidebar-help-widget {
   padding: 6px 0 !important;
-  margin-top: auto !important;
+  margin: 0 auto !important;
+  width: 38px !important;
+  height: 32px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  border-radius: 6px !important;
 }
 
 /* Sidebar Nav Scroll Body */
 .sidebar-nav-body {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 10px 8px;
+  padding: 6px 8px;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+  box-sizing: border-box;
 }
 
 .sidebar-nav-body::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+  width: 4px;
+}
+.sidebar-nav-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.sidebar-nav-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .crm-sidebar.collapsed .sidebar-nav-body {
-  padding: 8px 4px !important;
+  padding: 6px 4px !important;
+}
+
+/* Pinned Bottom Footer for Sidebar */
+.sidebar-footer {
+  flex-shrink: 0;
+  padding: 8px 8px 10px 8px;
+  background-color: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  box-sizing: border-box;
+}
+
+.crm-sidebar.collapsed .sidebar-footer {
+  padding: 6px 4px 8px 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* Sidebar action toggle button (Inside Sidebar) */
@@ -564,33 +592,33 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .sidebar-nav-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 3px;
+  margin-bottom: 6px;
 }
 
 .nav-group-title {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   color: #94a3b8;
   letter-spacing: 0.5px;
-  padding: 6px 10px 4px 10px;
+  padding: 4px 8px 2px 8px;
   text-transform: uppercase;
 }
 
 .sidebar-nav-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 3px;
 }
 
 .sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  min-height: 40px;
+  gap: 9px;
+  padding: 7px 10px;
+  min-height: 35px;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #475569;
   background: transparent;
@@ -599,6 +627,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   width: 100%;
   text-align: left;
   transition: all 0.15s ease;
+  box-sizing: border-box;
 }
 
 .sidebar-nav-item:hover {
@@ -619,8 +648,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .sidebar-help-widget {
-  margin-top: auto;
-  margin-bottom: 12px;
+  margin: 0;
   background-color: #fff7ed;
   border: 1px solid #ffedd5;
   border-radius: 6px;
@@ -628,6 +656,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   font-size: 10.5px;
   cursor: pointer;
   transition: all 0.15s ease;
+  box-sizing: border-box;
 }
 .sidebar-help-widget:hover {
   background-color: #ffedd5;
