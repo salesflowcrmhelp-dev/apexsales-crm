@@ -17828,42 +17828,40 @@ export default function App() {
                                       className={`kanban-card ${draggingCardId === lead.id ? "is-dragging" : ""}`}
                                       title="Click to view 360° dossier"
                                     >
-                                      <div className="kanban-card-main">
-                                        {/* Row 1: Lead Name + Value if Won */}
-                                        <div className="kanban-card-row1">
-                                          <span className="kanban-card-name" title={lead.name || "Untitled Lead"}>
-                                            {lead.name || "Untitled Lead"}
-                                          </span>
-                                          {isWon && lead.value ? (
-                                            <span className="kanban-card-won-val">
-                                              ₹{(Number(lead.value) || 0).toLocaleString("en-IN")}
-                                            </span>
-                                          ) : null}
-                                        </div>
+                                      {/* Top Row: Lead Name + Score Badge */}
+                                      <div className="kanban-card-row-top">
+                                        <span className="kanban-card-name" title={lead.name || "Untitled Lead"}>
+                                          {lead.name || "Untitled Lead"}
+                                        </span>
+                                        <span 
+                                          className={`kanban-score-square-badge score-${scoreLower === "hot" ? "h" : scoreLower === "cold" ? "c" : "w"}`}
+                                          title={`Priority: ${scoreLower.toUpperCase()}`}
+                                        >
+                                          {scoreLower === "hot" ? "H" : scoreLower === "cold" ? "C" : "W"}
+                                        </span>
+                                      </div>
 
-                                        {/* Row 2: Subtitle (Company / Source) */}
-                                        <div className="kanban-card-subtitle" title={lead.company || lead.source || ""}>
-                                          {lead.company || lead.source || "Direct Client"}
-                                        </div>
+                                      {/* Middle Row: Subtitle (Company / Source) */}
+                                      <div className="kanban-card-subtitle" title={lead.company || lead.source || ""}>
+                                        {lead.company || lead.source || "Direct Client"}
+                                      </div>
 
-                                        {/* Row 3: Resting Indicators (Stars + Owner) and Hover Actions (Call + WhatsApp) */}
-                                        <div className="kanban-card-meta-row">
-                                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                            <div className="kanban-card-stars" title={`Priority Score: ${scoreLower.toUpperCase()}`}>
-                                              {[1, 2, 3].map(s => (
-                                                <span key={s} style={{ color: s <= starsCount ? "#f59e0b" : "#cbd5e1" }}>★</span>
-                                              ))}
-                                            </div>
-                                            {lead.owner && (
-                                              <span 
-                                                className="kanban-rep-avatar-mini" 
-                                                title={`Owner: ${lead.owner}`}
-                                              >
-                                                {getRepInitials(lead.owner)}
-                                              </span>
-                                            )}
+                                      {/* Bottom Row: Resting Indicators (Stars + Owner + Actions) & Deal Value */}
+                                      <div className="kanban-card-row-bottom">
+                                        <div className="kanban-card-meta-left">
+                                          <div className="kanban-card-stars" title={`Priority: ${scoreLower.toUpperCase()}`}>
+                                            {[1, 2, 3].map(s => (
+                                              <span key={s} style={{ color: s <= starsCount ? "#f59e0b" : "#cbd5e1" }}>★</span>
+                                            ))}
                                           </div>
-
+                                          {lead.owner && (
+                                            <span 
+                                              className="kanban-rep-avatar-mini" 
+                                              title={`Owner: ${lead.owner}`}
+                                            >
+                                              {getRepInitials(lead.owner)}
+                                            </span>
+                                          )}
                                           <div className="kanban-card-mini-actions" onClick={(e) => e.stopPropagation()}>
                                             {lead.phone && (
                                               <a
@@ -17872,7 +17870,7 @@ export default function App() {
                                                 title={`Call ${lead.phone}`}
                                                 aria-label={`Call ${lead.name || "lead"}`}
                                               >
-                                                <Phone size={13} />
+                                                <Phone size={11} />
                                               </a>
                                             )}
                                             {cleanPhone && (
@@ -17884,19 +17882,18 @@ export default function App() {
                                                 title={`WhatsApp ${lead.phone}`}
                                                 aria-label={`WhatsApp ${lead.name || "lead"}`}
                                               >
-                                                <MessageCircle size={13} />
+                                                <MessageCircle size={11} />
                                               </a>
                                             )}
                                           </div>
                                         </div>
-                                      </div>
 
-                                      {/* Right Edge: Square Score Badge [ H ] / [ W ] / [ C ] */}
-                                      <div 
-                                        className={`kanban-score-square-badge score-${scoreLower === "hot" ? "h" : scoreLower === "cold" ? "c" : "w"}`}
-                                        title={`Score: ${scoreLower.toUpperCase()}`}
-                                      >
-                                        {scoreLower === "hot" ? "H" : scoreLower === "cold" ? "C" : "W"}
+                                        {/* Right: Deal Value Pill */}
+                                        {lead.value ? (
+                                          <span className={`kanban-card-val-pill ${isWon ? "is-won" : ""}`}>
+                                            ₹{(Number(lead.value) || 0).toLocaleString("en-IN")}
+                                          </span>
+                                        ) : null}
                                       </div>
                                     </div>
                                   );

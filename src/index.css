@@ -2508,18 +2508,21 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .kanban-card {
   background: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
-  border-radius: 6px !important;
+  border-radius: 7px !important;
   padding: 8px 10px !important;
-  min-height: 52px !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+  min-height: 56px !important;
+  height: auto !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
   position: relative !important;
   text-align: left !important;
   display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
+  flex-direction: column !important;
+  gap: 3px !important;
   cursor: grab !important;
   user-select: none !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
 }
 
 .kanban-card:hover {
@@ -2529,24 +2532,17 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07) !important;
 }
 
-.kanban-card-main {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 2px !important;
-  flex: 1 !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
-}
-
-.kanban-card-row1 {
+/* Row Top: Lead Name + Score Badge */
+.kanban-card-row-top {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 6px !important;
-  flex-wrap: wrap !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-width: 0 !important;
 }
 
-/* Lead Name (Issues 4-8: Never truncated with ellipsis) */
+/* Lead Name: Crisp bold single line with ellipsis and title tooltip */
 .kanban-card-name {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 12.5px !important;
@@ -2554,8 +2550,11 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   color: #0f172a !important;
   cursor: pointer !important;
   letter-spacing: -0.15px !important;
-  white-space: normal !important;
-  word-break: break-word !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex: 1 !important;
+  min-width: 0 !important;
   line-height: 1.25 !important;
   transition: color 0.15s ease !important;
 }
@@ -2564,96 +2563,43 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   color: #2563eb !important;
 }
 
-.kanban-card-won-val {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 11px !important;
-  font-weight: 800 !important;
-  color: #16a34a !important;
-  background: #f0fdf4 !important;
-  border: 1px solid #bbf7d0 !important;
-  padding: 0 5px !important;
-  border-radius: 4px !important;
-  white-space: nowrap !important;
-}
-
+/* Subtitle: Company or Source */
 .kanban-card-subtitle {
-  font-size: 10px !important;
+  font-size: 10.5px !important;
   color: #64748b !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+  width: 100% !important;
+  line-height: 1.2 !important;
 }
 
-.kanban-card-meta-row {
+/* Row Bottom: Meta Left (Stars, Avatar, Actions) & Value Pill Right */
+.kanban-card-row-bottom {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  margin-top: 1px !important;
+  gap: 6px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin-top: 2px !important;
+}
+
+.kanban-card-meta-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  min-width: 0 !important;
 }
 
 .kanban-card-stars {
-  font-size: 9.5px !important;
-  letter-spacing: 1px !important;
+  font-size: 9px !important;
+  letter-spacing: 0.5px !important;
   display: inline-flex !important;
   align-items: center !important;
   user-select: none !important;
-}
-
-/* Mini Action Buttons (Issue 6: Reveal on hover/focus to eliminate visual clutter) */
-.kanban-card-mini-actions {
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  opacity: 0 !important;
-  transform: translateX(4px) !important;
-  pointer-events: none !important;
-  transition: opacity 0.15s ease, transform 0.15s ease !important;
-}
-
-.kanban-card:hover .kanban-card-mini-actions,
-.kanban-card:focus-within .kanban-card-mini-actions {
-  opacity: 1 !important;
-  transform: translateX(0) !important;
-  pointer-events: auto !important;
-}
-
-@media (hover: none) {
-  .kanban-card-mini-actions {
-    opacity: 1 !important;
-    transform: none !important;
-    pointer-events: auto !important;
-  }
-}
-
-.kanban-card-mini-btn {
-  width: 24px !important;
-  height: 24px !important;
-  min-width: 24px !important;
-  min-height: 24px !important;
-  border-radius: 6px !important;
-  background: #f8fafc !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #475569 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  text-decoration: none !important;
-  transition: all 0.15s ease !important;
-}
-
-.kanban-card-mini-btn:hover {
-  color: #2563eb !important;
-  background: #eff6ff !important;
-  border-color: #bfdbfe !important;
-  transform: translateY(-1px) !important;
-}
-
-.kanban-card-mini-btn.wa:hover {
-  color: #16a34a !important;
-  background: #f0fdf4 !important;
-  border-color: #bbf7d0 !important;
-  transform: translateY(-1px) !important;
+  line-height: 1 !important;
 }
 
 .kanban-rep-avatar-mini {
@@ -2668,23 +2614,48 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0 !important;
+  letter-spacing: -0.2px !important;
+}
+
+/* Deal Value Pill */
+.kanban-card-val-pill,
+.kanban-card-won-val {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  color: #475569 !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  letter-spacing: -0.1px !important;
+}
+
+.kanban-card-val-pill.is-won,
+.kanban-card-won-val {
+  color: #16a34a !important;
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
 }
 
 /* Right Edge Score Square Badge: [ H ], [ W ], [ C ] */
 .kanban-score-square-badge {
-  width: 21px !important;
-  height: 21px !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
   border-radius: 4px !important;
-  display: flex !important;
+  display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-size: 10px !important;
+  font-size: 9.5px !important;
   font-weight: 800 !important;
   color: #ffffff !important;
   flex-shrink: 0 !important;
-  margin-left: 8px !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08) !important;
   text-transform: uppercase !important;
+  line-height: 1 !important;
 }
 
 .kanban-score-square-badge.score-h {
@@ -2697,6 +2668,86 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .kanban-score-square-badge.score-c {
   background: #64748b !important; /* Cold: slate */
+}
+
+/* Mini Action Buttons: Call & WhatsApp */
+.kanban-card-mini-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.kanban-card:hover .kanban-card-mini-actions,
+.kanban-card:focus-within .kanban-card-mini-actions {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+@media (hover: none) {
+  .kanban-card-mini-actions {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+}
+
+.kanban-card-mini-btn {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  border-radius: 4px !important;
+  background: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #475569 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+  padding: 0 !important;
+}
+
+.kanban-card-mini-btn:hover {
+  color: #2563eb !important;
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  transform: translateY(-0.5px) !important;
+}
+
+.kanban-card-mini-btn.wa:hover {
+  color: #16a34a !important;
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  transform: translateY(-0.5px) !important;
+}
+
+/* Backward compatibility fallbacks */
+.kanban-card-main {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.kanban-card-row1 {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.kanban-card-meta-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  width: 100% !important;
+  margin-top: 2px !important;
 }
 
 /* Dashed Drop Target Placeholder */
