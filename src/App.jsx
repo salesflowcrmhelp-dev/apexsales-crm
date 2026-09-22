@@ -17567,7 +17567,7 @@ export default function App() {
                             style={{ height: "32px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#334155", fontWeight: "600", outline: "none", cursor: "pointer" }}
                           >
                             <option value="all">All Sales Reps</option>
-                            {users.map(u => (
+                            {(allUsersList || []).map(u => (
                               <option key={u.id} value={u.name}>{u.name} ({u.role})</option>
                             ))}
                           </select>
