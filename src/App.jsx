@@ -8911,8 +8911,8 @@ export default function App() {
                       title="Kanban Board"
                     >
                       <Columns className="sub-item-icon" />
-                      <span>Kanban Board</span>
-                      <span className="sidebar-sub-badge" style={{ marginLeft: "8px" }}>New</span>
+                      <span style={{ flex: 1, textAlign: "left" }}>Kanban Board</span>
+                      <span className="sidebar-sub-badge" style={{ marginLeft: "10px", flexShrink: 0 }}>New</span>
                     </button>
                   </div>
                 </div>
@@ -9395,7 +9395,22 @@ export default function App() {
                   <span style={{ fontSize: "12px", fontWeight: "750", color: "#0f172a", whiteSpace: "nowrap" }}>
                     {currentUser?.displayName || currentUser?.name || "Admin"}
                   </span>
-                  <span style={{ fontSize: "10px", fontWeight: "800", color: currentUser?.role === "admin" ? "#b45309" : "#2563eb", textTransform: "uppercase" }}>
+                  <span 
+                    style={{ 
+                      fontSize: "10px", 
+                      fontWeight: "750", 
+                      color: currentUser?.role === "admin" ? "#b45309" : "#1d4ed8", 
+                      backgroundColor: currentUser?.role === "admin" ? "#fef3c7" : "#eff6ff",
+                      border: `1px solid ${currentUser?.role === "admin" ? "#fde68a" : "#bfdbfe"}`,
+                      borderRadius: "9999px",
+                      padding: "1.5px 7px",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.3px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      marginTop: "2px"
+                    }}
+                  >
                     {currentUser?.role === "admin" ? "👑 Admin" : "💼 Sales Rep"}
                   </span>
                 </div>
@@ -17544,9 +17559,9 @@ export default function App() {
                     {/* Kanban Top Toolbar */}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", padding: "10px 14px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                        {/* Search Input */}
-                        <div style={{ position: "relative", width: "210px" }}>
-                          <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)" }} />
+                        {/* Search Input (Issue 9: Flexible width; Issue 4: Strict vertical center alignment) */}
+                        <div style={{ position: "relative", flex: "1 1 260px", minWidth: "220px", maxWidth: "360px", height: "32px", display: "flex", alignItems: "center" }}>
+                          <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
                           <input
                             type="text"
                             placeholder="Search board leads..."
@@ -17564,7 +17579,7 @@ export default function App() {
                           <select
                             value={kanbanOwnerFilter}
                             onChange={(e) => setKanbanOwnerFilter(e.target.value)}
-                            style={{ height: "32px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#334155", fontWeight: "600", outline: "none", cursor: "pointer" }}
+                            style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#334155", fontWeight: "600", outline: "none", cursor: "pointer", verticalAlign: "middle", margin: 0 }}
                           >
                             <option value="all">All Sales Reps</option>
                             {(allUsersList || []).map(u => (
@@ -17573,7 +17588,7 @@ export default function App() {
                           </select>
                         )}
 
-                        {/* Segmented Score Filters (Issue 11: Standard segmented button affordance) */}
+                        {/* Segmented Score Filters (Issue 4: Aligned vertical centering) */}
                         <div 
                           role="group" 
                           aria-label="Filter by Lead Score" 
@@ -17586,7 +17601,9 @@ export default function App() {
                             border: "1px solid #cbd5e1", 
                             padding: "2px", 
                             borderRadius: "6px",
-                            gap: "2px"
+                            gap: "2px",
+                            verticalAlign: "middle",
+                            margin: 0
                           }}
                         >
                           <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", padding: "0 6px" }}>Score:</span>
@@ -17829,12 +17846,22 @@ export default function App() {
                                           {lead.company || lead.source || "Direct Client"}
                                         </div>
 
-                                        {/* Row 3: Stars & Quick Contact */}
+                                        {/* Row 3: Resting Indicators (Stars + Owner) and Hover Actions (Call + WhatsApp) */}
                                         <div className="kanban-card-meta-row">
-                                          <div className="kanban-card-stars" title={`Priority Score: ${scoreLower.toUpperCase()}`}>
-                                            {[1, 2, 3].map(s => (
-                                              <span key={s} style={{ color: s <= starsCount ? "#f59e0b" : "#cbd5e1" }}>★</span>
-                                            ))}
+                                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                            <div className="kanban-card-stars" title={`Priority Score: ${scoreLower.toUpperCase()}`}>
+                                              {[1, 2, 3].map(s => (
+                                                <span key={s} style={{ color: s <= starsCount ? "#f59e0b" : "#cbd5e1" }}>★</span>
+                                              ))}
+                                            </div>
+                                            {lead.owner && (
+                                              <span 
+                                                className="kanban-rep-avatar-mini" 
+                                                title={`Owner: ${lead.owner}`}
+                                              >
+                                                {getRepInitials(lead.owner)}
+                                              </span>
+                                            )}
                                           </div>
 
                                           <div className="kanban-card-mini-actions" onClick={(e) => e.stopPropagation()}>
@@ -17859,14 +17886,6 @@ export default function App() {
                                               >
                                                 <MessageCircle size={13} />
                                               </a>
-                                            )}
-                                            {lead.owner && (
-                                              <span 
-                                                className="kanban-rep-avatar-mini" 
-                                                title={`Owner: ${lead.owner}`}
-                                              >
-                                                {getRepInitials(lead.owner)}
-                                              </span>
                                             )}
                                           </div>
                                         </div>
