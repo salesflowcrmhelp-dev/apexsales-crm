@@ -2608,6 +2608,84 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   border: 1px solid #bfdbfe !important;
 }
 
+/* Dashed Drop Target Placeholder */
+.kanban-drop-target-placeholder {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 72px !important;
+  background: #f0f9ff !important;
+  border: 2px dashed #60a5fa !important;
+  border-radius: 12px !important;
+  color: #2563eb !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  animation: pulseTarget 1.5s infinite ease-in-out !important;
+  margin: 4px 0 !important;
+  text-align: center !important;
+  padding: 8px !important;
+  box-sizing: border-box !important;
+}
+
+@keyframes pulseTarget {
+  0%, 100% { opacity: 0.75; transform: scale(0.99); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* Dragging Card State */
+.kanban-card.is-dragging {
+  opacity: 0.45 !important;
+  border: 1.5px dashed #3b82f6 !important;
+  cursor: grabbing !important;
+}
+
+.kanban-card {
+  cursor: grab !important;
+  user-select: none !important;
+}
+
+.kanban-card:active {
+  cursor: grabbing !important;
+}
+
+/* Sales Rep Initials Avatar */
+.kanban-rep-avatar {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  background: #475569 !important;
+  color: #ffffff !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  letter-spacing: -0.2px !important;
+  user-select: none !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+}
+
+/* Days in Stage Aging Badge */
+.kanban-aging-badge {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 1.5px 6px !important;
+  border-radius: 5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+
+/* WhatsApp action button */
+.kanban-card-btn.wa:hover {
+  color: #16a34a !important;
+  background: #dcfce7 !important;
+}
+
 /* Dialog Lead Modal Form Overlay */
 .lead-modal-overlay {
   position: fixed !important;

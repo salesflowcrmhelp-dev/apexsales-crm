@@ -3503,6 +3503,9 @@ export default function App() {
   const [isLeadsMenuOpen, setIsLeadsMenuOpen] = useState(true);
   const [kanbanSearchQuery, setKanbanSearchQuery] = useState("");
   const [kanbanOwnerFilter, setKanbanOwnerFilter] = useState("all");
+  const [kanbanScoreFilter, setKanbanScoreFilter] = useState("all");
+  const [draggingCardId, setDraggingCardId] = useState(null);
+  const [dragOverStageId, setDragOverStageId] = useState(null);
 
   // Auto-close mobile sidebar drawer on workspace/tab changes
   useEffect(() => {
@@ -17476,6 +17479,20 @@ export default function App() {
                   { id: "Won", name: "Closed Won", color: "#166534", bg: "#f0fdf4", borderColor: "#bbf7d0", includes: ["Won", "Renewal Won"] },
                 ];
 
+                const getDaysInStage = (lead) => {
+                  const ts = lead.stageUpdatedAt || lead.lastModified || lead.created_at;
+                  if (!ts) return "1d in stage";
+                  const diffDays = Math.max(1, Math.floor(Math.abs(new Date() - new Date(ts)) / (1000 * 60 * 60 * 24)));
+                  return `${diffDays}d in stage`;
+                };
+
+                const getRepInitials = (ownerName) => {
+                  if (!ownerName) return "SR";
+                  const parts = ownerName.trim().split(/\s+/);
+                  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+                  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                };
+
                 const filteredKanbanLeads = ownerScopedLeads.filter(l => {
                   if (kanbanSearchQuery.trim()) {
                     const q = kanbanSearchQuery.toLowerCase().trim();
@@ -17488,6 +17505,9 @@ export default function App() {
                   if (kanbanOwnerFilter !== "all" && l.owner !== kanbanOwnerFilter) {
                     return false;
                   }
+                  if (kanbanScoreFilter !== "all" && (l.score || "warm").toLowerCase() !== kanbanScoreFilter.toLowerCase()) {
+                    return false;
+                  }
                   return true;
                 });
 
@@ -17498,7 +17518,12 @@ export default function App() {
                 const handleQuickStageChange = (leadId, newStg) => {
                   const updated = leads.map(l => {
                     if (l.id === leadId) {
-                      const u = { ...l, status: newStg, stageUpdatedAt: new Date().toISOString(), lastModified: new Date().toISOString() };
+                      const u = { 
+                        ...l, 
+                        status: newStg, 
+                        stageUpdatedAt: new Date().toISOString(), 
+                        lastModified: new Date().toISOString() 
+                      };
                       if (isWonStatus(newStg) && !l.won_date) {
                         u.won_date = new Date().toISOString().slice(0, 10);
                       }
@@ -17520,7 +17545,7 @@ export default function App() {
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", padding: "10px 14px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
                         {/* Search Input */}
-                        <div style={{ position: "relative", width: "220px" }}>
+                        <div style={{ position: "relative", width: "210px" }}>
                           <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)" }} />
                           <input
                             type="text"
@@ -17547,6 +17572,40 @@ export default function App() {
                             ))}
                           </select>
                         )}
+
+                        {/* Quick Score Filters */}
+                        <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 5px", borderRadius: "8px" }}>
+                          <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", padding: "0 2px" }}>Score:</span>
+                          {[
+                            { id: "all", label: "All" },
+                            { id: "hot", label: "Hot", bg: "#fef2f2", color: "#dc2626", activeBg: "#dc2626", activeColor: "#ffffff" },
+                            { id: "warm", label: "Warm", bg: "#fffbeb", color: "#d97706", activeBg: "#d97706", activeColor: "#ffffff" },
+                            { id: "cold", label: "Cold", bg: "#f1f5f9", color: "#475569", activeBg: "#475569", activeColor: "#ffffff" }
+                          ].map(pill => {
+                            const isSelected = kanbanScoreFilter === pill.id;
+                            return (
+                              <button
+                                key={pill.id}
+                                type="button"
+                                onClick={() => setKanbanScoreFilter(pill.id)}
+                                style={{
+                                  height: "24px",
+                                  padding: "0 8px",
+                                  fontSize: "11px",
+                                  fontWeight: isSelected ? "800" : "600",
+                                  borderRadius: "5px",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  backgroundColor: isSelected ? (pill.activeBg || "#2563eb") : (pill.bg || "transparent"),
+                                  color: isSelected ? (pill.activeColor || "#ffffff") : (pill.color || "#64748b"),
+                                  transition: "all 0.15s ease"
+                                }}
+                              >
+                                {pill.label}
+                              </button>
+                            );
+                          })}
+                        </div>
 
                         {/* Total Pipeline Pill */}
                         <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 10px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "12px", fontWeight: "700", color: "#1e40af" }}>
@@ -17616,6 +17675,28 @@ export default function App() {
                             key={stage.id} 
                             className="kanban-column"
                             style={{ "--column-color": stage.color }}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              e.dataTransfer.dropEffect = "move";
+                              if (dragOverStageId !== stage.id) {
+                                setDragOverStageId(stage.id);
+                              }
+                            }}
+                            onDragLeave={(e) => {
+                              if (e.currentTarget.contains(e.relatedTarget)) return;
+                              if (dragOverStageId === stage.id) {
+                                setDragOverStageId(null);
+                              }
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const leadId = e.dataTransfer.getData("text/plain") || draggingCardId;
+                              if (leadId) {
+                                handleQuickStageChange(leadId, stage.id);
+                              }
+                              setDraggingCardId(null);
+                              setDragOverStageId(null);
+                            }}
                           >
                             {/* Column Header */}
                             <div className="kanban-column-header">
@@ -17635,17 +17716,39 @@ export default function App() {
 
                             {/* Cards Scrollable List */}
                             <div className="kanban-cards-list">
-                              {colLeads.length === 0 ? (
+                              {dragOverStageId === stage.id && (
+                                <div className="kanban-drop-target-placeholder">
+                                  <span>Drop lead into {stage.name}</span>
+                                </div>
+                              )}
+
+                              {colLeads.length === 0 && dragOverStageId !== stage.id ? (
                                 <div style={{ textAlign: "center", padding: "40px 10px", color: "#94a3b8", fontSize: "12px" }}>
                                   <span>No leads in {stage.name}</span>
                                 </div>
                               ) : (
                                 colLeads.map(lead => {
                                   const scoreLower = (lead.score || "warm").toLowerCase();
-                                  const isOverdue = lead.next_follow_up && lead.next_follow_up < new Date().toISOString().slice(0, 10) && isActiveStatus(lead.status);
+                                  const todayStr = new Date().toISOString().slice(0, 10);
+                                  const isToday = lead.next_follow_up === todayStr;
+                                  const isOverdue = lead.next_follow_up && lead.next_follow_up < todayStr && isActiveStatus(lead.status);
+                                  const cleanPhone = String(lead.phone || "").replace(/[^0-9]/g, "");
 
                                   return (
-                                    <div key={lead.id} className="kanban-card">
+                                    <div 
+                                      key={lead.id} 
+                                      draggable={true}
+                                      onDragStart={(e) => {
+                                        setDraggingCardId(lead.id);
+                                        e.dataTransfer.setData("text/plain", lead.id);
+                                        e.dataTransfer.effectAllowed = "move";
+                                      }}
+                                      onDragEnd={() => {
+                                        setDraggingCardId(null);
+                                        setDragOverStageId(null);
+                                      }}
+                                      className={`kanban-card ${draggingCardId === lead.id ? "is-dragging" : ""}`}
+                                    >
                                       <div className="kanban-card-title-row">
                                         <span 
                                           className="kanban-card-name"
@@ -17673,12 +17776,24 @@ export default function App() {
                                         {lead.next_follow_up && (
                                           <span 
                                             className="kanban-card-due"
-                                            style={isOverdue ? { color: "#dc2626", backgroundColor: "#fef2f2", borderColor: "#fecaca" } : {}}
+                                            style={
+                                              isOverdue ? { color: "#dc2626", backgroundColor: "#fef2f2", borderColor: "#fecaca" } :
+                                              isToday ? { color: "#d97706", backgroundColor: "#fffbeb", borderColor: "#fde68a" } :
+                                              {}
+                                            }
                                           >
                                             <Clock size={10} />
-                                            {new Date(lead.next_follow_up).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}
+                                            {isOverdue ? "Overdue" : isToday ? "Due Today" : new Date(lead.next_follow_up).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}
                                           </span>
                                         )}
+                                      </div>
+
+                                      {/* Aging Row */}
+                                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                                        <span className="kanban-aging-badge">
+                                          <Clock size={9} />
+                                          {getDaysInStage(lead)}
+                                        </span>
                                       </div>
 
                                       <div className="kanban-card-footer">
@@ -17701,14 +17816,29 @@ export default function App() {
                                               className="kanban-card-btn"
                                               title={`Call ${lead.phone}`}
                                               style={{ textDecoration: "none" }}
+                                              onClick={(e) => e.stopPropagation()}
                                             >
                                               <Phone size={12} />
+                                            </a>
+                                          )}
+                                          {cleanPhone && (
+                                            <a
+                                              href={`https://wa.me/${cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone}?text=${encodeURIComponent(`Hello ${lead.name || ""}, connecting regarding your enquiry with ApexSales.`)}`}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="kanban-card-btn wa"
+                                              title={`WhatsApp ${lead.phone}`}
+                                              style={{ textDecoration: "none" }}
+                                              onClick={(e) => e.stopPropagation()}
+                                            >
+                                              <MessageCircle size={12} />
                                             </a>
                                           )}
                                           <button
                                             type="button"
                                             className="kanban-card-btn"
-                                            onClick={() => {
+                                            onClick={(e) => {
+                                              e.stopPropagation();
                                               setSelectedSplitLeadId(lead.id);
                                               setPipelineView("split");
                                             }}
@@ -17716,6 +17846,14 @@ export default function App() {
                                           >
                                             <Eye size={12} />
                                           </button>
+                                          {lead.owner && (
+                                            <span 
+                                              className="kanban-rep-avatar"
+                                              title={`Assigned: ${lead.owner}`}
+                                            >
+                                              {getRepInitials(lead.owner)}
+                                            </span>
+                                          )}
                                         </div>
                                       </div>
                                     </div>
