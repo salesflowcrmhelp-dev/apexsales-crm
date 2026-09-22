@@ -4,6 +4,12 @@ import {
   HelpCircle, X, Check, AlertCircle, TrendingUp, IndianRupee, Award, Grid, Upload, Trash2, Target, Pencil, Gift, Lock, Unlock, KeyRound, Calendar, Phone, AlertTriangle, Flame, CheckCircle2, MessageCircle, Clock, Bell, Sparkles, RotateCcw,
   Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders
 } from "lucide-react";
+import { 
+  fetchLeadsFromSupabase, 
+  upsertLeadToSupabase, 
+  deleteLeadFromSupabase, 
+  batchSyncLeadsToSupabase 
+} from "./lib/supabaseService";
 
 // Dropdown options
 const STATUS_OPTIONS = ["New", "Contacted", "Qualified", "Demo Booked", "Proposal Sent", "Demo Done", "Payment Follow Up", "Negotiation", "Renewal", "Renewal Won", "Won", "Lost", "Junk"];
@@ -564,43 +570,1089 @@ const getAiNextBestAction = (lead) => {
 
 // Initial data (STRICTLY All 32 Verified Original CRM Leads - 16 Won, 14 Active, 2 Lost)
 const INITIAL_LEADS = [
-  // 16 WON DEALS
-  { id: "lead_arun_raval", name: "Arun Raval", company: "Direct Individual", status: "Renewal Won", value: 6000, email: "arunravalgst@gmail.com", phone: "9033973907", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-09-05", notes: "Base + GST Renewal Won", owner: "Harsh Goyal" },
-  { id: "lead_narendra_kumar", name: "Narendra Kumar", company: "Direct Individual", status: "Won", value: 10000, email: "", phone: "79069 50013", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-09-02", notes: "Base ₹8,475 + GST ₹1,525", owner: "Harsh Goyal" },
-  { id: "lead_jaideep", name: "Jaideep", company: "Direct Individual", status: "Won", value: 12500, email: "", phone: "75759 62997", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-29", notes: "Base ₹10,593 + GST ₹1,907", owner: "Harsh Goyal" },
-  { id: "lead_lokendra_singh", name: "Lokendra Singh", company: "Direct Individual", status: "Won", value: 12000, email: "solankisingh97@gmail.com", phone: "91666 43493", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-22", notes: "Base ₹10,169 + GST ₹1,831", owner: "Harsh Goyal" },
-  { id: "lead_amol_singh", name: "Amol Singh", company: "Trolltech", status: "Won", value: 12000, email: "amolsingh@trolltech.co.in", phone: "98710 87005", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-19", notes: "Base ₹10,169 + GST ₹1,831", owner: "Harsh Goyal" },
-  { id: "lead_mohammed_imran", name: "Mohammed Imran", company: "MICORPS", status: "Won", value: 6000, email: "Mdimran.micorps@gmail.com", phone: "9741599107", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-07", notes: "Full payment received", owner: "Harsh Goyal" },
-  { id: "lead_arvind_pawar", name: "Arvind Pawar", company: "Tax Plus Consultancy", status: "Won", value: 7000, email: "taxplusconsultancy@gmail.com", phone: "7798680780", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-06", notes: "Consultancy license closed", owner: "Harsh Goyal" },
-  { id: "lead_vinay_shridhar", name: "Vinay Shridhar", company: "Matins Healthcare", status: "Won", value: 11000, email: "matinshealthcare@gmail.com", phone: "9810121951", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-05", notes: "Annual plan won", owner: "Harsh Goyal" },
-  { id: "lead_lingraj", name: "Lingraj R N", company: "Lingaraj RN & Co", status: "Won", value: 8000, email: "lingarajrn.co@gmail.com", phone: "7795743411", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-08", notes: "Single company license", owner: "Harsh Goyal" },
-  { id: "lead_sanjeev_mali", name: "Sanjeev Mali", company: "Direct Individual", status: "Won", value: 10000, email: "sanjeevmali1971@gmail.com", phone: "9886871546", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-08", notes: "Closed won deal", owner: "Harsh Goyal" },
-  { id: "lead_hetul", name: "Hetul sanghvi", company: "Direct Individual", status: "Won", value: 15000, email: "hetuljsanghvi@gmail.com", phone: "9898113331", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-09-02", notes: "15k+GST", owner: "Harsh Goyal" },
-  { id: "lead_modi", name: "Kalpesh Modi", company: "DK Modi & Co", status: "Renewal Won", value: 15000, email: "dkmodico@gmail.com", phone: "9925004405", source: "Manual", score: "Warm", next_follow_up: "2026-09-20", won_date: "2026-09-09", notes: "20 ko payment kre ga", owner: "Harsh Goyal" },
-  { id: "lead_anubhav", name: "Anubhav Agarwal", company: "Direct Individual", status: "Won", value: 15000, email: "anubhavagrawal82@gmail.com", phone: "+91 98189 30423", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-28", notes: "15k+GST for 5 co. | 9910158681 Santosh", owner: "Harsh Goyal" },
-  { id: "lead_sanjjay", name: "Sanjjay Bablani", company: "UGPL", status: "Won", value: 15000, email: "ugpl2011@gmail.com", phone: "+91 99101 75554", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-20", notes: "15k+GST for unlimited co.", owner: "Harsh Goyal" },
-  { id: "lead_ramnath", name: "Ramnath Kumar", company: "Direct Individual", status: "Won", value: 8000, email: "ramkumar31555@gmail.com", phone: "919615222555", source: "Manual", score: "Hot", next_follow_up: "", won_date: "2026-08-19", notes: "1-2 days mai batye ga offer k liye puch rha tha", owner: "Harsh Goyal" },
-  { id: "lead_prashant", name: "Prashant Gautam", company: "Direct Individual", status: "Won", value: 10000, email: "prashantgautam903@gmail.com", phone: "+919887554903", source: "Manual", score: "Warm", next_follow_up: "", won_date: "2026-08-08", notes: "10k+GST 5 co. 15k+GST unlimited co.", owner: "Harsh Goyal" },
-
-  // 14 ACTIVE PIPELINE DEALS
-  { id: "lead_amit_miglani", name: "Amit Miglani", company: "Direct Individual", status: "Payment Follow Up", value: 15000, email: "miglanikamit@gmail.com", phone: "98120 69041", source: "Manual", score: "Warm", next_follow_up: "2026-09-01", notes: "Payment follow-up pending. Review invoice terms for ₹10,000-₹15,000.", owner: "Harsh Goyal" },
-  { id: "lead_anshul_lodha", name: "Anshul Lodha", company: "Meridian Associates", status: "Renewal", value: 7000, email: "meridianassociate2019@gmail.com", phone: "9820892128", source: "Manual", score: "Warm", next_follow_up: "2026-09-02", notes: "Renewal contract discussion", owner: "Harsh Goyal" },
-  { id: "lead_surabhi", name: "Surabhi", company: "Direct Individual", status: "Payment Follow Up", value: 7000, email: "", phone: "", source: "Manual", score: "Warm", next_follow_up: "2026-08-26", notes: "Payment follow up pending", owner: "Harsh Goyal" },
-  { id: "lead_ssivaa", name: "SSivaa Kumaarr", company: "Direct Individual", status: "Demo Done", value: 15000, email: "msivak99@gmail.com", phone: "+91 97032 92929", source: "Manual", score: "Warm", next_follow_up: "2026-08-23", notes: "Demo completed. Awaiting final decision.", owner: "Harsh Goyal" },
-  { id: "lead_suman_saha", name: "SUMAN SAHA", company: "Maxx Solutions", status: "Demo Done", value: 5000, email: "sumanmaxx@gmail.com", phone: "9831094835", source: "Manual", score: "Warm", next_follow_up: "2026-09-01", notes: "Demo finished. Commercial discussion in progress.", owner: "Harsh Goyal" },
-  { id: "lead_juned", name: "Juned Malkani", company: "Direct Individual", status: "Negotiation", value: 20000, email: "sumalkani@gmail.com", phone: "9428730989", source: "Referral", score: "Warm", next_follow_up: "2026-09-10", notes: "Commercial quote shared, in negotiation", owner: "Harsh Goyal", updatedAt: "2026-09-10T12:14:04.927Z" },
-  { id: "lead_chetan", name: "Chetan Agarwal", company: "Direct Individual", status: "Qualified", value: 15000, email: "chetanlko1@gmail.com", phone: "7275061154", source: "Manual", score: "Hot", next_follow_up: "2026-09-11", notes: "Qualified lead", owner: "Harsh Goyal" },
-  { id: "lead_kalpesh_p", name: "Kalpesh Panchal", company: "Direct Individual", status: "Contacted", value: 10000, email: "kalpeshpanchal47@gmail.com", phone: "9898818993", source: "Manual", score: "Warm", next_follow_up: "2026-09-12", notes: "Initial pitch completed", owner: "Harsh Goyal" },
-  { id: "lead_dipti", name: "Dipti Shah", company: "Direct Individual", status: "Renewal", value: 12000, email: "diptishah567@rediffmail.com", phone: "9687604578", source: "Manual", score: "Warm", next_follow_up: "2026-09-14", notes: "Renewal upcoming", owner: "Harsh Goyal" },
-  { id: "lead_alok", name: "Alok Kumar Gothi", company: "IMP Details", status: "Proposal Sent", value: 18000, email: "impgothidetails@gmail.com", phone: "+91 96254 52224", source: "Manual", score: "Hot", next_follow_up: "2026-09-10", notes: "Proposal dispatched", owner: "Harsh Goyal" },
-  { id: "lead_nitin", name: "Nitin Jain", company: "Direct Individual", status: "Contacted", value: 10000, email: "", phone: "9646541244", source: "Manual", score: "Hot", next_follow_up: "2026-09-10", notes: "Follow up scheduled", owner: "Harsh Goyal" },
-  { id: "lead_ansari", name: "Ansari Nurul Huda", company: "Direct Individual", status: "Qualified", value: 12000, email: "annu24aug@yahoo.com", phone: "919837450608", source: "Manual", score: "Warm", next_follow_up: "2026-09-11", notes: "Requirements gathering", owner: "Harsh Goyal" },
-  { id: "lead_ashok", name: "Ashok Kumar", company: "Direct Individual", status: "Proposal Sent", value: 15000, email: "ak80980@gmail.com", phone: "+91 96900 14241", source: "Manual", score: "Warm", next_follow_up: "2026-09-12", notes: "Proposal sent", owner: "Harsh Goyal" },
-  { id: "lead_import_1789038270816_0_3qso", name: "Rajesh Sharma Test", company: "TechCorp Solutions", status: "New", value: 25000, email: "rajesh@techcorp.in", phone: "9876543210", source: "Website", score: "Hot", next_follow_up: "", notes: "Sample lead import test", owner: "Harsh Goyal", createdAt: "2026-09-10T11:04:30.816Z" },
-
-  // 2 LOST DEALS
-  { id: "lead_neha_sen", name: "Neha Sen", company: "Sen Consultancy", status: "Lost", value: 24000, email: "neha.sen@corp.com", phone: "+91 8888822222", source: "Website", score: "Cold", next_follow_up: "", notes: "Client postponed budget - closed lost", owner: "Harsh Goyal" },
-  { id: "lead_rahul_verma", name: "Rahul Verma", company: "Verma Logistics", status: "Lost", value: 15000, email: "rahul@vermalogistics.in", phone: "+91 9999911111", source: "Cold Call", score: "Cold", next_follow_up: "", notes: "Went with competitor solution", owner: "Harsh Goyal" }
+  {
+    "id": "lead_arun_raval",
+    "name": "Arun Raval",
+    "company": "Direct Individual",
+    "status": "Renewal Won",
+    "value": 6000,
+    "email": "arunravalgst@gmail.com",
+    "phone": "9033973907",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-09-05",
+    "notes": "Base + GST Renewal Won",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_narendra_kumar",
+    "name": "Narendra Kumar",
+    "company": "Direct Individual",
+    "status": "Won",
+    "value": 10000,
+    "email": "",
+    "phone": "79069 50013",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-09-02",
+    "notes": "Base ₹8,475 + GST ₹1,525",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_jaideep",
+    "name": "Jaideep",
+    "company": "Direct Individual",
+    "status": "Won",
+    "value": 12500,
+    "email": "",
+    "phone": "75759 62997",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-08-29",
+    "notes": "Base ₹10,593 + GST ₹1,907",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_lokendra_singh",
+    "name": "Lokendra Singh",
+    "company": "Direct Individual",
+    "status": "Won",
+    "value": 12000,
+    "email": "solankisingh97@gmail.com",
+    "phone": "91666 43493",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-08-22",
+    "notes": "Base ₹10,169 + GST ₹1,831",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_amol_singh",
+    "name": "Amol Singh",
+    "company": "Trolltech",
+    "status": "Won",
+    "value": 12000,
+    "email": "amolsingh@trolltech.co.in",
+    "phone": "98710 87005",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-08-19",
+    "notes": "Base ₹10,169 + GST ₹1,831",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_mohammed_imran",
+    "name": "Mohammed Imran",
+    "company": "MICORPS",
+    "status": "Won",
+    "value": 6000,
+    "email": "Mdimran.micorps@gmail.com",
+    "phone": "9741599107",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-08-07",
+    "notes": "Full payment received",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_arvind_pawar",
+    "name": "Arvind Pawar",
+    "company": "Tax Plus Consultancy",
+    "status": "Won",
+    "value": 7000,
+    "email": "taxplusconsultancy@gmail.com",
+    "phone": "7798680780",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-08-06",
+    "notes": "Consultancy license closed",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_vinay_shridhar",
+    "name": "Vinay Shridhar",
+    "company": "Matins Healthcare",
+    "status": "Won",
+    "value": 11000,
+    "email": "matinshealthcare@gmail.com",
+    "phone": "9810121951",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-08-05",
+    "notes": "Annual plan won",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_lingraj",
+    "name": "Lingraj R N",
+    "company": "Lingaraj RN & Co",
+    "status": "Won",
+    "value": 8000,
+    "email": "lingarajrn.co@gmail.com",
+    "phone": "7795743411",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-08-08",
+    "notes": "Single company license",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_sanjeev_mali",
+    "name": "Sanjeev Mali",
+    "company": "Direct Individual",
+    "status": "Won",
+    "value": 10000,
+    "email": "sanjeevmali1971@gmail.com",
+    "phone": "9886871546",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-08-08",
+    "notes": "Closed won deal",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_hetul",
+    "name": "Hetul sanghvi",
+    "company": "Direct Individual",
+    "status": "Renewal Won",
+    "value": 10000,
+    "email": "hetuljsanghvi@gmail.com",
+    "phone": "9898113331",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-09-02",
+    "notes": "15k+GST",
+    "owner": "Harsh Goyal",
+    "deal_type": "new",
+    "previous_stage": "Won",
+    "stageUpdatedAt": "2026-09-14T12:02:19.064Z"
+  },
+  {
+    "id": "lead_modi",
+    "name": "Kalpesh Modi",
+    "company": "DK Modi & Co",
+    "status": "Lost",
+    "value": 15000,
+    "email": "dkmodico@gmail.com",
+    "phone": "9925004405",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "2026-09-20",
+    "won_date": "2026-09-09",
+    "notes": "20 ko payment kre ga",
+    "owner": "Harsh Goyal",
+    "stageUpdatedAt": "2026-09-14T06:36:15.052Z"
+  },
+  {
+    "id": "lead_anubhav",
+    "name": "Anubhav Agarwal",
+    "company": "Direct Individual",
+    "status": "Lost",
+    "value": 15000,
+    "email": "anubhavagrawal82@gmail.com",
+    "phone": "+91 98189 30423",
+    "source": "Manual",
+    "score": "Hot",
+    "next_follow_up": "",
+    "won_date": "2026-08-28",
+    "notes": "15k+GST for 5 co. | 9910158681 Santosh",
+    "owner": "Harsh Goyal",
+    "stageUpdatedAt": "2026-09-14T06:36:09.412Z"
+  },
+  {
+    "id": "lead_sanjjay",
+    "name": "Sanjjay Bablani",
+    "company": "UGPL",
+    "status": "Lost",
+    "value": 15000,
+    "email": "ugpl2011@gmail.com",
+    "phone": "+91 99101 75554",
+    "source": "Manual",
+    "score": "Hot",
+    "next_follow_up": "",
+    "won_date": "2026-08-20",
+    "notes": "15k+GST for unlimited co.",
+    "owner": "Harsh Goyal",
+    "stageUpdatedAt": "2026-09-14T06:35:16.940Z"
+  },
+  {
+    "id": "lead_ramnath",
+    "name": "Ramnath Kumar",
+    "company": "Direct Individual",
+    "status": "Won",
+    "value": 8000,
+    "email": "ramkumar31555@gmail.com",
+    "phone": "919615222555",
+    "source": "Manual",
+    "score": "Hot",
+    "next_follow_up": "",
+    "won_date": "2026-08-19",
+    "notes": "1-2 days mai batye ga offer k liye puch rha tha",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_prashant",
+    "name": "Prashant Gautam",
+    "company": "Direct Individual",
+    "status": "Won",
+    "value": 10000,
+    "email": "prashantgautam903@gmail.com",
+    "phone": "+919887554903",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "won_date": "2026-08-08",
+    "notes": "10k+GST 5 co. 15k+GST unlimited co.",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_amit_miglani",
+    "name": "Amit Miglani",
+    "company": "Direct Individual",
+    "status": "Won",
+    "value": 10000,
+    "email": "miglanikamit@gmail.com",
+    "phone": "98120 69041",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "",
+    "notes": "Payment follow-up pending. Review invoice terms for ₹10,000-₹15,000.",
+    "owner": "Harsh Goyal",
+    "deal_type": "new",
+    "previous_stage": "Payment Follow Up",
+    "stageUpdatedAt": "2026-09-17T04:56:11.844Z",
+    "won_date": "2026-09-17"
+  },
+  {
+    "id": "lead_anshul_lodha",
+    "name": "Anshul Lodha",
+    "company": "Meridian Associates",
+    "status": "Renewal",
+    "value": 7000,
+    "email": "meridianassociate2019@gmail.com",
+    "phone": "9820892128",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "2026-09-02",
+    "notes": "Renewal contract discussion",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_surabhi",
+    "name": "Surabhi",
+    "company": "Direct Individual",
+    "status": "Payment Follow Up",
+    "value": 7000,
+    "email": "",
+    "phone": "",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "2026-08-26",
+    "notes": "Payment follow up pending",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_ssivaa",
+    "name": "SSivaa Kumaarr",
+    "company": "Direct Individual",
+    "status": "Demo Done",
+    "value": 15000,
+    "email": "msivak99@gmail.com",
+    "phone": "+91 97032 92929",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "2026-08-23",
+    "notes": "Demo completed. Awaiting final decision.",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_suman_saha",
+    "name": "SUMAN SAHA",
+    "company": "Maxx Solutions",
+    "status": "Demo Done",
+    "value": 5000,
+    "email": "sumanmaxx@gmail.com",
+    "phone": "9831094835",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "2026-09-01",
+    "notes": "Demo finished. Commercial discussion in progress.",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_juned",
+    "name": "Juned Malkani",
+    "company": "Direct Individual",
+    "status": "Negotiation",
+    "value": 20000,
+    "email": "sumalkani@gmail.com",
+    "phone": "9428730989",
+    "source": "Referral",
+    "score": "Warm",
+    "next_follow_up": "2026-09-10",
+    "notes": "Commercial quote shared, in negotiation",
+    "owner": "Harsh Goyal",
+    "updatedAt": "2026-09-10T12:14:04.927Z"
+  },
+  {
+    "id": "lead_chetan",
+    "name": "Chetan Agarwal",
+    "company": "Direct Individual",
+    "status": "Qualified",
+    "value": 15000,
+    "email": "chetanlko1@gmail.com",
+    "phone": "7275061154",
+    "source": "Manual",
+    "score": "Hot",
+    "next_follow_up": "2026-09-11",
+    "notes": "Qualified lead",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_kalpesh_p",
+    "name": "Kalpesh Panchal",
+    "company": "Direct Individual",
+    "status": "Contacted",
+    "value": 10000,
+    "email": "kalpeshpanchal47@gmail.com",
+    "phone": "9898818993",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "2026-09-12",
+    "notes": "Initial pitch completed",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_dipti",
+    "name": "Dipti Shah",
+    "company": "Direct Individual",
+    "status": "Renewal",
+    "value": 12000,
+    "email": "diptishah567@rediffmail.com",
+    "phone": "9687604578",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "2026-09-14",
+    "notes": "Renewal upcoming",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_alok",
+    "name": "Alok Kumar Gothi",
+    "company": "IMP Details",
+    "status": "Proposal Sent",
+    "value": 18000,
+    "email": "impgothidetails@gmail.com",
+    "phone": "+91 96254 52224",
+    "source": "Manual",
+    "score": "Hot",
+    "next_follow_up": "2026-09-10",
+    "notes": "Proposal dispatched",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_nitin",
+    "name": "Nitin Jain",
+    "company": "Direct Individual",
+    "status": "Contacted",
+    "value": 10000,
+    "email": "",
+    "phone": "9646541244",
+    "source": "Manual",
+    "score": "Hot",
+    "next_follow_up": "2026-09-10",
+    "notes": "Follow up scheduled",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_ansari",
+    "name": "Ansari Nurul Huda",
+    "company": "Direct Individual",
+    "status": "Qualified",
+    "value": 12000,
+    "email": "annu24aug@yahoo.com",
+    "phone": "919837450608",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "2026-09-11",
+    "notes": "Requirements gathering",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_ashok",
+    "name": "Ashok Kumar",
+    "company": "Direct Individual",
+    "status": "Proposal Sent",
+    "value": 15000,
+    "email": "ak80980@gmail.com",
+    "phone": "+91 96900 14241",
+    "source": "Manual",
+    "score": "Warm",
+    "next_follow_up": "2026-09-12",
+    "notes": "Proposal sent",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_import_1789038270816_0_3qso",
+    "name": "Rajesh Sharma Test",
+    "company": "TechCorp Solutions",
+    "status": "New",
+    "value": 25000,
+    "email": "rajesh@techcorp.in",
+    "phone": "9876543210",
+    "source": "Website",
+    "score": "Hot",
+    "next_follow_up": "",
+    "notes": "Sample lead import test",
+    "owner": "Harsh Goyal",
+    "createdAt": "2026-09-10T11:04:30.816Z"
+  },
+  {
+    "id": "lead_neha_sen",
+    "name": "Neha Sen",
+    "company": "Sen Consultancy",
+    "status": "Lost",
+    "value": 24000,
+    "email": "neha.sen@corp.com",
+    "phone": "+91 8888822222",
+    "source": "Website",
+    "score": "Cold",
+    "next_follow_up": "",
+    "notes": "Client postponed budget - closed lost",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_rahul_verma",
+    "name": "Rahul Verma",
+    "company": "Verma Logistics",
+    "status": "Lost",
+    "value": 15000,
+    "email": "rahul@vermalogistics.in",
+    "phone": "+91 9999911111",
+    "source": "Cold Call",
+    "score": "Cold",
+    "next_follow_up": "",
+    "notes": "Went with competitor solution",
+    "owner": "Harsh Goyal"
+  },
+  {
+    "id": "lead_1789383913646",
+    "activities": [
+      {
+        "id": "act_1789383913646",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+        "timestamp": "2026-09-14T11:05:13.646Z",
+        "performedBy": "Harsh Goyal"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "dipak3103@hotmail.com",
+    "name": "Dipak Thakkar",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Harsh Goyal",
+    "phone": "+91 97277 01626",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 5000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T11:07:53.940Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789381402327",
+    "activities": [
+      {
+        "id": "act_1789381507954_3ikm",
+        "type": "whatsapp",
+        "title": "WhatsApp Chat Opened",
+        "desc": "Initiated WhatsApp follow-up with Raj patel",
+        "timestamp": "2026-09-14T10:25:07.954Z",
+        "performedBy": "Kashish"
+      },
+      {
+        "id": "act_1789381502809_7uyp",
+        "type": "call",
+        "title": "Call Dialed",
+        "desc": "Dialed call to Raj patel (94287 11407)",
+        "timestamp": "2026-09-14T10:25:02.809Z",
+        "performedBy": "Kashish"
+      },
+      {
+        "id": "act_1789381492147_086x",
+        "type": "email",
+        "title": "Email Client Opened",
+        "desc": "Opened email to Raj patel (info@rpaca.in)",
+        "timestamp": "2026-09-14T10:24:52.147Z",
+        "performedBy": "Kashish"
+      },
+      {
+        "id": "act_1789381402327",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Kashish.",
+        "timestamp": "2026-09-14T10:23:22.327Z",
+        "performedBy": "Kashish"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "info@rpaca.in",
+    "name": "Raj patel",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Kashish",
+    "phone": "94287 11407",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 15000,
+    "lastActivityAt": "2026-09-14T10:25:07.954Z",
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T10:26:42.794Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789381475433",
+    "activities": [
+      {
+        "id": "act_1789712376902_96mc",
+        "type": "stage_change",
+        "title": "Deal Closed Lost",
+        "desc": "Marked deal as Lost.",
+        "timestamp": "2026-09-18T06:19:36.902Z",
+        "performedBy": "Kashish"
+      },
+      {
+        "id": "act_1789381599139_jrj5",
+        "type": "stage_change",
+        "title": "Deal Stage Changed",
+        "desc": "Moved from \"Won\" to \"Demo Done\" (Deal Value: ₹15,000)",
+        "timestamp": "2026-09-14T10:26:39.140Z",
+        "performedBy": "Kashish"
+      },
+      {
+        "id": "act_1789381599137",
+        "type": "stage_update",
+        "text": "Moved from Won to Demo Done. Notes: \"payment lena hai bs, pricing shared 15k 25k 30k\"",
+        "createdAt": "2026-09-14T10:26:39.137Z"
+      },
+      {
+        "id": "act_1789381475433",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Kashish.",
+        "timestamp": "2026-09-14T10:24:35.433Z",
+        "performedBy": "Kashish"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "",
+    "name": "CA Anil Dantani",
+    "next_follow_up": "2026-09-16",
+    "next_follow_up_time": "",
+    "notes": "payment lena hai bs, pricing shared 15k 25k 30k\n---\nProduct demo completed. Client showed positive interest.",
+    "owner": "Kashish",
+    "phone": "93270 98589",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Lost",
+    "value": 15000,
+    "deal_type": "new",
+    "previous_stage": "Won",
+    "stageUpdatedAt": "2026-09-18T06:19:36.900Z",
+    "won_date": "2026-09-14",
+    "follow_up_time": "10:00",
+    "lastActivityAt": "2026-09-18T06:19:36.902Z",
+    "updatedAt": "2026-09-14T10:26:39.536Z"
+  },
+  {
+    "id": "lead_1789383775529",
+    "activities": [
+      {
+        "id": "act_1789383775529",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Kashish.",
+        "timestamp": "2026-09-14T11:02:55.529Z",
+        "performedBy": "Kashish"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "",
+    "name": "Deepak Khatri",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Kashish",
+    "phone": "94252 58247",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 8000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T11:08:24.112Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789383806401",
+    "activities": [
+      {
+        "id": "act_1789383806401",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Kashish.",
+        "timestamp": "2026-09-14T11:03:26.401Z",
+        "performedBy": "Kashish"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "",
+    "name": "Raghavendra",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Kashish",
+    "phone": "99647 67276",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 13000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T11:08:20.271Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789383996869",
+    "activities": [
+      {
+        "id": "act_1789383996869",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+        "timestamp": "2026-09-14T11:06:36.869Z",
+        "performedBy": "Harsh Goyal"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "knp.prashanth@gmail.com",
+    "name": "Prashanth",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Harsh Goyal",
+    "phone": "+91 97395 16001",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 18000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T11:07:50.183Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789384053622",
+    "activities": [
+      {
+        "id": "act_1789384053622",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+        "timestamp": "2026-09-14T11:07:33.622Z",
+        "performedBy": "Harsh Goyal"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "yogayogagro11@gmail.com",
+    "name": "Sandip Lokhande",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "New lead added to pipeline. Follow-up scheduled.",
+    "owner": "Harsh Goyal",
+    "phone": "+91 88052 55566",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 6000,
+    "deal_type": "new",
+    "previous_stage": "New",
+    "stageUpdatedAt": "2026-09-14T11:07:43.439Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789383835992",
+    "activities": [
+      {
+        "id": "act_1789383835992",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Kashish.",
+        "timestamp": "2026-09-14T11:03:55.992Z",
+        "performedBy": "Kashish"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "designculturenagpur@gmail.com",
+    "name": "sushil Batra",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Kashish",
+    "phone": "9893779000",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 5000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T11:08:17.312Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789383885425",
+    "activities": [
+      {
+        "id": "act_1789383885425",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Kashish.",
+        "timestamp": "2026-09-14T11:04:45.425Z",
+        "performedBy": "Kashish"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "ceo@yasaswifinserve.com",
+    "name": "Knvs Sarma",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Kashish",
+    "phone": "98482 58834",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 13000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T11:08:13.136Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789383953535",
+    "activities": [
+      {
+        "id": "act_1789383953535",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Kashish.",
+        "timestamp": "2026-09-14T11:05:53.535Z",
+        "performedBy": "Kashish"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "it@futurevalue.in",
+    "name": "Vivek Kumar",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Kashish",
+    "phone": "85953 37973",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 25000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T11:08:10.359Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789384011169",
+    "activities": [
+      {
+        "id": "act_1789384011169",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Kashish.",
+        "timestamp": "2026-09-14T11:06:51.169Z",
+        "performedBy": "Kashish"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "",
+    "name": "Jitendra ji â€”Delhi",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Kashish",
+    "phone": "93122 12305",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 10000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T11:08:05.521Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789384066529",
+    "activities": [
+      {
+        "id": "act_1789384066529",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Kashish.",
+        "timestamp": "2026-09-14T11:07:46.529Z",
+        "performedBy": "Kashish"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "",
+    "name": "Gopikrishna Mallireddy",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Kashish",
+    "phone": "94825 12223",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 13000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T12:15:57.157Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789387993439",
+    "activities": [
+      {
+        "id": "act_1789387993439",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+        "timestamp": "2026-09-14T12:13:13.439Z",
+        "performedBy": "Harsh Goyal"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "ak80980@gmail.com",
+    "name": "Ashok Kumar",
+    "next_follow_up": "",
+    "next_follow_up_time": "",
+    "notes": "Product demo completed. Client showed positive interest.",
+    "owner": "Harsh Goyal",
+    "phone": "+91 96900 14241",
+    "score": "Warm",
+    "source": "Manual",
+    "status": "Won",
+    "value": 7000,
+    "deal_type": "new",
+    "previous_stage": "Demo Done",
+    "stageUpdatedAt": "2026-09-14T12:13:26.493Z",
+    "won_date": "2026-09-14"
+  },
+  {
+    "id": "lead_1789817705320",
+    "activities": [
+      {
+        "id": "act_1789817705320",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+        "timestamp": "2026-09-19T11:35:05.320Z",
+        "performedBy": "Harsh Goyal"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "agrawal.chintan05@gmail.com",
+    "name": "Chintan Agrawal",
+    "next_follow_up": "2026-09-19",
+    "next_follow_up_time": "11:00 AM",
+    "notes": "Payment follow-up active. Client promised payment for 19 Sept.",
+    "owner": "Harsh Goyal",
+    "packageId": "pkg_silver",
+    "phone": "918435542500",
+    "score": "Warm",
+    "source": "Google Ads",
+    "status": "Payment Follow Up",
+    "value": 10000
+  },
+  {
+    "id": "lead_1789818687592",
+    "activities": [
+      {
+        "id": "act_1789818687593",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+        "timestamp": "2026-09-19T11:51:27.593Z",
+        "performedBy": "Harsh Goyal"
+      },
+      {
+        "id": "act_note_1789818687593",
+        "type": "note",
+        "title": "Initial Note Added",
+        "desc": "demo done payment follow up",
+        "timestamp": "2026-09-19T11:51:27.593Z",
+        "performedBy": "Harsh Goyal"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "trthakkar@gmail.com",
+    "name": "Tushar Thakkar",
+    "next_follow_up": "2026-09-21",
+    "next_follow_up_time": "11:00 AM",
+    "notes": "demo done payment follow up",
+    "owner": "Harsh Goyal",
+    "packageId": "",
+    "phone": "919737003111",
+    "score": "Warm",
+    "source": "Facebook",
+    "status": "Payment Follow Up",
+    "value": 11000
+  },
+  {
+    "id": "lead_1789818827047",
+    "activities": [
+      {
+        "id": "act_1789818827047",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+        "timestamp": "2026-09-19T11:53:47.047Z",
+        "performedBy": "Harsh Goyal"
+      },
+      {
+        "id": "act_note_1789818827047",
+        "type": "note",
+        "title": "Initial Note Added",
+        "desc": "demo done payment follow up",
+        "timestamp": "2026-09-19T11:53:47.047Z",
+        "performedBy": "Harsh Goyal"
+      }
+    ],
+    "company": "",
+    "custom_fields": {},
+    "email": "shreemahalaxmiagrotec555@gmail.com",
+    "name": "vikas chougule",
+    "next_follow_up": "2026-09-21",
+    "next_follow_up_time": "11:00 AM",
+    "notes": "demo done payment follow up",
+    "owner": "Harsh Goyal",
+    "packageId": "",
+    "phone": "917030547555",
+    "score": "Warm",
+    "source": "Facebook",
+    "status": "Payment Follow Up",
+    "value": 6000
+  },
+  {
+    "id": "lead_1789819063408",
+    "name": "deepak",
+    "company": "",
+    "status": "Payment Follow Up",
+    "value": 10000,
+    "packageId": "",
+    "email": "deepakmanwani960@gmail.com",
+    "phone": "918104681341",
+    "source": "Facebook",
+    "score": "Warm",
+    "owner": "Harsh Goyal",
+    "next_follow_up": "2026-09-21",
+    "next_follow_up_time": "11:00 AM",
+    "custom_fields": {},
+    "activities": [
+      {
+        "id": "act_1789819063408",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+        "timestamp": "2026-09-19T11:57:43.408Z",
+        "performedBy": "Harsh Goyal"
+      },
+      {
+        "id": "act_note_1789819063408",
+        "type": "note",
+        "title": "Initial Note Added",
+        "desc": "demo done payment follow up",
+        "timestamp": "2026-09-19T11:57:43.408Z",
+        "performedBy": "Harsh Goyal"
+      }
+    ],
+    "notes": "demo done payment follow up"
+  },
+  {
+    "id": "lead_1789819261967",
+    "name": "Kiran shinde",
+    "company": "",
+    "status": "Payment Follow Up",
+    "value": 15000,
+    "packageId": "",
+    "email": "kirankshindeandco@gmail.com",
+    "phone": "+91 75066 47791",
+    "source": "Google Ads",
+    "score": "Warm",
+    "owner": "Harsh Goyal",
+    "next_follow_up": "2026-10-01",
+    "next_follow_up_time": "11:00 AM",
+    "custom_fields": {},
+    "activities": [
+      {
+        "id": "act_1789819261967",
+        "type": "created",
+        "title": "Lead Created",
+        "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+        "timestamp": "2026-09-19T12:01:01.967Z",
+        "performedBy": "Harsh Goyal"
+      },
+      {
+        "id": "act_note_1789819261967",
+        "type": "note",
+        "title": "Initial Note Added",
+        "desc": "demo done 1 oct ko connect krna hai",
+        "timestamp": "2026-09-19T12:01:01.967Z",
+        "performedBy": "Harsh Goyal"
+      }
+    ],
+    "notes": "demo done 1 oct ko connect krna hai"
+  }
 ];
 
 // High-performance requestAnimationFrame numeric count-up component
@@ -2288,6 +3340,7 @@ export default function App() {
       onConfirm: () => {
         const updated = leads.filter(l => l.id !== lead.id);
         saveLeadsToStorage(updated);
+        deleteLeadFromSupabase(lead.id).catch(err => console.warn("Supabase delete deferred:", err));
         setSelectedLeadIds(prev => prev.filter(id => id !== lead.id));
         if (selectedCell && filteredLeads[selectedCell.rowIndex]?.id === lead.id) {
           setSelectedCell(null);
@@ -2815,6 +3868,30 @@ export default function App() {
       const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
+      // 🚀 1. FAST-PATH: Fetch from Supabase PostgreSQL Cloud Database (Zero Cold Start)
+      try {
+        const supaLeads = await fetchLeadsFromSupabase();
+        if (Array.isArray(supaLeads) && supaLeads.length > 0) {
+          let sanitized = supaLeads.map(sanitizeLeadObject);
+          const canViewAll = isSuper || activeUser.role === "admin";
+          if (!canViewAll) {
+            if (!isManager) {
+              const userNameLower = (activeUser.name || "").trim().toLowerCase();
+              sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
+            }
+          }
+          setLeads(sanitized);
+          try {
+            sessionStorage.setItem(`salesflow_rep_leads_${activeUser.id || activeUser.name}`, JSON.stringify(sanitized));
+            localStorage.setItem("salesflow_standalone_leads", JSON.stringify(sanitized));
+            localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(sanitized));
+          } catch(e) {}
+          return sanitized;
+        }
+      } catch (err) {
+        console.warn("Supabase lead fetch deferred:", err);
+      }
+
       const res = await fetch("/api/leads", { headers });
       if (res.ok) {
         const data = await res.json();
@@ -3064,6 +4141,9 @@ export default function App() {
       headers["x-user-name"] = activeUser.name || "";
       headers["x-user-id"] = activeUser.id || "";
 
+      // 🚀 Dual-Sync to Supabase PostgreSQL Cloud Database
+      batchSyncLeadsToSupabase(leadsToSync).catch(err => console.warn("Supabase batch sync deferred:", err));
+
       await fetch("/api/sync/bulk", {
         method: "POST",
         headers,
@@ -3077,6 +4157,9 @@ export default function App() {
   const syncSingleLeadToBackend = async (lead) => {
     if (!lead || !lead.id) return;
     try {
+      // 🚀 Dual-Sync to Supabase PostgreSQL Cloud Database
+      upsertLeadToSupabase(lead).catch(err => console.warn("Supabase single lead sync deferred:", err));
+
       const headers = { "Content-Type": "application/json" };
       const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
       if (token) headers["Authorization"] = `Bearer ${token}`;
