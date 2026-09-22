@@ -829,7 +829,8 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   background: #059669 !important; /* High contrast emerald green that never blends into active blue row */
   padding: 2px 7.5px;
   border-radius: 9999px;
-  margin-left: auto;
+  margin-left: auto !important;
+  margin-inline-start: 8px !important;
   letter-spacing: 0.3px;
   text-transform: uppercase;
   display: inline-flex;
@@ -898,10 +899,17 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   height: 100%;
   overflow: hidden;
   background-color: #f8fafc;
+  position: relative;
 }
 
-/* Compact Top Header */
+/* Compact Top Header (Issue 12: Fixed at top of viewport, never floating into content) */
 .crm-top-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  flex-shrink: 0;
   height: 48px;
   min-height: 48px;
   max-height: 48px;
@@ -911,7 +919,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  z-index: 10;
+  z-index: 50;
   box-sizing: border-box;
   margin: 0;
 }
@@ -2404,8 +2412,8 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   min-height: 480px !important;
   max-height: calc(100vh - 210px) !important; /* Internal scrolling list */
   flex: 1 !important;
-  min-width: 250px !important;
-  max-width: 320px !important;
+  min-width: 275px !important;
+  max-width: 340px !important;
   display: flex !important;
   flex-direction: column !important;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
@@ -2483,13 +2491,14 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   color: #64748b !important;
 }
 
+/* Cards List (Issue 13: Sufficient vertical breathing room between cards) */
 .kanban-cards-list {
   display: flex !important;
   flex-direction: column !important;
-  gap: 6px !important;
+  gap: 9px !important;
   overflow-y: auto !important;
   flex: 1 !important;
-  padding: 6px !important;
+  padding: 8px !important;
   background: #f8fafc !important;
   border-radius: 6px !important;
   border: 1px solid #f1f5f9 !important;
@@ -2500,8 +2509,8 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   background: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
   border-radius: 6px !important;
-  padding: 7px 9px !important;
-  min-height: 50px !important;
+  padding: 8px 10px !important;
+  min-height: 52px !important;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
   position: relative !important;
@@ -2532,19 +2541,22 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .kanban-card-row1 {
   display: flex !important;
   align-items: center !important;
+  justify-content: space-between !important;
   gap: 6px !important;
+  flex-wrap: wrap !important;
 }
 
+/* Lead Name (Issues 4-8: Never truncated with ellipsis) */
 .kanban-card-name {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 12px !important;
+  font-size: 12.5px !important;
   font-weight: 750 !important;
   color: #0f172a !important;
   cursor: pointer !important;
   letter-spacing: -0.15px !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  line-height: 1.25 !important;
   transition: color 0.15s ease !important;
 }
 
@@ -2588,19 +2600,22 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   user-select: none !important;
 }
 
+/* Mini Action Buttons (Issue 9: Accessible 24x24px hit target) */
 .kanban-card-mini-actions {
   display: flex !important;
   align-items: center !important;
-  gap: 4px !important;
+  gap: 6px !important;
 }
 
 .kanban-card-mini-btn {
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 4px !important;
-  background: #f1f5f9 !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  border-radius: 6px !important;
+  background: #f8fafc !important;
   border: 1px solid #cbd5e1 !important;
-  color: #64748b !important;
+  color: #475569 !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -2612,12 +2627,14 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   color: #2563eb !important;
   background: #eff6ff !important;
   border-color: #bfdbfe !important;
+  transform: translateY(-1px) !important;
 }
 
 .kanban-card-mini-btn.wa:hover {
   color: #16a34a !important;
   background: #f0fdf4 !important;
   border-color: #bbf7d0 !important;
+  transform: translateY(-1px) !important;
 }
 
 .kanban-rep-avatar-mini {

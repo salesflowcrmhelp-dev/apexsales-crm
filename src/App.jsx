@@ -8912,7 +8912,7 @@ export default function App() {
                     >
                       <Columns className="sub-item-icon" />
                       <span>Kanban Board</span>
-                      <span className="sidebar-sub-badge">New</span>
+                      <span className="sidebar-sub-badge" style={{ marginLeft: "8px" }}>New</span>
                     </button>
                   </div>
                 </div>
@@ -17573,14 +17573,28 @@ export default function App() {
                           </select>
                         )}
 
-                        {/* Quick Score Filters (Aligned to 32px height) */}
-                        <div style={{ height: "32px", boxSizing: "border-box", display: "inline-flex", alignItems: "center", gap: "4px", backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", padding: "0 6px", borderRadius: "6px" }}>
-                          <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", padding: "0 2px" }}>Score:</span>
+                        {/* Segmented Score Filters (Issue 11: Standard segmented button affordance) */}
+                        <div 
+                          role="group" 
+                          aria-label="Filter by Lead Score" 
+                          style={{ 
+                            height: "32px", 
+                            boxSizing: "border-box", 
+                            display: "inline-flex", 
+                            alignItems: "center", 
+                            backgroundColor: "#f1f5f9", 
+                            border: "1px solid #cbd5e1", 
+                            padding: "2px", 
+                            borderRadius: "6px",
+                            gap: "2px"
+                          }}
+                        >
+                          <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", padding: "0 6px" }}>Score:</span>
                           {[
                             { id: "all", label: "All" },
-                            { id: "hot", label: "Hot", bg: "#fef2f2", color: "#dc2626", activeBg: "#dc2626", activeColor: "#ffffff" },
-                            { id: "warm", label: "Warm", bg: "#fffbeb", color: "#d97706", activeBg: "#d97706", activeColor: "#ffffff" },
-                            { id: "cold", label: "Cold", bg: "#f1f5f9", color: "#475569", activeBg: "#475569", activeColor: "#ffffff" }
+                            { id: "hot", label: "Hot", dot: "#e11d48" },
+                            { id: "warm", label: "Warm", dot: "#f59e0b" },
+                            { id: "cold", label: "Cold", dot: "#64748b" }
                           ].map(pill => {
                             const isSelected = kanbanScoreFilter === pill.id;
                             return (
@@ -17588,19 +17602,27 @@ export default function App() {
                                 key={pill.id}
                                 type="button"
                                 onClick={() => setKanbanScoreFilter(pill.id)}
+                                aria-pressed={isSelected}
                                 style={{
-                                  height: "22px",
-                                  padding: "0 7px",
+                                  height: "26px",
+                                  padding: "0 9px",
                                   fontSize: "11px",
-                                  fontWeight: isSelected ? "800" : "600",
+                                  fontWeight: isSelected ? "750" : "600",
                                   borderRadius: "4px",
-                                  border: "none",
+                                  border: isSelected ? "1px solid #cbd5e1" : "1px solid transparent",
                                   cursor: "pointer",
-                                  backgroundColor: isSelected ? (pill.activeBg || "#2563eb") : (pill.bg || "transparent"),
-                                  color: isSelected ? (pill.activeColor || "#ffffff") : (pill.color || "#64748b"),
+                                  backgroundColor: isSelected ? "#ffffff" : "transparent",
+                                  color: isSelected ? "#0f172a" : "#64748b",
+                                  boxShadow: isSelected ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "5px",
                                   transition: "all 0.15s ease"
                                 }}
                               >
+                                {pill.dot && (
+                                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: pill.dot, display: "inline-block" }} />
+                                )}
                                 {pill.label}
                               </button>
                             );
@@ -17792,7 +17814,7 @@ export default function App() {
                                       <div className="kanban-card-main">
                                         {/* Row 1: Lead Name + Value if Won */}
                                         <div className="kanban-card-row1">
-                                          <span className="kanban-card-name">
+                                          <span className="kanban-card-name" title={lead.name || "Untitled Lead"}>
                                             {lead.name || "Untitled Lead"}
                                           </span>
                                           {isWon && lead.value ? (
@@ -17803,7 +17825,7 @@ export default function App() {
                                         </div>
 
                                         {/* Row 2: Subtitle (Company / Source) */}
-                                        <div className="kanban-card-subtitle">
+                                        <div className="kanban-card-subtitle" title={lead.company || lead.source || ""}>
                                           {lead.company || lead.source || "Direct Client"}
                                         </div>
 
@@ -17821,8 +17843,9 @@ export default function App() {
                                                 href={`tel:${lead.phone}`}
                                                 className="kanban-card-mini-btn"
                                                 title={`Call ${lead.phone}`}
+                                                aria-label={`Call ${lead.name || "lead"}`}
                                               >
-                                                <Phone size={11} />
+                                                <Phone size={13} />
                                               </a>
                                             )}
                                             {cleanPhone && (
@@ -17832,8 +17855,9 @@ export default function App() {
                                                 rel="noopener noreferrer"
                                                 className="kanban-card-mini-btn wa"
                                                 title={`WhatsApp ${lead.phone}`}
+                                                aria-label={`WhatsApp ${lead.name || "lead"}`}
                                               >
-                                                <MessageCircle size={11} />
+                                                <MessageCircle size={13} />
                                               </a>
                                             )}
                                             {lead.owner && (
