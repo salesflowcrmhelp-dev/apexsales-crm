@@ -168,7 +168,9 @@ export const fetchUsersFromSupabase = async () => {
         ...u,
         displayName: u.display_name || u.name,
         packageTier: u.package_tier || u.packageTier || 'starter',
-        permissions: u.permissions || {}
+        permissions: u.permissions || {},
+        reportsTo: u.permissions?.reportsTo || u.reportsTo || '',
+        managerId: u.permissions?.managerId || u.managerId || ''
       }));
     }
     return [];
@@ -206,7 +208,9 @@ export const authenticateUserWithSupabase = async (loginIdentifier, inputPin) =>
         ...matchedUser,
         displayName: matchedUser.display_name || matchedUser.name,
         packageTier: matchedUser.package_tier || matchedUser.packageTier || 'starter',
-        permissions: matchedUser.permissions || {}
+        permissions: matchedUser.permissions || {},
+        reportsTo: matchedUser.permissions?.reportsTo || matchedUser.reportsTo || '',
+        managerId: matchedUser.permissions?.managerId || matchedUser.managerId || ''
       };
       return {
         success: true,
@@ -226,6 +230,14 @@ export const upsertUserToSupabase = async (userData) => {
   if (!userData) return null;
   try {
     const id = userData.id || `usr_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    const reportsTo = userData.reportsTo || '';
+    const managerId = userData.managerId || '';
+    const permissions = {
+      ...(userData.permissions || {}),
+      reportsTo,
+      managerId
+    };
+
     const payload = {
       id,
       name: userData.name || '',
@@ -237,7 +249,7 @@ export const upsertUserToSupabase = async (userData) => {
       phone: userData.phone || '',
       active: userData.active !== false,
       package_tier: userData.packageTier || 'starter',
-      permissions: userData.permissions || {}
+      permissions
     };
 
     const { data, error } = await supabase
@@ -252,7 +264,9 @@ export const upsertUserToSupabase = async (userData) => {
     return {
       ...payload,
       displayName: payload.display_name,
-      packageTier: payload.package_tier
+      packageTier: payload.package_tier,
+      reportsTo,
+      managerId
     };
   } catch (err) {
     console.warn('⚠️ upsertUserToSupabase exception:', err);

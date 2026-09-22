@@ -2111,11 +2111,16 @@ export function getUserEffectivePermissions(user) {
   };
 
   // 🛡️ AIRTIGHT ROLE-BASED ACCESS CONTROL (RBAC) FOR NON-SUPERADMINS:
-  // Non-admins can NEVER view global company leads, delete leads, or access Team RBAC settings
+  // Non-admins can NEVER view global company leads, delete leads, or access System Settings
   merged.canViewAllLeads = false;
   merged.canDeleteLeads = false;
-  merged.canAccessTeam = false;
-  if (user.role !== "manager") {
+  merged.canAccessSettings = false;
+  if (user.role === "manager") {
+    merged.canAccessTeam = true;
+    merged.canReassignLeads = true;
+    merged.canExportCSV = true;
+  } else {
+    merged.canAccessTeam = false;
     merged.canReassignLeads = false;
     merged.canExportCSV = false;
   }
@@ -3546,7 +3551,7 @@ export default function App() {
     if (activeWorkspace === "reports" && perms.canAccessReports === false) {
       setActiveWorkspace("pipeline");
     }
-    if (activeWorkspace === "settings" && perms.canAccessSettings === false) {
+    if (activeWorkspace === "settings" && (!isSuper || perms.canAccessSettings === false)) {
       setActiveWorkspace("pipeline");
     }
     if (activeWorkspace === "tasks" && perms.canAccessTasks === false) {
@@ -4760,6 +4765,24 @@ export default function App() {
     }
   };
 
+  const handleUpdateUserReportsTo = async (userId, targetManagerName) => {
+    try {
+      const targetUser = allUsersList.find(u => u.id === userId);
+      if (!targetUser) return;
+      const mgrObj = allUsersList.find(u => u.name === targetManagerName);
+      const updatedUser = {
+        ...targetUser,
+        reportsTo: targetManagerName,
+        managerId: mgrObj?.id || ''
+      };
+      await upsertUserToSupabase(updatedUser);
+      showToast(`Mapped "${targetUser.name}" to manager "${targetManagerName}"`, "success");
+      await loadUsersFromBackend();
+    } catch(err) {
+      showToast("Failed to update team mapping", "error");
+    }
+  };
+
   const handleCreateUser = async (e) => {
     if (e) e.preventDefault();
     if (!newUserData.name.trim()) {
@@ -4767,9 +4790,19 @@ export default function App() {
       return;
     }
 
+    const isSuper = checkIsSuperAdmin(currentUser) || currentUser?.role === "admin";
+    const isManager = currentUser?.role === "manager";
+    const userPayload = { ...newUserData };
+    if (!isSuper && isManager) {
+      userPayload.role = "sales_rep";
+      userPayload.packageTier = "starter";
+      userPayload.reportsTo = currentUser.name || "Manager";
+      userPayload.managerId = currentUser.id || "";
+    }
+
     try {
       // 🚀 Save directly to Supabase PostgreSQL Cloud Database
-      const supaUser = await upsertUserToSupabase(newUserData);
+      const supaUser = await upsertUserToSupabase(userPayload);
       if (supaUser) {
         showToast(`🎉 Team member "${supaUser.name}" created! PIN: ${supaUser.pin}`, "success");
         setCreatedInviteInfo({ user: supaUser });
@@ -8855,7 +8888,7 @@ export default function App() {
               </button>
             )}
 
-            {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || getUserEffectivePermissions(currentUser).canAccessTeam) && (
+            {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || currentUser?.role === "manager" || getUserEffectivePermissions(currentUser).canAccessTeam) && (
               <button 
                 onClick={() => {
                   setActiveWorkspace("team");
@@ -8875,16 +8908,18 @@ export default function App() {
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
                   <ShieldCheck className="nav-item-icon" />
-                  <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Team & Roles</span>
+                  <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {currentUser?.role === "manager" ? "Team & Mapping" : "Team & Roles"}
+                  </span>
                 </div>
                 <span 
                   className="sidebar-badge" 
                   style={{ 
                     fontSize: "10px", 
                     fontWeight: "750", 
-                    color: "#b45309", 
-                    backgroundColor: "#fef3c7", 
-                    border: "1px solid #fde68a", 
+                    color: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "#b45309" : "#1d4ed8", 
+                    backgroundColor: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "#fef3c7" : "#eff6ff", 
+                    border: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "1px solid #fde68a" : "1px solid #bfdbfe", 
                     padding: "2px 8px", 
                     borderRadius: "6px", 
                     marginLeft: "auto", 
@@ -8892,7 +8927,7 @@ export default function App() {
                     flexShrink: 0 
                   }}
                 >
-                  Admin
+                  {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "Admin" : "Manager"}
                 </span>
               </button>
             )}
@@ -12221,14 +12256,16 @@ export default function App() {
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                       <h1 style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", margin: 0, letterSpacing: "-0.02em" }}>
-                        Team & Role-Based Access Control (RBAC)
+                        {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "Team & Role-Based Access Control (RBAC)" : "My Sales Team & Lead Mapping"}
                       </h1>
-                      <span style={{ fontSize: "12px", fontWeight: "700", backgroundColor: "#fef3c7", color: "#b45309", padding: "2px 8px", borderRadius: "9999px", border: "1px solid #fde68a" }}>
-                        👑 Super Admin Only
+                      <span style={{ fontSize: "12px", fontWeight: "750", backgroundColor: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "#fef3c7" : "#eff6ff", color: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "#b45309" : "#1d4ed8", padding: "2px 8px", borderRadius: "9999px", border: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "1px solid #fde68a" : "1px solid #bfdbfe" }}>
+                        {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "👑 Super Admin Only" : "👔 Sales Manager Mode"}
                       </span>
                     </div>
                     <p style={{ fontSize: "12px", color: "#475569", margin: "3px 0 0 0", fontWeight: "500" }}>
-                      Manage login credentials, employee access permissions, lead quotas, and subscription packages.
+                      {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") 
+                        ? "Manage login credentials, employee access permissions, lead quotas, and subscription packages."
+                        : "Manage your sales reps, invite team members, monitor quotas, and reassign leads across your team."}
                     </p>
                   </div>
                 </div>
@@ -12278,84 +12315,122 @@ export default function App() {
                     gap: "6px"
                   }}
                 >
-                  <Users size={15} /> 👥 Team Members & Permissions
+                  <Users size={15} /> 👥 Team Members & Mapping
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setTeamTab("packages")}
-                  style={{
-                    padding: "7px 14px",
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    borderRadius: "6px",
-                    border: teamTab === "packages" ? "1px solid #2563eb" : "1px solid #e2e8f0",
-                    backgroundColor: teamTab === "packages" ? "#eff6ff" : "#ffffff",
-                    color: teamTab === "packages" ? "#1d4ed8" : "#475569",
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px"
-                  }}
-                >
-                  <Package size={15} /> 📦 Employee Package Tiers Matrix
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTeamTab("deal_packages")}
-                  style={{
-                    padding: "7px 14px",
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    borderRadius: "6px",
-                    border: teamTab === "deal_packages" ? "1px solid #2563eb" : "1px solid #e2e8f0",
-                    backgroundColor: teamTab === "deal_packages" ? "#eff6ff" : "#ffffff",
-                    color: teamTab === "deal_packages" ? "#1d4ed8" : "#475569",
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px"
-                  }}
-                >
-                  <Briefcase size={15} /> 💼 Client Deal Packages
-                </button>
+                {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setTeamTab("packages")}
+                      style={{
+                        padding: "7px 14px",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        borderRadius: "6px",
+                        border: teamTab === "packages" ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                        backgroundColor: teamTab === "packages" ? "#eff6ff" : "#ffffff",
+                        color: teamTab === "packages" ? "#1d4ed8" : "#475569",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                    >
+                      <Package size={15} /> 📦 Employee Package Tiers Matrix
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTeamTab("deal_packages")}
+                      style={{
+                        padding: "7px 14px",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        borderRadius: "6px",
+                        border: teamTab === "deal_packages" ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                        backgroundColor: teamTab === "deal_packages" ? "#eff6ff" : "#ffffff",
+                        color: teamTab === "deal_packages" ? "#1d4ed8" : "#475569",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px"
+                      }}
+                    >
+                      <Briefcase size={15} /> 💼 Client Deal Packages
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* VIEW 1: Team Members & Permissions */}
               {teamTab === "members" && (
                 <div>
                   {/* 4 Summary Stats Cards */}
-                  <div className="team-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginBottom: "16px" }}>
-                    <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Total Active Users</span>
-                      <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>{allUsersList.length || 4}</div>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Registered team accounts</span>
-                    </div>
+                  {(() => {
+                    const isSuper = checkIsSuperAdmin(currentUser) || currentUser?.role === "admin";
+                    const isManager = currentUser?.role === "manager";
+                    const mgrNameClean = (currentUser?.name || "").trim().toLowerCase();
+                    const mgrIdStr = String(currentUser?.id || "").trim();
 
-                    <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Super Admins (Full Data)</span>
-                      <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>
-                        {(allUsersList.filter(u => u.role === "admin").length) || 1}
-                      </div>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Full master visibility</span>
-                    </div>
+                    const visibleUsers = allUsersList.filter(u => {
+                      if (isSuper) return true;
+                      if (isManager) {
+                        if (u.id === currentUser?.id) return true;
+                        if ((u.name || "").trim().toLowerCase() === mgrNameClean) return true;
+                        const repTo = (u.reportsTo || u.manager || "").trim().toLowerCase();
+                        return repTo === mgrNameClean || String(u.managerId || "").trim() === mgrIdStr;
+                      }
+                      return u.id === currentUser?.id;
+                    });
 
-                    <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Sales Reps (Isolated)</span>
-                      <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>
-                        {(allUsersList.filter(u => u.role === "sales_rep").length) || 3}
-                      </div>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Strict own-lead access</span>
-                    </div>
+                    return (
+                      <div className="team-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginBottom: "16px" }}>
+                        <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>
+                            {isSuper ? "Total Active Users" : "My Team Members"}
+                          </span>
+                          <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>
+                            {visibleUsers.length || 1}
+                          </div>
+                          <span style={{ fontSize: "12px", color: "#64748b" }}>
+                            {isSuper ? "Registered CRM accounts" : "Assigned under your management"}
+                          </span>
+                        </div>
 
-                    <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Security Protocol</span>
-                      <div style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", marginTop: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
-                        <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#16a34a", display: "inline-block" }} />
-                        Database Guard Active
+                        <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>
+                            {isSuper ? "Super Admins (Full Data)" : "Your Management Role"}
+                          </span>
+                          <div style={{ fontSize: "18px", fontWeight: "700", color: isSuper ? "#0f172a" : "#6d28d9", marginTop: "2px" }}>
+                            {isSuper ? (allUsersList.filter(u => u.role === "admin").length || 1) : "👔 Sales Manager"}
+                          </div>
+                          <span style={{ fontSize: "12px", color: "#64748b" }}>
+                            {isSuper ? "Full master visibility" : "Team oversight & lead mapping"}
+                          </span>
+                        </div>
+
+                        <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>
+                            {isSuper ? "Sales Reps (Isolated)" : "Assigned Sales Reps"}
+                          </span>
+                          <div style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", marginTop: "2px" }}>
+                            {isSuper ? (allUsersList.filter(u => u.role === "sales_rep").length || 0) : (visibleUsers.filter(u => u.role === "sales_rep").length || 0)}
+                          </div>
+                          <span style={{ fontSize: "12px", color: "#64748b" }}>
+                            {isSuper ? "Strict own-lead access" : "Reporting directly to you"}
+                          </span>
+                        </div>
+
+                        <div style={{ padding: "10px 14px", backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Security Protocol</span>
+                          <div style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", marginTop: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#16a34a", display: "inline-block" }} />
+                            Database Guard Active
+                          </div>
+                          <span style={{ fontSize: "12px", color: "#64748b" }}>Anti-theft & quota enforced</span>
+                        </div>
                       </div>
-                      <span style={{ fontSize: "12px", color: "#64748b" }}>Anti-theft & quota enforced</span>
-                    </div>
-                  </div>
+                    );
+                  })()}
 
                   {/* Add New User Modal */}
                   {showAddUserSubModal && (
@@ -12439,43 +12514,65 @@ export default function App() {
                           </div>
 
                           <div className="team-form-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
-                            <div>
-                              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
-                                Role Privilege
-                              </label>
-                              <select 
-                                value={newUserData.role}
-                                onChange={(e) => {
-                                  const r = e.target.value;
-                                  setNewUserData(prev => ({ 
-                                    ...prev, 
-                                    role: r,
-                                    packageTier: r === "admin" ? "super_admin" : r === "manager" ? "enterprise" : "starter"
-                                  }));
-                                }}
-                                style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
-                              >
-                                <option value="sales_rep">💼 Sales Representative</option>
-                                <option value="manager">👔 Sales Manager</option>
-                                <option value="admin">👑 Super Admin</option>
-                              </select>
-                            </div>
+                            {(!checkIsSuperAdmin(currentUser) && currentUser?.role === "manager") ? (
+                              <div>
+                                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                  Role Privilege
+                                </label>
+                                <div style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#f8fafc", color: "#0f172a", display: "flex", alignItems: "center", fontWeight: "600", boxSizing: "border-box" }}>
+                                  💼 Sales Representative
+                                </div>
+                              </div>
+                            ) : (
+                              <div>
+                                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                  Role Privilege
+                                </label>
+                                <select 
+                                  value={newUserData.role}
+                                  onChange={(e) => {
+                                    const r = e.target.value;
+                                    setNewUserData(prev => ({ 
+                                      ...prev, 
+                                      role: r,
+                                      packageTier: r === "admin" ? "super_admin" : r === "manager" ? "enterprise" : "starter"
+                                    }));
+                                  }}
+                                  style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                                >
+                                  <option value="sales_rep">💼 Sales Representative</option>
+                                  <option value="manager">👔 Sales Manager</option>
+                                  <option value="admin">👑 Super Admin</option>
+                                </select>
+                              </div>
+                            )}
 
-                            <div>
-                              <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
-                                Package / Access Tier
-                              </label>
-                              <select 
-                                value={newUserData.packageTier || "starter"}
-                                onChange={(e) => setNewUserData(prev => ({ ...prev, packageTier: e.target.value }))}
-                                style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
-                              >
-                                <option value="starter">📦 Starter Rep (50 Leads Quota, Own Data)</option>
-                                <option value="growth">🚀 Growth Closer (250 Leads, AI Pitch, Bulk)</option>
-                                <option value="enterprise">🏢 Enterprise Manager (1,000 Leads, Team View)</option>
-                                <option value="super_admin">👑 Super Admin (Unlimited Lifetime)</option>
-                              </select>
-                            </div>
+                            {(!checkIsSuperAdmin(currentUser) && currentUser?.role === "manager") ? (
+                              <div>
+                                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                  Package / Access Tier
+                                </label>
+                                <div style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#f8fafc", color: "#0f172a", display: "flex", alignItems: "center", fontWeight: "600", boxSizing: "border-box" }}>
+                                  📦 Starter Rep (50 Quota, Isolated)
+                                </div>
+                              </div>
+                            ) : (
+                              <div>
+                                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
+                                  Package / Access Tier
+                                </label>
+                                <select 
+                                  value={newUserData.packageTier || "starter"}
+                                  onChange={(e) => setNewUserData(prev => ({ ...prev, packageTier: e.target.value }))}
+                                  style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
+                                >
+                                  <option value="starter">📦 Starter Rep (50 Leads Quota, Own Data)</option>
+                                  <option value="growth">🚀 Growth Closer (250 Leads, AI Pitch, Bulk)</option>
+                                  <option value="enterprise">🏢 Enterprise Manager (1,000 Leads, Team View)</option>
+                                  <option value="super_admin">👑 Super Admin (Unlimited Lifetime)</option>
+                                </select>
+                              </div>
+                            )}
 
                             <div>
                               <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>
@@ -12503,6 +12600,13 @@ export default function App() {
                               style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", boxSizing: "border-box" }}
                             />
                           </div>
+
+                          {(!checkIsSuperAdmin(currentUser) && currentUser?.role === "manager") && (
+                            <div style={{ padding: "8px 12px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "12px", color: "#1e40af", display: "flex", alignItems: "center", gap: "8px" }}>
+                              <Users size={15} color="#2563eb" />
+                              <span>This representative will be automatically mapped to your team (Reporting to <strong>{currentUser?.name || "You"}</strong>).</span>
+                            </div>
+                          )}
 
                           <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "8px" }}>
                             <button 
@@ -13110,178 +13214,310 @@ export default function App() {
                   )}
 
                   {/* Members List Table */}
-                  <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
-                    <table className="responsive-table" style={{ width: "100%", minWidth: "960px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
-                      <thead>
-                        <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: "700" }}>
-                          <th style={{ padding: "9px 12px" }}>TEAM MEMBER</th>
-                          <th style={{ padding: "9px 12px" }}>PACKAGE TIER</th>
-                          <th style={{ padding: "9px 12px" }}>ACTIVE PERMISSIONS</th>
-                          <th style={{ padding: "9px 12px" }}>LOGIN PIN</th>
-                          <th style={{ padding: "9px 12px", textAlign: "center" }}>ASSIGNED LEADS / QUOTA</th>
-                          <th style={{ padding: "9px 12px", textAlign: "left", width: "260px", minWidth: "260px" }}>ACTIONS</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(allUsersList.length > 0 ? allUsersList : [
-                          { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", packageTier: "super_admin", phone: "9876543210" },
-                          { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", pin: "112233", role: "sales_rep", packageTier: "growth", phone: "9898000001" },
-                          { id: "usr_priya", name: "Priya Verma", displayName: "Priya Verma", username: "priya", pin: "223344", role: "sales_rep", packageTier: "starter", phone: "9898000002" },
-                          { id: "usr_amit", name: "Amit Patel", displayName: "Amit Patel", username: "amit", pin: "334455", role: "sales_rep", packageTier: "starter", phone: "9898000003" }
-                        ]).map((usr) => {
-                          const isPinVisible = userPinVisibilityMap[usr.id];
-                          const leadsCount = leads.filter(l => (l.owner || "").toLowerCase() === usr.name.toLowerCase()).length;
-                          const isAdminRole = usr.role === "admin" || checkIsSuperAdmin(usr);
-                          const userPkgKey = usr.packageTier || (isAdminRole ? "super_admin" : usr.role === "manager" ? "enterprise" : "starter");
-                          const pkgInfo = EMPLOYEE_PACKAGES[userPkgKey] || EMPLOYEE_PACKAGES.starter;
-                          const effectivePerms = getUserEffectivePermissions(usr);
-                          const quota = usr.maxLeadsLimit || pkgInfo.quota;
-                          const quotaPercent = Math.min(100, Math.round((leadsCount / quota) * 100));
+                  {(() => {
+                    const isSuperAdminUser = checkIsSuperAdmin(currentUser) || currentUser?.role === "admin";
+                    const isManagerUser = currentUser?.role === "manager";
+                    const managerNameLower = (currentUser?.name || "").trim().toLowerCase();
+                    const managerIdStr = String(currentUser?.id || "").trim();
 
-                          return (
-                            <tr key={usr.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.15s ease" }}>
-                              {/* Member info */}
-                              <td style={{ padding: "8px 12px" }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                  <div style={{ width: "30px", height: "30px", borderRadius: "50%", backgroundColor: pkgInfo.bg, color: pkgInfo.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", fontSize: "12px", border: `1px solid ${pkgInfo.border}` }}>
-                                    {usr.name[0]}
-                                  </div>
-                                  <div>
-                                    <div style={{ fontWeight: "600", color: "#0f172a", fontSize: "12px" }}>{usr.displayName || usr.name}</div>
-                                    <div style={{ fontSize: "11px", color: "#64748b" }}>@{usr.username || "user"} • {usr.phone || "No phone"}</div>
-                                  </div>
-                                </div>
-                              </td>
+                    const teamUsersToDisplay = (allUsersList.length > 0 ? allUsersList : [
+                      { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal (Admin)", username: "admin", pin: "482910", role: "admin", packageTier: "super_admin", phone: "9876543210" }
+                    ]).filter(usr => {
+                      if (isSuperAdminUser) return true;
+                      if (isManagerUser) {
+                        if (usr.id === currentUser?.id) return true;
+                        if ((usr.name || "").trim().toLowerCase() === managerNameLower) return true;
+                        const repTo = (usr.reportsTo || usr.manager || "").trim().toLowerCase();
+                        return repTo === managerNameLower || String(usr.managerId || "").trim() === managerIdStr;
+                      }
+                      return usr.id === currentUser?.id;
+                    });
 
-                              {/* Package Tier Badge */}
-                              <td style={{ padding: "8px 12px" }}>
-                                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "3px 9px", backgroundColor: pkgInfo.bg, color: pkgInfo.color, borderRadius: "6px", fontSize: "11px", fontWeight: "700", border: `1px solid ${pkgInfo.border}` }}>
-                                  {pkgInfo.badge}
-                                </span>
-                              </td>
+                    return (
+                      <>
+                        <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
+                          <table className="responsive-table" style={{ width: "100%", minWidth: "1080px", borderCollapse: "collapse", textAlign: "left", fontSize: "12px" }}>
+                            <thead>
+                              <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: "700" }}>
+                                <th style={{ padding: "9px 12px" }}>TEAM MEMBER</th>
+                                <th style={{ padding: "9px 12px" }}>TEAM MAPPING / REPORTS TO</th>
+                                <th style={{ padding: "9px 12px" }}>PACKAGE TIER</th>
+                                <th style={{ padding: "9px 12px" }}>ACTIVE PERMISSIONS</th>
+                                <th style={{ padding: "9px 12px" }}>LOGIN PIN</th>
+                                <th style={{ padding: "9px 12px", textAlign: "center" }}>ASSIGNED LEADS / QUOTA</th>
+                                <th style={{ padding: "9px 12px", textAlign: "left", width: "260px", minWidth: "260px" }}>ACTIONS</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {teamUsersToDisplay.map((usr) => {
+                                const isPinVisible = userPinVisibilityMap[usr.id];
+                                const leadsCount = leads.filter(l => (l.owner || "").toLowerCase() === usr.name.toLowerCase()).length;
+                                const isAdminRole = usr.role === "admin" || checkIsSuperAdmin(usr);
+                                const userPkgKey = usr.packageTier || (isAdminRole ? "super_admin" : usr.role === "manager" ? "enterprise" : "starter");
+                                const pkgInfo = EMPLOYEE_PACKAGES[userPkgKey] || EMPLOYEE_PACKAGES.starter;
+                                const effectivePerms = getUserEffectivePermissions(usr);
+                                const quota = usr.maxLeadsLimit || pkgInfo.quota;
+                                const quotaPercent = Math.min(100, Math.round((leadsCount / quota) * 100));
 
-                              {/* Active Permissions Summary Pills */}
-                              <td style={{ padding: "8px 12px" }}>
-                                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                                  <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#334155", border: "1px solid #e2e8f0", fontWeight: "600" }}>
-                                    {effectivePerms.canViewAllLeads ? "👁️ All Leads" : "🔒 Own Leads"}
-                                  </span>
-                                  <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: effectivePerms.canExportCSV ? "#f1f5f9" : "#fef2f2", color: effectivePerms.canExportCSV ? "#334155" : "#991b1b", border: `1px solid ${effectivePerms.canExportCSV ? "#e2e8f0" : "#fecaca"}`, fontWeight: "600" }}>
-                                    {effectivePerms.canExportCSV ? "📥 Export OK" : "🚫 No Export"}
-                                  </span>
-                                  {!effectivePerms.canViewRevenue && (
-                                    <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#fffbeb", color: "#92400e", border: "1px solid #fde68a", fontWeight: "600" }}>
-                                      🙈 Revenue Masked
-                                    </span>
-                                  )}
-                                  {effectivePerms.canUseAI && (
-                                    <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#334155", border: "1px solid #e2e8f0", fontWeight: "600" }}>
-                                      🤖 AI Enabled
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
+                                return (
+                                  <tr key={usr.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.15s ease" }}>
+                                    {/* Member info */}
+                                    <td style={{ padding: "8px 12px" }}>
+                                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                        <div style={{ width: "30px", height: "30px", borderRadius: "50%", backgroundColor: pkgInfo.bg, color: pkgInfo.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", fontSize: "12px", border: `1px solid ${pkgInfo.border}` }}>
+                                          {usr.name[0]}
+                                        </div>
+                                        <div>
+                                          <div style={{ fontWeight: "600", color: "#0f172a", fontSize: "12px" }}>{usr.displayName || usr.name}</div>
+                                          <div style={{ fontSize: "11px", color: "#64748b" }}>@{usr.username || "user"} • {usr.phone || "No phone"}</div>
+                                        </div>
+                                      </div>
+                                    </td>
 
-                              {/* Login PIN */}
-                              <td style={{ padding: "8px 12px" }}>
-                                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 8px", borderRadius: "6px" }}>
-                                  <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: "700", letterSpacing: "2px", color: "#0f172a" }}>
-                                    {isPinVisible ? (usr.pin || "••••") : "••••••"}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => setUserPinVisibilityMap(prev => ({ ...prev, [usr.id]: !prev[usr.id] }))}
-                                    style={{ width: "24px", height: "24px", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: "0", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
-                                    title={isPinVisible ? "Hide PIN" : "Reveal PIN (View)"}
-                                    aria-label={isPinVisible ? "Hide PIN" : "Reveal PIN"}
-                                  >
-                                    {isPinVisible ? <EyeOff size={15} /> : <Eye size={15} />}
-                                  </button>
-                                </div>
-                              </td>
+                                    {/* Team Mapping / Reports To */}
+                                    <td style={{ padding: "8px 12px" }}>
+                                      {usr.role === "admin" || checkIsSuperAdmin(usr) ? (
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "11px", fontWeight: "700", color: "#b45309", backgroundColor: "#fef3c7", padding: "3px 8px", borderRadius: "6px", border: "1px solid #fde68a" }}>
+                                          👑 Master Authority
+                                        </span>
+                                      ) : usr.role === "manager" ? (
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "11px", fontWeight: "700", color: "#6d28d9", backgroundColor: "#f5f3ff", padding: "3px 8px", borderRadius: "6px", border: "1px solid #ddd6fe" }}>
+                                          👔 Sales Manager
+                                        </span>
+                                      ) : isSuperAdminUser ? (
+                                        <select
+                                          value={usr.reportsTo || "Harsh Goyal"}
+                                          onChange={(e) => handleUpdateUserReportsTo(usr.id, e.target.value)}
+                                          style={{
+                                            padding: "3px 8px",
+                                            fontSize: "11px",
+                                            fontWeight: "600",
+                                            borderRadius: "6px",
+                                            border: "1px solid #cbd5e1",
+                                            backgroundColor: "#ffffff",
+                                            color: "#0f172a",
+                                            cursor: "pointer",
+                                            outline: "none"
+                                          }}
+                                          title="Assign reporting manager"
+                                        >
+                                          <option value="Harsh Goyal">👔 Harsh Goyal (Admin)</option>
+                                          {allUsersList.filter(u => (u.role === "manager" || checkIsSuperAdmin(u)) && u.name !== "Harsh Goyal").map(mgr => (
+                                            <option key={mgr.id} value={mgr.name}>👔 {mgr.name} (Manager)</option>
+                                          ))}
+                                        </select>
+                                      ) : (
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "11px", fontWeight: "600", color: "#166534", backgroundColor: "#dcfce7", padding: "3px 8px", borderRadius: "6px", border: "1px solid #bbf7d0" }}>
+                                          ✓ Reports to {usr.reportsTo || currentUser?.name || "You"}
+                                        </span>
+                                      )}
+                                    </td>
 
-                              {/* Assigned Leads & Quota Indicator */}
-                              <td style={{ padding: "8px 12px", textAlign: "center" }}>
-                                <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
-                                  <span style={{ padding: "2px 8px", borderRadius: "9999px", backgroundColor: quotaPercent >= 90 ? "#fef2f2" : "#f1f5f9", fontWeight: "700", color: quotaPercent >= 90 ? "#dc2626" : "#475569", fontSize: "11px", border: "1px solid #e2e8f0" }}>
-                                    {leadsCount} / {quota > 9999 ? '∞' : quota} Leads
-                                  </span>
-                                  {quota <= 9999 ? (
-                                    <div style={{ width: "70px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "9999px", overflow: "hidden", marginTop: "2px" }}>
-                                      <div style={{ width: `${quotaPercent}%`, height: "100%", borderRadius: "9999px", backgroundColor: quotaPercent >= 90 ? "#dc2626" : quotaPercent >= 70 ? "#f59e0b" : "#2563eb" }} />
-                                    </div>
-                                  ) : (
-                                    <div style={{ width: "70px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "9999px", overflow: "hidden", marginTop: "2px" }} title="Unlimited Capacity">
-                                      <div style={{ width: "100%", height: "100%", borderRadius: "9999px", backgroundColor: "#cbd5e1" }} />
-                                    </div>
-                                  )}
-                                </div>
-                              </td>
+                                    {/* Package Tier Badge */}
+                                    <td style={{ padding: "8px 12px" }}>
+                                      <span style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "3px 9px", backgroundColor: pkgInfo.bg, color: pkgInfo.color, borderRadius: "6px", fontSize: "11px", fontWeight: "700", border: `1px solid ${pkgInfo.border}` }}>
+                                        {pkgInfo.badge}
+                                      </span>
+                                    </td>
 
-                              {/* Actions */}
-                              <td style={{ padding: "8px 12px" }}>
-                                <div style={{ display: "grid", gridTemplateColumns: "78px 90px 72px", alignItems: "center", gap: "6px", width: "246px" }}>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOpenAccessModal(usr)}
-                                    style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "11px", fontWeight: "700", color: "#1d4ed8", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
-                                    title="Configure permissions & package"
-                                  >
-                                    <Sliders size={12} /> Access
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleUpdateUserPin(usr.id, usr.name)}
-                                    style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#334155", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "3px" }}
-                                    title="Reset login PIN"
-                                  >
-                                    🔑 Reset PIN
-                                  </button>
-                                  {checkIsSuperAdmin(usr) || usr.id === "usr_admin" || usr.role === "admin" ? (
-                                    <button
-                                      type="button"
-                                      disabled
-                                      style={{
-                                        width: "100%",
-                                        height: "30px",
-                                        padding: "0 6px",
-                                        backgroundColor: "#f8fafc",
-                                        border: "1px solid #e2e8f0",
-                                        borderRadius: "6px",
-                                        fontSize: "11px",
-                                        fontWeight: "600",
-                                        color: "#94a3b8",
-                                        cursor: "not-allowed",
-                                        display: "inline-flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        gap: "3px",
-                                        opacity: 0.65
-                                      }}
-                                      title="Admin accounts are protected and cannot be deleted"
-                                      aria-label={`Delete ${usr.name} (Protected Account)`}
-                                    >
-                                      🗑️ Delete
-                                    </button>
-                                  ) : (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleDeleteUser(usr.id, usr.name, usr.email, usr.role)}
-                                      style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "3px" }}
-                                      title={`Permanently delete ${usr.name}`}
-                                      aria-label={`Permanently delete ${usr.name}`}
-                                    >
-                                      🗑️ Delete
-                                    </button>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                                    {/* Active Permissions Summary Pills */}
+                                    <td style={{ padding: "8px 12px" }}>
+                                      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                                        <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#334155", border: "1px solid #e2e8f0", fontWeight: "600" }}>
+                                          {effectivePerms.canViewAllLeads ? "👁️ All Leads" : "🔒 Own Leads"}
+                                        </span>
+                                        <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: effectivePerms.canExportCSV ? "#f1f5f9" : "#fef2f2", color: effectivePerms.canExportCSV ? "#334155" : "#991b1b", border: `1px solid ${effectivePerms.canExportCSV ? "#e2e8f0" : "#fecaca"}`, fontWeight: "600" }}>
+                                          {effectivePerms.canExportCSV ? "📥 Export OK" : "🚫 No Export"}
+                                        </span>
+                                        {!effectivePerms.canViewRevenue && (
+                                          <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#fffbeb", color: "#92400e", border: "1px solid #fde68a", fontWeight: "600" }}>
+                                            🙈 Revenue Masked
+                                          </span>
+                                        )}
+                                        {effectivePerms.canUseAI && (
+                                          <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#334155", border: "1px solid #e2e8f0", fontWeight: "600" }}>
+                                            🤖 AI Enabled
+                                          </span>
+                                        )}
+                                      </div>
+                                    </td>
+
+                                    {/* Login PIN */}
+                                    <td style={{ padding: "8px 12px" }}>
+                                      <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 8px", borderRadius: "6px" }}>
+                                        <span style={{ fontFamily: "monospace", fontSize: "12px", fontWeight: "700", letterSpacing: "2px", color: "#0f172a" }}>
+                                          {isPinVisible ? (usr.pin || "••••") : "••••••"}
+                                        </span>
+                                        <button
+                                          type="button"
+                                          onClick={() => setUserPinVisibilityMap(prev => ({ ...prev, [usr.id]: !prev[usr.id] }))}
+                                          style={{ width: "24px", height: "24px", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: "0", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+                                          title={isPinVisible ? "Hide PIN" : "Reveal PIN (View)"}
+                                          aria-label={isPinVisible ? "Hide PIN" : "Reveal PIN"}
+                                        >
+                                          {isPinVisible ? <EyeOff size={15} /> : <Eye size={15} />}
+                                        </button>
+                                      </div>
+                                    </td>
+
+                                    {/* Assigned Leads & Quota Indicator */}
+                                    <td style={{ padding: "8px 12px", textAlign: "center" }}>
+                                      <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                                        <span style={{ padding: "2px 8px", borderRadius: "9999px", backgroundColor: quotaPercent >= 90 ? "#fef2f2" : "#f1f5f9", fontWeight: "700", color: quotaPercent >= 90 ? "#dc2626" : "#475569", fontSize: "11px", border: "1px solid #e2e8f0" }}>
+                                          {leadsCount} / {quota > 9999 ? '∞' : quota} Leads
+                                        </span>
+                                        {quota <= 9999 ? (
+                                          <div style={{ width: "70px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "9999px", overflow: "hidden", marginTop: "2px" }}>
+                                            <div style={{ width: `${quotaPercent}%`, height: "100%", borderRadius: "9999px", backgroundColor: quotaPercent >= 90 ? "#dc2626" : quotaPercent >= 70 ? "#f59e0b" : "#2563eb" }} />
+                                          </div>
+                                        ) : (
+                                          <div style={{ width: "70px", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "9999px", overflow: "hidden", marginTop: "2px" }} title="Unlimited Capacity">
+                                            <div style={{ width: "100%", height: "100%", borderRadius: "9999px", backgroundColor: "#cbd5e1" }} />
+                                          </div>
+                                        )}
+                                      </div>
+                                    </td>
+
+                                    {/* Actions */}
+                                    <td style={{ padding: "8px 12px" }}>
+                                      <div style={{ display: "grid", gridTemplateColumns: "78px 90px 72px", alignItems: "center", gap: "6px", width: "246px" }}>
+                                        {isSuperAdminUser ? (
+                                          <button
+                                            type="button"
+                                            onClick={() => handleOpenAccessModal(usr)}
+                                            style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "11px", fontWeight: "700", color: "#1d4ed8", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
+                                            title="Configure permissions & package"
+                                          >
+                                            <Sliders size={12} /> Access
+                                          </button>
+                                        ) : (
+                                          <span
+                                            style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "10px", fontWeight: "600", color: "#94a3b8", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "3px" }}
+                                            title="Role & Package changes are locked to Super Admin"
+                                          >
+                                            🔒 Locked
+                                          </span>
+                                        )}
+                                        <button
+                                          type="button"
+                                          onClick={() => handleUpdateUserPin(usr.id, usr.name)}
+                                          style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#334155", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "3px" }}
+                                          title="Reset login PIN"
+                                        >
+                                          🔑 Reset PIN
+                                        </button>
+                                        {checkIsSuperAdmin(usr) || usr.id === "usr_admin" || usr.role === "admin" || (isManagerUser && (usr.role === "manager" || usr.id === currentUser?.id)) ? (
+                                          <button
+                                            type="button"
+                                            disabled
+                                            style={{
+                                              width: "100%",
+                                              height: "30px",
+                                              padding: "0 6px",
+                                              backgroundColor: "#f8fafc",
+                                              border: "1px solid #e2e8f0",
+                                              borderRadius: "6px",
+                                              fontSize: "11px",
+                                              fontWeight: "600",
+                                              color: "#94a3b8",
+                                              cursor: "not-allowed",
+                                              display: "inline-flex",
+                                              alignItems: "center",
+                                              justifyContent: "center",
+                                              gap: "3px",
+                                              opacity: 0.65
+                                            }}
+                                            title="Protected account cannot be deleted"
+                                            aria-label={`Delete ${usr.name} (Protected Account)`}
+                                          >
+                                            🗑️ Delete
+                                          </button>
+                                        ) : (
+                                          <button
+                                            type="button"
+                                            onClick={() => handleDeleteUser(usr.id, usr.name, usr.email, usr.role)}
+                                            style={{ width: "100%", height: "30px", padding: "0 6px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "3px" }}
+                                            title={`Permanently delete ${usr.name}`}
+                                            aria-label={`Permanently delete ${usr.name}`}
+                                          >
+                                            🗑️ Delete
+                                          </button>
+                                        )}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Quick Team Lead Reassignment & Mapping Tool */}
+                        <div style={{ marginTop: "16px", padding: "14px 18px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px", flexWrap: "wrap", gap: "8px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              <Shuffle size={16} color="#2563eb" />
+                              <h3 style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                                Team Mapping & Bulk Lead Reassignment
+                              </h3>
+                              <span style={{ fontSize: "10px", fontWeight: "700", padding: "1px 7px", borderRadius: "9999px", backgroundColor: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe" }}>
+                                Team Lead Balancer
+                              </span>
+                            </div>
+                            <span style={{ fontSize: "11px", color: "#64748b" }}>
+                              Reassign leads between representatives on your team in 1-click.
+                            </span>
+                          </div>
+
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                            <span style={{ fontSize: "12px", color: "#475569", fontWeight: "600" }}>Transfer leads from:</span>
+                            <select 
+                              id="reassignFromOwner"
+                              style={{ height: "32px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#0f172a" }}
+                            >
+                              {teamUsersToDisplay.map(u => (
+                                <option key={u.id} value={u.name}>{u.name} ({leads.filter(l => (l.owner || '').toLowerCase() === u.name.toLowerCase()).length} Leads)</option>
+                              ))}
+                            </select>
+
+                            <span style={{ fontSize: "12px", color: "#475569", fontWeight: "600" }}>to:</span>
+                            <select 
+                              id="reassignToOwner"
+                              style={{ height: "32px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#0f172a" }}
+                            >
+                              {teamUsersToDisplay.map(u => (
+                                <option key={u.id} value={u.name}>{u.name}</option>
+                              ))}
+                            </select>
+
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const from = document.getElementById("reassignFromOwner")?.value;
+                                const to = document.getElementById("reassignToOwner")?.value;
+                                if (!from || !to || from === to) {
+                                  showToast("Please select two different team members to transfer leads.", "error");
+                                  return;
+                                }
+                                const targetLeads = leads.filter(l => (l.owner || '').toLowerCase() === from.toLowerCase());
+                                if (targetLeads.length === 0) {
+                                  showToast(`"${from}" does not currently have any assigned leads.`, "error");
+                                  return;
+                                }
+                                const updated = leads.map(l => (l.owner || '').toLowerCase() === from.toLowerCase() ? { ...l, owner: to } : l);
+                                setLeads(updated);
+                                await batchSyncLeadsToSupabase(updated);
+                                showToast(`Successfully reassigned ${targetLeads.length} leads from "${from}" to "${to}"!`, "success");
+                              }}
+                              style={{ height: "32px", padding: "0 14px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
+                            >
+                              <Shuffle size={13} /> Execute Transfer
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
 
                   {/* Bottom Security Banner */}
                   <div style={{ marginTop: "16px", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
@@ -13634,7 +13870,7 @@ export default function App() {
                           <Bookmark size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                         </div>
                         <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                          Total Pipeline Value
+                          {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || currentUser?.role === "manager") ? "Total Pipeline Value" : "My Pipeline Value"}
                         </span>
                       </div>
                       <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -13654,7 +13890,7 @@ export default function App() {
                           <Award size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                         </div>
                         <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                          Closed Won Deals
+                          {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || currentUser?.role === "manager") ? "Closed Won Revenue" : "My Closed Won Revenue"}
                         </span>
                       </div>
                       <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
@@ -14979,34 +15215,47 @@ export default function App() {
                                     {(lead.owner || "Admin").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                   </div>
                                   {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canReassignLeads) ? (
-                                    <select
-                                      value={lead.owner || "Harsh Goyal"}
-                                      onChange={(e) => reassignLeadOwner(lead.id, e.target.value)}
-                                      onClick={(e) => e.stopPropagation()}
-                                      style={{
-                                        flex: 1,
-                                        width: "100%",
-                                        minWidth: 0,
-                                        padding: "3px 6px",
-                                        borderRadius: "6px",
-                                        fontSize: "11px",
-                                        fontWeight: "600",
-                                        color: "#334155",
-                                        backgroundColor: "#ffffff",
-                                        border: "1px solid #cbd5e1",
-                                        cursor: "pointer",
-                                        outline: "none",
-                                        height: "28px",
-                                        boxSizing: "border-box",
-                                        fontFamily: "'Plus Jakarta Sans', sans-serif"
-                                      }}
-                                      title="Click to reassign owner"
-                                      aria-label="Reassign Lead Owner"
-                                    >
-                                      {teamMembers.map(m => (
-                                        <option key={m} value={m}>{m}</option>
-                                      ))}
-                                    </select>
+                                    (() => {
+                                      const isSuper = checkIsSuperAdmin(currentUser) || currentUser?.role === "admin";
+                                      const allowedOwners = isSuper ? teamMembers : [
+                                        currentUser?.name,
+                                        ...allUsersList.filter(u => {
+                                          const repTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+                                          return repTo === (currentUser?.name || '').trim().toLowerCase() || String(u.managerId) === String(currentUser?.id);
+                                        }).map(u => u.name)
+                                      ].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
+
+                                      return (
+                                        <select
+                                          value={lead.owner || "Harsh Goyal"}
+                                          onChange={(e) => reassignLeadOwner(lead.id, e.target.value)}
+                                          onClick={(e) => e.stopPropagation()}
+                                          style={{
+                                            flex: 1,
+                                            width: "100%",
+                                            minWidth: 0,
+                                            padding: "3px 6px",
+                                            borderRadius: "6px",
+                                            fontSize: "11px",
+                                            fontWeight: "600",
+                                            color: "#334155",
+                                            backgroundColor: "#ffffff",
+                                            border: "1px solid #cbd5e1",
+                                            cursor: "pointer",
+                                            outline: "none",
+                                            height: "28px",
+                                            boxSizing: "border-box",
+                                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                                          }}
+                                          title="Click to reassign owner"
+                                          aria-label="Reassign Lead Owner"
+                                        >
+                                          {allowedOwners.map(m => (
+                                            <option key={m} value={m}>{m}</option>
+                                          ))}
+                                        </select>
+                                      );
+                                    })()
                                   ) : (
                                     <span style={{ fontSize: "11px", fontWeight: "600", color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                       {lead.owner || currentUser?.name || "You"}
@@ -15685,7 +15934,9 @@ export default function App() {
                           {/* 1. Total Closed Value */}
                           <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "8px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div>
-                              <span style={{ fontSize: "12px", fontWeight: "600", color: "#166534", textTransform: "uppercase", letterSpacing: "0.2px", display: "block" }}>Total Closed Value</span>
+                              <span style={{ fontSize: "12px", fontWeight: "600", color: "#166534", textTransform: "uppercase", letterSpacing: "0.2px", display: "block" }}>
+                                {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager" || currentUser?.role === "admin") ? "Total Closed Value" : "My Closed Revenue"}
+                              </span>
                               <strong style={{ fontSize: "16px", fontWeight: "700", color: "#166534" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
                               <span style={{ fontSize: "12px", color: "#64748b", display: "block", marginTop: "2px" }}>{wonLeadsList.length} Won Deals</span>
                             </div>
@@ -16673,7 +16924,9 @@ export default function App() {
                       {/* Card 1: Total Closed Value */}
                       <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Total Closed Value (Inc. GST)</span>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                            {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager" || currentUser?.role === "admin") ? "Total Company Closed Value (Inc. GST)" : "My Closed Revenue (Inc. GST)"}
+                          </span>
                           <strong style={{ fontSize: "16px", fontWeight: "800", color: "#166534", display: "block", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
                           <span style={{ fontSize: "12px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                             Base ₹{totalBaseVal.toLocaleString("en-IN")} + GST ₹{totalGstVal.toLocaleString("en-IN")}
@@ -22755,7 +23008,17 @@ export default function App() {
                       Assigned Owner
                     </label>
                     {(() => {
-                      const isRepOnly = !checkIsSuperAdmin(currentUser);
+                      const isSuper = checkIsSuperAdmin(currentUser) || currentUser?.role === "admin";
+                      const isManager = currentUser?.role === "manager";
+                      const isRepOnly = !isSuper && !isManager;
+                      const mgrReps = isManager ? [
+                        currentUser?.name,
+                        ...allUsersList.filter(u => {
+                          const repTo = (u.reportsTo || u.manager || '').trim().toLowerCase();
+                          return repTo === (currentUser?.name || '').trim().toLowerCase() || String(u.managerId) === String(currentUser?.id);
+                        }).map(u => u.name)
+                      ].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i) : [];
+
                       return (
                         <select
                           value={isRepOnly ? currentUser.name : newLeadData.owner}
@@ -22765,6 +23028,10 @@ export default function App() {
                         >
                           {isRepOnly ? (
                             <option value={currentUser.name}>{currentUser.name} (You)</option>
+                          ) : isManager ? (
+                            mgrReps.map(m => (
+                              <option key={m} value={m}>{m} {m === currentUser.name ? "(You)" : "(Team Rep)"}</option>
+                            ))
                           ) : (
                             teamMembers.map(m => (
                               <option key={m} value={m}>{m}</option>

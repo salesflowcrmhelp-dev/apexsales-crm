@@ -313,10 +313,22 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   align-self: flex-start;
   padding: 0 !important;
   z-index: 25;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   box-sizing: border-box;
+}
+
+.crm-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.crm-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.crm-sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
 }
 
 /* Collapsed Icon Rail State */
@@ -608,6 +620,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .sidebar-help-widget {
   margin-top: auto;
+  margin-bottom: 12px;
   background-color: #fff7ed;
   border: 1px solid #ffedd5;
   border-radius: 6px;

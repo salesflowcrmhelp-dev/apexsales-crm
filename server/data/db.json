@@ -12,17 +12,6 @@
       "active": true
     },
     {
-      "id": "usr_harsh",
-      "name": "Harsh Goyal",
-      "displayName": "Harsh Goyal (Admin)",
-      "username": "harsh",
-      "pin": "482910",
-      "role": "admin",
-      "email": "harsh.accomation@gmail.com",
-      "phone": "9876543210",
-      "active": true
-    },
-    {
       "id": "usr_1789033985345_n62j",
       "active": true,
       "createdAt": "2026-09-10T09:53:05.345Z",
