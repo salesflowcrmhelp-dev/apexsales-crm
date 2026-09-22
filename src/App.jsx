@@ -8982,11 +8982,11 @@ export default function App() {
                   style={{ 
                     fontSize: "10px", 
                     fontWeight: "750", 
-                    color: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "#b45309" : "#1d4ed8", 
+                    color: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "#92400e" : "#1d4ed8", 
                     backgroundColor: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "#fef3c7" : "#eff6ff", 
                     border: (checkIsSuperAdmin(currentUser) || currentUser?.role === "admin") ? "1px solid #fde68a" : "1px solid #bfdbfe", 
                     padding: "2px 8px", 
-                    borderRadius: "6px", 
+                    borderRadius: "9999px", 
                     marginLeft: "auto", 
                     letterSpacing: "0.3px", 
                     flexShrink: 0 
@@ -9124,10 +9124,10 @@ export default function App() {
             <div />
           )}
 
-          <div className="header-action-row" style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: "auto" }}>
+          <div className="header-action-row" style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
             
             {/* Cluster 1: Global Utilities (Period Selector, Backup, Start My Day) */}
-            <div className="header-utilities-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+            <div className="header-utilities-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
               {/* Global Monthly Period Selector Dropdown */}
               <div style={{ position: "relative" }}>
                 <button 
@@ -9279,10 +9279,10 @@ export default function App() {
               </div>
 
               {/* Vertical divider separating temporal scope from operational utilities */}
-              <div style={{ width: "1px", height: "20px", backgroundColor: "#e2e8f0", margin: "0 6px" }} aria-hidden="true" />
+              <div style={{ width: "1px", height: "20px", backgroundColor: "#e2e8f0", margin: "0 4px" }} aria-hidden="true" />
 
               {/* Sub-group: Operational Utilities (Vault Backup & Start My Day) */}
-              <div style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
                 {/* 🛡️ ADMIN DATA VAULT & BACKUP (Strictly Visible to Admin Harsh) */}
                 {checkIsSuperAdmin(currentUser) && (
                   <button
@@ -9348,10 +9348,10 @@ export default function App() {
             </div>
 
             {/* Visual Divider separating utilities from user account actions */}
-            <div style={{ width: "1px", height: "22px", backgroundColor: "#cbd5e1", margin: "0 8px" }} aria-hidden="true" />
+            <div style={{ width: "1px", height: "20px", backgroundColor: "#cbd5e1", margin: "0 4px" }} aria-hidden="true" />
 
             {/* Cluster 2: User Account & System Actions */}
-            <div className="header-user-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+            <div className="header-user-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
               <div className="header-notification-btn" onClick={() => setShowStartMyDay(true)} title="3 Pending Follow-ups" style={{ width: "32px", height: "32px" }}>
                 <Bell className="w-4 h-4 text-slate-600" />
                 <span className="notification-badge-dot">3</span>
@@ -17573,8 +17573,8 @@ export default function App() {
                           </select>
                         )}
 
-                        {/* Quick Score Filters */}
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", padding: "2px 5px", borderRadius: "8px" }}>
+                        {/* Quick Score Filters (Aligned to 32px height) */}
+                        <div style={{ height: "32px", boxSizing: "border-box", display: "inline-flex", alignItems: "center", gap: "4px", backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", padding: "0 6px", borderRadius: "6px" }}>
                           <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", padding: "0 2px" }}>Score:</span>
                           {[
                             { id: "all", label: "All" },
@@ -17589,11 +17589,11 @@ export default function App() {
                                 type="button"
                                 onClick={() => setKanbanScoreFilter(pill.id)}
                                 style={{
-                                  height: "24px",
-                                  padding: "0 8px",
+                                  height: "22px",
+                                  padding: "0 7px",
                                   fontSize: "11px",
                                   fontWeight: isSelected ? "800" : "600",
-                                  borderRadius: "5px",
+                                  borderRadius: "4px",
                                   border: "none",
                                   cursor: "pointer",
                                   backgroundColor: isSelected ? (pill.activeBg || "#2563eb") : (pill.bg || "transparent"),
@@ -17607,11 +17607,31 @@ export default function App() {
                           })}
                         </div>
 
-                        {/* Total Pipeline Pill */}
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 10px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "12px", fontWeight: "700", color: "#1e40af" }}>
-                          <span>Total Pipeline:</span>
+                        {/* Issue 7: Vertical Divider separating filter controls from analytical summary */}
+                        <div role="separator" aria-orientation="vertical" style={{ width: "1px", height: "20px", backgroundColor: "#cbd5e1", margin: "0 4px" }} />
+
+                        {/* Total Pipeline Analytical Metric Card */}
+                        <div 
+                          role="status"
+                          aria-label="Total Pipeline Value Summary"
+                          style={{ 
+                            height: "32px", 
+                            boxSizing: "border-box", 
+                            display: "inline-flex", 
+                            alignItems: "center", 
+                            gap: "6px", 
+                            padding: "0 10px", 
+                            backgroundColor: "#f8fafc", 
+                            border: "1px solid #cbd5e1", 
+                            borderRadius: "6px", 
+                            fontSize: "12px", 
+                            fontWeight: "700", 
+                            color: "#334155" 
+                          }}
+                        >
+                          <span style={{ color: "#475569" }}>Total Pipeline:</span>
                           <span style={{ color: "#2563eb", fontWeight: "800" }}>₹{totalPipelineValue.toLocaleString("en-IN")}</span>
-                          <span style={{ fontSize: "10px", color: "#64748b", fontWeight: "600" }}>({filteredKanbanLeads.length} leads)</span>
+                          <span style={{ fontSize: "10.5px", color: "#64748b", fontWeight: "600" }}>({filteredKanbanLeads.length} leads)</span>
                         </div>
                       </div>
 
@@ -17818,7 +17838,7 @@ export default function App() {
                                               style={{ textDecoration: "none" }}
                                               onClick={(e) => e.stopPropagation()}
                                             >
-                                              <Phone size={12} />
+                                              <Phone size={15} />
                                             </a>
                                           )}
                                           {cleanPhone && (
@@ -17831,7 +17851,7 @@ export default function App() {
                                               style={{ textDecoration: "none" }}
                                               onClick={(e) => e.stopPropagation()}
                                             >
-                                              <MessageCircle size={12} />
+                                              <MessageCircle size={15} />
                                             </a>
                                           )}
                                           <button
@@ -17844,7 +17864,7 @@ export default function App() {
                                             }}
                                             title="Open 360° Dossier"
                                           >
-                                            <Eye size={12} />
+                                            <Eye size={15} />
                                           </button>
                                           {lead.owner && (
                                             <span 
