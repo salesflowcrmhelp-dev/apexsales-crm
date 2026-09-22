@@ -680,82 +680,174 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   flex-shrink: 0;
 }
 
-/* Sidebar Submenu & Tree Hierarchy */
+/* Sidebar Submenu & Exact Tree Hierarchy */
 .sidebar-nav-parent-group {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
 
-.sidebar-parent-item {
-  justify-content: space-between;
-}
-
-.sidebar-parent-item.parent-active {
-  color: #0f172a;
-  font-weight: 700;
-}
-
-.sidebar-submenu-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-left: 17px;
-  padding-left: 10px;
-  border-left: 1.5px solid #e2e8f0;
-  margin-top: 3px;
-  margin-bottom: 5px;
-}
-
-.sidebar-sub-item {
+.sidebar-parent-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  min-height: 32px;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 10px;
+  min-height: 35px;
   border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748b;
-  background: transparent;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a !important;
+  background: transparent !important;
   border: none;
   cursor: pointer;
-  width: 100%;
-  text-align: left;
   transition: all 0.15s ease;
+  user-select: none;
   box-sizing: border-box;
 }
 
+.sidebar-parent-btn:hover {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.sidebar-parent-btn .parent-icon {
+  width: 16px;
+  height: 16px;
+  color: #0f172a !important;
+  flex-shrink: 0;
+}
+
+.sidebar-parent-btn .parent-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a !important;
+  letter-spacing: -0.2px;
+}
+
+.sidebar-parent-btn .sidebar-chevron {
+  display: flex;
+  align-items: center;
+  color: #475569;
+  margin-left: auto;
+}
+
+/* Tree Container - Vertical trunk line aligned with parent icon */
+.sidebar-tree-container {
+  position: relative;
+  margin-top: 2px;
+  margin-bottom: 6px;
+  margin-left: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Continuous vertical trunk line that terminates at the last item */
+.sidebar-tree-container::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 17px;
+  width: 1.5px;
+  background-color: #cbd5e1;
+  z-index: 1;
+}
+
+/* Each tree branch node */
+.sidebar-tree-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 2px 0;
+}
+
+/* Horizontal branch connector line (├── and └──) */
+.sidebar-tree-node::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 12px;
+  height: 1.5px;
+  background-color: #cbd5e1;
+  z-index: 1;
+}
+
+/* The sub-item button itself */
+.sidebar-sub-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+  padding: 6.5px 10px;
+  min-height: 33px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex: 1;
+  text-align: left;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
 .sidebar-sub-item:hover {
-  background-color: #f8fafc;
+  background-color: #f1f5f9;
   color: #0f172a;
 }
 
+/* Active sub-item (highlighted blue pill exactly matching mockup) */
 .sidebar-sub-item.active {
-  background-color: #eff6ff;
-  color: #2563eb;
-  font-weight: 700;
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  font-weight: 700 !important;
+}
+
+.sidebar-sub-item.active .sub-item-icon {
+  color: #1d4ed8 !important;
 }
 
 .sidebar-sub-item .sub-item-icon {
+  width: 15px;
+  height: 15px;
   flex-shrink: 0;
-  color: inherit;
+  color: #475569;
 }
 
+/* Sleek "New" Pill Badge */
 .sidebar-sub-badge {
-  font-size: 9px;
-  font-weight: 800;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 750;
   color: #ffffff;
-  background: #2563eb;
-  padding: 1px 6px;
-  border-radius: 9999px;
+  background: #0284c7;
+  padding: 1.5px 7px;
+  border-radius: 6px;
   margin-left: auto;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
 }
 
-.crm-sidebar.collapsed .sidebar-submenu-list,
-.crm-sidebar.collapsed .sidebar-chevron {
+.crm-sidebar.collapsed .sidebar-parent-btn {
+  width: 38px !important;
+  height: 31px !important;
+  padding: 0 !important;
+  margin: 1px auto !important;
+  justify-content: center !important;
+}
+
+.crm-sidebar.collapsed .parent-label,
+.crm-sidebar.collapsed .sidebar-chevron,
+.crm-sidebar.collapsed .sidebar-tree-container {
   display: none !important;
 }
 

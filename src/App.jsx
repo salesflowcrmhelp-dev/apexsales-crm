@@ -8828,9 +8828,10 @@ export default function App() {
               <span>Sales Intelligence</span>
             </button>
 
-            {/* Collapsible Leads Parent & Sub-Navigation */}
+            {/* Collapsible Leads Parent & Sub-Navigation matching visual mockup */}
             <div className="sidebar-nav-parent-group">
               <button 
+                type="button"
                 onClick={() => {
                   if (activeWorkspace !== "pipeline" || pipelineView === "analytics") {
                     setActiveWorkspace("pipeline");
@@ -8840,65 +8841,77 @@ export default function App() {
                   }
                   setIsLeadsMenuOpen(prev => !prev);
                 }} 
-                className={`sidebar-nav-item sidebar-parent-item ${activeWorkspace === "pipeline" && ["sheet", "split", "deals", "kanban"].includes(pipelineView) ? "active" : ""}`}
+                className="sidebar-parent-btn"
                 title="Leads Workspace"
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "9px", minWidth: 0 }}>
-                  <Users className="nav-item-icon" />
-                  <span>Leads</span>
+                  <Users className="parent-icon" />
+                  <span className="parent-label">Leads</span>
                 </div>
-                <span className="sidebar-chevron" style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
-                  {isLeadsMenuOpen ? <ChevronDown size={13} color="#94a3b8" /> : <ChevronRight size={13} color="#94a3b8" />}
+                <span className="sidebar-chevron">
+                  {isLeadsMenuOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                 </span>
               </button>
 
               {isLeadsMenuOpen && (
-                <div className="sidebar-submenu-list">
-                  <button 
-                    onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
-                    className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
-                    title="Pipeline Spreadsheet"
-                  >
-                    <Grid size={13} className="sub-item-icon" />
-                    <span>Pipeline Spreadsheet</span>
-                  </button>
+                <div className="sidebar-tree-container">
+                  <div className="sidebar-tree-node">
+                    <button 
+                      type="button"
+                      onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
+                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
+                      title="Pipeline Spreadsheet"
+                    >
+                      <Grid className="sub-item-icon" />
+                      <span>Pipeline Spreadsheet</span>
+                    </button>
+                  </div>
 
-                  <button 
-                    onClick={() => { 
-                      setActiveWorkspace("pipeline"); 
-                      setPipelineView("split"); 
-                    }} 
-                    className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "split" ? "active" : ""}`}
-                    title="Pipeline 360°"
-                  >
-                    <Layers size={13} className="sub-item-icon" />
-                    <span>Pipeline 360°</span>
-                  </button>
+                  <div className="sidebar-tree-node">
+                    <button 
+                      type="button"
+                      onClick={() => { 
+                        setActiveWorkspace("pipeline"); 
+                        setPipelineView("split"); 
+                      }} 
+                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "split" ? "active" : ""}`}
+                      title="Pipeline 360°"
+                    >
+                      <Layers className="sub-item-icon" />
+                      <span>Pipeline 360°</span>
+                    </button>
+                  </div>
 
-                  <button 
-                    onClick={() => { 
-                      setActiveWorkspace("pipeline"); 
-                      setPipelineView("deals"); 
-                    }} 
-                    className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
-                    title="Deals Hub"
-                  >
-                    <Award size={13} className="sub-item-icon" />
-                    <span>Deals Hub</span>
-                  </button>
+                  <div className="sidebar-tree-node">
+                    <button 
+                      type="button"
+                      onClick={() => { 
+                        setActiveWorkspace("pipeline"); 
+                        setPipelineView("deals"); 
+                      }} 
+                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
+                      title="Deals Hub"
+                    >
+                      <Award className="sub-item-icon" />
+                      <span>Deals Hub</span>
+                    </button>
+                  </div>
 
-                  <button 
-                    onClick={() => { 
-                      setActiveWorkspace("pipeline"); 
-                      setPipelineView("kanban"); 
-                    }} 
-                    className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "kanban" ? "active" : ""}`}
-                    title="Kanban Board"
-                  >
-                    <Columns size={13} className="sub-item-icon" />
-                    <span>Kanban Board</span>
-                    <span className="sidebar-sub-badge">New</span>
-                  </button>
+                  <div className="sidebar-tree-node">
+                    <button 
+                      type="button"
+                      onClick={() => { 
+                        setActiveWorkspace("pipeline"); 
+                        setPipelineView("kanban"); 
+                      }} 
+                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "kanban" ? "active" : ""}`}
+                      title="Kanban Board"
+                    >
+                      <Columns className="sub-item-icon" />
+                      <span>Kanban Board</span>
+                      <span className="sidebar-sub-badge">New</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
