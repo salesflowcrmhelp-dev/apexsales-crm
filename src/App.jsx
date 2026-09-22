@@ -16965,49 +16965,6 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Informative Pipeline Leads Banner */}
-                    <div style={{
-                      backgroundColor: "#f0fdf4",
-                      border: "1px solid #bbf7d0",
-                      borderRadius: "8px",
-                      padding: "10px 14px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: "12px",
-                      flexWrap: "wrap",
-                      boxShadow: "0 1px 2px rgba(0,0,0,0.02)"
-                    }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#166534", lineHeight: "1.5" }}>
-                        <span style={{ fontSize: "16px" }}>💡</span>
-                        <span>
-                          <strong>Closed Revenue View:</strong> Currently showing <strong>{wonLeadsList.length} Won Deals</strong> (out of {leads.length} total leads). To view and manage all pipeline leads across all stages (New, Contacted, Follow-ups, etc.), open <strong>Spreadsheet</strong>.
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setPipelineView("sheet")}
-                        style={{
-                          height: "32px",
-                          padding: "0 12px",
-                          backgroundColor: "#ffffff",
-                          color: "#0f172a",
-                          border: "1px solid #cbd5e1",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: "600",
-                          cursor: "pointer",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "5px",
-                          fontFamily: "inherit",
-                          boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04)"
-                        }}
-                      >
-                        <Grid size={13} color="#475569" /> View All {ownerScopedLeads.length} Leads in Spreadsheet →
-                      </button>
-                    </div>
-
                     {/* 2. COMPACT TOP 4 EXECUTIVE KPI SUMMARY CARDS */}
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
                       
