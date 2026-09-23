@@ -2142,6 +2142,26 @@ export function formatLeadRevenue(val, user) {
 }
 
 export default function App() {
+  // 🧹 100% Zero-LocalStorage Policy: Purge any legacy browser storage lead keys on mount
+  useEffect(() => {
+    try {
+      localStorage.removeItem("salesflow_standalone_leads");
+      localStorage.removeItem("salesflow_immutable_lead_backup");
+      localStorage.removeItem("salesflow_admin_vault_backup");
+      localStorage.removeItem("salesflow_standalone_tasks");
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith("salesflow_rep_leads_") || k.startsWith("salesflow_leads_")) {
+          localStorage.removeItem(k);
+        }
+      });
+      Object.keys(sessionStorage).forEach(k => {
+        if (k.startsWith("salesflow_rep_leads_") || k.startsWith("salesflow_leads_")) {
+          sessionStorage.removeItem(k);
+        }
+      });
+    } catch(e) {}
+  }, []);
+
   const [hasLoadedFromCloud, setHasLoadedFromCloud] = useState(false);
   const [leads, setLeads] = useState(() => {
     try {
@@ -3352,13 +3372,14 @@ export default function App() {
       message: "Are you sure you want to reset all pipeline data back to your initial leads? All newly added custom leads will be reset.",
       confirmLabel: "Yes, Reset Database",
       isWarning: true,
-      onConfirm: () => {
+      onConfirm: async () => {
         try {
-          localStorage.clear();
-          localStorage.setItem("salesflow_standalone_leads", JSON.stringify(INITIAL_LEADS));
-          localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(INITIAL_LEADS));
+          localStorage.removeItem("salesflow_standalone_leads");
+          localStorage.removeItem("salesflow_immutable_lead_backup");
+          localStorage.removeItem("salesflow_admin_vault_backup");
         } catch(e) {}
         setLeads(INITIAL_LEADS);
+        batchSyncLeadsToSupabase(INITIAL_LEADS).catch(e => console.warn("Supabase reset sync deferred:", e));
         setDeleteConfirmData(null);
         window.location.reload();
       }
@@ -3918,12 +3939,6 @@ export default function App() {
           }
           setLeads(sanitized);
           setHasLoadedFromCloud(true);
-          try {
-            sessionStorage.setItem(`salesflow_rep_leads_${activeUser.id || activeUser.name}`, JSON.stringify(sanitized));
-            localStorage.setItem("salesflow_standalone_leads", JSON.stringify(sanitized));
-            localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(sanitized));
-            if (isSuper) localStorage.setItem("salesflow_admin_vault_backup", JSON.stringify(sanitized));
-          } catch(e) {}
           return sanitized;
         }
       } catch (err) {
@@ -3935,67 +3950,19 @@ export default function App() {
         const data = await res.json();
         if (data && data.success && Array.isArray(data.leads)) {
           let sanitized = data.leads.map(sanitizeLeadObject);
-
-          // 🛡️ SUPER ADMIN VAULT AUTO-PROTECTION (Harsh Goyal ONLY):
-          if (isSuper && sanitized.length === 0) {
-            console.log("🛡️ Super Admin vault auto-protection activated: Restoring master pipeline leads!");
-            const localBackup = localStorage.getItem("salesflow_admin_vault_backup") || localStorage.getItem("salesflow_standalone_leads");
-            if (localBackup) {
-              try {
-                const parsed = JSON.parse(localBackup);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                  sanitized = parsed.map(sanitizeLeadObject);
-                }
-              } catch(e) {}
-            }
-            if (!sanitized || sanitized.length === 0) {
-              sanitized = INITIAL_LEADS.map(sanitizeLeadObject);
-            }
-            syncLeadsToBackend(sanitized);
-          }
-
-          // 🛡️ REP / MANAGER CACHING (Strict 3-tier RBAC isolation):
           const canViewAll = isSuper || activeUser.role === "admin";
-
           if (!canViewAll) {
             if (!isManager) {
               const userNameLower = (activeUser.name || "").trim().toLowerCase();
               sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
             }
-            try {
-              sessionStorage.setItem(`salesflow_rep_leads_${activeUser.id || activeUser.name}`, JSON.stringify(sanitized));
-            } catch(e) {}
-          } else {
-            try {
-              sessionStorage.setItem(`salesflow_rep_leads_${activeUser.id || activeUser.name}`, JSON.stringify(sanitized));
-              localStorage.setItem("salesflow_standalone_leads", JSON.stringify(sanitized));
-              localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(sanitized));
-              if (isSuper) localStorage.setItem("salesflow_admin_vault_backup", JSON.stringify(sanitized));
-            } catch(e) {}
           }
-
           setLeads(sanitized);
           return sanitized;
         }
       }
     } catch(e) {
-      console.warn("Backend leads fetch fallback to local:", e);
-      if (checkIsSuperAdmin(userToUse || currentUser)) {
-        const local = localStorage.getItem("salesflow_admin_vault_backup") || localStorage.getItem("salesflow_standalone_leads");
-        if (local) {
-          try {
-            const parsed = JSON.parse(local);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              const cleaned = parsed.map(sanitizeLeadObject);
-              setLeads(cleaned);
-              return cleaned;
-            }
-          } catch(err) {}
-        }
-        const fallback = INITIAL_LEADS.map(sanitizeLeadObject);
-        setLeads(fallback);
-        return fallback;
-      }
+      console.warn("Backend leads fetch fallback:", e);
     }
     return [];
   };
@@ -4125,12 +4092,6 @@ export default function App() {
       }
 
       setLeads(restoredLeads);
-      try {
-        localStorage.setItem("salesflow_standalone_leads", JSON.stringify(restoredLeads));
-        localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(restoredLeads));
-        localStorage.setItem("salesflow_admin_vault_backup", JSON.stringify(restoredLeads));
-      } catch(e) {}
-
       await syncLeadsToBackend(restoredLeads);
       showToast(`🛡️ Admin Vault Activated! ${restoredLeads.length} Verified Deals Restored & Synced to Cloud. 👑`, "success");
       setShowAdminVaultModal(false);
@@ -6882,15 +6843,7 @@ export default function App() {
   const saveLeadsToStorage = (updatedLeads) => {
     const cleaned = Array.isArray(updatedLeads) ? updatedLeads.map(sanitizeLeadObject) : [];
     setLeads(cleaned);
-    try {
-      localStorage.setItem("salesflow_standalone_leads", JSON.stringify(cleaned));
-      localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(cleaned));
-      if (checkIsSuperAdmin(currentUser) || cleaned.length >= 15) {
-        localStorage.setItem("salesflow_admin_vault_backup", JSON.stringify(cleaned));
-      }
-    } catch(e) {}
-
-    // Synchronize updates immediately to Central Node Backend & MongoDB Atlas
+    // 100% Cloud: Directly sync updates to Supabase PostgreSQL & Central Backend (Zero Local Storage Dependency)
     syncLeadsToBackend(cleaned);
   };
 
