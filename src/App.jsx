@@ -14,6 +14,7 @@ import {
   upsertUserToSupabase,
   deleteUserFromSupabase
 } from "./lib/supabaseService";
+import { supabase } from "./lib/supabase";
 
 // Dropdown options
 const STATUS_OPTIONS = ["New", "Contacted", "Qualified", "Demo Booked", "Proposal Sent", "Demo Done", "Payment Follow Up", "Negotiation", "Renewal", "Renewal Won", "Won", "Lost", "Junk"];
@@ -2141,6 +2142,7 @@ export function formatLeadRevenue(val, user) {
 }
 
 export default function App() {
+  const [hasLoadedFromCloud, setHasLoadedFromCloud] = useState(false);
   const [leads, setLeads] = useState(() => {
     try {
       const savedUser = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
@@ -2148,29 +2150,7 @@ export default function App() {
       if (!savedUser || !savedToken) {
         return []; // Strict isolation: Not logged in = ZERO leads in memory!
       }
-      const u = JSON.parse(savedUser);
-      const isSuper = checkIsSuperAdmin(u);
-      if (isSuper) {
-        u.role = "admin";
-        try { 
-          sessionStorage.setItem("crm_auth_user", JSON.stringify(u)); 
-          localStorage.setItem("crm_auth_user", JSON.stringify(u)); 
-        } catch(e) {}
-        const localVault = localStorage.getItem("salesflow_admin_vault_backup") || localStorage.getItem("salesflow_standalone_leads");
-        if (localVault) {
-          const parsed = JSON.parse(localVault);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed.map(sanitizeLeadObject);
-          }
-        }
-        return INITIAL_LEADS.map(sanitizeLeadObject);
-      }
-      // Sales rep: Strict zero-leakage isolation!
-      const cachedRepLeads = sessionStorage.getItem(`salesflow_rep_leads_${u.id || u.name}`);
-      if (cachedRepLeads) {
-        const parsed = JSON.parse(cachedRepLeads);
-        if (Array.isArray(parsed)) return parsed.map(sanitizeLeadObject);
-      }
+      // Pure Cloud-First architecture: Always start clean, fresh data loaded from Supabase Cloud on mount
       return [];
     } catch(e) {
       return [];
@@ -3927,7 +3907,7 @@ export default function App() {
       // 🚀 1. FAST-PATH: Fetch from Supabase PostgreSQL Cloud Database (Zero Cold Start)
       try {
         const supaLeads = await fetchLeadsFromSupabase();
-        if (Array.isArray(supaLeads) && supaLeads.length > 0) {
+        if (Array.isArray(supaLeads)) {
           let sanitized = supaLeads.map(sanitizeLeadObject);
           const canViewAll = isSuper || activeUser.role === "admin";
           if (!canViewAll) {
@@ -3937,10 +3917,12 @@ export default function App() {
             }
           }
           setLeads(sanitized);
+          setHasLoadedFromCloud(true);
           try {
             sessionStorage.setItem(`salesflow_rep_leads_${activeUser.id || activeUser.name}`, JSON.stringify(sanitized));
             localStorage.setItem("salesflow_standalone_leads", JSON.stringify(sanitized));
             localStorage.setItem("salesflow_immutable_lead_backup", JSON.stringify(sanitized));
+            if (isSuper) localStorage.setItem("salesflow_admin_vault_backup", JSON.stringify(sanitized));
           } catch(e) {}
           return sanitized;
         }
@@ -4082,26 +4064,35 @@ export default function App() {
     loadTasksFromBackend();
   }, []);
 
-  // 🛡️ ZERO-DATA-LOSS CONTINUOUS AUTO-RECOVERY GUARD:
-  // ONLY activates for authenticated Super Admin Harsh Goyal!
-  // Sales reps with 0 assigned leads must remain at 0 leads (zero data leak).
+  // 🛡️ Supabase Realtime Subscription: 100% Cloud-First Architecture
+  // Automatically keeps pipeline synchronized across all browser tabs and devices in real-time.
   useEffect(() => {
-    if (!isLoggedIn || !checkIsSuperAdmin(currentUser)) return;
-    if (Array.isArray(leads) && leads.length === 0) {
-      console.log("🛡️ Zero leads in memory for Super Admin. Auto-activating local backup vault...");
-      const local = localStorage.getItem("salesflow_admin_vault_backup") || localStorage.getItem("salesflow_standalone_leads");
-      if (local) {
-        try {
-          const parsed = JSON.parse(local);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setLeads(parsed.map(sanitizeLeadObject));
-            return;
+    if (!supabase) return;
+    const channel = supabase
+      .channel("public:leads_realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "leads" }, (payload) => {
+        console.log("⚡ Live Supabase PostgreSQL update received:", payload.eventType);
+        fetchLeadsFromSupabase().then(fresh => {
+          if (Array.isArray(fresh)) {
+            const sanitized = fresh.map(sanitizeLeadObject);
+            const isSuper = checkIsSuperAdmin(currentUser);
+            const isManager = currentUser?.role === "manager";
+            const canViewAll = isSuper || currentUser?.role === "admin";
+            let userScoped = sanitized;
+            if (!canViewAll && !isManager && currentUser?.name) {
+              const userNameLower = currentUser.name.trim().toLowerCase();
+              userScoped = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
+            }
+            setLeads(userScoped);
           }
-        } catch(e) {}
-      }
-      setLeads(INITIAL_LEADS.map(sanitizeLeadObject));
-    }
-  }, [leads, currentUser, isLoggedIn]);
+        }).catch(err => console.warn("Supabase realtime refetch error:", err));
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUser]);
 
   const restoreAdminVaultBackup = async () => {
     setIsAdminRestoring(true);
@@ -17548,6 +17539,7 @@ export default function App() {
                 const handleQuickStageChange = (leadId, newStg) => {
                   const isNowWon = isWonStatus(newStg);
                   let prevStatus = "";
+                  let updatedLeadObj = null;
                   const updated = leads.map(l => {
                     if (l.id === leadId) {
                       prevStatus = l.status;
@@ -17563,11 +17555,15 @@ export default function App() {
                         // CRITICAL: When moving out of Closed Won to an open stage or Lost, clear won_date!
                         u.won_date = "";
                       }
+                      updatedLeadObj = u;
                       return u;
                     }
                     return l;
                   });
                   saveLeadsToStorage(updated);
+                  if (updatedLeadObj) {
+                    upsertLeadToSupabase(updatedLeadObj).catch(err => console.warn("Supabase stage update error:", err));
+                  }
                   if (isNowWon) {
                     showToast(`🎉 Deal marked as WON!`, "success");
                   } else if (isWonStatus(prevStatus)) {
