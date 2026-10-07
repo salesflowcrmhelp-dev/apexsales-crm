@@ -3053,6 +3053,24 @@ export default function App({ onNavigateToLanding } = {}) {
       const saved = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
       if (saved) {
         const u = JSON.parse(saved);
+        const nameLower = (u.name || "").toLowerCase();
+        const emailLower = (u.email || "").toLowerCase();
+        const idLower = String(u.id || "").toLowerCase();
+        const isKashish = nameLower.includes("kashish") || emailLower.includes("kashish") || idLower === "usr_1789033985345_n62j" || idLower === "usr_kashish";
+        if (isKashish) {
+          u.role = "sales_rep";
+          u.packageTier = "starter";
+          if (u.permissions) {
+            u.permissions.canViewAllLeads = false;
+            u.permissions.canDeleteLeads = false;
+            u.permissions.canAccessTeam = false;
+          }
+          try {
+            sessionStorage.setItem("crm_auth_user", JSON.stringify(u));
+            localStorage.setItem("crm_auth_user", JSON.stringify(u));
+          } catch(e) {}
+          return u;
+        }
         if (checkIsSuperAdmin(u)) {
           u.role = "admin";
           if (u.name === "Admin User" || u.name === "Admin") {
@@ -3108,38 +3126,40 @@ export default function App({ onNavigateToLanding } = {}) {
     if (nameLower.includes("kashish") || username === "kashish" || idLower.includes("kashish") || idLower === "usr_1789033985345_n62j") {
       companyId = "tenant_kashish";
       companyName = "Kashish Enterprises";
-      role = CRM_ROLES.COMPANY_OWNER;
-      reportsTo = "";
+      // Respect configured role from DB / SuperAdmin:
+      role = normalizeRole(u.role || CRM_ROLES.SALES_EXECUTIVE);
+      reportsTo = u.reportsTo || "";
     } else if (nameLower.includes("rohan") || username === "rohan" || idLower.includes("rohan")) {
       companyId = "tenant_kashish";
       companyName = "Kashish Enterprises";
-      role = CRM_ROLES.SALES_EXECUTIVE;
-      reportsTo = "Kashish Sharma";
+      role = normalizeRole(u.role || CRM_ROLES.SALES_EXECUTIVE);
+      reportsTo = u.reportsTo || "Harsh Goyal";
     } else if (nameLower.includes("harsh") || username === "admin" || idLower === "usr_admin") {
       companyId = "tenant_apexsales";
       companyName = "ApexSales Global HQ";
-      role = CRM_ROLES.COMPANY_OWNER;
+      role = normalizeRole(u.role || CRM_ROLES.COMPANY_OWNER);
       reportsTo = "";
     } else if (nameLower.includes("vikram") || username === "vikram" || idLower === "usr_vikram") {
       companyId = "tenant_apexsales";
       companyName = "ApexSales Global HQ";
-      role = CRM_ROLES.TEAM_LEADER;
+      role = normalizeRole(u.role || CRM_ROLES.TEAM_LEADER);
       reportsTo = "Harsh Goyal";
     } else {
       if (!companyId) companyId = "tenant_apexsales";
       if (!companyName) companyName = "ApexSales Global HQ";
     }
 
+    const isOwnerRole = role === CRM_ROLES.COMPANY_OWNER;
     return {
       ...u,
-      id: (nameLower.includes("kashish") || username === "kashish" || idLower === "usr_1789033985345_n62j") ? "usr_kashish" : u.id,
-      name: (nameLower.includes("kashish") || username === "kashish") ? "Kashish Sharma" : name,
-      displayName: (nameLower.includes("kashish") || username === "kashish") ? "Kashish Sharma" : displayName,
+      id: u.id || ((nameLower.includes("kashish") || username === "kashish" || idLower === "usr_1789033985345_n62j") ? "usr_1789033985345_n62j" : u.id),
+      name: u.name || name,
+      displayName: u.displayName || displayName,
       role,
       reportsTo,
       companyId,
       companyName,
-      packageTier: (companyId === "tenant_kashish" ? "growth" : "super_admin")
+      packageTier: u.packageTier ? u.packageTier : (isOwnerRole ? (companyId === "tenant_kashish" ? "growth" : "super_admin") : "starter")
     };
   };
 
@@ -3149,17 +3169,17 @@ export default function App({ onNavigateToLanding } = {}) {
     const hasKashish = sanitized.some(u => (u.username === 'kashish' || (u.name && u.name.toLowerCase().includes('kashish'))));
     if (!hasKashish) {
       sanitized.push({
-        id: "usr_kashish",
-        name: "Kashish Sharma",
-        displayName: "Kashish Sharma",
+        id: "usr_1789033985345_n62j",
+        name: "Kashish",
+        displayName: "Kashish",
         username: "kashish",
         pin: "Admin@123",
         password: "Admin@123",
-        role: CRM_ROLES.COMPANY_OWNER,
+        role: CRM_ROLES.SALES_EXECUTIVE,
         companyId: "tenant_kashish",
         companyName: "Kashish Enterprises",
-        packageTier: "growth",
-        email: "kashish@kashishenterprises.com",
+        packageTier: "starter",
+        email: "kashish.accomation@gmail.com",
         phone: "7240705579",
         active: true
       });
@@ -3174,10 +3194,10 @@ export default function App({ onNavigateToLanding } = {}) {
         pin: "Rohan@2026",
         password: "Rohan@2026",
         role: CRM_ROLES.SALES_EXECUTIVE,
-        reportsTo: "Kashish Sharma",
+        reportsTo: "Harsh Goyal",
         companyId: "tenant_kashish",
         companyName: "Kashish Enterprises",
-        packageTier: "growth",
+        packageTier: "starter",
         email: "rohan@kashishenterprises.com",
         phone: "9819922334",
         active: true
@@ -3199,8 +3219,8 @@ export default function App({ onNavigateToLanding } = {}) {
     return [
       { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal", username: "admin", email: "harsh@apexsales.com", role: "company_owner", companyId: "tenant_apexsales", companyName: "ApexSales Global HQ", packageTier: "super_admin", permissions: { ...EMPLOYEE_PACKAGES.enterprise.permissions } },
       { id: "usr_vikram", name: "Vikram Malhotra", displayName: "Vikram Malhotra", username: "vikram", email: "vikram@apexsales.com", role: "team_leader", reportsTo: "Harsh Goyal", companyId: "tenant_apexsales", companyName: "ApexSales Global HQ", packageTier: "super_admin", permissions: { ...EMPLOYEE_PACKAGES.growth.permissions } },
-      { id: "usr_kashish", name: "Kashish Sharma", displayName: "Kashish Sharma", username: "kashish", email: "kashish.accomation@gmail.com", secondaryEmail: "kashish@kashishenterprises.com", pin: "Admin@123", role: "company_owner", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "growth", permissions: { ...EMPLOYEE_PACKAGES.enterprise.permissions } },
-      { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", email: "rohan@kashishenterprises.com", role: "sales_executive", reportsTo: "Kashish Sharma", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "growth", permissions: { ...EMPLOYEE_PACKAGES.starter.permissions } }
+      { id: "usr_1789033985345_n62j", name: "Kashish", displayName: "Kashish", username: "kashish", email: "kashish.accomation@gmail.com", secondaryEmail: "kashish@apexsales.com", pin: "Admin@123", role: "sales_rep", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "starter", permissions: { ...EMPLOYEE_PACKAGES.starter.permissions } },
+      { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", email: "rohan@kashishenterprises.com", role: "sales_executive", reportsTo: "Harsh Goyal", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "starter", permissions: { ...EMPLOYEE_PACKAGES.starter.permissions } }
     ];
   });
   const [currentLoggedInUser, setCurrentLoggedInUser] = useState(() => currentUser?.name || "");
@@ -3312,8 +3332,8 @@ export default function App({ onNavigateToLanding } = {}) {
       invoiceNumber: "INV-2026-001",
       companyId: "tenant_kashish",
       companyName: "Kashish Enterprises",
-      clientName: "Kashish Sharma",
-      clientEmail: "kashish@kashishenterprises.com",
+      clientName: "Harsh Goyal",
+      clientEmail: "harsh.accomation@gmail.com",
       clientPhone: "7240705579",
       clientAddress: "Corporate Plaza, MI Road, Jaipur, Rajasthan - 302001",
       clientGst: "08AABCK1234F1Z9",
@@ -16415,9 +16435,9 @@ export default function App({ onNavigateToLanding } = {}) {
                       {
                         id: "tenant_kashish",
                         name: "Kashish Enterprises",
-                        owner: "Kashish Sharma",
-                        phone: "7240705579",
-                        email: "kashish@kashishenterprises.com",
+                        owner: "Harsh Goyal",
+                        phone: "9876543210",
+                        email: "harsh.accomation@gmail.com",
                         licenseNumber: clientLicenses.find(l => l.companyId === 'tenant_kashish')?.licenseNumber || "2026-89421",
                         planId: (companyPlansMap && companyPlansMap['tenant_kashish']) || "growth",
                         planName: "Growth Company Plan",
@@ -16426,8 +16446,8 @@ export default function App({ onNavigateToLanding } = {}) {
                         members: (allUsersList.filter(u => getUserCompanyId(u) === 'tenant_kashish').length > 0
                           ? allUsersList.filter(u => getUserCompanyId(u) === 'tenant_kashish')
                           : [
-                              { id: "usr_kashish", name: "Kashish Sharma", displayName: "Kashish Sharma", username: "kashish", role: CRM_ROLES.COMPANY_OWNER, companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "growth", phone: "7240705579", email: "kashish@kashishenterprises.com", pin: "Admin@123", password: "Admin@123" },
-                              { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", role: CRM_ROLES.SALES_EXECUTIVE, reportsTo: "Kashish Sharma", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "growth", phone: "9819922334", email: "rohan@kashishenterprises.com", pin: "Rohan@2026", password: "Rohan@2026" }
+                              { id: "usr_1789033985345_n62j", name: "Kashish", displayName: "Kashish", username: "kashish", role: CRM_ROLES.SALES_EXECUTIVE, companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "starter", phone: "7240705579", email: "kashish.accomation@gmail.com", pin: "Admin@123", password: "Admin@123" },
+                              { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", role: CRM_ROLES.SALES_EXECUTIVE, reportsTo: "Harsh Goyal", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "starter", phone: "9819922334", email: "rohan@kashishenterprises.com", pin: "Rohan@2026", password: "Rohan@2026" }
                             ])
                       },
                       {
@@ -16641,9 +16661,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     
                     const activeOrgOwner = activeCompanyLicense?.clientName 
                       ? `${activeCompanyLicense.clientName} (Company Owner)`
-                      : (activeViewOrgId === 'tenant_kashish'
-                        ? "Kashish Sharma (Company Owner)"
-                        : "Harsh Goyal (Platform Owner)");
+                      : "Harsh Goyal (Platform Owner)";
 
                     const activeOrgPlanKey = (companyPlansMap && companyPlansMap[activeViewOrgId]) ||
                       activeCompanyLicense?.planId ||
@@ -16654,8 +16672,8 @@ export default function App({ onNavigateToLanding } = {}) {
                     const effectiveOrgLeadQuota = activeCompanyLicense?.leadQuota || activeOrgPlan.leadQuota;
 
                     let teamUsersToDisplay = (allUsersList.length > 0 ? allUsersList : [
-                      { id: "usr_kashish", name: "Kashish Sharma", displayName: "Kashish Sharma", username: "kashish", role: CRM_ROLES.COMPANY_OWNER, companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "growth" },
-                      { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", role: CRM_ROLES.SALES_EXECUTIVE, reportsTo: "Kashish Sharma", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "growth" }
+                      { id: "usr_1789033985345_n62j", name: "Kashish", displayName: "Kashish", username: "kashish", role: CRM_ROLES.SALES_EXECUTIVE, companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "starter" },
+                      { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", role: CRM_ROLES.SALES_EXECUTIVE, reportsTo: "Harsh Goyal", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "starter" }
                     ]).filter(usr => {
                       const uComp = getUserCompanyId(usr);
                       if (isSuperAdminUser) {
@@ -16681,8 +16699,8 @@ export default function App({ onNavigateToLanding } = {}) {
                     // Guaranteed Fallback if tenant_kashish or tenant_apexsales has 0 members
                     if (activeViewOrgId === 'tenant_kashish' && (!teamUsersToDisplay || teamUsersToDisplay.length === 0)) {
                       teamUsersToDisplay = [
-                        { id: "usr_kashish", name: "Kashish Sharma", displayName: "Kashish Sharma", username: "kashish", role: CRM_ROLES.COMPANY_OWNER, companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "growth", phone: "7240705579", email: "kashish@kashishenterprises.com", pin: "Admin@123", password: "Admin@123" },
-                        { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", role: CRM_ROLES.SALES_EXECUTIVE, reportsTo: "Kashish Sharma", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "growth", phone: "9819922334", email: "rohan@kashishenterprises.com", pin: "Rohan@2026", password: "Rohan@2026" }
+                        { id: "usr_1789033985345_n62j", name: "Kashish", displayName: "Kashish", username: "kashish", role: CRM_ROLES.SALES_EXECUTIVE, companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "starter", phone: "7240705579", email: "kashish.accomation@gmail.com", pin: "Admin@123", password: "Admin@123" },
+                        { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", role: CRM_ROLES.SALES_EXECUTIVE, reportsTo: "Harsh Goyal", companyId: "tenant_kashish", companyName: "Kashish Enterprises", packageTier: "starter", phone: "9819922334", email: "rohan@kashishenterprises.com", pin: "Rohan@2026", password: "Rohan@2026" }
                       ];
                     } else if (activeViewOrgId === 'tenant_apexsales' && (!teamUsersToDisplay || teamUsersToDisplay.length === 0)) {
                       teamUsersToDisplay = [
@@ -16837,7 +16855,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 {!isOwner ? (
                                   (isSuperAdminUser || isCompanyOwnerUser || isSalesHeadUser) ? (
                                     <select
-                                      value={detailUser.reportsTo || (isKashishMember ? "Kashish Sharma" : "Harsh Goyal")}
+                                      value={detailUser.reportsTo || "Harsh Goyal"}
                                       onChange={(e) => handleUpdateUserReportsTo(detailUser.id, e.target.value)}
                                       style={{
                                         width: "100%",
@@ -16854,7 +16872,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     >
                                       {isKashishMember ? (
                                         <>
-                                          <option value="Kashish Sharma">👑 Kashish Sharma (Company Owner)</option>
+                                          <option value="Harsh Goyal">👑 Harsh Goyal (Platform Owner)</option>
                                           {teamUsersToDisplay.filter(u => u.id !== detailUser.id && (normalizeRole(u.role) === CRM_ROLES.TEAM_LEADER || normalizeRole(u.role) === CRM_ROLES.SALES_HEAD)).map(mgr => (
                                             <option key={mgr.id} value={mgr.name}>👔 {mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
                                           ))}
@@ -16870,7 +16888,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     </select>
                                   ) : (
                                     <div style={{ padding: "8px 12px", fontSize: "12.5px", fontWeight: "600", color: "#334155", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-                                      {detailUser.reportsTo || (isKashishMember ? "Kashish Sharma" : "Harsh Goyal")}
+                                      {detailUser.reportsTo || "Harsh Goyal"}
                                     </div>
                                   )
                                 ) : (
@@ -17280,7 +17298,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                                   {roleBadge.badge}
                                                 </span>
                                                 <div style={{ fontSize: "11px", color: "#64748b" }}>
-                                                  Reports to: <strong style={{ color: "#334155" }}>{usr.reportsTo || (isKashishMember ? "Kashish Sharma" : "Harsh Goyal")}</strong>
+                                                  Reports to: <strong style={{ color: "#334155" }}>{usr.reportsTo || "Harsh Goyal"}</strong>
                                                 </div>
                                               </div>
                                             </td>
@@ -29781,7 +29799,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                       <span>Reports to:</span>
                                       {isSuper ? (
                                         <select
-                                          value={usr.reportsTo || (getUserCompanyId(usr) === 'tenant_kashish' ? "Kashish Sharma" : "Harsh Goyal")}
+                                          value={usr.reportsTo || "Harsh Goyal"}
                                           onChange={(e) => handleUpdateUserReportsTo(usr.id, e.target.value)}
                                           style={{
                                             padding: "1px 4px",
@@ -29797,7 +29815,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         >
                                           {getUserCompanyId(usr) === 'tenant_kashish' ? (
                                             <>
-                                              <option value="Kashish Sharma">👑 Kashish Sharma (Company Owner)</option>
+                                              <option value="Harsh Goyal">👑 Harsh Goyal (Platform Owner)</option>
                                               {allUsersList.filter(u => u.id !== usr.id && getUserCompanyId(u) === 'tenant_kashish' && (normalizeRole(u.role) === CRM_ROLES.TEAM_LEADER || normalizeRole(u.role) === CRM_ROLES.SALES_HEAD)).map(mgr => (
                                                 <option key={mgr.id} value={mgr.name}>👔 {mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
                                               ))}
@@ -29812,7 +29830,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                           )}
                                         </select>
                                       ) : (
-                                        <strong style={{ color: "#475569" }}>{usr.reportsTo || (getUserCompanyId(usr) === 'tenant_kashish' ? "Kashish Sharma" : "Harsh Goyal")}</strong>
+                                        <strong style={{ color: "#475569" }}>{usr.reportsTo || "Harsh Goyal"}</strong>
                                       )}
                                     </div>
                                   )}
