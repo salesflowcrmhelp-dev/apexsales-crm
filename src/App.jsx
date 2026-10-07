@@ -643,12 +643,12 @@ const getAiNextBestAction = (lead) => {
     return "📲 Priority 1: Send Payment QR Link / Invoice for instant closing!";
   }
   if (aiResult.percentage >= 60) {
-    return "📞 Priority 2: Call decision maker today to confirm payment & finalize agreement.";
+    return "Priority 2: Call decision maker today to confirm payment & finalize agreement.";
   }
   if (aiResult.percentage >= 40) {
-    return "🎁 Priority 3: Offer limited-time spot discount or address price objection.";
+    return "Priority 3: Offer limited-time spot discount or address price objection.";
   }
-  return "📅 Priority 4: Re-engage client via direct follow-up or reschedule demo.";
+  return "Priority 4: Re-engage client via direct follow-up or reschedule demo.";
 };
 
 // Initial data (STRICTLY All 32 Verified Original CRM Leads - 16 Won, 14 Active, 2 Lost)
@@ -1929,7 +1929,7 @@ export const getRoleBadgeInfo = (role) => {
         color: "#b45309",
         bg: "#fef3c7",
         border: "#fde68a",
-        icon: "👑",
+        icon: "crown",
         scopeDesc: "Global Authority (All Leads, Billing, Settings, Audit Logs)"
       };
     case CRM_ROLES.SALES_HEAD:
@@ -1941,7 +1941,7 @@ export const getRoleBadgeInfo = (role) => {
         color: "#1d4ed8",
         bg: "#eff6ff",
         border: "#bfdbfe",
-        icon: "📊",
+        icon: "bar-chart",
         scopeDesc: "Cross-Team Sales (All Teams' Leads, Targets, Comparisons)"
       };
     case CRM_ROLES.TEAM_LEADER:
@@ -1953,7 +1953,7 @@ export const getRoleBadgeInfo = (role) => {
         color: "#7c3aed",
         bg: "#faf5ff",
         border: "#e9d5ff",
-        icon: "👔",
+        icon: "tie",
         scopeDesc: "Team-Scoped Deals (Direct Reports' Pipeline + Unassigned Queue)"
       };
     default:
@@ -1965,7 +1965,7 @@ export const getRoleBadgeInfo = (role) => {
         color: "#059669",
         bg: "#ecfdf5",
         border: "#a7f3d0",
-        icon: "💼",
+        icon: "briefcase",
         scopeDesc: "Personal Deals (Strict Individual Pipeline Isolation)"
       };
   }
@@ -1976,7 +1976,7 @@ export const COMPANY_PLANS = {
   starter: {
     id: "starter",
     name: "Starter Company Plan",
-    badge: "🌱 Starter",
+    badge: "Starter",
     price: "₹1,999/mo",
     maxSeats: 5,
     leadQuota: 500,
@@ -1993,7 +1993,7 @@ export const COMPANY_PLANS = {
   growth: {
     id: "growth",
     name: "Growth Company Plan",
-    badge: "🚀 Growth",
+    badge: "Growth",
     price: "₹4,999/mo",
     maxSeats: 15,
     leadQuota: 2500,
@@ -2011,7 +2011,7 @@ export const COMPANY_PLANS = {
   enterprise: {
     id: "enterprise",
     name: "Enterprise Company Plan",
-    badge: "🏢 Enterprise",
+    badge: "Enterprise",
     price: "₹9,999/mo",
     maxSeats: 50,
     leadQuota: 10000,
@@ -2029,7 +2029,7 @@ export const COMPANY_PLANS = {
   super_admin: {
     id: "super_admin",
     name: "Master Super Admin License",
-    badge: "👑 Master Authority",
+    badge: "Master Authority",
     price: "Platform License",
     maxSeats: 9999,
     leadQuota: 999999,
@@ -2068,7 +2068,7 @@ export const ALL_PERMISSION_CATEGORIES = [
   },
   {
     id: "workspaces",
-    name: "🌐 Navigation Workspaces & Modules",
+    name: "Navigation Workspaces & Modules",
     desc: "Control which major pages and sidebar navigation items this employee can access.",
     color: "#0891b2",
     bg: "#ecfeff",
@@ -2083,7 +2083,7 @@ export const ALL_PERMISSION_CATEGORIES = [
   },
   {
     id: "views",
-    name: "👁️ Pipeline View Modes",
+    name: "Pipeline View Modes",
     desc: "Which pipeline view switchers are available on the top bar.",
     color: "#7c3aed",
     bg: "#faf5ff",
@@ -2096,7 +2096,7 @@ export const ALL_PERMISSION_CATEGORIES = [
   },
   {
     id: "pipeline",
-    name: "📋 Lead Operations & CRUD Isolation",
+    name: "Lead Operations & CRUD Isolation",
     desc: "Core pipeline operations, deal editing, and lead reassignment.",
     color: "#166534",
     bg: "#f0fdf4",
@@ -2111,7 +2111,7 @@ export const ALL_PERMISSION_CATEGORIES = [
   },
   {
     id: "financials",
-    name: "💰 Financials & Pricing Confidentiality",
+    name: "Financials & Pricing Confidentiality",
     desc: "Protect confidential deal values, targets, and commission rules.",
     color: "#b45309",
     bg: "#fffbeb",
@@ -2124,7 +2124,7 @@ export const ALL_PERMISSION_CATEGORIES = [
   },
   {
     id: "security",
-    name: "🔒 Data Security & Anti-Theft Guard",
+    name: "Data Security & Anti-Theft Guard",
     desc: "Prevent unauthorized customer data extraction or bulk alterations.",
     color: "#dc2626",
     bg: "#fef2f2",
@@ -2136,7 +2136,7 @@ export const ALL_PERMISSION_CATEGORIES = [
   },
   {
     id: "tools",
-    name: "⚡ Communication, AI & Audio Tools",
+    name: "Communication, AI & Audio Tools",
     desc: "Messaging, voice calling, AI pitch generators, and sound alerts.",
     color: "#4f46e5",
     bg: "#eef2ff",
@@ -2166,7 +2166,7 @@ export const EMPLOYEE_PACKAGES = {
   starter: {
     id: "starter",
     name: "Starter Rep",
-    badge: "📦 Starter",
+    badge: "Starter",
     bg: "#eff6ff",
     border: "#bfdbfe",
     color: "#2563eb",
@@ -2225,7 +2225,7 @@ export const EMPLOYEE_PACKAGES = {
   growth: {
     id: "growth",
     name: "Growth Closer",
-    badge: "🚀 Growth Pro",
+    badge: "Growth Pro",
     bg: "#f0fdf4",
     border: "#bbf7d0",
     color: "#166534",
@@ -2284,7 +2284,7 @@ export const EMPLOYEE_PACKAGES = {
   enterprise: {
     id: "enterprise",
     name: "Enterprise Manager",
-    badge: "🏢 Enterprise",
+    badge: "Enterprise",
     bg: "#faf5ff",
     border: "#e9d5ff",
     color: "#7c3aed",
@@ -2308,7 +2308,7 @@ export const EMPLOYEE_PACKAGES = {
   super_admin: {
     id: "super_admin",
     name: "Super Admin",
-    badge: "👑 Master Authority",
+    badge: "Master Authority",
     bg: "#fef3c7",
     border: "#fde68a",
     color: "#b45309",
@@ -2516,7 +2516,7 @@ export default function App({ onNavigateToLanding } = {}) {
     let cleanDigits = (otpPhone || "").replace(/[^0-9]/g, "");
     if (!cleanDigits || cleanDigits.length < 10) {
       setOtpError("Please enter a valid 10-digit mobile number.");
-      setSmsStatusMessage("❌ Error: Invalid 10-digit phone number");
+      setSmsStatusMessage("Error: Invalid 10-digit phone number");
       return;
     }
     const tenDigitPhone = cleanDigits.slice(-10);
@@ -2579,11 +2579,11 @@ export default function App({ onNavigateToLanding } = {}) {
             setSmsStatusMessage(`✅ ${gatewayName}: ${displayMsg}`);
             showToast(`✅ ${gatewayName}: ${displayMsg}`, "success");
           } else {
-            setSmsStatusMessage(`❌ ${gatewayName}: ${rawMsg || "Server SMS gateway error (Verify server environment SMS_GATEWAY_API_KEY)"}`);
-            showToast(`❌ ${gatewayName}: ${rawMsg || "Server SMS gateway error"}`, "error");
+            setSmsStatusMessage(`${gatewayName}: ${rawMsg || "Server SMS gateway error (Verify server environment SMS_GATEWAY_API_KEY)"}`);
+            showToast(`${gatewayName}: ${rawMsg || "Server SMS gateway error"}`, "error");
           }
         } catch(err) {
-          setSmsStatusMessage(`❌ SMS Gateway Error: ${err.message}`);
+          setSmsStatusMessage(`SMS Gateway Error: ${err.message}`);
           showToast(`SMS Error: ${err.message}`, "error");
         }
       }
@@ -4336,17 +4336,17 @@ export default function App({ onNavigateToLanding } = {}) {
     // Strict Mandatory Validation ONLY for active mid-pipeline stages
     if (!isNowWon && !isNowLost) {
       if (!stageModalAmount || isNaN(amt) || amt <= 0) {
-        setStageModalError("⚠️ Deal Amount (₹) is required! Please enter a valid discussed amount.");
+        setStageModalError("Deal Amount (₹) is required! Please enter a valid discussed amount.");
         return;
       }
 
       if (!stageModalNotes || stageModalNotes.trim().length < 3) {
-        setStageModalError("⚠️ What Was Discussed summary is required! Please enter call/demo outcome details.");
+        setStageModalError("What Was Discussed summary is required! Please enter call/demo outcome details.");
         return;
       }
 
       if (!stageModalPaymentDate) {
-        setStageModalError("⚠️ Promised Payment / Follow-up Date is required! Please select a valid date.");
+        setStageModalError("Promised Payment / Follow-up Date is required! Please select a valid date.");
         return;
       }
     }
@@ -7478,7 +7478,7 @@ export default function App({ onNavigateToLanding } = {}) {
       tierStatusBadge = totalIncentiveAmount > 0 ? `Earned: ₹${totalIncentiveAmount.toLocaleString("en-IN")}` : `${formatMonthLabel(selectedPeriodMonth, "short")} Closed`;
     } else {
       if (baseProgress >= 125) {
-        nextMilestoneText = "Max Tier 🔥";
+        nextMilestoneText = "Max Tier";
         tierStatusBadge = customSpotBonus > 0 ? `7% + ₹${customSpotBonus} Spot` : `7% Tier Earned`;
       } else if (baseProgress >= 100) {
         nextMilestoneText = "Goal: 125%";
@@ -7546,7 +7546,7 @@ export default function App({ onNavigateToLanding } = {}) {
     } else {
       // >= 125% Stretch goal successfully achieved!
       dailyRequired = 0;
-      dailySubtitle = "125% Goal Conquered! 🔥";
+      dailySubtitle = "125% Goal Conquered!";
     }
 
     return { 
@@ -9534,7 +9534,7 @@ export default function App({ onNavigateToLanding } = {}) {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "rgba(30, 41, 59, 0.6)", padding: "7px 12px", borderRadius: "8px", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
                 <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>ASSIGNED ROLE</span>
                 <span style={{ fontSize: "12px", fontWeight: "800", color: inviteDetails?.role === "admin" ? "#fcd34d" : "#93c5fd" }}>
-                  {inviteDetails?.role === "admin" ? "👑 Super Admin (Full Pipeline)" : "💼 Sales Rep (Isolated Data)"}
+                  {inviteDetails?.role === "admin" ? "Super Admin (Full Pipeline)" : "Sales Rep (Isolated Data)"}
                 </span>
               </div>
 
@@ -9589,7 +9589,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   marginTop: "4px"
                 }}
               >
-                {inviteAccepting ? "Activating Account..." : "Activate Account & Enter Workspace 🚀"}
+                {inviteAccepting ? "Activating Account..." : "Activate Account & Enter Workspace"}
               </button>
             </form>
           )}
@@ -9657,7 +9657,7 @@ export default function App({ onNavigateToLanding } = {}) {
           {/* Middle Hero Content */}
           <div style={{ position: "relative", zIndex: 10, maxWidth: "520px", display: "flex", flexDirection: "column", gap: "24px", margin: "auto 0" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", backgroundColor: "rgba(234, 88, 12, 0.12)", border: "1px solid rgba(234, 88, 12, 0.32)", padding: "5px 14px", borderRadius: "9999px", width: "fit-content" }}>
-              <span style={{ fontSize: "12px", fontWeight: "600", color: "#fb923c", letterSpacing: "0.4px" }}>⚡ Enterprise Workspace v2.4</span>
+              <span style={{ fontSize: "12px", fontWeight: "600", color: "#fb923c", letterSpacing: "0.4px" }}>Enterprise Workspace v2.4</span>
             </div>
 
             <h1 style={{ fontSize: "38px", fontWeight: "900", color: "#ffffff", lineHeight: "1.22", letterSpacing: "-1px", margin: 0 }}>
@@ -9696,7 +9696,7 @@ export default function App({ onNavigateToLanding } = {}) {
           {/* Bottom Social Proof / Trust */}
           <div style={{ paddingTop: "20px", borderTop: "1px solid rgba(255, 255, 255, 0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", color: "#94a3b8", position: "relative", zIndex: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{ color: "#fbbf24", fontSize: "13px" }}>★★★★★</span>
+              <span style={{ color: "#fbbf24", fontSize: "13px" }}>5/5 Stars</span>
               <strong style={{ color: "#e2e8f0" }}>4.9/5 Rating</strong>
               <span>by 500+ High-Growth Sales Teams</span>
             </div>
@@ -9758,7 +9758,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     Register Company Workspace
                   </h1>
                   <p style={{ margin: 0, fontSize: "12.5px", color: "#64748b", fontWeight: "500", lineHeight: 1.5 }}>
-                    Create your organization's CRM instance. You will be registered as the <strong>Company Owner 👑</strong> with master control over your sales squad, pipeline &amp; revenue.
+                    Create your organization's CRM instance. You will be registered as the <strong>Company Owner</strong> with master control over your sales squad, pipeline &amp; revenue.
                   </p>
                 </div>
 
@@ -9882,13 +9882,13 @@ export default function App({ onNavigateToLanding } = {}) {
                     {/* Live Strong Password Policy Indicator Pills */}
                     <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "8px", fontSize: "11px", fontWeight: "600" }}>
                       <span style={{ color: regPassValidation.hasMinLength ? "#059669" : "#94a3b8", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                        {regPassValidation.hasMinLength ? "✓" : "○"} 8+ chars
+                        {regPassValidation.hasMinLength ? "•" : "○"} 8+ chars
                       </span>
                       <span style={{ color: regPassValidation.hasUpper ? "#059669" : "#94a3b8", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                        {regPassValidation.hasUpper ? "✓" : "○"} 1 Capital (A-Z)
+                        {regPassValidation.hasUpper ? "•" : "○"} 1 Capital (A-Z)
                       </span>
                       <span style={{ color: regPassValidation.hasSpecial ? "#059669" : "#94a3b8", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                        {regPassValidation.hasSpecial ? "✓" : "○"} Special (@, #)
+                        {regPassValidation.hasSpecial ? "•" : "○"} Special (@, #)
                       </span>
                     </div>
                   </div>
@@ -9922,7 +9922,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       </>
                     ) : (
                       <>
-                        <span>Create Company Workspace &amp; Log In 🚀</span>
+                        <span>Create Company Workspace &amp; Log In</span>
                       </>
                     )}
                   </button>
@@ -10038,7 +10038,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       ) : (
                         <>
                           <span>Send Verification OTP</span>
-                          <span style={{ fontSize: "16px" }}>✉️</span>
+                          <Mail size={16} />
                         </>
                       )}
                     </button>
@@ -10151,13 +10151,13 @@ export default function App({ onNavigateToLanding } = {}) {
                       {/* Live Strong Password Policy Indicator Pills */}
                       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "8px", fontSize: "11px", fontWeight: "600" }}>
                         <span style={{ color: resetPassValidation.hasMinLength ? "#059669" : "#94a3b8", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                          {resetPassValidation.hasMinLength ? "✓" : "○"} 8+ chars
+                          {resetPassValidation.hasMinLength ? "•" : "○"} 8+ chars
                         </span>
                         <span style={{ color: resetPassValidation.hasUpper ? "#059669" : "#94a3b8", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                          {resetPassValidation.hasUpper ? "✓" : "○"} 1 Capital (A-Z)
+                          {resetPassValidation.hasUpper ? "•" : "○"} 1 Capital (A-Z)
                         </span>
                         <span style={{ color: resetPassValidation.hasSpecial ? "#059669" : "#94a3b8", display: "inline-flex", alignItems: "center", gap: "3px" }}>
-                          {resetPassValidation.hasSpecial ? "✓" : "○"} Special (@, #)
+                          {resetPassValidation.hasSpecial ? "•" : "○"} Special (@, #)
                         </span>
                       </div>
                     </div>
@@ -10224,7 +10224,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         </>
                       ) : (
                         <>
-                          <span>Verify OTP & Set Password 🚀</span>
+                          <span>Verify OTP & Set Password</span>
                         </>
                       )}
                     </button>
@@ -10248,7 +10248,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           gap: "4px"
                         }}
                       >
-                        ← Change Email
+                        Change Email
                       </button>
 
                       <button
@@ -10544,7 +10544,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 </div>
 
                 <h3 style={{ fontSize: "18px", fontWeight: "800", color: faceScanStatus === "denied" ? "#dc2626" : "#0f172a", margin: "0 0 6px 0", fontFamily: "'Inter', sans-serif" }}>
-                  {faceScanStatus === "verified" ? `Face ID Verified! ✅` : faceScanStatus === "denied" ? `Access Denied ❌` : `Scanning Facial Geometry...`}
+                  {faceScanStatus === "verified" ? `Face ID Verified!` : faceScanStatus === "denied" ? `Access Denied` : `Scanning Facial Geometry...`}
                 </h3>
 
                 <p style={{ fontSize: "12px", color: faceScanStatus === "verified" ? "#059669" : faceScanStatus === "denied" ? "#dc2626" : "#64748b", margin: "0 0 16px 0", fontWeight: "600" }}>
@@ -10568,7 +10568,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     style={{ padding: "8px 14px", backgroundColor: "#fef2f2", color: "#dc2626", border: "1px solid #fca5a5", borderRadius: "8px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}
                     title="Simulate scanning an unregistered face"
                   >
-                    Test Block 🚫
+                    Test Block
                   </button>
                 </div>
               </div>
@@ -10582,7 +10582,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                   <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
-                    📸 Biometric Face ID Registration
+                    Biometric Face ID Registration
                   </h3>
                   <button onClick={closeFaceRegistration} style={{ background: "none", border: "none", fontSize: "16px", cursor: "pointer", color: "#64748b" }}><X size={14} /></button>
                 </div>
@@ -10620,7 +10620,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       onClick={captureAndEnrollFace}
                       style={{ width: "100%", padding: "11px 20px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: "800", cursor: "pointer", boxShadow: "0 4px 14px rgba(234, 88, 12, 0.3)" }}
                     >
-                      📸 Capture & Register My Face ID
+                      Capture & Register My Face ID
                     </button>
                   </div>
                 )}
@@ -10639,7 +10639,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 {enrollStep === "success" && (
                   <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "12px", padding: "14px", marginTop: "10px" }}>
                     <div style={{ fontSize: "14px", fontWeight: "800", color: "#166534", marginBottom: "4px" }}>
-                      ✅ Face ID Registered & Calibrated!
+                      Face ID Registered & Calibrated!
                     </div>
                     <p style={{ fontSize: "12px", color: "#166534", margin: "0 0 12px 0", fontWeight: "600" }}>
                       Biometric facial vector saved for profile <strong>{registeredFaceName}</strong>. Workspace will now unlock with your face!
@@ -10875,7 +10875,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     <Laptop size={14} color="#ea580c" />
                     <span>Sales CRM View</span>
                   </span>
-                  <span style={{ fontSize: "11px", fontWeight: "800", color: "#c2410c" }}>→</span>
+                  <span>&gt;</span>
                 </button>
               </div>
 
@@ -11518,7 +11518,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     title="Switch to Sales Cockpit & Leads"
                   >
                     <Laptop size={14} />
-                    <span>💼 Switch to Sales CRM</span>
+                    <span>Switch to Sales CRM</span>
                   </button>
                 ) : (
                   <button
@@ -11543,7 +11543,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     title="Open Super Admin Enterprise Portal"
                   >
                     <Crown size={14} />
-                    <span>👑 Super Admin Hub</span>
+                    <span>Super Admin Hub</span>
                   </button>
                 )
               )}
@@ -11837,10 +11837,10 @@ export default function App({ onNavigateToLanding } = {}) {
                     }}
                     title="Role Simulator: Preview Dashboards for Owner, Sales Head, Team Lead, and Sales Rep"
                   >
-                    <option value="owner">👑 Owner View</option>
-                    <option value={CRM_ROLES.SALES_HEAD}>🎯 Sales Head View</option>
-                    <option value={CRM_ROLES.TEAM_LEADER}>👔 Team Lead View</option>
-                    <option value={CRM_ROLES.SALES_EXECUTIVE}>💼 Sales Rep View</option>
+                    <option value="owner">Owner View</option>
+                    <option value={CRM_ROLES.SALES_HEAD}>Sales Head View</option>
+                    <option value={CRM_ROLES.TEAM_LEADER}>Team Lead View</option>
+                    <option value={CRM_ROLES.SALES_EXECUTIVE}>Sales Rep View</option>
                   </select>
                 </div>
               )}
@@ -12070,7 +12070,7 @@ export default function App({ onNavigateToLanding } = {}) {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontSize: "18px" }}>👁️</span>
+                <Eye size={18} />
                 <div>
                   <div style={{ fontSize: "13px", fontWeight: "600", color: "#1e40af" }}>
                     Role Simulation Active: Viewing as {getRoleBadgeInfo(simulatedRole).label}
@@ -12101,7 +12101,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
                 }}
               >
-                ✕ Exit Simulation (Back to Owner)
+                Exit Simulation (Back to Owner)
               </button>
             </div>
           )}
@@ -12339,11 +12339,11 @@ export default function App({ onNavigateToLanding } = {}) {
                           }}
                         >
                           {isRepOnly ? (
-                            <option value={currentUser?.name}>👤 My Calendar ({currentUser?.name})</option>
+                            <option value={currentUser?.name}>My Calendar ({currentUser?.name})</option>
                           ) : isManager ? (
                             <>
                               <option value="">Team: All Scheduled</option>
-                              <option value="__my_events__">👤 My Follow-ups ({currentLoggedInUser})</option>
+                              <option value="__my_events__">My Follow-ups ({currentLoggedInUser})</option>
                               {teamMembers.filter(m => m !== currentLoggedInUser).map(m => (
                                 <option key={m} value={m}>{m}</option>
                               ))}
@@ -12351,7 +12351,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           ) : (
                             <>
                               <option value="">Owner: All Scheduled</option>
-                              <option value="__my_events__">👤 My Follow-ups ({currentLoggedInUser})</option>
+                              <option value="__my_events__">My Follow-ups ({currentLoggedInUser})</option>
                               {teamMembers.map(m => <option key={m} value={m}>{m}</option>)}
                             </>
                           )}
@@ -12615,7 +12615,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: scoreDotColor }} title={`Priority: ${ev.score}`} />
                                   {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && ev.owner && (
                                     <span style={{ fontSize: "12px", backgroundColor: "#f1f5f9", color: "#475569", padding: "2px 6px", borderRadius: "6px", fontWeight: "600", border: "1px solid #e2e8f0" }}>
-                                      👤 {ev.owner}
+                                      {ev.owner}
                                     </span>
                                   )}
                                 </div>
@@ -12842,10 +12842,10 @@ export default function App({ onNavigateToLanding } = {}) {
                 {/* Reports Section Switcher Tabs to reduce cognitive density (Issue 4) */}
                 <div style={{ display: "flex", gap: "8px", borderTop: "1px solid #f1f5f9", paddingTop: "8px", flexWrap: "wrap" }}>
                   {[
-                    { id: "analytics", label: "📊 Revenue Velocity & Pipeline" },
-                    { id: "team", label: "👥 Rep Leaderboard & Digest" },
-                    { id: "table", label: "📋 Audit Ledger & Records" },
-                    { id: "all", label: "📑 All Reports & Overview" }
+                    { id: "analytics", label: "Revenue Velocity & Pipeline" },
+                    { id: "team", label: "Rep Leaderboard & Digest" },
+                    { id: "table", label: "Audit Ledger & Records" },
+                    { id: "all", label: "All Reports & Overview" }
                   ].map(t => (
                     <button
                       key={t.id}
@@ -13255,7 +13255,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       return (
                         <>
                           <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c" }}>
-                            📅 {item.label}: <strong>₹{item.actual.toLocaleString("en-IN")}</strong> ({item.count} deals closed)
+                            {item.label}: <strong>₹{item.actual.toLocaleString("en-IN")}</strong> ({item.count} deals closed)
                           </span>
                           <span style={{ fontSize: "12px", fontWeight: "500", color: item.actual >= item.target ? "#16a34a" : "#ea580c" }}>
                             Target: ₹{item.target.toLocaleString("en-IN")} ({pace}% pace{gap > 0 ? ` • ₹${gap.toLocaleString("en-IN")} gap` : ` • Target Achieved`})
@@ -13272,7 +13272,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       return (
                         <>
                           <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c" }}>
-                            📅 {currentItem.label}: <strong>₹{currentItem.actual.toLocaleString("en-IN")}</strong> ({currentItem.count} deals)
+                            {currentItem.label}: <strong>₹{currentItem.actual.toLocaleString("en-IN")}</strong> ({currentItem.count} deals)
                           </span>
                           <span style={{ fontSize: "12px", fontWeight: "500", color: currentItem.actual >= currentItem.target ? "#16a34a" : "#ea580c" }}>
                             Target: ₹{currentItem.target.toLocaleString("en-IN")} ({currentPace}% pace{gap > 0 ? ` • ₹${gap.toLocaleString("en-IN")} gap` : ` • On Track`})
@@ -13552,7 +13552,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
                   <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                     {repLeaderboardData.map((rep, idx) => {
-                      const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`;
+                      const medal = `#${idx + 1}`;
                       const avatarColors = [
                         { bg: "#ffedd5", text: "#ea580c" },
                         { bg: "#eff6ff", text: "#2563eb" },
@@ -14416,9 +14416,9 @@ export default function App({ onNavigateToLanding } = {}) {
                           borderRadius: "6px",
                           fontSize: "12px",
                           fontWeight: "500",
-                          backgroundColor: smsStatusMessage.includes("✅") ? "#f0fdf4" : "#fef2f2",
-                          color: smsStatusMessage.includes("✅") ? "#166534" : "#dc2626",
-                          border: smsStatusMessage.includes("✅") ? "1px solid #bbf7d0" : "1px solid #fecaca"
+                          backgroundColor: smsStatusMessage.includes("success") ? "#f0fdf4" : "#fef2f2",
+                          color: smsStatusMessage.includes("success") ? "#166534" : "#dc2626",
+                          border: smsStatusMessage.includes("success") ? "1px solid #bbf7d0" : "1px solid #fecaca"
                         }}>
                           {smsStatusMessage}
                         </div>
@@ -14766,7 +14766,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         Super Admin
                       </span>
                       <span style={{ fontSize: "12px", fontWeight: "600", color: "#166534", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "2px 8px", borderRadius: "6px" }}>
-                        ● Active
+                        Active
                       </span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "8px 16px", marginTop: "6px", fontSize: "12px", color: "#475569" }}>
@@ -15147,7 +15147,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   {/* View Selector Dropdown */}
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     <label htmlFor="team-view-dropdown" style={{ fontSize: "12px", fontWeight: "700", color: "#475569" }}>
-                      📂 View:
+                      View:
                     </label>
                     <select
                       id="team-view-dropdown"
@@ -15167,9 +15167,9 @@ export default function App({ onNavigateToLanding } = {}) {
                         boxShadow: "0 1px 3px rgba(37,99,235,0.15)"
                       }}
                     >
-                      <option value="members">👥 Team Members & Hierarchy</option>
-                      <option value="scorecard">🏆 Performance & Quota Scorecard</option>
-                      <option value="reassign">🔀 Lead Reassignment Balancer</option>
+                      <option value="members">Team Members & Hierarchy</option>
+                      <option value="scorecard">Performance & Quota Scorecard</option>
+                      <option value="reassign">Lead Reassignment Balancer</option>
                     </select>
                   </div>
 
@@ -15217,7 +15217,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     gap: "6px"
                   }}
                 >
-                  <Users size={15} /> 👥 Team Members ({allUsersList.length})
+                  <Users size={15} /> Team Members ({allUsersList.length})
                 </button>
 
                 <button
@@ -15237,7 +15237,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     gap: "6px"
                   }}
                 >
-                  <Trophy size={15} /> 🏆 Performance Scorecard
+                  <Trophy size={15} /> Performance Scorecard
                 </button>
 
                 <button
@@ -15257,7 +15257,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     gap: "6px"
                   }}
                 >
-                  <Shuffle size={15} /> 🔀 Lead Reassign Balancer
+                  <Shuffle size={15} /> Lead Reassign Balancer
                 </button>
               </div>
 
@@ -15362,7 +15362,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               </div>
                               <div>
                                 <h2 style={{ fontSize: "15px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
-                                  👔 {isLeader ? "My Team Performance & Quota Velocity Scorecard" : `North India Sales Squad (${simLeader?.name || "Vikram Malhotra"}) — Performance Scorecard`}
+                                  {isLeader ? "My Team Performance & Quota Velocity Scorecard" : `North India Sales Squad (${simLeader?.name || "Vikram Malhotra"}) — Performance Scorecard`}
                                 </h2>
                                 <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>
                                   Target Achievement Pace • Direct Reports Capacity • Inbound Allocation Velocity
@@ -15391,7 +15391,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               }}
                             >
                               <Inbox size={14} />
-                              <span>Allocate Inbound Pool ({unassignedLeadsList.length}) →</span>
+                              <span>Allocate Inbound Pool ({unassignedLeadsList.length})</span>
                             </button>
                           </div>
 
@@ -15402,7 +15402,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                 <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", textTransform: "uppercase" }}>Monthly Team Target</span>
                                 <span style={{ fontSize: "11px", fontWeight: "600", color: teamAchievedPct >= 70 ? "#16a34a" : "#ea580c", backgroundColor: teamAchievedPct >= 70 ? "#dcfce7" : "#fff7ed", padding: "1px 6px", borderRadius: "4px" }}>
-                                  {teamAchievedPct >= 70 ? "🔥 Ahead of Pace" : "⚡ On Track"}
+                                  {teamAchievedPct >= 70 ? "Ahead of Pace" : "On Track"}
                                 </span>
                               </div>
                               <div style={{ fontSize: "20px", fontWeight: "800", color: "#0f172a", marginTop: "4px" }}>
@@ -15672,7 +15672,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 Company Subscription Seat
                               </label>
                               <div style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#f8fafc", color: "#0f172a", display: "flex", alignItems: "center", justifyContent: "space-between", fontWeight: "600", boxSizing: "border-box" }}>
-                                <span>📦 {activeCompanyPlan.name} Seat</span>
+                                <span>{activeCompanyPlan.name} Seat</span>
                                 <span style={{ fontSize: "11px", color: "#16a34a", fontWeight: "600" }}>Included in Company Plan</span>
                               </div>
                             </div>
@@ -15832,7 +15832,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             {/* Left Group: Label & Safe Presets */}
                             <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                               <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", marginRight: "2px" }}>
-                                ⚡ Quick Actions:
+                                Quick Actions:
                               </span>
                               
                               <button
@@ -15859,7 +15859,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   transition: "all 0.15s ease"
                                 }}
                               >
-                                ✅ Grant All Permissions (38)
+                                Grant All Permissions (38)
                               </button>
 
                               {/* Subtle divider separating global grant from security presets */}
@@ -15901,7 +15901,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   transition: "all 0.15s ease"
                                 }}
                               >
-                                🔒 Anti-Theft Lockdown
+                                Anti-Theft Lockdown
                               </button>
 
                               <button
@@ -15936,7 +15936,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   transition: "all 0.15s ease"
                                 }}
                               >
-                                🙈 Toggle Revenue & Financial Cards
+                                Toggle Revenue & Financial Cards
                               </button>
                             </div>
 
@@ -15967,7 +15967,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               title="Revoke all 38 permissions for this user"
                               aria-label="Deselect all permissions"
                             >
-                              ❌ Deselect All
+                              Deselect All
                             </button>
                           </div>
 
@@ -16003,13 +16003,13 @@ export default function App({ onNavigateToLanding } = {}) {
                                     gap: "4px"
                                   }}
                                 >
-                                  {ALL_PERMISSION_CATEGORIES.every(c => !!collapsedCategories[c.id]) ? "📂 Expand All" : "📁 Collapse All"}
+                                  {ALL_PERMISSION_CATEGORIES.every(c => !!collapsedCategories[c.id]) ? "Expand All" : "Collapse All"}
                                 </button>
                               </div>
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                                 <input 
                                   type="text"
-                                  placeholder="🔍 Search cards, permissions, tools..."
+                                  placeholder="Search cards, permissions, tools..."
                                   value={permSearchQuery}
                                   onChange={(e) => setPermSearchQuery(e.target.value)}
                                   style={{ width: "240px", height: "30px", padding: "4px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none" }}
@@ -16508,19 +16508,19 @@ export default function App({ onNavigateToLanding } = {}) {
                                     <div>
                                       <div style={{ fontSize: "9.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase" }}>License No.</div>
                                       <div style={{ fontSize: "11.5px", fontWeight: "800", color: "#0f172a", fontFamily: "monospace", marginTop: "2px" }}>
-                                        🔑 {comp.licenseNumber}
+                                        {comp.licenseNumber}
                                       </div>
                                     </div>
                                     <div>
                                       <div style={{ fontSize: "9.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase" }}>Seats Used</div>
                                       <div style={{ fontSize: "11.5px", fontWeight: "800", color: "#0f172a", marginTop: "2px" }}>
-                                        👥 {comp.members.length} / {comp.maxSeats > 999 ? "∞" : comp.maxSeats}
+                                        {comp.members.length} / {comp.maxSeats > 999 ? "Unlimited" : comp.maxSeats}
                                       </div>
                                     </div>
                                     <div>
                                       <div style={{ fontSize: "9.5px", fontWeight: "700", color: "#64748b", textTransform: "uppercase" }}>Leads Quota</div>
                                       <div style={{ fontSize: "11.5px", fontWeight: "800", color: "#0f172a", marginTop: "2px" }}>
-                                        📊 {compLeadsCount} / {comp.leadQuota > 9999 ? "∞" : comp.leadQuota.toLocaleString()}
+                                        {compLeadsCount} / {comp.leadQuota > 9999 ? "Unlimited" : comp.leadQuota.toLocaleString()}
                                       </div>
                                     </div>
                                   </div>
@@ -16673,7 +16673,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               </button>
                               <div>
                                 <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "800", color: "#0f172a" }}>
-                                  👤 {cleanName} Profile &amp; Data Window
+                                  {cleanName} Profile &amp; Data Window
                                 </h3>
                                 <p style={{ margin: "2px 0 0 0", fontSize: "11.5px", color: "#64748b" }}>
                                   Full record, credentials, security &amp; permissions under {activeOrgName}
@@ -16702,16 +16702,16 @@ export default function App({ onNavigateToLanding } = {}) {
                                   {roleBadge.badge}
                                 </span>
                                 <span style={{ fontSize: "11px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "2px 8px", borderRadius: "6px", border: "1px solid #bfdbfe" }}>
-                                  📊 {leadsCount} {leadsCount === 1 ? 'Lead' : 'Leads'}
+                                  {leadsCount} {leadsCount === 1 ? 'Lead' : 'Leads'}
                                 </span>
                                 <span style={{ fontSize: "11px", fontWeight: "600", color: "#64748b", backgroundColor: "#f8fafc", padding: "2px 8px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
-                                  🏢 {activeOrgName}
+                                  {activeOrgName}
                                 </span>
                               </div>
                               <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "6px", fontSize: "12px", color: "#64748b", flexWrap: "wrap" }}>
                                 <span><strong>Username:</strong> @{detailUser.username || "user"}</span>
                                 {detailUser.email && <span><strong>Email:</strong> {detailUser.email}</span>}
-                                {detailUser.phone && <span><strong>Phone:</strong> 📞 {detailUser.phone}</span>}
+                                {detailUser.phone && <span><strong>Phone:</strong> {detailUser.phone}</span>}
                               </div>
                             </div>
                           </div>
@@ -16726,7 +16726,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 <label style={{ display: "block", fontSize: "11px", fontWeight: "600", color: "#64748b", marginBottom: "5px" }}>DESIGNATION / ROLE</label>
                                 {isOwner ? (
                                   <div style={{ padding: "8px 12px", fontSize: "12.5px", fontWeight: "600", color: roleBadge.color, backgroundColor: roleBadge.bg, borderRadius: "6px", border: `1px solid ${roleBadge.border}` }}>
-                                    {checkIsPlatformSuperAdmin(detailUser) ? "👑 Platform Super Admin" : "Company Owner (Client Admin)"}
+                                    {checkIsPlatformSuperAdmin(detailUser) ? "Platform Super Admin" : "Company Owner (Client Admin)"}
                                   </div>
                                 ) : isSuperAdminUser ? (
                                   <select
@@ -16833,7 +16833,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   onClick={() => handleUpdateUserPin(detailUser.id, detailUser.name)}
                                   style={{ padding: "6px 14px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#334155", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                                 >
-                                  🔑 Change Password
+                                  Change Password
                                 </button>
                                 {detailUser.email && (
                                   <button
@@ -16841,7 +16841,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     onClick={() => handleResendInvite(detailUser)}
                                     style={{ padding: "6px 14px", backgroundColor: "#f0fdf4", border: "1px solid #86efac", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#166534", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                                   >
-                                    ✉️ Send Credentials Mail
+                                    Send Credentials Mail
                                   </button>
                                 )}
                               </div>
@@ -16871,28 +16871,28 @@ export default function App({ onNavigateToLanding } = {}) {
                               <div style={{ padding: "10px 12px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
                                 <div style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", textTransform: "uppercase" }}>Lead Visibility</div>
                                 <div style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a", marginTop: "3px" }}>
-                                  {effectivePerms.canViewAllLeads ? "👁️ All Leads" : "🔒 Own Leads Only"}
+                                  {effectivePerms.canViewAllLeads ? "All Leads" : "Own Leads Only"}
                                 </div>
                               </div>
 
                               <div style={{ padding: "10px 12px", backgroundColor: effectivePerms.canExportCSV ? "#f8fafc" : "#fef2f2", borderRadius: "6px", border: `1px solid ${effectivePerms.canExportCSV ? "#e2e8f0" : "#fecaca"}` }}>
                                 <div style={{ fontSize: "10px", fontWeight: "600", color: effectivePerms.canExportCSV ? "#64748b" : "#991b1b", textTransform: "uppercase" }}>CSV Export</div>
                                 <div style={{ fontSize: "12.5px", fontWeight: "600", color: effectivePerms.canExportCSV ? "#0f172a" : "#dc2626", marginTop: "3px" }}>
-                                  {effectivePerms.canExportCSV ? "📥 Allowed" : "🚫 Restricted"}
+                                  {effectivePerms.canExportCSV ? "Allowed" : "Restricted"}
                                 </div>
                               </div>
 
                               <div style={{ padding: "10px 12px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
                                 <div style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", textTransform: "uppercase" }}>Revenue Access</div>
                                 <div style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a", marginTop: "3px" }}>
-                                  {effectivePerms.canViewRevenue ? "💰 Visible" : "🙈 Masked"}
+                                  {effectivePerms.canViewRevenue ? "Visible" : "Masked"}
                                 </div>
                               </div>
 
                               <div style={{ padding: "10px 12px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
                                 <div style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", textTransform: "uppercase" }}>AI Assistant</div>
                                 <div style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a", marginTop: "3px" }}>
-                                  {effectivePerms.canUseAI ? "🤖 Enabled" : "⚪ Disabled"}
+                                  {effectivePerms.canUseAI ? "Enabled" : "Disabled"}
                                 </div>
                               </div>
                             </div>
@@ -16924,7 +16924,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               onClick={() => setSelectedUserForDetail(null)}
                               style={{ padding: "7px 18px", backgroundColor: "#0f172a", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", color: "#ffffff", cursor: "pointer" }}
                             >
-                              ← Back to {activeOrgName} Team
+                              Back to {activeOrgName} Team
                             </button>
                           </div>
                         </div>
@@ -17043,10 +17043,10 @@ export default function App({ onNavigateToLanding } = {}) {
                                 }}
                                 title="Plan Control"
                               >
-                                <option value="starter">🌱 Starter (5 Seats)</option>
-                                <option value="growth">🚀 Growth (15 Seats)</option>
-                                <option value="enterprise">🏢 Enterprise (50 Seats)</option>
-                                <option value="super_admin">👑 Master License</option>
+                                <option value="starter">Starter (5 Seats)</option>
+                                <option value="growth">Growth (15 Seats)</option>
+                                <option value="enterprise">Enterprise (50 Seats)</option>
+                                <option value="super_admin">Master License</option>
                               </select>
                             )}
                           </div>
@@ -17178,8 +17178,8 @@ export default function App({ onNavigateToLanding } = {}) {
                                                   </div>
                                                   <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px", display: "flex", alignItems: "center", gap: "6px" }}>
                                                     <span>@{usr.username || "user"}</span>
-                                                    {usr.phone && <span>• 📞 {usr.phone}</span>}
-                                                    {usr.email && <span>• ✉️ {usr.email}</span>}
+                                                    {usr.phone && <span>• {usr.phone}</span>}
+                                                    {usr.email && <span>• {usr.email}</span>}
                                                   </div>
                                                 </div>
                                               </div>
@@ -17223,7 +17223,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                                 fontWeight: "600",
                                                 color: "#0f172a"
                                               }}>
-                                                📊 {leadsCount} {leadsCount === 1 ? 'Lead' : 'Leads'}
+                                                {leadsCount} {leadsCount === 1 ? 'Lead' : 'Leads'}
                                               </span>
                                             </td>
 
@@ -17320,7 +17320,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               </div>
                               <div>
                                 <h2 style={{ fontSize: "15px", fontWeight: "600", color: "#0f172a", margin: 0 }}>
-                                  🔀 Team Lead Balancer & Bulk Lead Reassignment
+                                  Team Lead Balancer & Bulk Lead Reassignment
                                 </h2>
                                 <p style={{ fontSize: "11px", color: "#64748b", margin: "2px 0 0 0" }}>
                                   Reassign batches of prospects across representatives to maintain even workload and quotas.
@@ -17381,7 +17381,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           {/* Squad Lead Distribution & Capacity Table */}
                           <div style={{ marginTop: "16px", border: "1px solid #e2e8f0", borderRadius: "8px", overflow: "hidden", backgroundColor: "#ffffff" }}>
                             <div style={{ padding: "10px 14px", backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <strong style={{ fontSize: "12px", color: "#0f172a" }}>📊 Squad Lead Distribution & Capacity Table</strong>
+                              <strong style={{ fontSize: "12px", color: "#0f172a" }}>Squad Lead Distribution & Capacity Table</strong>
                               <span style={{ fontSize: "11px", color: "#64748b" }}>Shows current workload to prevent rep overloading</span>
                             </div>
                             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", textAlign: "left" }}>
@@ -17585,7 +17585,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         } else if (simulatedRole === CRM_ROLES.SALES_HEAD) {
                           name = `${actualUserName} (Sales Head)`;
                         }
-                        return `${greeting}, ${name}! 👋`;
+                        return `${greeting}, ${name}!`;
                       })()}
                     </h1>
                     <p style={{ fontSize: "13.5px", color: "#64748b", margin: 0, padding: "0 0 4px 0", fontWeight: "400", lineHeight: "1.5" }}>
@@ -17668,7 +17668,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         {Number(stats.winRate) === 0 ? (
                           <span style={{ color: "#64748b", fontWeight: "600" }}>0 Closed in {formatMonthLabel(selectedPeriodMonth, "short")}</span>
                         ) : (
-                          <span style={{ color: "#166534", fontWeight: "700" }}>✓ Won conversion rate</span>
+                          <span style={{ color: "#166534", fontWeight: "700" }}>Won conversion rate</span>
                         )}
                       </div>
                     </div>
@@ -17680,7 +17680,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       className="kpi-luxury-card" 
                       onClick={() => {
                         if (!checkIsSuperAdmin(currentUser) && !getUserEffectivePermissions(currentUser).canEditTarget) {
-                          showToast("🔒 Sales target editing is restricted by Super Admin.", "info");
+                          showToast("Sales target editing is restricted by Super Admin.", "info");
                           return;
                         }
                         startEditingTarget();
@@ -17734,7 +17734,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       className="kpi-luxury-card" 
                       onClick={() => {
                         if (!checkIsSuperAdmin(currentUser) && !getUserEffectivePermissions(currentUser).canEditTarget) {
-                          showToast("🔒 Daily target editing is restricted by Super Admin.", "info");
+                          showToast("Daily target editing is restricted by Super Admin.", "info");
                           return;
                         }
                         startEditingTarget();
@@ -17775,7 +17775,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       className="kpi-luxury-card" 
                       onClick={() => {
                         if (!checkIsSuperAdmin(currentUser) && !getUserEffectivePermissions(currentUser).canEditIncentive) {
-                          showToast("🔒 Incentive structure editing is restricted by Super Admin.", "info");
+                          showToast("Incentive structure editing is restricted by Super Admin.", "info");
                           return;
                         }
                         startEditingTarget();
@@ -18433,7 +18433,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             onClick={() => setIsSheetStageOpen(false)}
                             style={{ padding: "3px 10px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "10px", fontWeight: "600", cursor: "pointer" }}
                           >
-                            Done ✓
+                            Done
                           </button>
                         </div>
                       </div>
@@ -18520,22 +18520,22 @@ export default function App({ onNavigateToLanding } = {}) {
                           style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterOwner ? "#7c3aed" : "#475569", backgroundColor: isRepOnly ? "#f8fafc" : (filterOwner ? "#f5f3ff" : "#ffffff"), outline: "none", cursor: isRepOnly ? "default" : "pointer", fontWeight: "600", fontFamily: "'Inter', sans-serif", height: "32px" }}
                         >
                           {isRepOnly ? (
-                            <option value={currentUser.name}>👤 My Leads ({currentUser.name})</option>
+                            <option value={currentUser.name}>My Leads ({currentUser.name})</option>
                           ) : isManager ? (
                             <>
-                              <option value="__my_leads__">👤 My Leads ({myName}) - {ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
-                              <option value="">👥 Team: All Leads ({ownerScopedLeads.length})</option>
+                              <option value="__my_leads__">My Leads ({myName}) - {ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
+                              <option value="">Team: All Leads ({ownerScopedLeads.length})</option>
                               {otherOwners.map(m => (
-                                <option key={m} value={m}>👤 {m} ({ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
+                                <option key={m} value={m}>{m} ({ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
                               ))}
                             </>
                           ) : (
                             <>
-                              <option value="__my_leads__">👤 My Leads ({myName}) - {ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
-                              <option value="">👥 All Leads ({ownerScopedLeads.length} Total)</option>
-                              <option value="__unassigned__">⚠️ Unassigned ({ownerScopedLeads.filter(l => !l.owner || l.owner === "Unassigned").length})</option>
+                              <option value="__my_leads__">My Leads ({myName}) - {ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
+                              <option value="">All Leads ({ownerScopedLeads.length} Total)</option>
+                              <option value="__unassigned__">Unassigned ({ownerScopedLeads.filter(l => !l.owner || l.owner === "Unassigned").length})</option>
                               {otherOwners.map(m => (
-                                <option key={m} value={m}>👤 {m} ({ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
+                                <option key={m} value={m}>{m} ({ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
                               ))}
                             </>
                           )}
@@ -18719,7 +18719,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             bg: "#fff7ed",
                             border: "#fed7aa",
                             text: "#c2410c",
-                            icon: "🔥",
+                            icon: "active",
                             label: "Warm"
                           };
                           if (scoreVal === "hot") {
@@ -18727,7 +18727,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               bg: "#fef2f2",
                               border: "#fecaca",
                               text: "#dc2626",
-                              icon: "🔥",
+                              icon: "active",
                               label: "Hot"
                             };
                           } else if (scoreVal === "cold") {
@@ -18735,7 +18735,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               bg: "#f0f9ff",
                               border: "#bae6fd",
                               text: "#0369a1",
-                              icon: "●",
+                              icon: "dot",
                               label: "Cold"
                             };
                           }
@@ -18881,7 +18881,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 onClick={() => setSelectedCell({ rowIndex: rIdx, colIndex: 2 })}
                                 onDoubleClick={() => {
                                   if (!getUserEffectivePermissions(currentUser).canViewRevenue) {
-                                    showToast("🔒 Deal revenue is protected for your role/package tier.", "info");
+                                    showToast("Deal revenue is protected for your role/package tier.", "info");
                                     return;
                                   }
                                   startEditing(rIdx, 2);
@@ -21131,7 +21131,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               <div>
                                 <span style={{ fontSize: "10px", color: "#64748b", fontWeight: "600", display: "block" }}>Payment Date:</span>
                                 <strong style={{ color: "#0f172a" }}>{selectedReceiptDeal.won_date || new Date().toISOString().slice(0, 10)}</strong>
-                                <span style={{ color: "#166534", fontWeight: "700", display: "block", fontSize: "10px" }}>Status: Paid in Full ✓</span>
+                                <span style={{ color: "#166534", fontWeight: "700", display: "block", fontSize: "10px" }}>Status: Paid in Full</span>
                               </div>
                             </div>
                           </div>
@@ -21684,7 +21684,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         <div className="kanban-card-meta-left">
                                           <div className="kanban-card-stars" title={`Priority: ${scoreLower.toUpperCase()}`}>
                                             {[1, 2, 3].map(s => (
-                                              <span key={s} style={{ color: s <= starsCount ? "#f59e0b" : "#cbd5e1" }}>★</span>
+                                              <span key={s} style={{ color: s <= starsCount ? "#f59e0b" : "#cbd5e1", fontSize: "14px" }}>*</span>
                                             ))}
                                           </div>
                                           {lead.owner && (
@@ -22294,7 +22294,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             onClick={() => setPipelineView("sheet")}
                             style={{ padding: "8px 16px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}
                           >
-                            Return to Pipeline Grid →
+                            Return to Pipeline Grid
                           </button>
                         </div>
                       </div>
@@ -22673,7 +22673,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)"
                                 }}
                               >
-                                Allocate Inbound Leads →
+                                Allocate Inbound Leads
                               </button>
                             </div>
                           )}
@@ -22714,7 +22714,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   aria-label="View Follow-ups Due Today"
                                   className="btn-card-action"
                                 >
-                                  View →
+                                  View
                                 </button>
                               </div>
                             </div>
@@ -22754,7 +22754,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   aria-label="View Overdue Follow-ups"
                                   className="btn-card-action btn-card-action-danger"
                                 >
-                                  View →
+                                  View
                                 </button>
                               </div>
                             </div>
@@ -22794,7 +22794,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   aria-label="View Hot Priority Deals"
                                   className="btn-card-action"
                                 >
-                                  View →
+                                  View
                                 </button>
                               </div>
                             </div>
@@ -22834,7 +22834,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   aria-label="View Expected Revenue"
                                   className="btn-card-action"
                                 >
-                                  View →
+                                  View
                                 </button>
                               </div>
                             </div>
@@ -22874,7 +22874,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   aria-label="View Deals Ready to Close"
                                   className="btn-card-action"
                                 >
-                                  View →
+                                  View
                                 </button>
                               </div>
                             </div>
@@ -22914,7 +22914,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   aria-label="View Renewal Leads"
                                   className="btn-card-action"
                                 >
-                                  View →
+                                  View
                                 </button>
                               </div>
                             </div>
@@ -22988,7 +22988,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); }}
                                 style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "2px 8px", borderRadius: "6px", cursor: "pointer" }}
                               >
-                                View All →
+                                View All
                               </span>
                             </div>
 
@@ -23032,7 +23032,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); }}
                                 style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "2px 8px", borderRadius: "6px", cursor: "pointer" }}
                               >
-                                View All →
+                                View All
                               </span>
                             </div>
 
@@ -23854,7 +23854,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           <Flame size={18} color="#ef4444" fill="#ef4444" />
                           <h3 className="chart-box-title" style={{ margin: 0 }}>Hot Opportunities</h3>
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", cursor: "pointer" }}>View All →</span>
+                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", cursor: "pointer" }}>View All</span>
                       </div>
 
                       <div className="hot-leads-cards-wrapper" style={{ display: "flex", flexDirection: "column", gap: "10px", maxHeight: "255px", overflowY: "auto" }}>
@@ -24361,7 +24361,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             <strong style={{ fontSize: "14px", color: "#0f172a" }}>{intelData.avgClosingTime === "N/A" ? "N/A" : `${intelData.avgClosingTime} days`}</strong>
                           </div>
                           <div style={{ padding: "8px", borderBottom: "1px solid #f1f5f9" }}>
-                            <div style={{ color: "#64748b", fontWeight: "600", fontSize: "12px" }}>Follow-up → Won</div>
+                            <div style={{ color: "#64748b", fontWeight: "600", fontSize: "12px" }}>Follow-up to Won</div>
                             <strong style={{ fontSize: "14px", color: "#166534" }}>{intelData.followupWonConversion}%</strong>
                           </div>
                         </div>
@@ -24369,7 +24369,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
                       {/* Revenue Opportunity Card */}
                       <div className="analytics-chart-box" style={{ animationDelay: "0.15s" }}>
-                        <h4 className="chart-box-title" style={{ color: "#166534", marginBottom: "12px" }}>💰 Revenue Opportunity</h4>
+                        <h4 className="chart-box-title" style={{ color: "#166534", marginBottom: "12px" }}>Revenue Opportunity</h4>
                         <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "12px" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: "6px", borderBottom: "1px solid #f1f5f9" }}>
                             <span style={{ color: "#475569", fontWeight: "600" }}>Total Active Pipeline:</span>
@@ -24401,7 +24401,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                       {/* Lost Deal Analysis */}
                       <div className="analytics-chart-box" style={{ animationDelay: "0.2s" }}>
-                        <h4 className="chart-box-title" style={{ color: "#dc2626", marginBottom: "12px" }}>🔍 Lost Deal Analysis</h4>
+                        <h4 className="chart-box-title" style={{ color: "#dc2626", marginBottom: "12px" }}>Lost Deal Analysis</h4>
                         {intelData.lostCount === 0 ? (
                           <div style={{ padding: "20px", textAlign: "center", color: "#64748b", fontStyle: "italic", fontSize: "12px" }}>
                             Not enough lost-deal data yet.
@@ -24477,7 +24477,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
                       {/* Best Lead Source table */}
                       <div className="analytics-chart-box" style={{ animationDelay: "0.25s" }}>
-                        <h4 className="chart-box-title" style={{ color: "#2563eb", marginBottom: "12px" }}>🏆 Best Lead Source</h4>
+                        <h4 className="chart-box-title" style={{ color: "#2563eb", marginBottom: "12px" }}>Best Lead Source</h4>
                         {intelData.bestSourcesList.length === 0 ? (
                           <div style={{ padding: "20px", textAlign: "center", color: "#64748b", fontStyle: "italic", fontSize: "12px" }}>
                             Not enough lead source data yet.
@@ -24511,7 +24511,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
                     {/* Row 4: Stage conversions */}
                     <div className="analytics-chart-box full-width" style={{ animationDelay: "0.3s" }}>
-                      <h4 className="chart-box-title" style={{ marginBottom: "12px" }}>📈 Stage Conversion Funnel Analysis</h4>
+                      <h4 className="chart-box-title" style={{ marginBottom: "12px" }}>Stage Conversion Funnel Analysis</h4>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginTop: "6px" }}>
                         {intelData.stagesList.map((stage, idx) => {
                           const prevStage = idx > 0 ? intelData.stagesList[idx - 1] : null;
@@ -24524,7 +24524,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               
                               {pct !== null && (
                                 <div style={{ position: "absolute", left: "-20px", top: "40%", transform: "translateY(-50%)", zIndex: 10, fontSize: "12px", fontWeight: "900", color: "#2563eb", backgroundColor: "#e0e7ff", border: "1px solid #c7d2fe", padding: "2px 6px", borderRadius: "6px" }}>
-                                  {pct}% →
+                                  {pct}%
                                 </div>
                               )}
                             </div>
@@ -26213,7 +26213,7 @@ export default function App({ onNavigateToLanding } = {}) {
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "800px", width: "95%" }}>
             <div className="modal-header" style={{ borderBottom: "1px solid #cbd5e1", paddingBottom: "12px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontSize: "20px" }}>🎯</span>
+                <Target size={20} />
                 <div>
                   <h3 className="modal-title" style={{ fontSize: "16px", fontWeight: "900" }}>Start My Day - Sales Cockpit Focus</h3>
                   <p style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0 0" }}>Focused summary to prioritize your actions for today</p>
@@ -26465,13 +26465,13 @@ export default function App({ onNavigateToLanding } = {}) {
             {/* Modal Body */}
             <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "16px" }}>
               <div style={{ backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "12px 14px", borderRadius: "8px", fontSize: "12px", color: "#2563eb" }}>
-                ⚡ <strong>2-Way Real-time Google Sheets Webhook Sync:</strong><br />
+                <strong>2-Way Real-time Google Sheets Webhook Sync:</strong><br />
                 Paste your Google Apps Script Webhook URL below to automatically push edits between your browser CRM and Google Sheets in real-time.
               </div>
 
               <div>
                 <label style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", display: "block", marginBottom: "6px", fontFamily: "'Inter', sans-serif" }}>
-                  🔗 Google Apps Script Webhook URL:
+                  Google Apps Script Webhook URL:
                 </label>
                 <input 
                   type="text" 
@@ -27894,13 +27894,13 @@ export default function App({ onNavigateToLanding } = {}) {
                     {/* Live Validation Pills */}
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px", fontSize: "11px", fontWeight: "600" }}>
                       <span style={{ color: passValidation.hasMinLength ? "#059669" : "#94a3b8" }}>
-                        {passValidation.hasMinLength ? "✓" : "○"} 8+ chars
+                        {passValidation.hasMinLength ? "•" : "○"} 8+ chars
                       </span>
                       <span style={{ color: passValidation.hasUpper ? "#059669" : "#94a3b8" }}>
-                        {passValidation.hasUpper ? "✓" : "○"} 1 Capital (A-Z)
+                        {passValidation.hasUpper ? "•" : "○"} 1 Capital (A-Z)
                       </span>
                       <span style={{ color: passValidation.hasSpecial ? "#059669" : "#94a3b8" }}>
-                        {passValidation.hasSpecial ? "✓" : "○"} Special (@, #)
+                        {passValidation.hasSpecial ? "•" : "○"} Special (@, #)
                       </span>
                     </div>
                   </div>
@@ -29198,7 +29198,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 <button
                   type="button"
                   onClick={() => {
-                    const text = `📊 *[ApexSales] Weekly Executive Revenue Digest*\n\n💰 *Realized Revenue (M-T-D):* ₹4,85,000 (inc. 18% GST)\n📈 *Expected Month-End:* ₹6,20,000 (Weighted Forecast)\n🎯 *Team Win Rate:* 68% (Target: 65%)\n⚡ *Avg Closing Velocity:* 3.2 Days\n🥇 *Top Performer:* Harsh Goyal (₹1,80,000 | 115% Quota)\n🔄 *Client Renewal ARR:* ₹1,24,000 Protected\n\n_Auto-dispatched via ApexSales CRM Intelligence_`;
+                    const text = `*[ApexSales] Weekly Executive Revenue Digest*\n\n*Realized Revenue (M-T-D):* ₹4,85,000 (inc. 18% GST)\n*Expected Month-End:* ₹6,20,000 (Weighted Forecast)\n*Team Win Rate:* 68% (Target: 65%)\n*Avg Closing Velocity:* 3.2 Days\n*Top Performer:* Harsh Goyal (₹1,80,000 | 115% Quota)\n*Client Renewal ARR:* ₹1,24,000 Protected\n\n_Auto-dispatched via ApexSales CRM Intelligence_`;
                     navigator.clipboard.writeText(text);
                     showToast("Copied digest for WhatsApp broadcast!");
                   }}
