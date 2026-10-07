@@ -68,15 +68,15 @@
     {
       "id": "usr_1789033985345_n62j",
       "name": "Kashish",
-      "displayName": "Kashish (Owner)",
+      "displayName": "Kashish",
       "username": "kashish",
       "pin": "$argon2id$v=19$m=19456,t=2,p=1$67e0OvAMQ2sVhELurRjbHQ$VQ1Dgb1Yo+aRL/aXxQmhi1EkjMbiowADZ3TcBO1WiW0",
-      "role": "company_owner",
+      "role": "sales_rep",
       "email": "kashish.accomation@gmail.com",
       "secondaryEmail": "kashish@apexsales.com",
       "phone": "7240705579",
       "active": true,
-      "packageTier": "super_admin",
+      "packageTier": "starter",
       "companyId": "tenant_kashish",
       "companyName": "Kashish Enterprises",
       "permissions": {
@@ -86,7 +86,7 @@
         "canAccessTasks": true,
         "canAccessCalendar": true
       },
-      "maxLeadsLimit": 999999
+      "maxLeadsLimit": 50
     },
     {
       "id": "usr_1791191649630",

@@ -29,6 +29,17 @@ import {
 } from './lib/supabaseService';
 import { supabase } from './lib/supabase';
 
+export const normalizeRoleForDisplay = (r) => {
+  if (!r) return 'Employee';
+  const roleLower = String(r).trim().toLowerCase();
+  if (roleLower === 'admin' || roleLower === 'company_owner' || roleLower === 'owner') return 'Admin';
+  if (roleLower === 'manager') return 'Manager';
+  if (roleLower === 'sales head' || roleLower === 'sales_head') return 'Sales Head';
+  if (roleLower === 'team leader' || roleLower === 'team_leader') return 'Team Leader';
+  if (roleLower === 'employee' || roleLower === 'sales_rep' || roleLower === 'sales_executive' || roleLower === 'sales rep') return 'Employee';
+  return r;
+};
+
 const DEFAULT_COMPANY_PLANS = {
   starter: {
     id: "starter",
@@ -496,9 +507,7 @@ export default function SuperAdminDashboard({
         id: u.id || 'usr_' + Math.random().toString(36).slice(2, 7),
         name: u.name || u.displayName || 'Team Member',
         email: u.email || `${(u.username || 'user')}@example.com`,
-        role: (u.role === 'company_owner' || u.role === 'admin') ? 'Admin'
-              : u.role === 'team_leader' ? 'Manager'
-              : 'Employee',
+        role: normalizeRoleForDisplay(u.role),
         company: u.companyName || u.company_name || u.company || 'ABC Pvt Ltd',
         status: u.active !== false && u.status !== 'Inactive' ? 'Active' : 'Inactive',
         avatarBg: '#3b82f6'
@@ -564,7 +573,7 @@ export default function SuperAdminDashboard({
       if (notifs.status === 'fulfilled' && Array.isArray(notifs.value)) setNotifications(notifs.value);
       if (integs.status === 'fulfilled' && Array.isArray(integs.value)) setIntegrations(integs.value);
       if (lds.status === 'fulfilled' && Array.isArray(lds.value)) setActiveLeads(lds.value);
-      if (usrs.status === 'fulfilled' && Array.isArray(usrs.value)) setUsersList(usrs.value);
+      if (usrs.status === 'fulfilled' && Array.isArray(usrs.value)) setUsersList(usrs.value.map(u => ({ ...u, role: normalizeRoleForDisplay(u.role) })));
       if (plansRes.status === 'fulfilled' && plansRes.value?.success && plansRes.value.map) setCompanyPlansMap(prev => ({ ...prev, ...plansRes.value.map }));
       if (pkgsRes.status === 'fulfilled' && pkgsRes.value?.success && Array.isArray(pkgsRes.value.data) && pkgsRes.value.data.length > 0) setClientDealPackages(pkgsRes.value.data);
       if (licsRes.status === 'fulfilled' && licsRes.value?.success && Array.isArray(licsRes.value.data) && licsRes.value.data.length > 0) setClientLicenses(licsRes.value.data);
@@ -1295,8 +1304,15 @@ export default function SuperAdminDashboard({
     e.preventDefault();
     if (!editingUser || !editingUser.name.trim()) return;
     setIsSubmitting(true);
+    const backendRole = 
+      editingUser.role === 'Employee' ? 'sales_rep' :
+      editingUser.role === 'Manager' ? 'manager' :
+      editingUser.role === 'Sales Head' ? 'sales_head' :
+      editingUser.role === 'Team Leader' ? 'team_leader' :
+      editingUser.role === 'Admin' ? 'admin' : editingUser.role;
+
     try {
-      const res = await upsertUserToSupabase(editingUser);
+      const res = await upsertUserToSupabase({ ...editingUser, role: backendRole });
       if (res && res.success === false) {
         showToast(`Failed to update user: ${res.error}`, 'error');
         setIsSubmitting(false);
@@ -1304,7 +1320,7 @@ export default function SuperAdminDashboard({
       }
       const refreshed = await fetchUsersFromSupabase();
       if (Array.isArray(refreshed) && refreshed.length > 0) {
-        setUsersList(refreshed);
+        setUsersList(refreshed.map(u => ({ ...u, role: normalizeRoleForDisplay(u.role) })));
       } else {
         setUsersList(prev => prev.map(u => u.id === editingUser.id ? { ...editingUser } : u));
       }
@@ -1388,8 +1404,15 @@ export default function SuperAdminDashboard({
   const handleChangeUserRole = async (user, newRole) => {
     if (!user || !newRole) return;
     setActionLoadingId(user.id);
+    const backendRole = 
+      newRole === 'Employee' ? 'sales_rep' :
+      newRole === 'Manager' ? 'manager' :
+      newRole === 'Sales Head' ? 'sales_head' :
+      newRole === 'Team Leader' ? 'team_leader' :
+      newRole === 'Admin' ? 'admin' : newRole;
+
     try {
-      const res = await upsertUserToSupabase({ ...user, role: newRole });
+      const res = await upsertUserToSupabase({ ...user, role: backendRole });
       if (res && res.success === false) {
         showToast(`Failed to change role: ${res.error}`, 'error');
         setActionLoadingId(null);
@@ -1397,14 +1420,14 @@ export default function SuperAdminDashboard({
       }
       const refreshed = await fetchUsersFromSupabase();
       if (Array.isArray(refreshed) && refreshed.length > 0) {
-        setUsersList(refreshed);
+        setUsersList(refreshed.map(u => ({ ...u, role: normalizeRoleForDisplay(u.role) })));
       } else {
         setUsersList(prev => prev.map(u => u.id === user.id ? { ...u, role: newRole } : u));
       }
       if (activeActionMenu?.item?.id === user.id) {
         setActiveActionMenu(prev => prev ? { ...prev, item: { ...prev.item, role: newRole } } : null);
       }
-      showToast(`Role updated to ${newRole} for "${user.name}" in Supabase!`, 'success');
+      showToast(`Role updated to ${newRole} for "${user.name}"!`, 'success');
       fetchAuditLogsFromSupabase().then(logs => { if (logs) setAuditLogs(logs); });
     } catch (err) {
       showToast(`Error: ${err.message}`, 'error');
@@ -7033,7 +7056,7 @@ Thank you for your business!`;
                   <Eye size={15} color="#2563eb" /> View User Profile
                 </button>
                 <button
-                  onClick={() => { setEditingUser({ ...activeActionMenu.item }); setIsEditUserOpen(true); setActiveActionMenu(null); }}
+                  onClick={() => { setEditingUser({ ...activeActionMenu.item, role: normalizeRoleForDisplay(activeActionMenu.item.role) }); setIsEditUserOpen(true); setActiveActionMenu(null); }}
                   style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', color: '#0f172a', fontWeight: '700', fontSize: '12px', cursor: 'pointer' }}
                 >
                   <Pencil size={15} color="#d97706" /> Edit User Info
@@ -7047,7 +7070,7 @@ Thank you for your business!`;
                 <div style={{ padding: '8px 10px', backgroundColor: '#f1f5f9', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <label style={{ fontSize: '11px', fontWeight: '600', color: '#475569' }}>Change User Role</label>
                   <select
-                    value={activeActionMenu.item.role || 'Admin'}
+                    value={normalizeRoleForDisplay(activeActionMenu.item?.role)}
                     onChange={(e) => handleChangeUserRole(activeActionMenu.item, e.target.value)}
                     style={{ padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '12px', backgroundColor: '#fff', outline: 'none' }}
                   >
@@ -7435,7 +7458,7 @@ Thank you for your business!`;
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '3px' }}>Role</label>
                   <select
-                    value={editingUser.role}
+                    value={normalizeRoleForDisplay(editingUser.role)}
                     onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
                     style={{ width: '100%', padding: '7px', borderRadius: '5px', border: '1px solid #cbd5e1', fontSize: '12px' }}
                   >

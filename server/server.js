@@ -1742,7 +1742,14 @@ app.post('/api/users', async (req, res) => {
     displayName: name.trim(),
     username: userSlug,
     pin: await hashCredential(pin),
-    role: ['admin', 'manager'].includes(role) ? role : 'sales_rep',
+    role: (() => {
+      const rLower = String(role || '').trim().toLowerCase();
+      if (rLower === 'admin' || rLower === 'company_owner' || rLower === 'owner') return 'admin';
+      if (rLower === 'manager') return 'manager';
+      if (rLower === 'sales_head' || rLower === 'sales head') return 'sales_head';
+      if (rLower === 'team_leader' || rLower === 'team leader') return 'team_leader';
+      return 'sales_rep';
+    })(),
     packageTier: ['starter', 'growth', 'enterprise', 'super_admin'].includes(packageTier) ? packageTier : 'starter',
     permissions: permissions || null,
     maxLeadsLimit: maxLeadsLimit ? Number(maxLeadsLimit) : (role === 'admin' ? 999999 : 50),
@@ -1841,7 +1848,18 @@ app.put('/api/users/:id', async (req, res) => {
     updated.pin = rawP.startsWith('$argon2') || (rawP.length === 64 && /^[a-fA-F0-9]{64}$/.test(rawP)) ? rawP : await hashCredential(rawP);
   }
   if (role !== undefined) {
-    updated.role = ['admin', 'manager'].includes(role) ? role : 'sales_rep';
+    const rLower = String(role).trim().toLowerCase();
+    if (rLower === 'admin' || rLower === 'company_owner' || rLower === 'owner') {
+      updated.role = 'admin';
+    } else if (rLower === 'manager') {
+      updated.role = 'manager';
+    } else if (rLower === 'sales_head' || rLower === 'sales head') {
+      updated.role = 'sales_head';
+    } else if (rLower === 'team_leader' || rLower === 'team leader') {
+      updated.role = 'team_leader';
+    } else {
+      updated.role = 'sales_rep';
+    }
   }
   if (packageTier !== undefined) {
     updated.packageTier = ['starter', 'growth', 'enterprise', 'super_admin'].includes(packageTier) ? packageTier : 'starter';
