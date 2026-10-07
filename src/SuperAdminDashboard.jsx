@@ -7068,6 +7068,22 @@ Thank you for your business!`;
                     {companies.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                   </select>
                 </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '2px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const userName = activeActionMenu.item?.name || 'User';
+                      setActiveActionMenu(null);
+                      showToast(`Changes for "${userName}" saved successfully!`, 'success');
+                    }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px 14px', borderRadius: '8px', backgroundColor: '#ea580c', color: '#ffffff', fontWeight: '700', fontSize: '12.5px', border: 'none', cursor: 'pointer', boxShadow: '0 2px 4px rgba(234, 88, 12, 0.2)' }}
+                  >
+                    <Check size={16} /> Save &amp; Apply Changes
+                  </button>
+                  <span style={{ fontSize: '11px', color: '#16a34a', fontWeight: '600', textAlign: 'center' }}>
+                    ✓ Selections auto-save instantly
+                  </span>
+                </div>
                 <button
                   disabled={actionLoadingId === activeActionMenu.item.id}
                   onClick={() => handleDeleteUser(activeActionMenu.item.id)}
@@ -7118,6 +7134,22 @@ Thank you for your business!`;
                   >
                     {usersList.map(u => <option key={u.id} value={u.name}>{u.name}</option>)}
                   </select>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '2px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const leadName = activeActionMenu.item?.name || 'Lead';
+                      setActiveActionMenu(null);
+                      showToast(`Changes for "${leadName}" saved successfully!`, 'success');
+                    }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px 14px', borderRadius: '8px', backgroundColor: '#ea580c', color: '#ffffff', fontWeight: '700', fontSize: '12.5px', border: 'none', cursor: 'pointer', boxShadow: '0 2px 4px rgba(234, 88, 12, 0.2)' }}
+                  >
+                    <Check size={16} /> Save &amp; Apply Changes
+                  </button>
+                  <span style={{ fontSize: '11px', color: '#16a34a', fontWeight: '600', textAlign: 'center' }}>
+                    ✓ Selections auto-save instantly
+                  </span>
                 </div>
                 <button
                   disabled={actionLoadingId === activeActionMenu.item.id}
