@@ -1,9 +1,23 @@
-import app from '../server/server.js';
+let appPromise = null;
 
-export default function handler(req, res) {
-  // If Vercel rewrote /api/... to /api, ensure Express router matches
-  if (req.url && !req.url.startsWith('/api')) {
-    req.url = '/api' + (req.url.startsWith('/') ? req.url : '/' + req.url);
+export default async function handler(req, res) {
+  try {
+    if (!appPromise) {
+      appPromise = import('../server/server.js').then(m => m.default || m.app);
+    }
+    const app = await appPromise;
+    if (req.url && !req.url.startsWith('/api')) {
+      req.url = '/api' + (req.url.startsWith('/') ? req.url : '/' + req.url);
+    }
+    return app(req, res);
+  } catch (err) {
+    console.error('Serverless boot error:', err);
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(500).json({
+      success: false,
+      error: 'SERVERLESS_BOOT_ERROR',
+      message: err.message,
+      stack: err.stack
+    });
   }
-  return app(req, res);
 }
