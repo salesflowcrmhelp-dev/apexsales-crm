@@ -2411,23 +2411,13 @@ export function formatLeadRevenue(val, user) {
 }
 
 export default function App({ onNavigateToLanding } = {}) {
-  // 🧹 100% Zero-LocalStorage Policy: Purge any legacy browser storage lead keys on mount
+  // 🛡️ Reliable Persistence Policy: Purge stale legacy backups but preserve user's active edited leads
   useEffect(() => {
     try {
       localStorage.removeItem("salesflow_standalone_leads");
       localStorage.removeItem("salesflow_immutable_lead_backup");
       localStorage.removeItem("salesflow_admin_vault_backup");
       localStorage.removeItem("salesflow_standalone_tasks");
-      Object.keys(localStorage).forEach(k => {
-        if (k.startsWith("salesflow_rep_leads_") || k.startsWith("salesflow_leads_")) {
-          localStorage.removeItem(k);
-        }
-      });
-      Object.keys(sessionStorage).forEach(k => {
-        if (k.startsWith("salesflow_rep_leads_") || k.startsWith("salesflow_leads_")) {
-          sessionStorage.removeItem(k);
-        }
-      });
     } catch(e) {}
   }, []);
 
@@ -2436,10 +2426,15 @@ export default function App({ onNavigateToLanding } = {}) {
     try {
       const savedUser = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
       const savedToken = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
-      if (!savedUser || !savedToken) {
+      if (!savedUser && !savedToken) {
         return []; // Strict isolation: Not logged in = ZERO leads in memory!
       }
-      // Pure Cloud-First architecture: Always start clean, fresh data loaded from Supabase Cloud on mount
+      // Instant reload resilience: restore cached edited leads immediately
+      const cached = localStorage.getItem("salesflow_active_leads");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
       return [];
     } catch(e) {
       return [];
@@ -5203,6 +5198,47 @@ export default function App({ onNavigateToLanding } = {}) {
       const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
+      const mergeWithLocalCache = (incomingLeads) => {
+        try {
+          const cachedStr = localStorage.getItem("salesflow_active_leads");
+          if (!cachedStr) return incomingLeads;
+          const cachedList = JSON.parse(cachedStr);
+          if (!Array.isArray(cachedList) || cachedList.length === 0) return incomingLeads;
+
+          const incomingIds = new Set(incomingLeads.map(l => String(l.id)));
+          const cachedMap = new Map();
+          cachedList.forEach(l => {
+            if (l && l.id) cachedMap.set(String(l.id), l);
+          });
+
+          const merged = incomingLeads.map(lead => {
+            const cached = cachedMap.get(String(lead.id));
+            if (!cached) return lead;
+
+            const cachedTime = new Date(cached.stageUpdatedAt || cached.lastModified || cached.lastModifiedAt || 0).getTime();
+            const incomingTime = new Date(lead.stageUpdatedAt || lead.lastModified || lead.lastModifiedAt || 0).getTime();
+
+            if (cachedTime > incomingTime) {
+              return { ...lead, ...cached };
+            }
+            if (isWonStatus(cached.status) && !isWonStatus(lead.status)) {
+              return { ...lead, ...cached };
+            }
+            return lead;
+          });
+
+          cachedList.forEach(l => {
+            if (l && l.id && !incomingIds.has(String(l.id))) {
+              merged.push(l);
+            }
+          });
+
+          return merged;
+        } catch(e) {
+          return incomingLeads;
+        }
+      };
+
       // 🚀 1. FAST-PATH: Fetch from Supabase PostgreSQL Cloud Database (Zero Cold Start)
       try {
         const supaLeads = await fetchLeadsFromSupabase();
@@ -5215,7 +5251,11 @@ export default function App({ onNavigateToLanding } = {}) {
               sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
             }
           }
+          sanitized = mergeWithLocalCache(sanitized);
           setLeads(sanitized);
+          try {
+            localStorage.setItem("salesflow_active_leads", JSON.stringify(sanitized));
+          } catch(e) {}
           setHasLoadedFromCloud(true);
           return sanitized;
         }
@@ -5235,7 +5275,11 @@ export default function App({ onNavigateToLanding } = {}) {
               sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
             }
           }
+          sanitized = mergeWithLocalCache(sanitized);
           setLeads(sanitized);
+          try {
+            localStorage.setItem("salesflow_active_leads", JSON.stringify(sanitized));
+          } catch(e) {}
           return sanitized;
         }
       }
@@ -8546,7 +8590,10 @@ export default function App({ onNavigateToLanding } = {}) {
   const saveLeadsToStorage = (updatedLeads) => {
     const cleaned = Array.isArray(updatedLeads) ? updatedLeads.map(sanitizeLeadObject) : [];
     setLeads(cleaned);
-    // 100% Cloud: Directly sync updates to Supabase PostgreSQL & Central Backend (Zero Local Storage Dependency)
+    try {
+      localStorage.setItem("salesflow_active_leads", JSON.stringify(cleaned));
+    } catch(e) {}
+    // Directly sync updates to Supabase PostgreSQL & Central Backend
     syncLeadsToBackend(cleaned);
   };
 
@@ -8729,6 +8776,7 @@ export default function App({ onNavigateToLanding } = {}) {
         };
         updatedLeads[actualIndex] = updatedLeadObj;
         saveLeadsToStorage(updatedLeads);
+        syncSingleLeadToBackend(updatedLeadObj);
 
         setWonLeadName(lead.name || lead.company || "Lead");
         setWonDealData(updatedLeadObj);
@@ -8751,6 +8799,7 @@ export default function App({ onNavigateToLanding } = {}) {
         };
         updatedLeads[actualIndex] = updatedLeadObj;
         saveLeadsToStorage(updatedLeads);
+        syncSingleLeadToBackend(updatedLeadObj);
 
         // Auto-complete & close all open tasks linked to this lost lead
         let tasksChanged = false;

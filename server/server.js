@@ -2261,6 +2261,7 @@ app.put('/api/leads/:id', async (req, res) => {
   }
 
   const allLeads = await getLeads();
+  const allUsers = await getUsers();
   const currentLead = allLeads.find(l => String(l.id) === String(id));
   if (!currentLead) {
     return res.status(404).json({ success: false, message: 'Lead not found.' });
