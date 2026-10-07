@@ -1813,7 +1813,7 @@ function CircularProgress({ percentage, color = "#ea580c", size = 52, strokeWidt
         color: percentage >= 100 ? color : "#0f172a", 
         lineHeight: 1, 
         letterSpacing: textLength >= 4 ? "-0.5px" : "normal",
-        fontFamily: "'Plus Jakarta Sans', sans-serif" 
+        fontFamily: "'Inter', sans-serif" 
       }}>
         {percentage}%
       </span>
@@ -1854,7 +1854,7 @@ export function checkIsPlatformSuperAdmin(u) {
          name === "harsh goyal";
 }
 
-// 👑 Company Owner check (Platform Admin Harsh for ApexSales OR Client Owner Kashish for Kashish Enterprises)
+// Company Owner check (Platform Admin Harsh for ApexSales OR Client Owner Kashish for Kashish Enterprises)
 export function checkIsSuperAdmin(u) {
   if (!u) return false;
   if (checkIsPlatformSuperAdmin(u)) return true;
@@ -1925,7 +1925,7 @@ export const getRoleBadgeInfo = (role) => {
         key: CRM_ROLES.COMPANY_OWNER,
         label: "Company Owner",
         shortLabel: "Owner",
-        badge: "👑 Company Owner",
+        badge: "Company Owner",
         color: "#b45309",
         bg: "#fef3c7",
         border: "#fde68a",
@@ -1937,7 +1937,7 @@ export const getRoleBadgeInfo = (role) => {
         key: CRM_ROLES.SALES_HEAD,
         label: "Sales Head",
         shortLabel: "Sales Head",
-        badge: "📊 Sales Head",
+        badge: "Sales Head",
         color: "#1d4ed8",
         bg: "#eff6ff",
         border: "#bfdbfe",
@@ -1949,7 +1949,7 @@ export const getRoleBadgeInfo = (role) => {
         key: CRM_ROLES.TEAM_LEADER,
         label: "Team Leader",
         shortLabel: "Team Lead",
-        badge: "👔 Team Leader",
+        badge: "Team Leader",
         color: "#7c3aed",
         bg: "#faf5ff",
         border: "#e9d5ff",
@@ -1961,7 +1961,7 @@ export const getRoleBadgeInfo = (role) => {
         key: CRM_ROLES.SALES_EXECUTIVE,
         label: "Sales Executive",
         shortLabel: "Executive",
-        badge: "💼 Sales Executive",
+        badge: "Sales Executive",
         color: "#059669",
         bg: "#ecfdf5",
         border: "#a7f3d0",
@@ -2842,7 +2842,7 @@ export default function App({ onNavigateToLanding } = {}) {
             localStorage.setItem("crm_auth_token", "face_token");
           } catch(e) {}
           loadLeadsFromBackend(adminUser);
-          if (showToast) showToast(`👤 Face ID Verified! Welcome back ${registeredFaceName}!`, "success");
+          if (showToast) showToast(`Face ID Verified! Welcome back ${registeredFaceName}!`, "success");
         }, 600);
       }
     }, 1500);
@@ -3532,7 +3532,7 @@ export default function App({ onNavigateToLanding } = {}) {
       setShowLicenseModal(false);
       setSelectedLicenseForInvoice(licenseRecord);
       setShowInvoiceModal(true);
-      showToast(`🎉 License ${licenseRecord.licenseNumber} issued & Invoice generated!`, "success");
+      showToast(` License ${licenseRecord.licenseNumber} issued & Invoice generated!`, "success");
 
       // Reload users to pull any auto-provisioned owner
       setTimeout(() => {
@@ -4365,7 +4365,7 @@ export default function App({ onNavigateToLanding } = {}) {
       // Build updated notes array
       const noteEntry = {
         id: "note_" + Date.now(),
-        text: `[Stage Change: ${oldStatus} ➔ ${newStatus}] ${discussionNoteText}`,
+        text: `[Stage Change: ${oldStatus}  ${newStatus}] ${discussionNoteText}`,
         createdAt: new Date().toISOString()
       };
       let updatedNotes = Array.isArray(targetLead.notes) 
@@ -4500,6 +4500,11 @@ export default function App({ onNavigateToLanding } = {}) {
   useEffect(() => {
     if (!canAccessUnassignedQueue && pipelineView === "unassigned") {
       setPipelineView("sheet");
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set("pipelineView", "sheet");
+        window.history.replaceState({}, "", url.toString());
+      } catch (e) {}
     }
   }, [canAccessUnassignedQueue, pipelineView]);
 
@@ -4656,7 +4661,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
       setSelectedUnassignedLeads([]);
       setIsAllocatingLeads(false);
-      showToast(`🎲 Round-robin distributed ${idsToAssign.length} leads across ${targetPool.length} executives!`, "success");
+      showToast(` Round-robin distributed ${idsToAssign.length} leads across ${targetPool.length} executives!`, "success");
     } catch (err) {
       setIsAllocatingLeads(false);
       showToast("Round-robin allocation completed with local fallback.", "info");
@@ -4892,7 +4897,7 @@ export default function App({ onNavigateToLanding } = {}) {
         localStorage.setItem("crm_auth_token", `supa_jwt_${activeUser.id}`);
       } catch(e) {}
 
-      showToast(`🎉 Company Workspace "${registerCompanyData.companyName}" Created! Welcome ${registerCompanyData.ownerName} (Company Owner) 👑`, "success");
+      showToast(` Company Workspace "${registerCompanyData.companyName}" Created! Welcome ${registerCompanyData.ownerName} (Company Owner) 👑`, "success");
       await loadLeadsFromBackend(activeUser);
       await loadUsersFromBackend();
     } catch(err) {
@@ -4985,7 +4990,7 @@ export default function App({ onNavigateToLanding } = {}) {
       const data = await res.json();
       setForgotLoading(false);
       if (res.ok && data.success && data.user) {
-        showToast("🎉 Password updated successfully! Logging you in...");
+        showToast(" Password updated successfully! Logging you in...");
         setIsLoggedIn(true);
         setLoginError("");
         setPasswordInput("");
@@ -5852,7 +5857,7 @@ export default function App({ onNavigateToLanding } = {}) {
           localStorage.setItem("crm_auth_token", data.token);
           window.history.replaceState({}, document.title, window.location.pathname);
         } catch(e) {}
-        showToast(`🎉 Welcome ${data.user.name}! Your account has been activated.`, "success");
+        showToast(` Welcome ${data.user.name}! Your account has been activated.`, "success");
         await loadLeadsFromBackend(data.user);
       } else {
         setInviteError(data.message || "Failed to activate account.");
@@ -6041,7 +6046,7 @@ export default function App({ onNavigateToLanding } = {}) {
       });
 
       setShowAccessModal(false);
-      showToast(`🎉 Access & Permissions updated for ${selectedUserForAccess.name}!`, "success");
+      showToast(` Access & Permissions updated for ${selectedUserForAccess.name}!`, "success");
       await loadUsersFromBackend();
       await loadLeadsFromBackend();
     } catch(err) {
@@ -6106,7 +6111,7 @@ export default function App({ onNavigateToLanding } = {}) {
         // 2. Commit state
         setClientDealPackages(updatedList);
         try { localStorage.setItem("crm_client_deal_packages", JSON.stringify(updatedList)); } catch(e) {}
-        showToast(`🎉 Client package "${updatedPkg.name}" rate updated to ₹${(Number(updatedPkg.price) || 0).toLocaleString("en-IN")}!`, "success");
+        showToast(` Client package "${updatedPkg.name}" rate updated to ₹${(Number(updatedPkg.price) || 0).toLocaleString("en-IN")}!`, "success");
 
         try {
           await fetch("/api/packages", {
@@ -6129,7 +6134,7 @@ export default function App({ onNavigateToLanding } = {}) {
         };
         setEmployeePackagesList(updatedObj);
         try { localStorage.setItem("crm_employee_packages", JSON.stringify(updatedObj)); } catch(e) {}
-        showToast(`🎉 Employee tier "${updatedPkg.name}" rate & quota updated!`, "success");
+        showToast(` Employee tier "${updatedPkg.name}" rate & quota updated!`, "success");
 
         try {
           await fetch("/api/packages", {
@@ -6276,7 +6281,7 @@ export default function App({ onNavigateToLanding } = {}) {
             const emailData = await emailRes.json().catch(() => ({}));
             if (emailRes.ok && emailData.success) {
               emailSent = true;
-              showToast(`🎉 Team member created! Official invitation email sent to ${supaUser.email}`, "success");
+              showToast(` Team member created! Official invitation email sent to ${supaUser.email}`, "success");
             } else {
               showToast(`Team member "${supaUser.name}" created! PIN: ${supaUser.pin} (Email notice: ${emailData.message || 'offline'})`, "warning");
             }
@@ -6285,7 +6290,7 @@ export default function App({ onNavigateToLanding } = {}) {
             showToast(`Team member "${supaUser.name}" created! PIN: ${supaUser.pin}`, "success");
           }
         } else {
-          showToast(`🎉 Team member "${supaUser.name}" created! PIN: ${supaUser.pin}`, "success");
+          showToast(` Team member "${supaUser.name}" created! PIN: ${supaUser.pin}`, "success");
         }
 
         const appUrl = typeof window !== 'undefined' ? window.location.origin : 'https://apexsales-crm.vercel.app';
@@ -6315,7 +6320,7 @@ export default function App({ onNavigateToLanding } = {}) {
       const data = await res.json();
       if (res.ok && data.success) {
         if (data.emailSent) {
-          showToast(`🎉 Team member created! Official invitation email sent to ${newUserData.email}`, "success");
+          showToast(` Team member created! Official invitation email sent to ${newUserData.email}`, "success");
         } else {
           showToast(`Team member "${data.user.name}" created! PIN: ${data.user.pin}`, "success");
         }
@@ -6352,7 +6357,7 @@ export default function App({ onNavigateToLanding } = {}) {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
-        showToast(`🎉 Official invitation email sent to ${targetUser.email}!`, "success");
+        showToast(` Official invitation email sent to ${targetUser.email}!`, "success");
       } else {
         showToast(`Failed to send email: ${data.message || 'Resend error'}`, "error");
       }
@@ -6582,7 +6587,7 @@ export default function App({ onNavigateToLanding } = {}) {
       logLeadActivity(lead.id, "call", `Task Completed: ${cleanTitle}`, activityDesc);
     }
 
-    showToast("Task completed successfully! 🎉", "success");
+    showToast("Task completed successfully! ", "success");
     setTaskToComplete(null);
   };
 
@@ -9289,7 +9294,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
       if (res.ok && data.success) {
         saveLeadsToStorage([...leadsToImport, ...leads]);
-        showToast(`🎉 Successfully imported ${data.count || leadsToImport.length} leads!`);
+        showToast(` Successfully imported ${data.count || leadsToImport.length} leads!`);
         setShowImportLeadsModal(false);
         setImportPreviewLeads([]);
         setImportFileName("");
@@ -9423,7 +9428,7 @@ export default function App({ onNavigateToLanding } = {}) {
           alignItems: "center", 
           justifyContent: "center", 
           padding: "20px", 
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           zIndex: 99999,
           overflow: "hidden"
         }}
@@ -9479,7 +9484,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", fontWeight: "600", color: "#64748b", marginBottom: "4px", textTransform: "uppercase" }}>
                   <span>Authorized Email Address</span>
                   <span style={{ color: "#166534", fontSize: "10px", display: "flex", alignItems: "center", gap: "3px" }}>
-                    ✓ Locked & Authorized
+                    Locked & Authorized
                   </span>
                 </label>
                 <input
@@ -9607,7 +9612,7 @@ export default function App({ onNavigateToLanding } = {}) {
           backgroundColor: "#0b0f19", 
           display: "flex", 
           flexDirection: "row",
-          fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
+          fontFamily: "'Inter', sans-serif",
           boxSizing: "border-box",
           position: "relative"
         }}
@@ -9736,7 +9741,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 gap: "6px"
               }}
             >
-              ← Back to Official Product Website
+              Back to Official Product Website
             </button>
           )}
 
@@ -9928,7 +9933,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       onClick={() => setIsRegisterCompanyView(false)}
                       style={{ background: "none", border: "none", color: "#64748b", fontSize: "12.5px", fontWeight: "600", cursor: "pointer" }}
                     >
-                      ← Back to Sign In
+                      Back to Sign In
                     </button>
                   </div>
                 </form>
@@ -9997,7 +10002,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             outline: "none",
                             boxSizing: "border-box",
                             transition: "all 0.15s ease",
-                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                            fontFamily: "'Inter', sans-serif"
                           }}
                         />
                       </div>
@@ -10058,7 +10063,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           gap: "5px"
                         }}
                       >
-                        ← Back to Login
+                        Back to Login
                       </button>
                     </div>
                   </form>
@@ -10139,7 +10144,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             outline: "none",
                             boxSizing: "border-box",
                             transition: "all 0.15s ease",
-                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                            fontFamily: "'Inter', sans-serif"
                           }}
                         />
                       </div>
@@ -10184,7 +10189,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             outline: "none",
                             boxSizing: "border-box",
                             transition: "all 0.15s ease",
-                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                            fontFamily: "'Inter', sans-serif"
                           }}
                         />
                       </div>
@@ -10323,7 +10328,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           boxSizing: "border-box",
                           boxShadow: loginEmail ? "0 0 0 3px rgba(37, 99, 235, 0.12)" : "none",
                           transition: "all 0.15s ease",
-                          fontFamily: "'Plus Jakarta Sans', sans-serif"
+                          fontFamily: "'Inter', sans-serif"
                         }}
                       />
                     </div>
@@ -10386,7 +10391,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           boxSizing: "border-box",
                           boxShadow: passwordInput ? "0 0 0 3px rgba(37, 99, 235, 0.12)" : "none",
                           transition: "all 0.15s ease",
-                          fontFamily: showPinText ? "'Plus Jakarta Sans', sans-serif" : "monospace"
+                          fontFamily: showPinText ? "'Inter', sans-serif" : "monospace"
                         }}
                       />
                       <button
@@ -10458,7 +10463,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     ) : (
                       <>
                         <span>Sign In to Dashboard</span>
-                        <span style={{ fontSize: "16px" }}>➔</span>
+                        <span style={{ fontSize: "16px" }}></span>
                       </>
                     )}
                   </button>
@@ -10538,7 +10543,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   }} />
                 </div>
 
-                <h3 style={{ fontSize: "18px", fontWeight: "800", color: faceScanStatus === "denied" ? "#dc2626" : "#0f172a", margin: "0 0 6px 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: "800", color: faceScanStatus === "denied" ? "#dc2626" : "#0f172a", margin: "0 0 6px 0", fontFamily: "'Inter', sans-serif" }}>
                   {faceScanStatus === "verified" ? `Face ID Verified! ✅` : faceScanStatus === "denied" ? `Access Denied ❌` : `Scanning Facial Geometry...`}
                 </h3>
 
@@ -10579,7 +10584,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
                     📸 Biometric Face ID Registration
                   </h3>
-                  <button onClick={closeFaceRegistration} style={{ background: "none", border: "none", fontSize: "16px", cursor: "pointer", color: "#64748b" }}>✕</button>
+                  <button onClick={closeFaceRegistration} style={{ background: "none", border: "none", fontSize: "16px", cursor: "pointer", color: "#64748b" }}><X size={14} /></button>
                 </div>
 
                 <p style={{ fontSize: "12px", color: "#64748b", marginBottom: "16px", fontWeight: "500" }}>
@@ -11439,7 +11444,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     fontSize: "14px",
                     fontWeight: "800",
                     color: "#0f172a",
-                    fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif",
+                    fontFamily: "'Inter', -apple-system, sans-serif",
                     letterSpacing: "-0.2px",
                     lineHeight: 1
                   }}
@@ -11750,7 +11755,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         color: "#475569",
                         cursor: "pointer",
                         boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontFamily: "'Inter', sans-serif",
                         whiteSpace: "nowrap"
                       }}
                       title="Admin Data Vault: Verified Deals Safe"
@@ -11781,7 +11786,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         color: "#334155", 
                         cursor: "pointer", 
                         boxShadow: "0 1px 2px rgba(0,0,0,0.02)", 
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontFamily: "'Inter', sans-serif",
                         transition: "all 0.15s ease",
                         whiteSpace: "nowrap"
                       }}
@@ -12122,14 +12127,14 @@ export default function App({ onNavigateToLanding } = {}) {
                   onClick={() => { setSelectedPeriodMonth(currentMonthKey); setDealsDateFilter("this_month"); }}
                   style={{ padding: "6px 14px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", boxShadow: "0 2px 4px rgba(234, 88, 12, 0.25)" }}
                 >
-                  Switch to Current Month ({formatMonthLabel(currentMonthKey, "short")}) ➔
+                  Switch to Current Month ({formatMonthLabel(currentMonthKey, "short")}) 
                 </button>
               </div>
             </div>
           )}
 
           {activeWorkspace === "calendar" ? (
-            <div className="calendar-page-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="calendar-page-container animate-fade-in" style={{ fontFamily: "'Inter', sans-serif" }}>
               
               {/* 1. TOP 4 EXECUTIVE METRIC CARDS */}
               <div className="calendar-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "10px" }}>
@@ -12329,7 +12334,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             outline: "none",
                             cursor: isRepOnly ? "default" : "pointer",
                             fontWeight: "600",
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            fontFamily: "'Inter', sans-serif",
                             height: "32px"
                           }}
                         >
@@ -12749,7 +12754,7 @@ export default function App({ onNavigateToLanding } = {}) {
               </div>
             </div>
           ) : activeWorkspace === "reports" ? (
-                        <div className="reports-page-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif",  }}>
+                        <div className="reports-page-container animate-fade-in" style={{ fontFamily: "'Inter', sans-serif",  }}>
               
               {/* TOP CONTROL HEADER & ADVANCED MULTI-CRITERIA FILTER BAR */}
               <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px 12px", marginBottom: "16px", display: "flex", flexDirection: "column", gap: "6px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
@@ -12784,7 +12789,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         style={{ width: "100%", height: "32px", boxSizing: "border-box", padding: "0 18px 0 26px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "400", outline: "none", color: "#0f172a" }}
                       />
                       {reportSearchQuery && (
-                        <button onClick={() => setReportSearchQuery("")} style={{ position: "absolute", right: "6px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px", padding: 0 }}>✕</button>
+                        <button onClick={() => setReportSearchQuery("")} style={{ position: "absolute", right: "6px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px", padding: 0 }}><X size={14} /></button>
                       )}
                     </div>
 
@@ -12961,7 +12966,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           style={{ padding: "1px 4px", height: "20px", border: "1px solid #fdba74", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff" }}
                         />
                       </div>
-                      <span style={{ color: "#ea580c", fontWeight: "600", fontSize: "12px" }}>➔</span>
+                      <span style={{ color: "#ea580c", fontWeight: "600", fontSize: "12px" }}></span>
                       <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <label style={{ fontSize: "12px", fontWeight: "500", color: "#ea580c" }}>To:</label>
                         <input 
@@ -13057,7 +13062,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         {reportTimeframe !== "all" && (
                           <span style={{ fontSize: "12px", fontWeight: "400", backgroundColor: "#fff7ed", color: "#ea580c", border: "1px solid #fed7aa", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                             {reportTimeframe}
-                            <button onClick={() => setReportTimeframe("all")} style={{ border: "none", background: "none", color: "#ea580c", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                            <button onClick={() => setReportTimeframe("all")} style={{ border: "none", background: "none", color: "#ea580c", cursor: "pointer", padding: 0, fontWeight: "600" }}><X size={14} /></button>
                           </span>
                         )}
 
@@ -13065,14 +13070,14 @@ export default function App({ onNavigateToLanding } = {}) {
                           reportSelectedStages.map(st => (
                             <span key={st} style={{ fontSize: "12px", fontWeight: "500", backgroundColor: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                               {st}
-                              <button onClick={() => setReportSelectedStages(prev => prev.filter(x => x !== st))} style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                              <button onClick={() => setReportSelectedStages(prev => prev.filter(x => x !== st))} style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontWeight: "600" }}><X size={14} /></button>
                             </span>
                           ))
                         ) : (
                           reportStatusFilter !== "all" && (
                             <span style={{ fontSize: "12px", fontWeight: "400", backgroundColor: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                               {reportStatusFilter}
-                              <button onClick={() => setReportStatusFilter("all")} style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                              <button onClick={() => setReportStatusFilter("all")} style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontWeight: "600" }}><X size={14} /></button>
                             </span>
                           )
                         )}
@@ -13080,14 +13085,14 @@ export default function App({ onNavigateToLanding } = {}) {
                         {reportSourceFilter !== "all" && (
                           <span style={{ fontSize: "12px", fontWeight: "400", backgroundColor: "#f5f3ff", color: "#2563eb", border: "1px solid #ddd6fe", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                             {reportSourceFilter}
-                            <button onClick={() => setReportSourceFilter("all")} style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                            <button onClick={() => setReportSourceFilter("all")} style={{ border: "none", background: "none", color: "#2563eb", cursor: "pointer", padding: 0, fontWeight: "600" }}><X size={14} /></button>
                           </span>
                         )}
 
                         {(reportMinValue || reportMaxValue) && (
                           <span style={{ fontSize: "12px", fontWeight: "400", backgroundColor: "#ecfdf5", color: "#166534", border: "1px solid #a7f3d0", padding: "1px 4px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "2px" }}>
                             ₹{reportMinValue || "0"}-₹{reportMaxValue || "Max"}
-                            <button onClick={() => { setReportMinValue(""); setReportMaxValue(""); }} style={{ border: "none", background: "none", color: "#166534", cursor: "pointer", padding: 0, fontWeight: "600" }}>✕</button>
+                            <button onClick={() => { setReportMinValue(""); setReportMaxValue(""); }} style={{ border: "none", background: "none", color: "#166534", cursor: "pointer", padding: 0, fontWeight: "600" }}><X size={14} /></button>
                           </span>
                         )}
                       </div>
@@ -14225,7 +14230,7 @@ export default function App({ onNavigateToLanding } = {}) {
               )}
             </div>
           ) : activeWorkspace === "settings" ? (
-            <div className="settings-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", padding: "14px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="settings-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", padding: "14px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.02)", fontFamily: "'Inter', sans-serif" }}>
               {/* Page Title Header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "12px", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -14687,7 +14692,7 @@ export default function App({ onNavigateToLanding } = {}) {
               </div>
             </div>
           ) : activeWorkspace === "users" ? (
-            <div className="user-profile-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", padding: "16px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="user-profile-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", padding: "16px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", fontFamily: "'Inter', sans-serif" }}>
               {/* Page Title Header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #e2e8f0", paddingBottom: "12px", marginBottom: "16px", flexWrap: "wrap", gap: "10px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -15097,7 +15102,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
             </div>
           ) : activeWorkspace === "team" ? (
-            <div className="team-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", padding: "16px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="team-page-container animate-fade-in" style={{ backgroundColor: "#ffffff", borderRadius: "8px", border: "1px solid #e2e8f0", padding: "16px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", fontFamily: "'Inter', sans-serif" }}>
               
               {/* Page Title Header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "14px", marginBottom: "14px", flexWrap: "wrap", gap: "10px" }}>
@@ -15335,7 +15340,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 {unassignedLeadsList.length} Leads
                               </div>
                               <span style={{ fontSize: "11px", color: unassignedAgingCriticalCount > 0 ? "#dc2626" : "#16a34a", fontWeight: "600" }}>
-                                {unassignedAgingCriticalCount > 0 ? `🚨 ${unassignedAgingCriticalCount} SLA Breach` : "SLA 100% normal"}
+                                {unassignedAgingCriticalCount > 0 ? ` ${unassignedAgingCriticalCount} SLA Breach` : "SLA 100% normal"}
                               </span>
                             </div>
                           </div>
@@ -15620,7 +15625,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   title="Generate Strong Password"
                                   style={{ padding: "0 10px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "12px", cursor: "pointer", fontWeight: "700", color: "#1d4ed8" }}
                                 >
-                                  🎲
+                                  
                                 </button>
                               </div>
                             </div>
@@ -15633,7 +15638,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   Role Privilege
                                 </label>
                                 <div style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#f8fafc", color: "#0f172a", display: "flex", alignItems: "center", fontWeight: "600", boxSizing: "border-box" }}>
-                                  💼 Sales Executive (Direct Team)
+                                  Sales Executive (Direct Team)
                                 </div>
                               </div>
                             ) : (
@@ -15654,10 +15659,10 @@ export default function App({ onNavigateToLanding } = {}) {
                                   }}
                                   style={{ width: "100%", height: "34px", padding: "6px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                                 >
-                                  <option value={CRM_ROLES.SALES_EXECUTIVE}>💼 Sales Executive</option>
-                                  <option value={CRM_ROLES.TEAM_LEADER}>👔 Team Leader</option>
-                                  <option value={CRM_ROLES.SALES_HEAD}>📊 Sales Head</option>
-                                  <option value={CRM_ROLES.COMPANY_OWNER}>👑 Company Owner</option>
+                                  <option value={CRM_ROLES.SALES_EXECUTIVE}>Sales Executive</option>
+                                  <option value={CRM_ROLES.TEAM_LEADER}>Team Leader</option>
+                                  <option value={CRM_ROLES.SALES_HEAD}>Sales Head</option>
+                                  <option value={CRM_ROLES.COMPANY_OWNER}>Company Owner</option>
                                 </select>
                               </div>
                             )}
@@ -16721,7 +16726,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 <label style={{ display: "block", fontSize: "11px", fontWeight: "600", color: "#64748b", marginBottom: "5px" }}>DESIGNATION / ROLE</label>
                                 {isOwner ? (
                                   <div style={{ padding: "8px 12px", fontSize: "12.5px", fontWeight: "600", color: roleBadge.color, backgroundColor: roleBadge.bg, borderRadius: "6px", border: `1px solid ${roleBadge.border}` }}>
-                                    {checkIsPlatformSuperAdmin(detailUser) ? "👑 Platform Super Admin" : "👑 Company Owner (Client Admin)"}
+                                    {checkIsPlatformSuperAdmin(detailUser) ? "👑 Platform Super Admin" : "Company Owner (Client Admin)"}
                                   </div>
                                 ) : isSuperAdminUser ? (
                                   <select
@@ -16740,9 +16745,9 @@ export default function App({ onNavigateToLanding } = {}) {
                                       outline: "none"
                                     }}
                                   >
-                                    <option value={CRM_ROLES.SALES_EXECUTIVE}>💼 Sales Executive</option>
-                                    <option value={CRM_ROLES.TEAM_LEADER}>👔 Team Leader</option>
-                                    <option value={CRM_ROLES.SALES_HEAD}>📊 Sales Head</option>
+                                    <option value={CRM_ROLES.SALES_EXECUTIVE}>Sales Executive</option>
+                                    <option value={CRM_ROLES.TEAM_LEADER}>Team Leader</option>
+                                    <option value={CRM_ROLES.SALES_HEAD}>Sales Head</option>
                                   </select>
                                 ) : (
                                   <div style={{ padding: "8px 12px", fontSize: "12.5px", fontWeight: "600", color: roleBadge.color, backgroundColor: roleBadge.bg, borderRadius: "6px", border: `1px solid ${roleBadge.border}` }}>
@@ -16773,16 +16778,16 @@ export default function App({ onNavigateToLanding } = {}) {
                                     >
                                       {isKashishMember ? (
                                         <>
-                                          <option value="Harsh Goyal">👑 Harsh Goyal (Platform Owner)</option>
+                                          <option value="Harsh Goyal">Harsh Goyal (Platform Owner)</option>
                                           {teamUsersToDisplay.filter(u => u.id !== detailUser.id && (normalizeRole(u.role) === CRM_ROLES.TEAM_LEADER || normalizeRole(u.role) === CRM_ROLES.SALES_HEAD)).map(mgr => (
-                                            <option key={mgr.id} value={mgr.name}>👔 {mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
+                                            <option key={mgr.id} value={mgr.name}>{mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
                                           ))}
                                         </>
                                       ) : (
                                         <>
-                                          <option value="Harsh Goyal">👑 Harsh Goyal (Platform Owner)</option>
+                                          <option value="Harsh Goyal">Harsh Goyal (Platform Owner)</option>
                                           {teamUsersToDisplay.filter(u => u.id !== detailUser.id && (normalizeRole(u.role) === CRM_ROLES.TEAM_LEADER || normalizeRole(u.role) === CRM_ROLES.SALES_HEAD)).map(mgr => (
-                                            <option key={mgr.id} value={mgr.name}>👔 {mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
+                                            <option key={mgr.id} value={mgr.name}>{mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
                                           ))}
                                         </>
                                       )}
@@ -16898,7 +16903,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             <div>
                               {checkIsSuperAdmin(detailUser) || detailUser.id === "usr_admin" || normalizeRole(detailUser.role) === CRM_ROLES.COMPANY_OWNER || (!isSuperAdminUser && (detailUser.id === currentUser?.id || normalizeRole(detailUser.role) !== CRM_ROLES.SALES_EXECUTIVE)) ? (
                                 <span style={{ fontSize: "12px", color: "#94a3b8", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                                  🔒 Protected account (Cannot be deleted)
+                                  Protected account (Cannot be deleted)
                                 </span>
                               ) : (
                                 <button
@@ -17099,7 +17104,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     Showing {filteredTeamUsers.length} of {teamUsersToDisplay.length} Members
                                   </span>
                                   <span style={{ fontSize: "11px", backgroundColor: "#f1f5f9", color: "#475569", padding: "3px 8px", borderRadius: "12px", border: "1px solid #e2e8f0", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                                    💡 Click any member to open their window
+                                     Click any member to open their window
                                   </span>
                                 </div>
                               </div>
@@ -17608,14 +17613,14 @@ export default function App({ onNavigateToLanding } = {}) {
                         <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <Bookmark size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                           {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || currentUser?.role === "manager") ? "Total Pipeline Value" : "My Pipeline Value"}
                         </span>
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         <AnimatedNumber value={stats.totalPipeline} isCurrency />
                       </div>
-                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                         <span style={{ color: "#64748b", fontWeight: "600", fontSize: "12px" }}>Active Open Pipeline</span>
                       </div>
                     </div>
@@ -17628,14 +17633,14 @@ export default function App({ onNavigateToLanding } = {}) {
                         <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <Award size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                           {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || currentUser?.role === "manager") ? "Closed Won Revenue" : "My Closed Won Revenue"}
                         </span>
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         <AnimatedNumber value={stats.wonPipeline} isCurrency />
                       </div>
-                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                         {stats.wonPipeline === 0 ? (
                           <span style={{ color: "#64748b", fontWeight: "600" }}>Fresh Month (0 Won)</span>
                         ) : (
@@ -17652,14 +17657,14 @@ export default function App({ onNavigateToLanding } = {}) {
                         <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#ecfdf5", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <TrendingUp size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                           Pipeline Win Rate
                         </span>
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         <AnimatedNumber value={Number(stats.winRate)} isPercent />
                       </div>
-                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                         {Number(stats.winRate) === 0 ? (
                           <span style={{ color: "#64748b", fontWeight: "600" }}>0 Closed in {formatMonthLabel(selectedPeriodMonth, "short")}</span>
                         ) : (
@@ -17689,7 +17694,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                               <Target size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
                             </div>
-                            <span title="Sales Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                            <span title="Sales Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                               Sales Target
                             </span>
                           </div>
@@ -17701,13 +17706,13 @@ export default function App({ onNavigateToLanding } = {}) {
                           )}
                         </div>
                         
-                        <div style={{ fontSize: targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <div style={{ fontSize: targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {targetValue > 0 ? <AnimatedNumber value={targetValue} isCurrency /> : "Pending ⏳"}
                         </div>
-                        <span style={{ fontSize: "12px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#64748b", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <span style={{ fontSize: "12px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#64748b", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", display: "block", fontFamily: "'Inter', sans-serif" }}>
                           {targetValue > 0 ? (
                             targetStats.baseProgress >= 100
-                              ? `🎉 100% Goal Conquered!`
+                              ? ` 100% Goal Conquered!`
                               : `Goal Progress: ${Math.round(targetStats.baseProgress)}%`
                           ) : "Target Pending"}
                         </span>
@@ -17742,14 +17747,14 @@ export default function App({ onNavigateToLanding } = {}) {
                           <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                             <Clock size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
                           </div>
-                          <span title="Daily Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <span title="Daily Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                             Daily Target
                           </span>
                         </div>
-                        <div style={{ fontSize: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "14px" : targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <div style={{ fontSize: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "14px" : targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {(selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "Month Ended" : targetValue > 0 ? <AnimatedNumber value={targetStats.dailyRequired} isCurrency /> : "-- / day"}
                         </div>
-                        <span style={{ fontSize: "12px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <span style={{ fontSize: "12px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Inter', sans-serif" }}>
                           {targetStats.dailySubtitle || ((selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? `${formatMonthLabel(selectedPeriodMonth)} Closed` : targetValue > 0 ? `For remaining ${targetStats.daysRemaining} days` : "Waiting for assignment")}
                         </span>
                       </div>
@@ -17783,7 +17788,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fef2f2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                             <Gift size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                           </div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                             My Incentive
                           </span>
                         </div>
@@ -17794,10 +17799,10 @@ export default function App({ onNavigateToLanding } = {}) {
                           </div>
                         )}
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         <AnimatedNumber value={targetStats.incentiveAmount} isCurrency />
                       </div>
-                      <div style={{ fontSize: "12px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      <div style={{ fontSize: "12px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0, fontFamily: "'Inter', sans-serif" }}>
                         <span style={{ color: targetStats.incentiveAmount > 0 ? "#059669" : "#64748b", fontWeight: "800", backgroundColor: targetStats.incentiveAmount > 0 ? "#ecfdf5" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", border: targetStats.incentiveAmount > 0 ? "1px solid #a7f3d0" : "1px solid #e2e8f0", whiteSpace: "nowrap", flexShrink: 0 }}>
                           {targetStats.tierStatusBadge}
                         </span>
@@ -17832,7 +17837,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   flexDirection: "column",
                   width: "100%",
                   boxSizing: "border-box",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif"
+                  fontFamily: "'Inter', sans-serif"
                 }}
               >
                 {/* Accessible H1 Heading for Table View (Issue 4) */}
@@ -17902,7 +17907,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             alignItems: "center",
                             gap: "6px",
                             boxShadow: isActive ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            fontFamily: "'Inter', sans-serif",
                             transition: "all 0.15s ease"
                           }}
                         >
@@ -18075,7 +18080,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         placeholder="Search leads by name, company..." 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{ width: "100%", padding: searchQuery ? "0 28px 0 30px" : "0 10px 0 30px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
+                        style={{ width: "100%", padding: searchQuery ? "0 28px 0 30px" : "0 10px 0 30px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", outline: "none", backgroundColor: "#ffffff", fontFamily: "'Inter', sans-serif", boxSizing: "border-box", height: "32px", color: "#0f172a" }}
                       />
                       {searchQuery && (
                         <button
@@ -18103,9 +18108,9 @@ export default function App({ onNavigateToLanding } = {}) {
                       )}
                     </div>
 
-                    {/* Right Actions: 'Delete Lead' (if selected) + '+ Add Lead' + 'Import Leads' + 'Actions ▾' */}
+                    {/* Right Actions: 'Delete Lead' (if selected and permitted) + '+ Add Lead' + 'Import Leads' + 'Actions ▾' */}
                     <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "8px", position: "relative" }}>
-                      {(selectedLeadIds.length > 0 || selectedCell !== null) && (
+                      {(selectedLeadIds.length > 0 || selectedCell !== null) && (checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canDeleteLeads) && (
                         <button 
                           type="button"
                           onClick={handleDeleteSelectedLeads}
@@ -18122,7 +18127,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             fontWeight: "700", 
                             cursor: "pointer", 
                             boxShadow: "0 1px 2px rgba(220, 38, 38, 0.15)", 
-                            fontFamily: "'Plus Jakarta Sans', sans-serif", 
+                            fontFamily: "'Inter', sans-serif", 
                             height: "32px", 
                             boxSizing: "border-box",
                             transition: "all 0.15s ease" 
@@ -18150,7 +18155,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           fontWeight: "600", 
                           cursor: "pointer", 
                           boxShadow: "0 1px 2px rgba(37, 99, 235, 0.25)", 
-                          fontFamily: "'Plus Jakarta Sans', sans-serif", 
+                          fontFamily: "'Inter', sans-serif", 
                           height: "32px", 
                           boxSizing: "border-box" 
                         }}
@@ -18180,7 +18185,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           fontWeight: "600", 
                           cursor: "pointer", 
                           boxShadow: "0 1px 2px rgba(0,0,0,0.04)", 
-                          fontFamily: "'Plus Jakarta Sans', sans-serif", 
+                          fontFamily: "'Inter', sans-serif", 
                           height: "32px", 
                           boxSizing: "border-box",
                           transition: "all 0.15s ease" 
@@ -18212,7 +18217,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             cursor: "pointer",
                             height: "32px",
                             boxSizing: "border-box",
-                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                            fontFamily: "'Inter', sans-serif"
                           }}
                         >
                           Actions <ChevronDown size={12} color="#64748b" />
@@ -18266,15 +18271,19 @@ export default function App({ onNavigateToLanding } = {}) {
                             >
                               <Download size={12} color="#64748b" /> Export CSV
                             </button>
-                            <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "3px 0" }} />
-                            <button
-                              onClick={() => { requestDeleteSelectedRow(); setShowActionsDropdown(false); }}
-                              style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "12px", color: "#dc2626", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fef2f2"}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                            >
-                              <Trash2 size={12} color="#dc2626" /> Delete Row
-                            </button>
+                            {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canDeleteLeads) && (
+                              <>
+                                <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "3px 0" }} />
+                                <button
+                                  onClick={() => { requestDeleteSelectedRow(); setShowActionsDropdown(false); }}
+                                  style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "12px", color: "#dc2626", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
+                                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fef2f2"}
+                                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                >
+                                  <Trash2 size={12} color="#dc2626" /> Delete Row
+                                </button>
+                              </>
+                            )}
                             <button
                               onClick={() => { requestResetLeads(); setShowActionsDropdown(false); }}
                               style={{ padding: "7px 12px", border: "none", background: "none", textAlign: "left", fontSize: "12px", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", fontWeight: "500" }}
@@ -18316,7 +18325,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         outline: "none",
                         cursor: "pointer",
                         fontWeight: "600",
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontFamily: "'Inter', sans-serif",
                         height: "32px",
                         display: "inline-flex",
                         alignItems: "center",
@@ -18348,7 +18357,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           borderRadius: "8px",
                           boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
                           padding: "6px",
-                          fontFamily: "'Plus Jakarta Sans', sans-serif"
+                          fontFamily: "'Inter', sans-serif"
                         }}
                       >
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: "5px", borderBottom: "1px solid #f1f5f9", marginBottom: "4px" }}>
@@ -18436,7 +18445,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     <select 
                       value={filterScore}
                       onChange={(e) => setFilterScore(e.target.value)}
-                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterScore ? "#1d4ed8" : "#475569", backgroundColor: filterScore ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
+                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterScore ? "#1d4ed8" : "#475569", backgroundColor: filterScore ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Inter', sans-serif", height: "32px" }}
                     >
                       <option value="">Score: All</option>
                       {SCORE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -18449,7 +18458,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     <select 
                       value={filterSource}
                       onChange={(e) => setFilterSource(e.target.value)}
-                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterSource ? "#1d4ed8" : "#475569", backgroundColor: filterSource ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
+                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterSource ? "#1d4ed8" : "#475569", backgroundColor: filterSource ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Inter', sans-serif", height: "32px" }}
                     >
                       <option value="">Source: All</option>
                       {SOURCE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -18479,7 +18488,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         color: filterMinVal ? "#1d4ed8" : "#0f172a", 
                         backgroundColor: filterMinVal ? "#eff6ff" : "#ffffff", 
                         outline: "none", 
-                        fontFamily: "'Plus Jakarta Sans', sans-serif", 
+                        fontFamily: "'Inter', sans-serif", 
                         height: "32px", 
                         boxSizing: "border-box",
                         transition: "all 0.15s ease"
@@ -18508,7 +18517,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           value={isRepOnly ? currentUser.name : filterOwner}
                           disabled={isRepOnly}
                           onChange={(e) => setFilterOwner(e.target.value)}
-                          style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterOwner ? "#7c3aed" : "#475569", backgroundColor: isRepOnly ? "#f8fafc" : (filterOwner ? "#f5f3ff" : "#ffffff"), outline: "none", cursor: isRepOnly ? "default" : "pointer", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif", height: "32px" }}
+                          style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterOwner ? "#7c3aed" : "#475569", backgroundColor: isRepOnly ? "#f8fafc" : (filterOwner ? "#f5f3ff" : "#ffffff"), outline: "none", cursor: isRepOnly ? "default" : "pointer", fontWeight: "600", fontFamily: "'Inter', sans-serif", height: "32px" }}
                         >
                           {isRepOnly ? (
                             <option value={currentUser.name}>👤 My Leads ({currentUser.name})</option>
@@ -18540,7 +18549,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   <button
                     type="button"
                     onClick={() => setShowAddCustomFieldModal(true)}
-                    style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "4px 9px", backgroundColor: "#ffffff", border: "1px dashed #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer", height: "32px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "4px 9px", backgroundColor: "#ffffff", border: "1px dashed #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer", height: "32px", fontFamily: "'Inter', sans-serif" }}
                     title="Add dynamic custom fields (City, Requirement, etc.)"
                   >
                     <Plus size={12} color="#64748b" /> Field
@@ -18608,7 +18617,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   const avgClosingSpeed = validCount > 0 ? (totalDays / validCount).toFixed(1) : "3.5";
 
                   return (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", padding: "0 16px 10px 16px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", padding: "0 16px 10px 16px", fontFamily: "'Inter', sans-serif" }}>
                       <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <div>
                           {/* Issue 4: Title Case instead of all-caps text */}
@@ -18661,7 +18670,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       </p>
                     </div>
                   ) : (
-                    <table className="leads-data-table" style={{ minWidth: "1120px", width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <table className="leads-data-table" style={{ minWidth: "1120px", width: "100%", tableLayout: "fixed", borderCollapse: "collapse", textAlign: "left", fontSize: "12px", fontFamily: "'Inter', sans-serif" }}>
                       <thead>
                         <tr style={{ backgroundColor: "#fcfdfe", borderBottom: "1px solid #edf2f7", color: "#475569", fontWeight: "600", height: "38px" }}>
                           <th style={{ width: "36px", padding: "6px 2px 6px 10px", textAlign: "center", verticalAlign: "middle" }}>
@@ -18976,7 +18985,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                           whiteSpace: "nowrap",
                                           height: "26px",
                                           boxSizing: "border-box",
-                                          fontFamily: "'Plus Jakarta Sans', sans-serif"
+                                          fontFamily: "'Inter', sans-serif"
                                         }}
                                         onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#dbeafe"; e.currentTarget.style.borderColor = "#93c5fd"; }}
                                         onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#eff6ff"; e.currentTarget.style.borderColor = "#bfdbfe"; }}
@@ -19026,7 +19035,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                             outline: "none",
                                             height: "28px",
                                             boxSizing: "border-box",
-                                            fontFamily: "'Plus Jakarta Sans', sans-serif"
+                                            fontFamily: "'Inter', sans-serif"
                                           }}
                                           title="Click to reassign owner"
                                           aria-label="Reassign Lead Owner"
@@ -19106,7 +19115,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                             border: getLeadWonMonth(lead) !== currentMonthKey ? "1px solid #fed7aa" : "1px solid #bbf7d0", 
                                             whiteSpace: "nowrap" 
                                           }}>
-                                            🗓️ {formatMonthLabel(getLeadWonMonth(lead), "short")} Won
+                                            {formatMonthLabel(getLeadWonMonth(lead), "short")} Won
                                           </span>
                                         ) : isOverdue ? (
                                           <span style={{ fontSize: "10px", fontWeight: "700", color: "#dc2626", backgroundColor: "#fee2e2", padding: "1.5px 6px", borderRadius: "4px", whiteSpace: "nowrap" }}>
@@ -19283,34 +19292,37 @@ export default function App({ onNavigateToLanding } = {}) {
                                           </a>
                                         )}
 
-                                        <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "2px 0" }} />
-
-                                        <button
-                                          type="button"
-                                          onClick={() => {
-                                            setActiveRowMenuId(null);
-                                            handleDeleteLead(lead);
-                                          }}
-                                          style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "8px",
-                                            padding: "6px 10px",
-                                            fontSize: "12px",
-                                            fontWeight: "600",
-                                            color: "#dc2626",
-                                            background: "transparent",
-                                            border: "none",
-                                            borderRadius: "6px",
-                                            cursor: "pointer",
-                                            width: "100%",
-                                            textAlign: "left"
-                                          }}
-                                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fef2f2"}
-                                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                                        >
-                                          <Trash2 size={13} color="#dc2626" /> Delete Lead
-                                        </button>
+                                        {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canDeleteLeads) && (
+                                          <>
+                                            <div style={{ height: "1px", backgroundColor: "#f1f5f9", margin: "2px 0" }} />
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setActiveRowMenuId(null);
+                                                handleDeleteLead(lead);
+                                              }}
+                                              style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "8px",
+                                                padding: "6px 10px",
+                                                fontSize: "12px",
+                                                fontWeight: "600",
+                                                color: "#dc2626",
+                                                background: "transparent",
+                                                border: "none",
+                                                borderRadius: "6px",
+                                                cursor: "pointer",
+                                                width: "100%",
+                                                textAlign: "left"
+                                              }}
+                                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fef2f2"}
+                                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                            >
+                                              <Trash2 size={13} color="#dc2626" /> Delete Lead
+                                            </button>
+                                          </>
+                                        )}
                                       </div>
                                     )}
                                   </div>
@@ -19616,7 +19628,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 const aiAction = activeLead ? calculateAiWinProbability(activeLead) : { percentage: 50, level: "Moderate" };
 
                 return (
-                  <div className="split-screen-workspace-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <div className="split-screen-workspace-container animate-fade-in" style={{ fontFamily: "'Inter', sans-serif" }}>
                     {/* TOP ACTION & VIEW SWITCHER BAR */}
                     <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 14px", marginBottom: "10px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -19733,7 +19745,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       const avgClosingSpeed = validCount > 0 ? (totalDays / validCount).toFixed(1) : "3.5";
 
                       return (
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "10px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "10px", fontFamily: "'Inter', sans-serif" }}>
                           {/* 1. Total Closed Value */}
                           <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "8px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div>
@@ -19794,7 +19806,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             style={{ width: "100%", height: "32px", padding: "0 28px 0 32px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "400", outline: "none", color: "#0f172a", boxSizing: "border-box" }}
                           />
                           {splitLeadSearch && (
-                            <button onClick={() => setSplitLeadSearch("")} style={{ position: "absolute", right: "8px", top: "7px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px", padding: 0 }}>✕</button>
+                            <button onClick={() => setSplitLeadSearch("")} style={{ position: "absolute", right: "8px", top: "7px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px", padding: 0 }}><X size={14} /></button>
                           )}
                         </div>
 
@@ -19804,7 +19816,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             <select
                               value={splitLeadFilterStage}
                               onChange={(e) => setSplitLeadFilterStage(e.target.value)}
-                              style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                             >
                               <option value="all">All Stages ({ownerScopedLeads.length})</option>
                               <option value="hot">Hot Deals</option>
@@ -19820,7 +19832,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             <select
                               value={splitLeadFilterScore}
                               onChange={(e) => setSplitLeadFilterScore(e.target.value)}
-                              style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                             >
                               <option value="all">All Priority</option>
                               <option value="Hot">Hot</option>
@@ -19949,7 +19961,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     href={`https://wa.me/${(activeLead.phone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${activeLead.name || ""}, regarding our discussion on your requirements...`)}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    style={{ padding: "0 12px", height: "32px", lineHeight: "32px", backgroundColor: "#166534", color: "#ffffff", borderRadius: "6px", fontSize: "12px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ padding: "0 12px", height: "32px", lineHeight: "32px", backgroundColor: "#166534", color: "#ffffff", borderRadius: "6px", fontSize: "12px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Inter', sans-serif" }}
                                   >
                                     <MessageCircle size={14} /> WhatsApp
                                   </a>
@@ -19958,7 +19970,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 {activeLead.phone && (
                                   <a
                                     href={`tel:${activeLead.phone}`}
-                                    style={{ padding: "0 12px", height: "32px", lineHeight: "32px", backgroundColor: "#0f172a", color: "#ffffff", borderRadius: "6px", fontSize: "12px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ padding: "0 12px", height: "32px", lineHeight: "32px", backgroundColor: "#0f172a", color: "#ffffff", borderRadius: "6px", fontSize: "12px", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Inter', sans-serif" }}
                                   >
                                     <Phone size={13} color="#ffffff" /> Call
                                   </a>
@@ -19971,7 +19983,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                       handleUpdateActiveLead("won_date", new Date().toISOString().slice(0, 10));
                                       showToast(`Deal marked as WON! Revenue: ₹${(Number(activeLead.value) || 0).toLocaleString("en-IN")}`, "success");
                                     }}
-                                    style={{ padding: "0 14px", height: "32px", backgroundColor: "#166534", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ padding: "0 14px", height: "32px", backgroundColor: "#166534", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(22,101,52,0.25)", fontFamily: "'Inter', sans-serif" }}
                                   >
                                     <Award size={14} /> Mark Won
                                   </button>
@@ -20005,7 +20017,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         type="number"
                                         value={splitTempAmount}
                                         onChange={(e) => setSplitTempAmount(e.target.value)}
-                                        style={{ width: "80px", height: "26px", padding: "2px 6px", fontSize: "12px", fontWeight: "700", color: "#166534", border: "1px solid #2563eb", borderRadius: "6px", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ width: "80px", height: "26px", padding: "2px 6px", fontSize: "12px", fontWeight: "700", color: "#166534", border: "1px solid #2563eb", borderRadius: "6px", outline: "none", fontFamily: "'Inter', sans-serif" }}
                                       />
                                       <button
                                         onClick={() => {
@@ -20013,10 +20025,8 @@ export default function App({ onNavigateToLanding } = {}) {
                                           setSplitEditValueMode(false);
                                           showToast("Updated Deal Value!");
                                         }}
-                                        style={{ padding: "0 6px", height: "26px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                                      >
-                                        ✓
-                                      </button>
+                                        style={{ padding: "0 6px", height: "26px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
+                                      ><Check size={14} /></button>
                                     </div>
                                   ) : (
                                     <div 
@@ -20045,7 +20055,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         showToast(`Stage updated to ${newStg}`);
                                       }
                                     }}
-                                    style={{ padding: "0 8px", height: "28px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ padding: "0 8px", height: "28px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
                                   >
                                     {STATUS_OPTIONS.map(stg => (
                                       <option key={stg} value={stg}>{stg}</option>
@@ -20086,7 +20096,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     alignItems: "center",
                                     gap: "5px",
                                     transition: "all 0.15s ease",
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif"
+                                    fontFamily: "'Inter', sans-serif"
                                   }}
                                 >
                                   <Icon size={13} color={isActive ? "#2563eb" : "#64748b"} />
@@ -20121,7 +20131,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         type="text" 
                                         value={activeLead.name || ""} 
                                         onChange={(e) => handleUpdateActiveLead("name", e.target.value)}
-                                        style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                                       />
                                     </div>
 
@@ -20132,7 +20142,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         value={activeLead.company || ""} 
                                         onChange={(e) => handleUpdateActiveLead("company", e.target.value)}
                                         placeholder="e.g. Acme Corp Pvt Ltd"
-                                        style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                                       />
                                     </div>
 
@@ -20149,7 +20159,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                           data-1p-ignore="true"
                                           value={activeLead.phone || ""} 
                                           onChange={(e) => handleUpdateActiveLead("phone", e.target.value)}
-                                          style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                                         />
                                       </div>
                                       <div>
@@ -20164,7 +20174,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                           data-1p-ignore="true"
                                           value={activeLead.email || ""} 
                                           onChange={(e) => handleUpdateActiveLead("email", e.target.value)}
-                                          style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 10px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                                         />
                                       </div>
                                     </div>
@@ -20186,7 +20196,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                             type="number" 
                                             value={activeLead.value || 0} 
                                             onChange={(e) => handleUpdateActiveLead("value", Number(e.target.value) || 0)}
-                                            style={{ width: "100%", padding: "0 10px", height: "32px", border: "1.5px solid #86efac", borderRadius: "6px", fontSize: "12px", color: "#166534", backgroundColor: "#f0fdf4", outline: "none", fontWeight: "700", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                            style={{ width: "100%", padding: "0 10px", height: "32px", border: "1.5px solid #86efac", borderRadius: "6px", fontSize: "12px", color: "#166534", backgroundColor: "#f0fdf4", outline: "none", fontWeight: "700", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                                           />
                                         </div>
                                       </div>
@@ -20195,7 +20205,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         <select
                                           value={activeLead.score || "Hot"}
                                           onChange={(e) => handleUpdateActiveLead("score", e.target.value)}
-                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                                         >
                                           <option value="Hot">Hot</option>
                                           <option value="Warm">Warm</option>
@@ -20211,7 +20221,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                           type="date" 
                                           value={activeLead.next_follow_up || ""} 
                                           onChange={(e) => handleUpdateActiveLead("next_follow_up", e.target.value)}
-                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                                         />
                                       </div>
                                       <div>
@@ -20219,7 +20229,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         <select
                                           value={activeLead.source || "Manual"}
                                           onChange={(e) => handleUpdateActiveLead("source", e.target.value)}
-                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                                         >
                                           {SOURCE_OPTIONS.map(src => (
                                             <option key={src} value={src}>{src}</option>
@@ -20233,7 +20243,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                       <button
                                         type="button"
                                         onClick={() => showToast("Lead details saved successfully!", "success")}
-                                        style={{ width: "100%", height: "34px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", boxShadow: "0 1px 2px rgba(37, 99, 235, 0.2)", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ width: "100%", height: "34px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", boxShadow: "0 1px 2px rgba(37, 99, 235, 0.2)", fontFamily: "'Inter', sans-serif" }}
                                       >
                                         <Check size={14} /> Save Information
                                       </button>
@@ -20282,7 +20292,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                               display: "inline-flex",
                                               alignItems: "center",
                                               gap: "3px",
-                                              fontFamily: "'Plus Jakarta Sans', sans-serif"
+                                              fontFamily: "'Inter', sans-serif"
                                             }}
                                           >
                                             <TypeIcon size={11} />
@@ -20305,7 +20315,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         key={pIdx}
                                         type="button"
                                         onClick={() => setSplitNewNoteText(preset)}
-                                        style={{ fontSize: "12px", padding: "2px 8px", borderRadius: "6px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", color: "#475569", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ fontSize: "12px", padding: "2px 8px", borderRadius: "6px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", color: "#475569", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
                                       >
                                         + {preset.slice(0, 32)}...
                                       </button>
@@ -20317,14 +20327,14 @@ export default function App({ onNavigateToLanding } = {}) {
                                     placeholder="Type conversation details, objections handled, next steps..."
                                     value={splitNewNoteText}
                                     onChange={(e) => setSplitNewNoteText(e.target.value)}
-                                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", color: "#0f172a", outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", color: "#0f172a", outline: "none", resize: "vertical", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
                                   />
 
                                   <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px" }}>
                                     <button
                                       type="button"
                                       onClick={handleAddSplitNote}
-                                      style={{ padding: "0 12px", height: "30px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                      style={{ padding: "0 12px", height: "30px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Inter', sans-serif" }}
                                     >
                                       <Plus size={13} /> Add Note
                                     </button>
@@ -20341,7 +20351,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     {typeof activeLead.notes === "string" && activeLead.notes.trim() ? (
                                       activeLead.notes.split("\n\n").filter(Boolean).map((noteBlock, nIdx) => (
                                         <div key={nIdx} style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "8px 10px" }}>
-                                          <p style={{ margin: 0, fontSize: "12px", color: "#0f172a", whiteSpace: "pre-wrap", lineHeight: 1.4, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                          <p style={{ margin: 0, fontSize: "12px", color: "#0f172a", whiteSpace: "pre-wrap", lineHeight: 1.4, fontFamily: "'Inter', sans-serif" }}>
                                             {noteBlock}
                                           </p>
                                         </div>
@@ -20437,7 +20447,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                         href={`https://wa.me/${(activeLead.phone || "").replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${activeLead.name || ""}, here are the payment details for your subscription: Total Amount: ₹${(Number(activeLead.value) || 0).toLocaleString("en-IN")}. Please confirm once paid!`)}`}
                                         target="_blank"
                                         rel="noreferrer"
-                                        style={{ display: "block", textAlign: "center", padding: "0 12px", height: "32px", lineHeight: "32px", backgroundColor: "#166534", color: "#ffffff", borderRadius: "6px", fontSize: "12px", fontWeight: "600", textDecoration: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                                        style={{ display: "block", textAlign: "center", padding: "0 12px", height: "32px", lineHeight: "32px", backgroundColor: "#166534", color: "#ffffff", borderRadius: "6px", fontSize: "12px", fontWeight: "600", textDecoration: "none", fontFamily: "'Inter', sans-serif" }}
                                       >
                                         Send Payment Link via WhatsApp
                                       </a>
@@ -20582,20 +20592,20 @@ export default function App({ onNavigateToLanding } = {}) {
                 const newSalesVal = Math.max(0, totalClosedVal - renewalVal);
 
                 return (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "2px", fontFamily: "'Inter', sans-serif" }}>
                     
                     {/* 1. COMPACT TOP HEADER & VIEW MODES TOOLBAR */}
                     <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                       <div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <h1 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <h1 style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px", fontFamily: "'Inter', sans-serif" }}>
                             <Award size={16} color="#16a34a" /> Deals & Revenue Hub
                           </h1>
-                          <span style={{ fontSize: "12px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "2px 8px", borderRadius: "6px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", border: "1px solid #bbf7d0", padding: "2px 8px", borderRadius: "6px", fontFamily: "'Inter', sans-serif" }}>
                             Closed Revenue Ledger
                           </span>
                         </div>
-                        <p style={{ fontSize: "12px", color: "#475569", margin: "4px 0 0 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <p style={{ fontSize: "12px", color: "#475569", margin: "4px 0 0 0", fontFamily: "'Inter', sans-serif" }}>
                           Track closed won transactions, date-wise revenue ledger, and sales velocity metrics.
                         </p>
                       </div>
@@ -20613,7 +20623,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             aria-selected={pipelineView === "analytics"}
                             tabIndex={pipelineView === "analytics" ? 0 : -1}
                             onClick={() => setPipelineView("analytics")}
-                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "analytics" ? "700" : "600", color: pipelineView === "analytics" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "analytics" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "analytics" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Inter', sans-serif" }}
                           >
                             <TrendingUp size={13} /> Dashboard
                           </button>
@@ -20623,7 +20633,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             aria-selected={pipelineView === "sheet"}
                             tabIndex={pipelineView === "sheet" ? 0 : -1}
                             onClick={() => setPipelineView("sheet")}
-                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Inter', sans-serif" }}
                           >
                             <Grid size={13} /> Grid View
                           </button>
@@ -20633,7 +20643,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             aria-selected={pipelineView === "split"}
                             tabIndex={pipelineView === "split" ? 0 : -1}
                             onClick={() => setPipelineView("split")}
-                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "split" ? "700" : "600", color: pipelineView === "split" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "split" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "split" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Inter', sans-serif" }}
                           >
                             <Layers size={13} /> Split 360°
                           </button>
@@ -20643,7 +20653,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             aria-selected={pipelineView === "deals"}
                             tabIndex={pipelineView === "deals" ? 0 : -1}
                             onClick={() => setPipelineView("deals")}
-                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "deals" ? "700" : "600", color: pipelineView === "deals" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "deals" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "deals" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Inter', sans-serif" }}
                           >
                             <Award size={13} /> Deals Board
                           </button>
@@ -20653,7 +20663,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             aria-selected={pipelineView === "kanban"}
                             tabIndex={pipelineView === "kanban" ? 0 : -1}
                             onClick={() => setPipelineView("kanban")}
-                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "kanban" ? "700" : "600", color: pipelineView === "kanban" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "kanban" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "kanban" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "kanban" ? "700" : "600", color: pipelineView === "kanban" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "kanban" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "kanban" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Inter', sans-serif" }}
                           >
                             <Columns size={13} /> Kanban
                           </button>
@@ -20664,7 +20674,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               aria-selected={pipelineView === "unassigned"}
                               tabIndex={pipelineView === "unassigned" ? 0 : -1}
                               onClick={() => setPipelineView("unassigned")}
-                              style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "unassigned" ? "700" : "600", color: pipelineView === "unassigned" ? "#ea580c" : "#64748b", border: "none", backgroundColor: pipelineView === "unassigned" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "unassigned" ? "0 1px 2px rgba(234, 88, 12, 0.15)" : "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "unassigned" ? "700" : "600", color: pipelineView === "unassigned" ? "#ea580c" : "#64748b", border: "none", backgroundColor: pipelineView === "unassigned" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "unassigned" ? "0 1px 2px rgba(234, 88, 12, 0.15)" : "none", fontFamily: "'Inter', sans-serif" }}
                             >
                               <Inbox size={13} /> Unassigned ({unassignedLeadsList.length})
                             </button>
@@ -20693,7 +20703,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             a.click();
                             showToast("Exported Won Deals Ledger CSV!", "success");
                           }}
-                          style={{ height: "30px", padding: "4px 12px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                          style={{ height: "30px", padding: "4px 12px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", fontFamily: "'Inter', sans-serif" }}
                         >
                           <Download size={13} /> Export
                         </button>
@@ -20706,11 +20716,11 @@ export default function App({ onNavigateToLanding } = {}) {
                       {/* Card 1: Total Closed Value */}
                       <div style={{ backgroundColor: "#ffffff", border: "1px solid #bbf7d0", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Inter', sans-serif" }}>
                             {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager" || currentUser?.role === "admin") ? "Total Company Closed Value (Inc. GST)" : "My Closed Revenue (Inc. GST)"}
                           </span>
-                          <strong style={{ fontSize: "16px", fontWeight: "800", color: "#166534", display: "block", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
-                          <span style={{ fontSize: "12px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <strong style={{ fontSize: "16px", fontWeight: "800", color: "#166534", display: "block", marginTop: "2px", fontFamily: "'Inter', sans-serif" }}>₹{totalClosedVal.toLocaleString("en-IN")}</strong>
+                          <span style={{ fontSize: "12px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Inter', sans-serif" }}>
                             Base ₹{totalBaseVal.toLocaleString("en-IN")} + GST ₹{totalGstVal.toLocaleString("en-IN")}
                           </span>
                         </div>
@@ -20722,9 +20732,9 @@ export default function App({ onNavigateToLanding } = {}) {
                       {/* Card 2: Average Deal Size */}
                       <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Average Deal Size (Inc. GST)</span>
-                          <strong style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", display: "block", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{avgDealVal.toLocaleString("en-IN")}</strong>
-                          <span style={{ fontSize: "12px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Inter', sans-serif" }}>Average Deal Size (Inc. GST)</span>
+                          <strong style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", display: "block", marginTop: "2px", fontFamily: "'Inter', sans-serif" }}>₹{avgDealVal.toLocaleString("en-IN")}</strong>
+                          <span style={{ fontSize: "12px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Inter', sans-serif" }}>
                             {filteredWonDeals.length === wonLeadsList.length ? `${wonLeadsList.length} Deals Won` : `${filteredWonDeals.length} of ${wonLeadsList.length} Deals`}
                           </span>
                         </div>
@@ -20736,9 +20746,9 @@ export default function App({ onNavigateToLanding } = {}) {
                       {/* Card 3: Closing Speed */}
                       <div style={{ backgroundColor: "#ffffff", border: "1px solid #fed7aa", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Avg Closing Speed</span>
-                          <strong style={{ fontSize: "16px", fontWeight: "800", color: "#ea580c", display: "block", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{avgClosingSpeed} Days</strong>
-                          <span style={{ fontSize: "12px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Turnaround Time</span>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Inter', sans-serif" }}>Avg Closing Speed</span>
+                          <strong style={{ fontSize: "16px", fontWeight: "800", color: "#ea580c", display: "block", marginTop: "2px", fontFamily: "'Inter', sans-serif" }}>{avgClosingSpeed} Days</strong>
+                          <span style={{ fontSize: "12px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Inter', sans-serif" }}>Turnaround Time</span>
                         </div>
                         <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <Clock size={15} color="#ea580c" />
@@ -20748,13 +20758,13 @@ export default function App({ onNavigateToLanding } = {}) {
                       {/* Card 4: New vs Renewal Split */}
                       <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
                         <div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>New vs Renewal</span>
+                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", fontFamily: "'Inter', sans-serif" }}>New vs Renewal</span>
                           <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "2px" }}>
-                            <strong style={{ fontSize: "14px", fontWeight: "800", color: "#166534", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{newSalesVal.toLocaleString("en-IN")}</strong>
+                            <strong style={{ fontSize: "14px", fontWeight: "800", color: "#166534", fontFamily: "'Inter', sans-serif" }}>₹{newSalesVal.toLocaleString("en-IN")}</strong>
                             <span style={{ color: "#64748b", fontSize: "12px" }}>/</span>
-                            <strong style={{ fontSize: "14px", fontWeight: "800", color: "#2563eb", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>₹{renewalVal.toLocaleString("en-IN")}</strong>
+                            <strong style={{ fontSize: "14px", fontWeight: "800", color: "#2563eb", fontFamily: "'Inter', sans-serif" }}>₹{renewalVal.toLocaleString("en-IN")}</strong>
                           </div>
-                          <span style={{ fontSize: "12px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>New / Renewals (Inc. GST)</span>
+                          <span style={{ fontSize: "12px", color: "#475569", marginTop: "2px", display: "block", fontFamily: "'Inter', sans-serif" }}>New / Renewals (Inc. GST)</span>
                         </div>
                         <div style={{ width: "32px", height: "32px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center" }}>
                           <RotateCw size={15} color="#2563eb" />
@@ -20783,10 +20793,10 @@ export default function App({ onNavigateToLanding } = {}) {
                             placeholder="Search deals by client, company, amount..."
                             value={dealsSearchQuery}
                             onChange={(e) => setDealsSearchQuery(e.target.value)}
-                            style={{ width: "100%", height: "34px", padding: "0 28px 0 32px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", outline: "none", color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ width: "100%", height: "34px", padding: "0 28px 0 32px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", outline: "none", color: "#0f172a", fontFamily: "'Inter', sans-serif" }}
                           />
                           {dealsSearchQuery && (
-                            <button onClick={() => setDealsSearchQuery("")} style={{ position: "absolute", right: "8px", top: "7px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px" }}>✕</button>
+                            <button onClick={() => setDealsSearchQuery("")} style={{ position: "absolute", right: "8px", top: "7px", border: "none", background: "none", color: "#64748b", cursor: "pointer", fontSize: "12px" }}><X size={14} /></button>
                           )}
                         </div>
 
@@ -20795,7 +20805,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           <select
                             value={dealsDateFilter}
                             onChange={(e) => setDealsDateFilter(e.target.value)}
-                            style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: dealsDateFilter !== "all" ? "1.5px solid #2563eb" : "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: dealsDateFilter !== "all" ? "#2563eb" : "#0f172a", backgroundColor: dealsDateFilter !== "all" ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: dealsDateFilter !== "all" ? "1.5px solid #2563eb" : "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: dealsDateFilter !== "all" ? "#2563eb" : "#0f172a", backgroundColor: dealsDateFilter !== "all" ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
                           >
                             <option value="all">All Dates (All Time)</option>
                             <option value="today">Today's Won Deals</option>
@@ -20815,14 +20825,14 @@ export default function App({ onNavigateToLanding } = {}) {
                               type="date"
                               value={dealsStartDate}
                               onChange={(e) => setDealsStartDate(e.target.value)}
-                              style={{ height: "28px", padding: "0 4px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ height: "28px", padding: "0 4px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", fontFamily: "'Inter', sans-serif" }}
                             />
                             <span style={{ fontSize: "12px", color: "#475569", fontWeight: "600" }}>To:</span>
                             <input
                               type="date"
                               value={dealsEndDate}
                               onChange={(e) => setDealsEndDate(e.target.value)}
-                              style={{ height: "28px", padding: "0 4px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ height: "28px", padding: "0 4px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", fontFamily: "'Inter', sans-serif" }}
                             />
                           </div>
                         )}
@@ -20831,7 +20841,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         <select
                           value={dealsFilterAmount}
                           onChange={(e) => setDealsFilterAmount(e.target.value)}
-                          style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                          style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
                         >
                           <option value="all">All Amounts</option>
                           <option value="high">High Value (&gt; ₹20k)</option>
@@ -20843,7 +20853,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         <select
                           value={dealsSortBy}
                           onChange={(e) => setDealsSortBy(e.target.value)}
-                          style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                          style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
                         >
                           <option value="newest">Newest First</option>
                           <option value="highest">Highest Amount</option>
@@ -20861,7 +20871,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               setDealsEndDate("");
                               setDealsSortBy("newest");
                             }}
-                            style={{ height: "34px", padding: "0 12px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ height: "34px", padding: "0 12px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#475569", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
                           >
                             Reset
                           </button>
@@ -20875,13 +20885,13 @@ export default function App({ onNavigateToLanding } = {}) {
                         </span>
                         {[
                           { id: "all", label: `All Deals (${wonLeadsList.length})`, type: "all" },
-                          { id: "this_month", label: `🗓️ ${formatMonthLabel(currentMonthKey, "short")} (${wonLeadsList.filter(l => (getLeadWonMonth(l) === currentMonthKey || (l.won_date || "").startsWith(currentMonthKey))).length})`, type: "date" },
+                          { id: "this_month", label: `${formatMonthLabel(currentMonthKey, "short")} (${wonLeadsList.filter(l => (getLeadWonMonth(l) === currentMonthKey || (l.won_date || "").startsWith(currentMonthKey))).length})`, type: "date" },
                           { id: "last_month", label: `⏮️ ${formatMonthLabel(lastMonthKey, "short")} (${wonLeadsList.filter(l => (getLeadWonMonth(l) === lastMonthKey || (l.won_date || "").startsWith(lastMonthKey))).length})`, type: "date" },
                           { id: "new", label: "New Sales", type: "category" },
                           { id: "renewal", label: "Renewals", type: "category" },
                           { id: "high_val", label: "High Value (₹15k+)", type: "category" },
-                          { id: "today", label: "⚡ Closed Today", type: "date" },
-                          { id: "this_week", label: "📆 Last 7 Days", type: "date" }
+                          { id: "today", label: "Closed Today", type: "date" },
+                          { id: "this_week", label: "Last 7 Days", type: "date" }
                         ].map(chip => {
                           const isActive = chip.type === "all"
                             ? (dealsDateFilter === "all" && dealsFilterType === "all")
@@ -20915,7 +20925,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 color: isActive ? (chip.type === "date" ? "#16a34a" : "#2563eb") : "#475569",
                                 cursor: "pointer",
                                 transition: "all 0.15s ease",
-                                fontFamily: "'Plus Jakarta Sans', sans-serif"
+                                fontFamily: "'Inter', sans-serif"
                               }}
                             >
                               {chip.label}
@@ -20938,7 +20948,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       )}
                       {dealsDateFilter === "this_month" && (
                         <div style={{ backgroundColor: "#f0fdf4", borderBottom: "1px solid #bbf7d0", padding: "8px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", color: "#166534", fontWeight: "600" }}>
-                          <span>🗓️ Showing <strong>{formatMonthLabel(currentMonthKey)} (Current Month)</strong> Won Deals: <strong>{filteredWonDeals.length} Deals</strong> (₹{totalClosedVal.toLocaleString("en-IN")})</span>
+                          <span>Showing <strong>{formatMonthLabel(currentMonthKey)} (Current Month)</strong> Won Deals: <strong>{filteredWonDeals.length} Deals</strong> (₹{totalClosedVal.toLocaleString("en-IN")})</span>
                           <button onClick={() => setDealsDateFilter("all")} style={{ border: "none", backgroundColor: "#16a34a", color: "#ffffff", height: "30px", padding: "0 12px", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}>Show All Closed Deals ({wonLeadsList.length})</button>
                         </div>
                       )}
@@ -20946,14 +20956,14 @@ export default function App({ onNavigateToLanding } = {}) {
                       {filteredWonDeals.length === 0 ? (
                         <div style={{ padding: "32px 16px", textAlign: "center", color: "#64748b" }}>
                           <Award size={28} color="#cbd5e1" style={{ margin: "0 auto 6px auto" }} />
-                          <h4 style={{ fontSize: "13px", fontWeight: "700", color: "#475569", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No closed deals found</h4>
-                          <p style={{ fontSize: "12px", color: "#64748b", margin: "4px 0 0 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Try changing search query or filters.</p>
+                          <h4 style={{ fontSize: "13px", fontWeight: "700", color: "#475569", margin: 0, fontFamily: "'Inter', sans-serif" }}>No closed deals found</h4>
+                          <p style={{ fontSize: "12px", color: "#64748b", margin: "4px 0 0 0", fontFamily: "'Inter', sans-serif" }}>Try changing search query or filters.</p>
                         </div>
                       ) : (
                         <div style={{ overflowX: "auto" }}>
-                          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "12px", fontFamily: "'Inter', sans-serif" }}>
                             <thead>
-                              <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "12px", fontWeight: "600", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                              <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontSize: "12px", fontWeight: "600", fontFamily: "'Inter', sans-serif" }}>
                                 <th style={{ padding: "10px 14px" }}>Client & Organization</th>
                                 <th style={{ padding: "10px 14px" }}>Deal Value (Inc. 18% GST)</th>
                                 <th style={{ padding: "10px 14px" }}>Stage / Type</th>
@@ -20987,10 +20997,10 @@ export default function App({ onNavigateToLanding } = {}) {
                                           {(deal.name || "Deal").split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
                                         </div>
                                         <div>
-                                          <strong style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                          <strong style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", display: "block", fontFamily: "'Inter', sans-serif" }}>
                                             {deal.name || "Untitled Lead"}
                                           </strong>
-                                          <div style={{ fontSize: "12px", color: "#475569", display: "flex", alignItems: "center", gap: "5px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                          <div style={{ fontSize: "12px", color: "#475569", display: "flex", alignItems: "center", gap: "5px", marginTop: "2px", fontFamily: "'Inter', sans-serif" }}>
                                             <Building2 size={12} color="#475569" />
                                             <span>{deal.company || "Direct Individual"}</span>
                                             {deal.phone && (
@@ -21007,10 +21017,10 @@ export default function App({ onNavigateToLanding } = {}) {
                                     {/* Deal Value (Total with GST) */}
                                     <td style={{ padding: "10px 14px" }}>
                                       <div>
-                                        <strong style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", display: "block", lineHeight: "1.3", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                        <strong style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", display: "block", lineHeight: "1.3", fontFamily: "'Inter', sans-serif" }}>
                                           ₹{totalAmountWithGst.toLocaleString("en-IN")}
                                         </strong>
-                                        <span style={{ fontSize: "12px", color: "#475569", display: "block", marginTop: "4px", lineHeight: "1.3", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                        <span style={{ fontSize: "12px", color: "#475569", display: "block", marginTop: "4px", lineHeight: "1.3", fontFamily: "'Inter', sans-serif" }}>
                                           Base: ₹{baseAmount.toLocaleString("en-IN")} + GST (18%): ₹{gstAmount.toLocaleString("en-IN")}
                                         </span>
                                       </div>
@@ -21019,18 +21029,18 @@ export default function App({ onNavigateToLanding } = {}) {
                                     {/* Stage / Type */}
                                     <td style={{ padding: "10px 14px" }}>
                                       {isRenewal ? (
-                                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "3px 8px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "3px 8px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "'Inter', sans-serif" }}>
                                           <RotateCw size={11} /> Renewal Won
                                         </span>
                                       ) : (
-                                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#166534", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "3px 8px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#166534", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "3px 8px", borderRadius: "6px", display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "'Inter', sans-serif" }}>
                                           <Check size={11} /> Closed Won
                                         </span>
                                       )}
                                     </td>
 
                                     {/* Closed Date */}
-                                    <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                    <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Inter', sans-serif" }}>
                                       <div style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
                                         <Calendar size={12} color={getLeadWonMonth(deal) !== currentMonthKey ? "#ea580c" : "#16a34a"} />
                                         <span style={{
@@ -21048,7 +21058,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     </td>
 
                                     {/* Email Address */}
-                                    <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                    <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Inter', sans-serif" }}>
                                       {deal.email ? (
                                         <a 
                                           href={`mailto:${deal.email}`} 
@@ -21061,7 +21071,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                             alignItems: "center", 
                                             gap: "4px", 
                                             fontSize: "12px", 
-                                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                            fontFamily: "'Inter', sans-serif",
                                             maxWidth: "160px"
                                           }}
                                         >
@@ -21076,7 +21086,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     </td>
 
                                     {/* Source */}
-                                    <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                    <td style={{ padding: "10px 14px", color: "#475569", fontSize: "12px", fontFamily: "'Inter', sans-serif" }}>
                                       <span style={{ fontSize: "12px", color: "#475569" }}>
                                         {deal.source || "Direct"}
                                       </span>
@@ -21107,9 +21117,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             <button
                               onClick={() => setSelectedReceiptDeal(null)}
                               style={{ border: "none", background: "none", fontSize: "16px", color: "#64748b", cursor: "pointer", padding: "0 4px" }}
-                            >
-                              ✕
-                            </button>
+                            ><X size={14} /></button>
                           </div>
 
                           {/* Client Info */}
@@ -21313,7 +21321,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     upsertLeadToSupabase(updatedLeadObj).catch(err => console.warn("Supabase stage update error:", err));
                   }
                   if (isNowWon) {
-                    showToast(`🎉 Deal marked as WON!`, "success");
+                    showToast(` Deal marked as WON!`, "success");
                   } else if (isWonStatus(prevStatus)) {
                     showToast(`Reopened deal: Moved from Won to ${newStg}`, "info");
                   } else {
@@ -21337,7 +21345,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             style={{ width: "100%", height: "32px", padding: "0 10px 0 30px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
                           />
                           {kanbanSearchQuery && (
-                            <button onClick={() => setKanbanSearchQuery("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", color: "#94a3b8" }}>✕</button>
+                            <button onClick={() => setKanbanSearchQuery("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", color: "#94a3b8" }}><X size={14} /></button>
                           )}
                         </div>
 
@@ -21348,10 +21356,10 @@ export default function App({ onNavigateToLanding } = {}) {
                           style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#334155", fontWeight: "600", outline: "none", cursor: "pointer", verticalAlign: "middle", margin: 0 }}
                           title="Filter Kanban by Timeline"
                         >
-                          <option value="all">📅 All Time Pipeline</option>
-                          <option value={getCurrentMonthKey()}>⚡ {formatMonthLabel(getCurrentMonthKey())} (Current)</option>
+                          <option value="all">All Time Pipeline</option>
+                          <option value={getCurrentMonthKey()}>{formatMonthLabel(getCurrentMonthKey())} (Current)</option>
                           <option value={getOffsetMonthKey(-1)}>⏮️ {formatMonthLabel(getOffsetMonthKey(-1))} (Last Month)</option>
-                          <option value={getOffsetMonthKey(-2)}>🗓️ {formatMonthLabel(getOffsetMonthKey(-2))}</option>
+                          <option value={getOffsetMonthKey(-2)}>{formatMonthLabel(getOffsetMonthKey(-2))}</option>
                         </select>
 
                         {/* Owner Filter (if Super Admin or Manager) */}
@@ -21819,7 +21827,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   : (effectiveRole === CRM_ROLES.SALES_EXECUTIVE && simulatedRole ? "Rohan Sharma" : (currentUser?.name || "Me"));
 
                 return (
-                  <div className="unassigned-leads-cockpit animate-fade-in" style={{ padding: "8px 12px 24px 12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <div className="unassigned-leads-cockpit animate-fade-in" style={{ padding: "8px 12px 24px 12px", fontFamily: "'Inter', sans-serif" }}>
                     
                     {/* 1. Header Toolbar with Title & View Switcher */}
                     <div style={{
@@ -22150,7 +22158,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             }}
                           >
                             <Shuffle size={13} color="#2563eb" />
-                            <span>🎲 Round-Robin Auto-Distribute</span>
+                            <span> Round-Robin Auto-Distribute</span>
                           </button>
                         </div>
                       </div>
@@ -22210,7 +22218,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               cursor: "pointer"
                             }}
                           >
-                            🔥 Hot ({hotLeads.length})
+                            Hot ({hotLeads.length})
                           </button>
                           <button
                             type="button"
@@ -22227,7 +22235,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               cursor: "pointer"
                             }}
                           >
-                            🟡 Warm ({warmLeads.length})
+                            Warm ({warmLeads.length})
                           </button>
                           <button
                             type="button"
@@ -22244,7 +22252,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               cursor: "pointer"
                             }}
                           >
-                            🚨 SLA &gt; 2h ({unassignedAgingCriticalCount})
+                            SLA &gt; 2h ({unassignedAgingCriticalCount})
                           </button>
                         </div>
                       </div>
@@ -22264,7 +22272,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           <CheckCircle2 size={30} />
                         </div>
                         <h3 style={{ fontSize: "18px", fontWeight: "600", color: "#0f172a", margin: "0 0 6px 0" }}>
-                          {unassignedLeadsList.length === 0 ? "All Inbound Leads Allocated! 🎉" : "No Leads Match Current Filter"}
+                          {unassignedLeadsList.length === 0 ? "All Inbound Leads Allocated! " : "No Leads Match Current Filter"}
                         </h3>
                         <p style={{ fontSize: "13px", color: "#64748b", maxWidth: "460px", margin: "0 auto 18px auto" }}>
                           {unassignedLeadsList.length === 0 
@@ -22474,7 +22482,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                     }}>
                                       <Clock size={11} />
                                       {formatLeadAging(lead)}
-                                      {isCriticalAging && " 🚨 SLA"}
+                                      {isCriticalAging && " SLA"}
                                     </span>
                                   </td>
 
@@ -22564,9 +22572,9 @@ export default function App({ onNavigateToLanding } = {}) {
                         className="dashboard-tablist"
                       >
                         {[
-                          { id: "all", label: "📋 All Sections" },
-                          { id: "cockpit", label: "⚡ Cockpit & Action Items" },
-                          { id: "analytics", label: "📊 Revenue Analytics & Charts" }
+                          { id: "all", label: "All Sections" },
+                          { id: "cockpit", label: "Cockpit & Action Items" },
+                          { id: "analytics", label: "Revenue Analytics & Charts" }
                         ].map(sec => {
                           const isActive = overviewSectionFilter === sec.id;
                           return (
@@ -22599,10 +22607,10 @@ export default function App({ onNavigateToLanding } = {}) {
                         <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", marginBottom: "14px", overflow: "hidden" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                             <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#0f172a", display: "flex", alignItems: "center", gap: "6px", margin: 0, letterSpacing: "-0.2px" }}>
-                              ⚡ Today's Sales Cockpit
+                              Today's Sales Cockpit
                             </h2>
                             <div style={{ fontSize: "12px", color: "#475569", fontWeight: "600", border: "1px solid #e2e8f0", padding: "3px 9px", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#fff" }}>
-                              📅 Today ▾
+                              Today ▾
                             </div>
                           </div>
 
@@ -22639,10 +22647,10 @@ export default function App({ onNavigateToLanding } = {}) {
                                 </div>
                                 <div>
                                   <div style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a" }}>
-                                    ⚡ {unassignedLeadsList.length} Inbound Leads Awaiting Rep Assignment
+                                    {unassignedLeadsList.length} Inbound Leads Awaiting Rep Assignment
                                     {unassignedAgingCriticalCount > 0 && (
                                       <span style={{ marginLeft: "8px", fontSize: "11px", fontWeight: "600", color: "#dc2626", backgroundColor: "#fee2e2", padding: "1px 6px", borderRadius: "4px" }}>
-                                        🚨 {unassignedAgingCriticalCount} Exceeding 2h SLA
+                                         {unassignedAgingCriticalCount} Exceeding 2h SLA
                                       </span>
                                     )}
                                   </div>
@@ -23175,14 +23183,14 @@ export default function App({ onNavigateToLanding } = {}) {
                     <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#e0e7ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <Shuffle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                     </div>
-                    <h3 style={{ fontSize: "14px", fontWeight: "600", color: "#0f172a", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <h3 style={{ fontSize: "14px", fontWeight: "600", color: "#0f172a", margin: 0, fontFamily: "'Inter', sans-serif" }}>
                       Recommended Next Actions
                     </h3>
                   </div>
 
                   {recommendedActions.length === 0 ? (
-                    <div className="no-actions-card" style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "8px", textAlign: "center", color: "#64748b", fontSize: "12px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                      All caught up! No immediate recommended follow-ups. 🎉
+                    <div className="no-actions-card" style={{ backgroundColor: "#f8fafc", padding: "14px", borderRadius: "8px", textAlign: "center", color: "#64748b", fontSize: "12px", fontFamily: "'Inter', sans-serif" }}>
+                      All caught up! No immediate recommended follow-ups. 
                     </div>
                   ) : (
                     <div className="actions-list-container" style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -23208,7 +23216,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           >
                             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                               <span className="action-bullet-dot" style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: action.priority === "High" ? "#ea580c" : "#3b82f6", display: "inline-block", flexShrink: 0 }} />
-                              <span className="action-message-text" style={{ fontSize: "12px", color: "#475569", fontWeight: "500", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                              <span className="action-message-text" style={{ fontSize: "12px", color: "#475569", fontWeight: "500", fontFamily: "'Inter', sans-serif" }}>
                                 <strong style={{ fontWeight: "700", color: "#0f172a" }}>{leadNamePart}</strong>
                                 {messagePart}
                               </span>
@@ -23223,7 +23231,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 padding: "6px 14px",
                                 fontSize: "12px",
                                 fontWeight: "600",
-                                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                fontFamily: "'Inter', sans-serif",
                                 cursor: "pointer",
                                 whiteSpace: "nowrap",
                                 boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)"
@@ -23245,7 +23253,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       <div style={{ width: "32px", height: "32px", borderRadius: "8px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Target size={18} style={{ width: "18px", height: "18px", strokeWidth: 1.8 }} />
                       </div>
-                      <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, fontFamily: "'Inter', sans-serif" }}>
                         Today's Focus
                       </h3>
                     </div>
@@ -23261,7 +23269,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     </div>
                   ) : (
                     <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
-                      <table className="responsive-table" style={{ width: "100%", minWidth: "680px", borderCollapse: "collapse", textAlign: "left", fontFamily: "'Plus Jakarta Sans', sans-serif", tableLayout: "auto" }}>
+                      <table className="responsive-table" style={{ width: "100%", minWidth: "680px", borderCollapse: "collapse", textAlign: "left", fontFamily: "'Inter', sans-serif", tableLayout: "auto" }}>
                         <thead>
                           <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
                             <th style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", padding: "10px 12px", whiteSpace: "nowrap" }}>Lead Name</th>
@@ -23390,7 +23398,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         <div style={{ width: "32px", height: "32px", borderRadius: "8px", backgroundColor: "#fef2f2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                           <AlertTriangle size={18} style={{ width: "18px", height: "18px", strokeWidth: 1.8 }} />
                         </div>
-                        <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, fontFamily: "'Inter', sans-serif" }}>
                           Deals Stuck in Pipeline
                         </h3>
                       </div>
@@ -23400,7 +23408,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     </div>
 
                     <div className="responsive-table-container" style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", backgroundColor: "#ffffff" }}>
-                      <table className="responsive-table" style={{ width: "100%", minWidth: "650px", borderCollapse: "collapse", textAlign: "left", fontFamily: "'Plus Jakarta Sans', sans-serif", tableLayout: "auto" }}>
+                      <table className="responsive-table" style={{ width: "100%", minWidth: "650px", borderCollapse: "collapse", textAlign: "left", fontFamily: "'Inter', sans-serif", tableLayout: "auto" }}>
                         <thead>
                           <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
                             <th style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", padding: "10px 12px", whiteSpace: "nowrap" }}>Lead Name</th>
@@ -23472,7 +23480,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                       padding: "6px 14px",
                                       fontSize: "12px",
                                       fontWeight: "600",
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                      fontFamily: "'Inter', sans-serif",
                                       cursor: "pointer",
                                       whiteSpace: "nowrap",
                                       boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)"
@@ -23527,14 +23535,14 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                                   Forecast Revenue
                                 </span>
-                                <span style={{ fontSize: "10px", fontWeight: "700", color: forecastPct > 0 ? "#166534" : "#64748b", backgroundColor: forecastPct > 0 ? "#dcfce7" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                <span style={{ fontSize: "10px", fontWeight: "700", color: forecastPct > 0 ? "#166534" : "#64748b", backgroundColor: forecastPct > 0 ? "#dcfce7" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                                   {forecastPct > 0 ? `+${forecastPct}%` : "0%"}
                                 </span>
                               </div>
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#166534", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#166534", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Inter', sans-serif" }}>
                                 ₹{Math.round(forecastVal).toLocaleString("en-IN")}
                               </div>
                             </div>
@@ -23569,14 +23577,14 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                                   Pipeline Health
                                 </span>
-                                <span style={{ fontSize: "10px", fontWeight: "700", color: healthColor, backgroundColor: healthBg, padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                <span style={{ fontSize: "10px", fontWeight: "700", color: healthColor, backgroundColor: healthBg, padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                                   {healthLabel}
                                 </span>
                               </div>
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Inter', sans-serif" }}>
                                 {healthPct}%
                               </div>
                             </div>
@@ -23607,14 +23615,14 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                                   Hot Deals Value
                                 </span>
-                                <span style={{ fontSize: "10px", fontWeight: "700", color: "#ea580c", backgroundColor: "#ffedd5", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                <span style={{ fontSize: "10px", fontWeight: "700", color: "#ea580c", backgroundColor: "#ffedd5", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                                   {hotCount} Deals
                                 </span>
                               </div>
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#ea580c", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#ea580c", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Inter', sans-serif" }}>
                                 ₹{hotVal.toLocaleString("en-IN")}
                               </div>
                             </div>
@@ -23658,14 +23666,14 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                                   Avg Conversion
                                 </span>
-                                <span style={{ fontSize: "10px", fontWeight: "700", color: wonLeads.length > 0 ? "#166534" : "#64748b", backgroundColor: wonLeads.length > 0 ? "#dcfce7" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                                <span style={{ fontSize: "10px", fontWeight: "700", color: wonLeads.length > 0 ? "#166534" : "#64748b", backgroundColor: wonLeads.length > 0 ? "#dcfce7" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                                   {wonLeads.length > 0 ? `${wonLeads.length} Won` : "0 Won"}
                                 </span>
                               </div>
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#2563eb", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#2563eb", letterSpacing: "-0.3px", marginTop: "2px", fontFamily: "'Inter', sans-serif" }}>
                                 {wonLeads.length > 0 ? `${avgDays} Days` : "0 Days"}
                               </div>
                             </div>
@@ -23973,7 +23981,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 <text 
                                   x="50" 
                                   y="52" 
-                                  fontFamily="'Plus Jakarta Sans', sans-serif" 
+                                  fontFamily="'Inter', sans-serif" 
                                   fontSize="15" 
                                   fontWeight="900" 
                                   fill="#0f172a" 
@@ -23984,7 +23992,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 <text 
                                   x="50" 
                                   y="66" 
-                                  fontFamily="'Plus Jakarta Sans', sans-serif" 
+                                  fontFamily="'Inter', sans-serif" 
                                   fontSize="7" 
                                   fontWeight="800" 
                                   fill="#64748b" 
@@ -24000,25 +24008,25 @@ export default function App({ onNavigateToLanding } = {}) {
                               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                                 <div>
                                   <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b" }}>Target</span>
-                                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "14px", fontWeight: "800", color: targetVal > 0 ? "#0f172a" : "#64748b" }}>
+                                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px", fontWeight: "800", color: targetVal > 0 ? "#0f172a" : "#64748b" }}>
                                     {targetVal > 0 ? `₹${targetVal.toLocaleString("en-IN")}` : "Pending ⏳"}
                                   </div>
                                 </div>
                                 <div>
                                   <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b" }}>Achieved</span>
-                                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "14px", fontWeight: "800", color: "#166534" }}>
+                                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px", fontWeight: "800", color: "#166534" }}>
                                     ₹{wonVal.toLocaleString("en-IN")}
                                   </div>
                                 </div>
                                 <div>
                                   <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b" }}>Remaining</span>
-                                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "14px", fontWeight: "800", color: targetVal > 0 ? "#e11d48" : "#94a3b8" }}>
+                                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px", fontWeight: "800", color: targetVal > 0 ? "#e11d48" : "#94a3b8" }}>
                                     {targetVal > 0 ? `₹${gap.toLocaleString("en-IN")}` : "Pending"}
                                   </div>
                                 </div>
                                 <div>
                                   <span style={{ fontSize: "12px", fontWeight: "700", color: "#64748b" }}>Achievement</span>
-                                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "14px", fontWeight: "800", color: "#166534" }}>
+                                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: "14px", fontWeight: "800", color: "#166534" }}>
                                     {pct}%
                                   </div>
                                 </div>
@@ -24036,11 +24044,11 @@ export default function App({ onNavigateToLanding } = {}) {
                               <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "8px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                                 <div>
                                   <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b" }}>Pipeline Value</span>
-                                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "12px", fontWeight: "600", color: "#0f172a" }}>₹{stats.totalPipeline.toLocaleString("en-IN")}</div>
+                                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: "12px", fontWeight: "600", color: "#0f172a" }}>₹{stats.totalPipeline.toLocaleString("en-IN")}</div>
                                 </div>
                                 <div>
                                   <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b" }}>Forecast Value</span>
-                                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: "12px", fontWeight: "600", color: "#2563eb" }}>
+                                  <div style={{ fontFamily: "'Inter', sans-serif", fontSize: "12px", fontWeight: "600", color: "#2563eb" }}>
                                     ₹{(
                                       ownerScopedLeads.filter(l => (l.score || "warm").toLowerCase() === "hot" && isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0) * 0.7 + 
                                       ownerScopedLeads.filter(l => (l.score || "warm").toLowerCase() === "warm" && isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0) * 0.3
@@ -24067,9 +24075,9 @@ export default function App({ onNavigateToLanding } = {}) {
                             const scores = analyticsData.scoreGroups;
                             const maxVal = Math.max(5, scores.Hot, scores.Warm, scores.Cold);
                             const items = [
-                              { label: "🔴 HOT", count: scores.Hot, color: "#dc2626", x: 30 },
-                              { label: "🟡 WARM", count: scores.Warm, color: "#b45309", x: 122.5 },
-                              { label: "🔵 COLD", count: scores.Cold, color: "#2563eb", x: 215 }
+                              { label: "HOT", count: scores.Hot, color: "#dc2626", x: 30 },
+                              { label: "WARM", count: scores.Warm, color: "#b45309", x: 122.5 },
+                              { label: "COLD", count: scores.Cold, color: "#2563eb", x: 215 }
                             ];
 
                             return (
@@ -24130,11 +24138,11 @@ export default function App({ onNavigateToLanding } = {}) {
                         {/* Left: SVG Donut Ring Chart */}
                         {(() => {
                           const channels = [
-                            { name: "Manual", icon: "📋", color: "#2563eb" },
-                            { name: "Inbound", icon: "🌐", color: "#166534" },
-                            { name: "Referral", icon: "🤝", color: "#2563eb" },
-                            { name: "Campaign", icon: "📧", color: "#b45309" },
-                            { name: "Social", icon: "📱", color: "#2563eb" }
+                            { name: "Manual", icon: "", color: "#2563eb" },
+                            { name: "Inbound", icon: "", color: "#166534" },
+                            { name: "Referral", icon: "", color: "#2563eb" },
+                            { name: "Campaign", icon: "", color: "#b45309" },
+                            { name: "Social", icon: "", color: "#2563eb" }
                           ];
                           const total = ownerScopedLeads.length;
                           let cumulativeAngle = 0;
@@ -24180,11 +24188,11 @@ export default function App({ onNavigateToLanding } = {}) {
                         {/* Right: Color-Coded Channel Breakdown */}
                         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                           {[
-                            { name: "Manual", icon: "📋", color: "#2563eb" },
-                            { name: "Inbound", icon: "🌐", color: "#166534" },
-                            { name: "Referral", icon: "🤝", color: "#2563eb" },
-                            { name: "Campaign", icon: "📧", color: "#b45309" },
-                            { name: "Social", icon: "📱", color: "#2563eb" }
+                            { name: "Manual", icon: "", color: "#2563eb" },
+                            { name: "Inbound", icon: "", color: "#166534" },
+                            { name: "Referral", icon: "", color: "#2563eb" },
+                            { name: "Campaign", icon: "", color: "#b45309" },
+                            { name: "Social", icon: "", color: "#2563eb" }
                           ].map((ch, idx) => {
                             const count = ownerScopedLeads.filter(l => (l.source || "Manual").toLowerCase() === ch.name.toLowerCase()).length;
                             const total = ownerScopedLeads.length;
@@ -24222,7 +24230,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 {/* 1. Timeframe Filter Selector Card */}
                 <div className="analytics-chart-box full-width" style={{ padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ fontSize: "16px" }}>💡</span>
+                    <span style={{ fontSize: "16px" }}></span>
                     <h3 className="chart-box-title" style={{ margin: 0 }}>Sales Intelligence Assistant</h3>
                   </div>
                   <div className="timeframe-toggle-wrapper" style={{ display: "flex", gap: "4px", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "6px" }}>
@@ -24256,7 +24264,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       {/* 🎯 Sales Insights (Dynamic Recommendations) */}
                       <div className="analytics-chart-box" style={{ animationDelay: "0s" }}>
                         <h4 className="chart-box-title" style={{ color: "#2563eb", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
-                          <span>🎯</span> Sales Insights
+                           Sales Insights
                         </h4>
                         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                           {intelData.dynamicInsights.length === 0 ? (
@@ -24277,7 +24285,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       <div className="analytics-chart-box" style={{ animationDelay: "0.05s" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
                           <h4 className="chart-box-title" style={{ margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
-                            <span>📅</span> Weekly Sales Summary
+                            Weekly Sales Summary
                           </h4>
                           <span style={{ fontSize: "12px", fontWeight: "800", color: "#2563eb", backgroundColor: "#eff6ff", padding: "2px 10px", borderRadius: "12px", border: "1px solid #bfdbfe" }}>
                             Total Deals: {ownerScopedLeads.length}
@@ -24330,7 +24338,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                       {/* Sales Performance Insights */}
                       <div className="analytics-chart-box" style={{ animationDelay: "0.1s" }}>
-                        <h4 className="chart-box-title" style={{ marginBottom: "12px" }}>📊 Sales Performance</h4>
+                        <h4 className="chart-box-title" style={{ marginBottom: "12px" }}>Sales Performance</h4>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "12px" }}>
                           <div style={{ padding: "8px", borderBottom: "1px solid #f1f5f9" }}>
                             <div style={{ color: "#64748b", fontWeight: "600", fontSize: "12px" }}>Total Leads</div>
@@ -24382,7 +24390,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: "6px", borderBottom: "1px solid #f1f5f9" }}>
                             <span style={{ color: "#475569", fontWeight: "600" }}>Revenue Gap to Target:</span>
                             <strong style={{ color: intelData.revenueGap > 0 ? "#ef4444" : "#10b981" }}>
-                              {intelData.revenueGap > 0 ? `₹${intelData.revenueGap.toLocaleString("en-IN")}` : "Target Met! 🎉"}
+                              {intelData.revenueGap > 0 ? `₹${intelData.revenueGap.toLocaleString("en-IN")}` : "Target Met! "}
                             </strong>
                           </div>
                         </div>
@@ -24533,7 +24541,7 @@ export default function App({ onNavigateToLanding } = {}) {
       </div>
     ) : (
           /* Task Manager Panel Modern Luxury UI */
-          <div className="tasks-page-container animate-fade-in" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <div className="tasks-page-container animate-fade-in" style={{ fontFamily: "'Inter', sans-serif" }}>
             
             {/* Accessible Page Header with H1 */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
@@ -24696,9 +24704,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           onClick={() => setTaskSearchQuery("")} 
                           title="Clear search"
                           style={{ position: "absolute", right: "6px", width: "18px", height: "18px", border: "none", background: "#f1f5f9", borderRadius: "50%", color: "#64748b", cursor: "pointer", fontSize: "10px", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}
-                        >
-                          ✕
-                        </button>
+                        ><X size={14} /></button>
                       )}
                     </div>
 
@@ -25018,10 +25024,10 @@ export default function App({ onNavigateToLanding } = {}) {
             </div>
 
             {/* Title & Subtitle */}
-            <h2 style={{ fontSize: "24px", fontWeight: "700", color: "#0f172a", margin: "0 0 6px 0", letterSpacing: "-0.4px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <h2 style={{ fontSize: "24px", fontWeight: "700", color: "#0f172a", margin: "0 0 6px 0", letterSpacing: "-0.4px", fontFamily: "'Inter', sans-serif" }}>
               Deal Closed Won!
             </h2>
-            <p style={{ fontSize: "13px", color: "#475569", margin: "0 0 20px 0", lineHeight: "1.45", fontWeight: "500", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <p style={{ fontSize: "13px", color: "#475569", margin: "0 0 20px 0", lineHeight: "1.45", fontWeight: "500", fontFamily: "'Inter', sans-serif" }}>
               Awesome work! The deal with <strong style={{ color: "#0f172a", fontWeight: "600" }}>{wonLeadName || (wonDealData && wonDealData.name) || "Hetul Sanghvi"}</strong> is officially won!
             </p>
 
@@ -25131,7 +25137,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   gap: "6px"
                 }}
               >
-                <span>🎉</span>
+                
                 <span>Celebrate & Continue</span>
               </button>
             </div>
@@ -25239,7 +25245,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       >
                         {STATUS_OPTIONS.map(opt => (
                           <option key={opt} value={opt}>
-                            {opt === "Lost" ? "❌ Lost (Closed)" : opt === "Won" ? "🏆 Won (Closed)" : opt}
+                            {opt === "Lost" ? "Lost (Closed)" : opt === "Won" ? "Won (Closed)" : opt}
                           </option>
                         ))}
                       </select>
@@ -25283,7 +25289,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             e.currentTarget.style.backgroundColor = "#ffffff";
                           }}
                         >
-                          <span aria-hidden="true">✕</span>
+                          <X size={14} />
                           <span>Mark Lost</span>
                         </button>
                       ) : (
@@ -25318,7 +25324,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     {isWonStatus(selectedLeadForDetails.status) && (
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "6px", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "4px 8px", borderRadius: "6px" }}>
                         <span style={{ color: "#166534", fontWeight: "600", fontSize: "12px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                          🗓️ Won / Sale Date:
+                          Won / Sale Date:
                         </span>
                         <input
                           type="date"
@@ -25446,16 +25452,12 @@ export default function App({ onNavigateToLanding } = {}) {
                                 setIsEditingModalPhone(false);
                               }}
                               style={{ padding: "3px 7px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "10px", fontWeight: "700", cursor: "pointer" }}
-                            >
-                              ✓
-                            </button>
+                            ><Check size={14} /></button>
                             <button
                               type="button"
                               onClick={() => setIsEditingModalPhone(false)}
                               style={{ padding: "3px 5px", backgroundColor: "#f1f5f9", color: "#64748b", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "10px", cursor: "pointer" }}
-                            >
-                              ✕
-                            </button>
+                            ><X size={14} /></button>
                           </div>
                         ) : selectedLeadForDetails.phone ? (
                           <a 
@@ -25577,16 +25579,12 @@ export default function App({ onNavigateToLanding } = {}) {
                                 setIsEditingModalEmail(false);
                               }}
                               style={{ padding: "3px 7px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "10px", fontWeight: "700", cursor: "pointer" }}
-                            >
-                              ✓
-                            </button>
+                            ><Check size={14} /></button>
                             <button
                               type="button"
                               onClick={() => setIsEditingModalEmail(false)}
                               style={{ padding: "3px 5px", backgroundColor: "#f1f5f9", color: "#64748b", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "10px", cursor: "pointer" }}
-                            >
-                              ✕
-                            </button>
+                            ><X size={14} /></button>
                           </div>
                         ) : selectedLeadForDetails.email ? (
                           <a 
@@ -25985,19 +25983,17 @@ export default function App({ onNavigateToLanding } = {}) {
                     }}>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <span style={{ fontSize: "12px", fontWeight: "600", color: activeQuickAction === "note" ? "#c2410c" : activeQuickAction === "call" ? "#1d4ed8" : activeQuickAction === "whatsapp" ? "#15803d" : "#6d28d9" }}>
-                          {activeQuickAction === "note" && `📝 Add Note for ${selectedLeadForDetails.name}`}
-                          {activeQuickAction === "call" && `📞 Log Call with ${selectedLeadForDetails.name}`}
-                          {activeQuickAction === "whatsapp" && `💬 WhatsApp to ${selectedLeadForDetails.name}`}
-                          {activeQuickAction === "meeting" && `🤝 Meeting with ${selectedLeadForDetails.name}`}
+                          {activeQuickAction === "note" && `Add Note for ${selectedLeadForDetails.name}`}
+                          {activeQuickAction === "call" && `Log Call with ${selectedLeadForDetails.name}`}
+                          {activeQuickAction === "whatsapp" && `WhatsApp to ${selectedLeadForDetails.name}`}
+                          {activeQuickAction === "meeting" && `Meeting with ${selectedLeadForDetails.name}`}
                         </span>
                         <button
                           type="button"
                           onClick={() => setActiveQuickAction(null)}
                           style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "12px", fontWeight: "800", padding: "0 2px" }}
                           title="Close"
-                        >
-                          ✕
-                        </button>
+                        ><X size={14} /></button>
                       </div>
 
                       <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
@@ -26252,7 +26248,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       {todayFocusLeads.length === 0 ? (
                         <tr>
                           <td colSpan="6" style={{ padding: "16px", textAlign: "center", color: "#64748b", fontStyle: "italic", fontSize: "12px" }}>
-                            No active leads to focus on today! 🎉
+                            No active leads to focus on today!
                           </td>
                         </tr>
                       ) : (
@@ -26293,14 +26289,14 @@ export default function App({ onNavigateToLanding } = {}) {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                 <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px", backgroundColor: "#fff" }}>
                   <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#dc2626", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span>📞 Due & Overdue Follow-ups</span>
+                    <span>Due & Overdue Follow-ups</span>
                     <span style={{ fontSize: "10px", backgroundColor: "#ffe4e6", color: "#dc2626", padding: "2px 8px", borderRadius: "6px" }}>
                       {ownerScopedLeads.filter(l => isActiveStatus(l.status) && l.next_follow_up && l.next_follow_up <= new Date().toISOString().split('T')[0]).length} Actionable
                     </span>
                   </h4>
                   <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "180px", overflowY: "auto" }}>
                     {ownerScopedLeads.filter(l => isActiveStatus(l.status) && l.next_follow_up && l.next_follow_up <= new Date().toISOString().split('T')[0]).length === 0 ? (
-                      <p style={{ fontSize: "12px", color: "#64748b", fontStyle: "italic", textAlign: "center", marginTop: "10px" }}>No due or overdue follow-ups! 🎉</p>
+                      <p style={{ fontSize: "12px", color: "#64748b", fontStyle: "italic", textAlign: "center", marginTop: "10px" }}>No due or overdue follow-ups! </p>
                     ) : (
                       ownerScopedLeads.filter(l => isActiveStatus(l.status) && l.next_follow_up && l.next_follow_up <= new Date().toISOString().split('T')[0])
                         .sort((a, b) => (a.next_follow_up || "").localeCompare(b.next_follow_up || ""))
@@ -26325,7 +26321,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
                 <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px", backgroundColor: "#fff" }}>
                   <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#ea580c", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span>🔥 Hot Opportunities</span>
+                    <span>Hot Opportunities</span>
                     <span style={{ fontSize: "10px", backgroundColor: "#ffedd5", color: "#ea580c", padding: "2px 8px", borderRadius: "6px" }}>
                       {ownerScopedLeads.filter(l => isActiveStatus(l.status) && (l.score || "").toLowerCase() === "hot").length} Total
                     </span>
@@ -26356,7 +26352,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
               <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px", backgroundColor: "#fff" }}>
                 <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#166534", marginBottom: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span>🎯 Deals Ready to Close</span>
+                  <span>Deals Ready to Close</span>
                   <span style={{ fontSize: "10px", backgroundColor: "#d1fae5", color: "#166534", padding: "2px 8px", borderRadius: "6px" }}>
                     {ownerScopedLeads.filter(l => isActiveStatus(l.status) && ["negotiation", "payment follow up", "proposal sent"].includes((l.status || "").toLowerCase())).length} Active
                   </span>
@@ -26408,14 +26404,14 @@ export default function App({ onNavigateToLanding } = {}) {
         </div>
       )}
 
-      {/* 🔔 Floating WhatsApp Alarm Toast Notification Card */}
-      {/* 🔔 Floating Follow-Up Alarm Toast Notification Card */}
+      {/*  Floating WhatsApp Alarm Toast Notification Card */}
+      {/*  Floating Follow-Up Alarm Toast Notification Card */}
       {waAlarmLead && (
         <div style={{ position: "fixed", bottom: "24px", right: "24px", zIndex: 99999, backgroundColor: "#0f172a", color: "#ffffff", padding: "16px 20px", borderRadius: "12px", boxShadow: "0 10px 30px rgba(15,23,42,0.4)", width: "360px", border: "2px solid #38bdf8", animation: "slideInRight 0.3s ease" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <div style={{ width: "32px", height: "32px", borderRadius: "50%", backgroundColor: "#0284c7", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                🔔
+                
               </div>
               <strong style={{ fontSize: "13px", color: "#2563eb" }}>⏰ FOLLOW-UP ALARM DUE NOW!</strong>
             </div>
@@ -26453,7 +26449,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   <Settings className="w-5 h-5 text-sky-400" />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: "16px", fontWeight: "800", margin: 0, color: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", margin: 0, color: "#ffffff", fontFamily: "'Inter', sans-serif" }}>
                     Workspace & Google Sheets Settings
                   </h3>
                   <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
@@ -26474,7 +26470,7 @@ export default function App({ onNavigateToLanding } = {}) {
               </div>
 
               <div>
-                <label style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", display: "block", marginBottom: "6px", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <label style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", display: "block", marginBottom: "6px", fontFamily: "'Inter', sans-serif" }}>
                   🔗 Google Apps Script Webhook URL:
                 </label>
                 <input 
@@ -26488,14 +26484,14 @@ export default function App({ onNavigateToLanding } = {}) {
 
               {/* 🎛️ CRM Feature ON / OFF Preferences */}
               <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "4px" }}>
-                <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", margin: "0 0 2px 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                  🎛️ CRM Feature ON / OFF Controls
+                <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", margin: "0 0 2px 0", fontFamily: "'Inter', sans-serif" }}>
+                  CRM Feature ON / OFF Controls
                 </h4>
                 
                 {/* Toggle 1: Face ID Unlock */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
                   <div>
-                    <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>👤 Face ID Lock Screen Unlock</strong>
+                    <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Face ID Lock Screen Unlock</strong>
                     <span style={{ fontSize: "12px", color: "#64748b" }}>Unlock workspace using webcam face scan</span>
                   </div>
                   <label style={{ position: "relative", display: "inline-block", width: "42px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
@@ -26506,7 +26502,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         const val = e.target.checked;
                         setEnableFaceId(val);
                         localStorage.setItem("feature_enable_face_id", String(val));
-                        showToast(`Face ID Unlock turned ${val ? "ON 🟢" : "OFF 🔴"}`);
+                        showToast(`Face ID Unlock turned ${val ? "ON" : "OFF"}`);
                       }}
                       style={{ opacity: 0, width: 0, height: 0 }} 
                     />
@@ -26519,7 +26515,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 {/* Toggle 3: Audio Alert Sound Chimes */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
                   <div>
-                    <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>🔔 Audio Alert Sound Chimes</strong>
+                    <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Audio Alert Sound Chimes</strong>
                     <span style={{ fontSize: "12px", color: "#64748b" }}>Play sound chime on alarms, stage changes & logins</span>
                   </div>
                   <label style={{ position: "relative", display: "inline-block", width: "42px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
@@ -26530,7 +26526,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         const val = e.target.checked;
                         setEnableSoundAlerts(val);
                         localStorage.setItem("feature_sound_alerts", String(val));
-                        showToast(`Audio Alert Sounds turned ${val ? "ON 🟢" : "OFF 🔴"}`);
+                        showToast(`Audio Alert Sounds turned ${val ? "ON" : "OFF"}`);
                       }}
                       style={{ opacity: 0, width: 0, height: 0 }} 
                     />
@@ -26543,7 +26539,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 {/* Toggle 4: AI Closing Predictor Badge */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
                   <div>
-                    <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>🤖 AI Closing Probability Predictor</strong>
+                    <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>AI Closing Probability Predictor</strong>
                     <span style={{ fontSize: "12px", color: "#64748b" }}>Show live AI Win % badge in lead details & table</span>
                   </div>
                   <label style={{ position: "relative", display: "inline-block", width: "42px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
@@ -26554,7 +26550,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         const val = e.target.checked;
                         setEnableAiPredictor(val);
                         localStorage.setItem("feature_ai_predictor", String(val));
-                        showToast(`AI Closing Predictor turned ${val ? "ON 🟢" : "OFF 🔴"}`);
+                        showToast(`AI Closing Predictor turned ${val ? "ON" : "OFF"}`);
                       }}
                       style={{ opacity: 0, width: 0, height: 0 }} 
                     />
@@ -26567,7 +26563,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 {/* Toggle 5: Auto Create Payment Follow-up Tasks */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
                   <div>
-                    <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>⚡ Auto-Create Payment Tasks</strong>
+                    <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Auto-Create Payment Tasks</strong>
                     <span style={{ fontSize: "12px", color: "#64748b" }}>Auto generate tasks when lead enters Payment Follow Up stage</span>
                   </div>
                   <label style={{ position: "relative", display: "inline-block", width: "42px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
@@ -26578,7 +26574,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         const val = e.target.checked;
                         setEnableAutoTasks(val);
                         localStorage.setItem("feature_auto_tasks", String(val));
-                        showToast(`Auto Task Generation turned ${val ? "ON 🟢" : "OFF 🔴"}`);
+                        showToast(`Auto Task Generation turned ${val ? "ON" : "OFF"}`);
                       }}
                       style={{ opacity: 0, width: 0, height: 0 }} 
                     />
@@ -26590,14 +26586,14 @@ export default function App({ onNavigateToLanding } = {}) {
 
                 {/* Header Toolbar Visibility Controls */}
                 <div style={{ borderTop: "1px dashed #cbd5e1", paddingTop: "10px", marginTop: "4px" }}>
-                  <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", margin: "0 0 8px 0", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    🛠️ Top Header Toolbar Buttons (Default: OFF)
+                  <h4 style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", margin: "0 0 8px 0", fontFamily: "'Inter', sans-serif" }}>
+                    Top Header Toolbar Buttons (Default: OFF)
                   </h4>
                   
                   {/* Toggle: Monthly Period Selector */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", marginBottom: "8px" }}>
                     <div>
-                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>📅 Monthly Period Selector Dropdown</strong>
+                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Monthly Period Selector Dropdown</strong>
                       <span style={{ fontSize: "12px", color: "#64748b" }}>Show month switcher (e.g. October 2026) in top header</span>
                     </div>
                     <label style={{ position: "relative", display: "inline-block", width: "42px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
@@ -26608,7 +26604,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           const val = e.target.checked;
                           setShowPeriodSelector(val);
                           localStorage.setItem("feature_show_period_selector", String(val));
-                          showToast(`Period Selector turned ${val ? "ON 🟢" : "OFF 🔴"}`);
+                          showToast(`Period Selector turned ${val ? "ON" : "OFF"}`);
                         }}
                         style={{ opacity: 0, width: 0, height: 0 }} 
                       />
@@ -26621,7 +26617,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   {/* Toggle: Vault Backup */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", marginBottom: "8px" }}>
                     <div>
-                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>🛡️ Admin Data Vault Backup Button</strong>
+                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Admin Data Vault Backup Button</strong>
                       <span style={{ fontSize: "12px", color: "#64748b" }}>Show Vault Backup quick button in top header</span>
                     </div>
                     <label style={{ position: "relative", display: "inline-block", width: "42px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
@@ -26632,7 +26628,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           const val = e.target.checked;
                           setShowVaultBackup(val);
                           localStorage.setItem("feature_show_vault_backup", String(val));
-                          showToast(`Vault Backup Button turned ${val ? "ON 🟢" : "OFF 🔴"}`);
+                          showToast(`Vault Backup Button turned ${val ? "ON" : "OFF"}`);
                         }}
                         style={{ opacity: 0, width: 0, height: 0 }} 
                       />
@@ -26645,7 +26641,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   {/* Toggle: Start My Day */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px" }}>
                     <div>
-                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>🔆 Start My Day Action Button</strong>
+                      <strong style={{ fontSize: "12px", color: "#0f172a", display: "block" }}>Start My Day Action Button</strong>
                       <span style={{ fontSize: "12px", color: "#64748b" }}>Show morning focus shortcut button in top header</span>
                     </div>
                     <label style={{ position: "relative", display: "inline-block", width: "42px", height: "22px", cursor: "pointer", flexShrink: 0 }}>
@@ -26656,7 +26652,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           const val = e.target.checked;
                           setShowStartMyDayBtn(val);
                           localStorage.setItem("feature_show_start_my_day", String(val));
-                          showToast(`Start My Day Button turned ${val ? "ON 🟢" : "OFF 🔴"}`);
+                          showToast(`Start My Day Button turned ${val ? "ON" : "OFF"}`);
                         }}
                         style={{ opacity: 0, width: 0, height: 0 }} 
                       />
@@ -26721,7 +26717,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     <span style={{ fontSize: "12px", fontWeight: "700", padding: "2px 7px", borderRadius: "6px", backgroundColor: "#334155", color: "#64748b" }}>
                       {stageModalData.oldStatus}
                     </span>
-                    <span style={{ color: "#2563eb", fontWeight: "800", fontSize: "12px" }}>➔</span>
+                    <span style={{ color: "#2563eb", fontWeight: "800", fontSize: "12px" }}></span>
                     <span style={{ fontSize: "12px", fontWeight: "800", padding: "2px 7px", borderRadius: "6px", backgroundColor: "#0284c7", color: "#ffffff" }}>
                       {stageModalData.newStatus}
                     </span>
@@ -26880,7 +26876,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 </div>
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <h3 style={{ fontSize: "18px", fontWeight: "800", margin: 0, color: "#ffffff", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <h3 style={{ fontSize: "18px", fontWeight: "800", margin: 0, color: "#ffffff", fontFamily: "'Inter', sans-serif" }}>
                       Executive Sales Audit & Performance Report
                     </h3>
                     <span style={{ fontSize: "10px", fontWeight: "700", color: "#2563eb", backgroundColor: "rgba(56, 189, 248, 0.15)", padding: "2px 8px", borderRadius: "12px", border: "1px solid rgba(56, 189, 248, 0.3)" }}>
@@ -27157,7 +27153,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 className="sheet-toolbar-btn primary"
                 style={{ padding: "9px 18px", fontSize: "12px", fontWeight: "700" }}
               >
-                📊 Open Live Interactive Analytics View
+                Open Live Interactive Analytics View
               </button>
               
               <div style={{ display: "flex", gap: "10px" }}>
@@ -27209,7 +27205,7 @@ export default function App({ onNavigateToLanding } = {}) {
               overflow: "hidden", 
               backgroundColor: "#ffffff", 
               boxShadow: "0 25px 60px -15px rgba(15, 23, 42, 0.3)", 
-              fontFamily: "'Plus Jakarta Sans', sans-serif" 
+              fontFamily: "'Inter', sans-serif" 
             }}
           >
             
@@ -27426,7 +27422,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   </div>
                   {Number(targetModalSpotInput) > 0 && (
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", paddingTop: "4px", borderTop: "1px dashed #e2e8f0" }}>
-                      <span style={{ color: "#dc2626", fontWeight: "700" }}>🎁 Active Spot Incentive:</span>
+                      <span style={{ color: "#dc2626", fontWeight: "700" }}>Active Spot Incentive:</span>
                       <strong style={{ color: "#dc2626" }}>+₹{Number(targetModalSpotInput).toLocaleString("en-IN")} ({targetModalSpotNote || "Spot Bonus"})</strong>
                     </div>
                   )}
@@ -27491,7 +27487,7 @@ export default function App({ onNavigateToLanding } = {}) {
               border: "1px solid #f1f5f9",
               position: "relative",
               textAlign: "center",
-              fontFamily: "'Plus Jakarta Sans', sans-serif"
+              fontFamily: "'Inter', sans-serif"
             }}
           >
             {/* Top Close Button */}
@@ -27751,7 +27747,7 @@ export default function App({ onNavigateToLanding } = {}) {
               border: "1px solid #f1f5f9",
               position: "relative",
               textAlign: "center",
-              fontFamily: "'Plus Jakarta Sans', sans-serif"
+              fontFamily: "'Inter', sans-serif"
             }}
           >
             {/* Top Close Button */}
@@ -27891,7 +27887,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           gap: "4px"
                         }}
                       >
-                        🎲 Generate
+                        Generate
                       </button>
                     </div>
 
@@ -27971,13 +27967,13 @@ export default function App({ onNavigateToLanding } = {}) {
         </div>
       )}
 
-      {/* ⚙️ Custom Field Builder Modal */}
+      {/* Custom Field Builder Modal */}
       {showAddCustomFieldModal && (
         <div className="modal-overlay" onClick={() => setShowAddCustomFieldModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "520px", width: "90%", borderRadius: "8px" }}>
             <div className="modal-header" style={{ borderBottom: "1px solid #e2e8f0", paddingBottom: "10px" }}>
               <h3 className="modal-title" style={{ fontSize: "14px", fontWeight: "600", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
-                ⚙️ Custom Field Builder (LeadSquared Style)
+                Custom Field Builder (LeadSquared Style)
               </h3>
               <button onClick={() => setShowAddCustomFieldModal(false)} className="modal-close">
                 <X className="w-4 h-4" />
@@ -28340,9 +28336,9 @@ export default function App({ onNavigateToLanding } = {}) {
                     </label>
                     <div style={{ display: "flex", gap: "6px" }}>
                       {[
-                        { label: "🔥 Hot", value: "Hot", bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
-                        { label: "🟡 Warm", value: "Warm", bg: "#fffbeb", color: "#b45309", border: "#fde68a" },
-                        { label: "🔵 Cold", value: "Cold", bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe" }
+                        { label: "Hot", value: "Hot", bg: "#fef2f2", color: "#dc2626", border: "#fecaca" },
+                        { label: "Warm", value: "Warm", bg: "#fffbeb", color: "#b45309", border: "#fde68a" },
+                        { label: "Cold", value: "Cold", bg: "#eff6ff", color: "#2563eb", border: "#bfdbfe" }
                       ].map(item => {
                         const isSelected = newLeadData.score === item.value;
                         return (
@@ -28685,7 +28681,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     onChange={(e) => setTaskToComplete(prev => ({ ...prev, scheduleNext: e.target.checked }))}
                     style={{ width: "15px", height: "15px", cursor: "pointer", accentColor: "#2563eb" }}
                   />
-                  <span>📅 Schedule Next Follow-up for this Lead</span>
+                  <span>Schedule Next Follow-up for this Lead</span>
                 </label>
 
                 {taskToComplete.scheduleNext && (
@@ -28986,10 +28982,10 @@ export default function App({ onNavigateToLanding } = {}) {
                   {importFileName ? (
                     <div>
                       <span style={{ fontSize: "14px", fontWeight: "600", color: "#2563eb", display: "block" }}>
-                        📄 {importFileName}
+                        {importFileName}
                       </span>
                       <span style={{ fontSize: "12px", color: "#166534", fontWeight: "600", display: "block", marginTop: "4px" }}>
-                        ✓ {importPreviewLeads.length} valid lead(s) detected and ready to import!
+                        {importPreviewLeads.length} valid lead(s) detected and ready to import!
                       </span>
                       <span style={{ fontSize: "12px", color: "#64748b", display: "block", marginTop: "2px" }}>
                         Click to choose a different file
@@ -29109,7 +29105,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 ) : (
                   <>
                     <span>Import {importPreviewLeads.length > 0 ? `${importPreviewLeads.length} Leads` : "Leads"} to CRM</span>
-                    <span style={{ fontSize: "14px" }}>➔</span>
+                    <span style={{ fontSize: "14px" }}></span>
                   </>
                 )}
               </button>
@@ -29141,9 +29137,7 @@ export default function App({ onNavigateToLanding } = {}) {
               <button
                 onClick={() => setShowWeeklyDigestModal(false)}
                 style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "16px", padding: "2px 6px" }}
-              >
-                ✕
-              </button>
+              ><X size={14} /></button>
             </div>
 
             {/* Modal Body */}
@@ -29206,7 +29200,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   onClick={() => {
                     const text = `📊 *[ApexSales] Weekly Executive Revenue Digest*\n\n💰 *Realized Revenue (M-T-D):* ₹4,85,000 (inc. 18% GST)\n📈 *Expected Month-End:* ₹6,20,000 (Weighted Forecast)\n🎯 *Team Win Rate:* 68% (Target: 65%)\n⚡ *Avg Closing Velocity:* 3.2 Days\n🥇 *Top Performer:* Harsh Goyal (₹1,80,000 | 115% Quota)\n🔄 *Client Renewal ARR:* ₹1,24,000 Protected\n\n_Auto-dispatched via ApexSales CRM Intelligence_`;
                     navigator.clipboard.writeText(text);
-                    showToast("Copied digest for WhatsApp broadcast! 🚀");
+                    showToast("Copied digest for WhatsApp broadcast!");
                   }}
                   style={{ padding: "5px 10px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#0f172a", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                 >
@@ -29283,7 +29277,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       Team & Role-Based Access Control
                     </h3>
                     <span style={{ fontSize: "10px", fontWeight: "800", backgroundColor: "#fef3c7", color: "#b45309", padding: "1px 7px", borderRadius: "9999px", border: "1px solid #fde68a" }}>
-                      👑 Company Owner Only
+                      Company Owner Only
                     </span>
                   </div>
                   <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
@@ -29350,28 +29344,28 @@ export default function App({ onNavigateToLanding } = {}) {
                   </div>
 
                   <div style={{ padding: "8px 12px", backgroundColor: "#fffbeb", borderRadius: "8px", border: "1px solid #fef3c7" }}>
-                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#b45309" }}>👑 Owners</span>
+                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#b45309" }}>Owners</span>
                     <div style={{ fontSize: "16px", fontWeight: "700", color: "#b45309" }}>
                       {allUsersList.filter(u => normalizeRole(u.role) === CRM_ROLES.COMPANY_OWNER).length || 1}
                     </div>
                   </div>
 
                   <div style={{ padding: "8px 12px", backgroundColor: "#f5f3ff", borderRadius: "8px", border: "1px solid #ddd6fe" }}>
-                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#7c3aed" }}>📊 Sales Heads</span>
+                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#7c3aed" }}>Sales Heads</span>
                     <div style={{ fontSize: "16px", fontWeight: "700", color: "#7c3aed" }}>
                       {allUsersList.filter(u => normalizeRole(u.role) === CRM_ROLES.SALES_HEAD).length}
                     </div>
                   </div>
 
                   <div style={{ padding: "8px 12px", backgroundColor: "#f0fdf4", borderRadius: "8px", border: "1px solid #bbf7d0" }}>
-                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#166534" }}>👔 Team Leads</span>
+                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#166534" }}>Team Leads</span>
                     <div style={{ fontSize: "16px", fontWeight: "700", color: "#166534" }}>
                       {allUsersList.filter(u => normalizeRole(u.role) === CRM_ROLES.TEAM_LEADER).length}
                     </div>
                   </div>
 
                   <div style={{ padding: "8px 12px", backgroundColor: "#eff6ff", borderRadius: "8px", border: "1px solid #dbeafe" }}>
-                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#2563eb" }}>💼 Executives</span>
+                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#2563eb" }}>Executives</span>
                     <div style={{ fontSize: "16px", fontWeight: "700", color: "#2563eb" }}>
                       {allUsersList.filter(u => normalizeRole(u.role) === CRM_ROLES.SALES_EXECUTIVE).length || 3}
                     </div>
@@ -29433,7 +29427,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       <strong style={{ fontSize: "13px", color: "#166534" }}>Create Team Member & Send Password to Email</strong>
                     </div>
                     <span style={{ fontSize: "12px", color: "#166534", fontWeight: "600" }}>
-                      🔒 User ko unke email par ApexSales CRM brand ke saath password jayega
+                      User ko unke email par ApexSales CRM brand ke saath password jayega
                     </span>
                   </div>
 
@@ -29496,7 +29490,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           title="Generate Strong Password"
                           style={{ padding: "0 10px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "12px", cursor: "pointer", fontWeight: "700", color: "#1d4ed8" }}
                         >
-                          🎲
+                          
                         </button>
                       </div>
                     </div>
@@ -29512,10 +29506,10 @@ export default function App({ onNavigateToLanding } = {}) {
                         onChange={(e) => setNewUserData(prev => ({ ...prev, role: e.target.value }))}
                         style={{ width: "100%", padding: "8px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                       >
-                        <option value={CRM_ROLES.COMPANY_OWNER}>👑 Company Owner (Global Authority: Deals, Settings, Billing, Audit)</option>
-                        <option value={CRM_ROLES.SALES_HEAD}>📊 Sales Head (Cross-Team Sales Leadership & Targets)</option>
-                        <option value={CRM_ROLES.TEAM_LEADER}>👔 Team Leader (Team Oversight & Lead Assignment)</option>
-                        <option value={CRM_ROLES.SALES_EXECUTIVE}>💼 Sales Executive (Strict Personal Pipeline Isolation)</option>
+                        <option value={CRM_ROLES.COMPANY_OWNER}>Company Owner (Global Authority: Deals, Settings, Billing, Audit)</option>
+                        <option value={CRM_ROLES.SALES_HEAD}>Sales Head (Cross-Team Sales Leadership & Targets)</option>
+                        <option value={CRM_ROLES.TEAM_LEADER}>Team Leader (Team Oversight & Lead Assignment)</option>
+                        <option value={CRM_ROLES.SALES_EXECUTIVE}>Sales Executive (Strict Personal Pipeline Isolation)</option>
                       </select>
                     </div>
 
@@ -29576,7 +29570,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       type="submit"
                       style={{ padding: "7px 18px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "6px", boxShadow: "0 2px 6px rgba(22, 163, 74, 0.3)" }}
                     >
-                      <Send size={14} /> ✨ Create User & Send Password to Email
+                      <Send size={14} /> Create User & Send Password to Email
                     </button>
                   </div>
                 </form>
@@ -29674,9 +29668,9 @@ export default function App({ onNavigateToLanding } = {}) {
                                       }}
                                       title="Change employee role"
                                     >
-                                      <option value={CRM_ROLES.SALES_EXECUTIVE}>💼 Sales Executive</option>
-                                      <option value={CRM_ROLES.TEAM_LEADER}>👔 Team Leader</option>
-                                      <option value={CRM_ROLES.SALES_HEAD}>📊 Sales Head</option>
+                                      <option value={CRM_ROLES.SALES_EXECUTIVE}>Sales Executive</option>
+                                      <option value={CRM_ROLES.TEAM_LEADER}>Team Leader</option>
+                                      <option value={CRM_ROLES.SALES_HEAD}>Sales Head</option>
                                     </select>
                                   ) : (
                                     <span style={{ 
@@ -29716,16 +29710,16 @@ export default function App({ onNavigateToLanding } = {}) {
                                         >
                                           {getUserCompanyId(usr) === 'tenant_kashish' ? (
                                             <>
-                                              <option value="Harsh Goyal">👑 Harsh Goyal (Platform Owner)</option>
+                                              <option value="Harsh Goyal">Harsh Goyal (Platform Owner)</option>
                                               {allUsersList.filter(u => u.id !== usr.id && getUserCompanyId(u) === 'tenant_kashish' && (normalizeRole(u.role) === CRM_ROLES.TEAM_LEADER || normalizeRole(u.role) === CRM_ROLES.SALES_HEAD)).map(mgr => (
-                                                <option key={mgr.id} value={mgr.name}>👔 {mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
+                                                <option key={mgr.id} value={mgr.name}>{mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
                                               ))}
                                             </>
                                           ) : (
                                             <>
-                                              <option value="Harsh Goyal">👑 Harsh Goyal (Platform Owner)</option>
+                                              <option value="Harsh Goyal">Harsh Goyal (Platform Owner)</option>
                                               {allUsersList.filter(u => u.id !== usr.id && getUserCompanyId(u) !== 'tenant_kashish' && (normalizeRole(u.role) === CRM_ROLES.TEAM_LEADER || normalizeRole(u.role) === CRM_ROLES.SALES_HEAD)).map(mgr => (
-                                                <option key={mgr.id} value={mgr.name}>👔 {mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
+                                                <option key={mgr.id} value={mgr.name}>{mgr.name} ({getRoleBadgeInfo(mgr.role).shortLabel})</option>
                                               ))}
                                             </>
                                           )}
@@ -29748,7 +29742,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               </span>
                             ) : (
                               <span style={{ display: "inline-block", padding: "2px 7px", backgroundColor: "#ecfdf5", color: "#166534", borderRadius: "9999px", fontSize: "10px", fontWeight: "600", border: "1px solid #a7f3d0" }}>
-                                Active 🟢
+                                Active
                               </span>
                             )}
                           </td>
@@ -29791,7 +29785,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   style={{ height: "32px", padding: "0 10px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#2563eb", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                                   title="Copy activation link"
                                 >
-                                  📋 Link
+                                  Link
                                 </button>
                               )}
                               <button
@@ -29800,7 +29794,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 style={{ height: "32px", padding: "0 10px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#0f172a", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}
                                 title="Reset or change password"
                               >
-                                🔑 Reset Password
+                                Reset Password
                               </button>
                               {usr.email ? (
                                 <button
@@ -29809,12 +29803,12 @@ export default function App({ onNavigateToLanding } = {}) {
                                   style={{ height: "32px", padding: "0 10px", backgroundColor: "#f0fdf4", border: "1px solid #86efac", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#166534", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}
                                   title={`Send credentials email to ${usr.email}`}
                                 >
-                                  ✉️ Send Mail
+                                  Send Mail
                                 </button>
                               ) : null}
                               {checkIsSuperAdmin(usr) || usr.id === "usr_admin" ? (
                                 <span style={{ height: "32px", padding: "0 10px", backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#64748b", display: "inline-flex", alignItems: "center" }} title="Primary Super Admin cannot be deleted">
-                                  🔒 Protected
+                                  Protected
                                 </span>
                               ) : (
                                 <button
@@ -29823,7 +29817,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   style={{ height: "32px", padding: "0 10px", backgroundColor: "#fef2f2", border: "1px solid #fca5a5", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#dc2626", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                                   title={`Permanently delete ${usr.name}`}
                                 >
-                                  🗑️ Delete
+                                  Delete
                                 </button>
                               )}
                             </div>
@@ -29842,16 +29836,16 @@ export default function App({ onNavigateToLanding } = {}) {
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <Send size={16} color="#16a34a" />
                       <strong style={{ fontSize: "12px", color: "#166534" }}>
-                        🎉 Invitation Created for: {createdInviteInfo.user?.email}
+                        Invitation Created for: {createdInviteInfo.user?.email}
                       </strong>
                     </div>
                     {createdInviteInfo.emailSent ? (
                       <span style={{ fontSize: "12px", backgroundColor: "#bbf7d0", color: "#166534", padding: "3px 8px", borderRadius: "6px", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                        ✅ Official Email Dispatched from @salesflowhub.cloud!
+                        Official Email Dispatched from @salesflowhub.cloud!
                       </span>
                     ) : (
                       <span style={{ fontSize: "12px", backgroundColor: "#fef3c7", color: "#b45309", padding: "3px 8px", borderRadius: "6px", fontWeight: "700", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                        ⚠️ Click "1-Click Gmail" or "WhatsApp" below to share!
+                        Click "1-Click Gmail" or "WhatsApp" below to share!
                       </span>
                     )}
                     <button
@@ -29859,7 +29853,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       onClick={() => setCreatedInviteInfo(null)}
                       style={{ background: "none", border: "none", color: "#166534", cursor: "pointer", fontWeight: "700" }}
                     >
-                      ✕ Close
+                      Close
                     </button>
                   </div>
 
@@ -29882,7 +29876,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       }}
                       style={{ padding: "6px 12px", backgroundColor: "#16a34a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}
                     >
-                      📋 Copy Link
+                      Copy Link
                     </button>
                     <button
                       type="button"
@@ -29892,24 +29886,24 @@ export default function App({ onNavigateToLanding } = {}) {
                       }}
                       style={{ padding: "6px 12px", backgroundColor: "#25d366", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}
                     >
-                      📱 WhatsApp
+                      WhatsApp
                     </button>
                     <a
-                      href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(createdInviteInfo.user?.email || "")}&su=${encodeURIComponent("🎉 Welcome to ApexSales CRM - Your Account & Login Password")}&body=${encodeURIComponent(createdInviteInfo.inviteMessage || createdInviteInfo.inviteUrl)}`}
+                      href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(createdInviteInfo.user?.email || "")}&su=${encodeURIComponent(" Welcome to ApexSales CRM - Your Account & Login Password")}&body=${encodeURIComponent(createdInviteInfo.inviteMessage || createdInviteInfo.inviteUrl)}`}
                       target="_blank"
                       rel="noreferrer"
                       style={{ padding: "6px 12px", backgroundColor: "#ea4335", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}
                       title="Open Gmail with recipient, credentials and brand message pre-filled"
                     >
-                      ✉️ 1-Click Gmail
+                      1-Click Gmail
                     </a>
                     <a
-                      href={`mailto:${encodeURIComponent(createdInviteInfo.user?.email || "")}?subject=${encodeURIComponent("🎉 Welcome to ApexSales CRM - Your Account & Login Password")}&body=${encodeURIComponent(createdInviteInfo.inviteMessage || createdInviteInfo.inviteUrl)}`}
+                      href={`mailto:${encodeURIComponent(createdInviteInfo.user?.email || "")}?subject=${encodeURIComponent(" Welcome to ApexSales CRM - Your Account & Login Password")}&body=${encodeURIComponent(createdInviteInfo.inviteMessage || createdInviteInfo.inviteUrl)}`}
                       target="_blank"
                       rel="noreferrer"
                       style={{ padding: "6px 12px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer", textDecoration: "none" }}
                     >
-                      ✉️ Default Mail
+                      Default Mail
                     </a>
                   </div>
                 </div>
@@ -29920,7 +29914,7 @@ export default function App({ onNavigateToLanding } = {}) {
             {/* Modal Footer */}
             <div style={{ borderTop: "1px solid #e2e8f0", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f8fafc" }}>
               <div style={{ fontSize: "12px", color: "#64748b" }}>
-                🔒 All requests from Sales Reps are filtered strictly at server database level.
+                All requests from Sales Reps are filtered strictly at server database level.
               </div>
               <button 
                 type="button"
@@ -29966,7 +29960,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 </div>
                 <div>
                   <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
-                    Admin Data Vault & Permanent Backup 👑
+                    Admin Data Vault & Permanent Backup
                   </h3>
                   <p style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0 0" }}>
                     Restricted exclusively to Super Admin ({currentUser?.email || "Authorized Super Admin"}). Zero risk of data loss.
@@ -30057,7 +30051,7 @@ export default function App({ onNavigateToLanding } = {}) {
               {/* Active Pipeline List Preview */}
               <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px" }}>
                 <div style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", marginBottom: "8px", display: "flex", justifyContent: "space-between" }}>
-                  <span>📋 10 Active Pipeline Leads in Vault</span>
+                  <span>10 Active Pipeline Leads in Vault</span>
                   <span style={{ color: "#2563eb", fontWeight: "600" }}>Juned Malkani (Negotiation ₹20k)</span>
                 </div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
@@ -30094,7 +30088,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   }}
                 >
                   <RotateCw size={15} className={isAdminRestoring ? "animate-spin" : ""} />
-                  <span>{isAdminRestoring ? "Activating Vault..." : "🔄 Activate & Restore 15-Lead Backup Now"}</span>
+                  <span>{isAdminRestoring ? "Activating Vault..." : "Activate & Restore 15-Lead Backup Now"}</span>
                 </button>
 
                 <button
@@ -30127,7 +30121,7 @@ export default function App({ onNavigateToLanding } = {}) {
             {/* Footer */}
             <div style={{ borderTop: "1px solid #e2e8f0", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f8fafc" }}>
               <div style={{ fontSize: "12px", color: "#475569" }}>
-                🔒 Synced to Supabase PostgreSQL Cloud Cluster & local data vault.
+                Synced to Supabase PostgreSQL Cloud Cluster & local data vault.
               </div>
               <button 
                 type="button"
@@ -30184,7 +30178,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
                             <div>
                               <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "800", color: "#ffffff" }}>
-                                {editingLicenseData.id ? "✏️ Edit Client License & Quota" : "🔑 Onboard Client & Issue Software License"}
+                                {editingLicenseData.id ? "Edit Client License & Quota" : "Onboard Client & Issue Software License"}
                               </h3>
                               <p style={{ margin: "2px 0 0 0", fontSize: "11.5px", color: "#94a3b8" }}>
                                 Activate CRM plan, adjust user seats, apply discount, and auto-generate Tax Invoice
@@ -30411,7 +30405,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             {(editingLicenseData.customSeats > (editingLicenseData.defaultSeats || 15)) && (
                               <div style={{ marginTop: "10px", paddingTop: "8px", borderTop: "1px dashed #86efac", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
                                 <span style={{ fontSize: "11.5px", color: "#15803d", fontWeight: "600" }}>
-                                  ✨ {editingLicenseData.customSeats - (editingLicenseData.defaultSeats || 15)} Extra Seats requested over default {editingLicenseData.defaultSeats || 15} seats.
+                                  {editingLicenseData.customSeats - (editingLicenseData.defaultSeats || 15)} Extra Seats requested over default {editingLicenseData.defaultSeats || 15} seats.
                                 </span>
                                 <label style={{ fontSize: "11.5px", fontWeight: "700", color: "#166534", display: "flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
                                   <input
@@ -30560,7 +30554,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                   onChange={(e) => setEditingLicenseData(prev => ({ ...prev, paymentStatus: e.target.value }))}
                                   style={{ width: "100%", padding: "7px 10px", fontSize: "12px", borderRadius: "6px", border: "1px solid #cbd5e1", outline: "none", boxSizing: "border-box", fontWeight: "600", color: editingLicenseData.paymentStatus === "paid" ? "#16a34a" : "#b45309" }}
                                 >
-                                  <option value="paid">✅ Paid & Verified</option>
+                                  <option value="paid">Paid & Verified</option>
                                   <option value="pending">⌛ Payment Pending</option>
                                 </select>
                               </div>
@@ -30609,7 +30603,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 boxShadow: "0 2px 6px rgba(22, 163, 74, 0.3)"
                               }}
                             >
-                              <Zap size={16} /> 🚀 Activate Plan & Generate License Invoice
+                              <Zap size={16} /> Activate Plan & Generate License Invoice
                             </button>
                           </div>
                         </div>
@@ -30662,7 +30656,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               type="button"
                               onClick={() => {
                                 navigator.clipboard.writeText(selectedLicenseForInvoice.licenseNumber);
-                                showToast(`Copied License No: ${selectedLicenseForInvoice.licenseNumber} 📋`, "success");
+                                showToast(`Copied License No: ${selectedLicenseForInvoice.licenseNumber}`, "success");
                               }}
                               style={{
                                 padding: "6px 12px",
@@ -30698,7 +30692,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 boxShadow: "0 1px 3px rgba(37,99,235,0.3)"
                               }}
                             >
-                              <Printer size={13} /> 🖨️ Print / Save as PDF
+                              <Printer size={13} /> Print / Save as PDF
                             </button>
                             <button
                               type="button"
@@ -30766,7 +30760,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           }}>
                             <div>
                               <span style={{ fontSize: "10.5px", fontWeight: "800", color: "#92400e", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                                🔑 OFFICIAL SOFTWARE LICENSE NO.
+                                OFFICIAL SOFTWARE LICENSE NO.
                               </span>
                               <div style={{ fontSize: "18px", fontWeight: "900", color: "#78350f", fontFamily: "monospace", letterSpacing: "1px", marginTop: "2px" }}>
                                 {selectedLicenseForInvoice.licenseNumber}
@@ -30774,7 +30768,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
                             <div style={{ textAlign: "right" }}>
                               <span style={{ fontSize: "11px", fontWeight: "800", padding: "3px 8px", backgroundColor: "#16a34a", color: "#ffffff", borderRadius: "9999px" }}>
-                                ● ACTIVE & VERIFIED LICENSE
+                                ACTIVE & VERIFIED LICENSE
                               </span>
                               <div style={{ fontSize: "11px", color: "#92400e", fontWeight: "600", marginTop: "4px" }}>
                                 Provisioned via Super Admin Master License Engine
@@ -30831,7 +30825,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                 <strong>Transaction / UTR ID:</strong> {selectedLicenseForInvoice.transactionId || "Direct Verification"}
                               </div>
                               <div style={{ fontSize: "12px", color: "#16a34a", fontWeight: "600", marginTop: "2px" }}>
-                                <strong>Payment Status:</strong> PAID IN FULL ✓
+                                <strong>Payment Status:</strong> PAID IN FULL
                               </div>
                             </div>
                           </div>
@@ -31150,7 +31144,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     onClick={() => handleResetPackageRate(editingPackageData.id, editingPackageData.type)}
                     style={{ height: "32px", padding: "0 10px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "#64748b", cursor: "pointer" }}
                   >
-                    🔄 Revert to Factory Default
+                    Revert to Factory Default
                   </button>
                 )}
               </div>

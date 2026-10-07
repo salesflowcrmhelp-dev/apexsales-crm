@@ -32,7 +32,7 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", backgroundColor: "#f8fafc", fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif", padding: "20px", boxSizing: "border-box" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", backgroundColor: "#f8fafc", fontFamily: "'Inter', sans-serif", padding: "20px", boxSizing: "border-box" }}>
           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "20px", padding: "36px 30px", maxWidth: "460px", width: "100%", textAlign: "center", boxShadow: "0 20px 45px -10px rgba(15, 23, 42, 0.08)", boxSizing: "border-box" }}>
             
             {/* ApexSales CRM Brand Header */}

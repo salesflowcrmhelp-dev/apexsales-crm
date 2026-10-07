@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* src/index.css */
 
@@ -18,7 +18,40 @@
   --text-muted: #64748b;
   --border-light: #e2e8f0;
   --border-grid: #cbd5e1;
-  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-family-crm: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Centralized Typography Scale (Strict 7-Tier Standard) */
+  --font-size-metadata: 12px;
+  --font-size-dense: 13px;
+  --font-size-body: 14px;
+  --font-size-section: 16px;
+  --font-size-page: 20px;
+  --font-size-major: 24px;
+  --font-size-title: 28px;
+
+  /* Centralized Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Centralized Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.35;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+
+  /* Centralized Spacing Tokens (Strict Repository-Wide Scale) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
 
   /* Standard 8-Step Typographic Scale */
   --text-2xs: 11px;
@@ -259,7 +292,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -278,7 +311,7 @@ html, body {
 }
 
 button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p, div, label, a, strong, small {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 }
 
 #root {
@@ -486,7 +519,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .version-text {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 12px !important;
   font-weight: 600;
   color: #64748b !important;
@@ -603,7 +636,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .brand-name {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 15.5px;
   font-weight: 800;
   color: #0b192c;
@@ -613,7 +646,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .brand-tag {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: #64748b;
@@ -822,7 +855,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 /* Standardized Sidebar Badges (Issue 8: Consistent pill shape & high contrast) */
 .sidebar-sub-badge {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
   font-weight: 600;
   color: #ffffff !important;
@@ -840,7 +873,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .sidebar-badge {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
   font-weight: 600;
   padding: 2px 8px;
@@ -1196,7 +1229,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .kpi-details p {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 22px;
   font-weight: 800;
   color: #0f172a;
@@ -1870,7 +1903,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   align-items: center;
   justify-content: center;
   z-index: 9999 !important;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .login-card {
@@ -2460,7 +2493,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .kanban-column-title-text {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 13px !important;
   font-weight: 800 !important;
   color: #0f172a !important;
@@ -2544,7 +2577,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 /* Lead Name: Crisp bold single line with ellipsis and title tooltip */
 .kanban-card-name {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 12.5px !important;
   font-weight: 600 !important;
   color: #0f172a !important;
@@ -2620,7 +2653,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 /* Deal Value Pill */
 .kanban-card-val-pill,
 .kanban-card-won-val {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 10.5px !important;
   font-weight: 800 !important;
   color: #475569 !important;
@@ -2698,7 +2731,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   align-items: center !important;
   justify-content: center !important;
   transform: rotate(45deg) !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 8.5px !important;
   font-weight: 700 !important;
   letter-spacing: 0.8px !important;
@@ -2990,7 +3023,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .analytics-metric-card .metric-val {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 24px;
   font-weight: 800;
   color: #0f172a;
@@ -3041,7 +3074,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .chart-box-title {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 13.5px;
   font-weight: 800;
   color: #0f172a;
@@ -3347,7 +3380,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .pill-val {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 14px;
   font-weight: 800;
   color: #0f172a;
@@ -3420,7 +3453,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .insight-val {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 20px;
   font-weight: 700;
   color: #0f172a;
@@ -3499,7 +3532,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .analytics-dashboard-premium-theme .kpi-card p {
   color: var(--text-premium-main) !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-weight: 800 !important;
 }
 
@@ -3530,7 +3563,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .analytics-dashboard-premium-theme .metric-val {
   color: var(--text-premium-main) !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-weight: 800 !important;
 }
 
@@ -3680,7 +3713,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 8px 14px;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 12px;
   font-weight: 600;
   color: #475569;
@@ -3716,7 +3749,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .section-title-compact {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 13.5px;
   font-weight: 800;
   color: #0f172a;
@@ -3751,7 +3784,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .action-count {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 20px;
   font-weight: 800;
   color: #0f172a;
@@ -3921,7 +3954,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .lead-value-cell {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-weight: 700;
   color: #0f172a;
 }
@@ -4014,7 +4047,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .target-progress-amount {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 14.5px;
   font-weight: 800;
   color: #0f172a;
@@ -4154,7 +4187,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .health-qty {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 14px;
   font-weight: 800;
   color: #0f172a;

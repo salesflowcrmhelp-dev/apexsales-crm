@@ -130,7 +130,7 @@ export default function LandingPage({ onNavigateToCRM }) {
   ];
 
   return (
-    <div style={{ backgroundColor: colors.bg, color: colors.textPrimary, minHeight: "100vh", fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif", transition: "background-color 0.25s ease, color 0.25s ease" }}>
+    <div style={{ backgroundColor: colors.bg, color: colors.textPrimary, minHeight: "100vh", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", transition: "background-color 0.25s ease, color 0.25s ease" }}>
 
       {/* 🧭 NAVIGATION BAR */}
       <header style={{ position: "sticky", top: 0, zIndex: 50, backdropFilter: "blur(16px)", backgroundColor: colors.navBg, borderBottom: `1px solid ${colors.border}` }}>

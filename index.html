@@ -10,7 +10,7 @@
     <title>ApexSales - Revenue Intelligence CRM</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
       /* Ensure background is never pure white during page load */
       html, body {
@@ -20,6 +20,7 @@
         min-height: 100%;
         color: #f8fafc;
         -webkit-font-smoothing: antialiased;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
       @keyframes apexSpin {
         to { transform: rotate(360deg); }
@@ -85,7 +86,7 @@
   <body>
     <div id="root">
       <!-- Pre-rendered Dark Loader to prevent ANY blank white screen while bundles load -->
-      <div id="crm-initial-loader" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 20%, #1e1b4b 0%, #0f172a 60%, #090d16 100%); font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; color: #ffffff; padding: 24px; text-align: center; box-sizing: border-box;">
+      <div id="crm-initial-loader" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 20%, #1e1b4b 0%, #0f172a 60%, #090d16 100%); font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #ffffff; padding: 24px; text-align: center; box-sizing: border-box;">
         <div style="width: 58px; height: 58px; border-radius: 16px; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 30px rgba(37,99,235,0.45); margin-bottom: 20px; animation: apexPulse 2s ease-in-out infinite;">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
@@ -105,7 +106,7 @@
             Workspace taking a moment to load?
           </p>
           <button onclick="window.location.replace(window.location.pathname + '?_bust=' + Date.now())" style="padding: 10px 22px; background: #2563eb; color: #ffffff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(37,99,235,0.4);">
-            🔄 Reload Workspace
+            Reload Workspace
           </button>
         </div>
         <script>

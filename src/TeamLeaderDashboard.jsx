@@ -3,7 +3,7 @@ import {
   Users, Award, AlertTriangle, Target, DollarSign, CheckCircle2,
   Calendar, Sun, Download, FileText, Shuffle, UserPlus, PhoneCall,
   Clock, Shield, BarChart3, ChevronRight, Layers, MessageSquare,
-  Sparkles, Bell, Radio, ArrowUpRight
+  Sparkles, Bell, Radio, ArrowUpRight, ArrowRight
 } from 'lucide-react';
 
 export default function TeamLeaderDashboard({
@@ -208,7 +208,7 @@ export default function TeamLeaderDashboard({
   const greetingText = hr < 12 ? "Good Morning" : hr < 17 ? "Good Afternoon" : "Good Evening";
 
   return (
-    <div style={{ padding: "0 0 30px 0", color: "#0f172a", fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+    <div style={{ padding: "0 0 30px 0", color: "#0f172a", fontFamily: "'Inter', sans-serif" }}>
       
       {/* 1. Header Banner */}
       <div style={{
@@ -283,7 +283,7 @@ export default function TeamLeaderDashboard({
       {/* Greeting Subtitle */}
       <div style={{ marginBottom: "16px" }}>
         <h1 style={{ fontSize: "24px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0", letterSpacing: "-0.02em", lineHeight: "1.25" }}>
-          {greetingText}, {tlName} (Team Leader)! 👏
+          {greetingText}, {tlName} (Team Leader)!
         </h1>
         <p style={{ fontSize: "13.5px", color: "#64748b", margin: 0, fontWeight: "400", lineHeight: "1.5" }}>
           Here's your squad's performance and live leads requiring attention.
@@ -379,7 +379,7 @@ export default function TeamLeaderDashboard({
                 onClick={() => onNavigate && onNavigate("tasks")}
                 style={{ fontSize: "11px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}
               >
-                View Tasks →
+                View Tasks <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
               </div>
             </div>
 
@@ -466,7 +466,7 @@ export default function TeamLeaderDashboard({
                 <span>
                   Top performer: <strong>{topSquadPerformer ? `${topSquadPerformer.name} (${topSquadPerformer.won} won)` : "All reps active"}</strong>
                 </span>
-                <span onClick={() => onNavigate && onNavigate("team")} style={{ color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>Manage Team →</span>
+                <span onClick={() => onNavigate && onNavigate("team")} style={{ color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>Manage Team <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} /></span>
               </div>
             </div>
 
@@ -478,7 +478,7 @@ export default function TeamLeaderDashboard({
                   <span>My Leads</span>
                 </div>
                 <span onClick={() => onNavigate && onNavigate("sheet")} style={{ fontSize: "11px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>
-                  View All →
+                  View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
                 </span>
               </div>
 
@@ -567,7 +567,7 @@ export default function TeamLeaderDashboard({
                   <span>My Tasks</span>
                 </div>
                 <span onClick={() => onNavigate && onNavigate("tasks")} style={{ fontSize: "11px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>
-                  View All →
+                  View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
                 </span>
               </div>
 

@@ -2418,17 +2418,17 @@ Thank you for your business!`;
     try {
       const res = await pingSupabaseDatabase();
       if (res && res.success) {
-        showToast(`✓ Database reachable — ${res.latency}ms latency`, 'success');
+        showToast(`Database reachable — ${res.latency}ms latency`, 'success');
       } else {
-        showToast(`✕ Database check failed (${res?.latency ?? '0'}ms) — ${res?.error || 'Unknown error'}`, 'error');
+        showToast(`Database check failed (${res?.latency ?? '0'}ms) — ${res?.error || 'Unknown error'}`, 'error');
       }
     } catch (err) {
-      showToast(`✕ Database check failed — ${err.message}`, 'error');
+      showToast(`Database check failed — ${err.message}`, 'error');
     }
   };
 
   return (
-    <div style={{ padding: '4px 20px 30px 20px', color: '#0f172a', fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+    <div style={{ padding: '4px 20px 30px 20px', color: '#0f172a', fontFamily: "'Inter', sans-serif" }}>
       
       {/* Dynamic Content Area (Navigation managed cleanly in Left Sidebar matching reference image) */}
       <div>
@@ -2442,7 +2442,7 @@ Thank you for your business!`;
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
               <div>
                 <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', margin: '0 0 4px 0', letterSpacing: '-0.02em', lineHeight: '1.25' }}>
-                  Good Morning, Super Admin! 👏
+                  Good Morning, Super Admin!
                 </h1>
                 <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0, fontWeight: '400', lineHeight: '1.5' }}>
                   Manage companies, users, subscriptions and system settings from here.
@@ -2600,7 +2600,7 @@ Thank you for your business!`;
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '10px', fontWeight: '700' }}>
                     <span style={{ color: '#2563eb' }}>● Live Revenue (₹{liveDashboardMetrics.totalRevenue.toLocaleString('en-IN')})</span>
-                    <span style={{ color: '#16a34a' }}>● Verified Paid</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#16a34a' }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#16a34a', display: 'inline-block' }} /> Verified Paid</span>
                   </div>
                 </div>
 
@@ -2685,7 +2685,7 @@ Thank you for your business!`;
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '4px', fontSize: '10px', fontWeight: '600' }}>
                   {companyPlanDistribution.slices.map(s => (
                     <div key={s.plan} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ color: s.color }}>● {s.plan} Tier</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: s.color }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: s.color, display: 'inline-block' }} /> {s.plan} Tier</span>
                       <span style={{ color: '#64748b', fontWeight: '600' }}>{s.pct}% ({s.count})</span>
                     </div>
                   ))}
@@ -2700,7 +2700,7 @@ Thank you for your business!`;
                     <span>Recent Accounts</span>
                   </div>
                   <span onClick={() => setActiveTab('companies')} style={{ fontSize: '11px', color: '#2563eb', fontWeight: '600', cursor: 'pointer' }}>
-                    View All →
+                    View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
                   </span>
                 </div>
 
@@ -2757,7 +2757,7 @@ Thank you for your business!`;
                     <span>Active Team Members</span>
                   </div>
                   <span onClick={() => setActiveTab('users')} style={{ fontSize: '11px', color: '#2563eb', fontWeight: '600', cursor: 'pointer' }}>
-                    View All →
+                    View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
                   </span>
                 </div>
 
@@ -2820,15 +2820,15 @@ Thank you for your business!`;
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '4px', fontSize: '10px', fontWeight: '600' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#10b981' }}>● Subscribed Tenants</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#10b981' }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }} /> Subscribed Tenants</span>
                     <span style={{ color: '#64748b', fontWeight: '600' }}>1 (100%)</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#f59e0b' }}>● Trial / Provisioning</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#f59e0b' }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#f59e0b', display: 'inline-block' }} /> Trial / Provisioning</span>
                     <span style={{ color: '#64748b', fontWeight: '600' }}>0 (0%)</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#94a3b8' }}>● Suspended Accounts</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#94a3b8' }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#94a3b8', display: 'inline-block' }} /> Suspended Accounts</span>
                     <span style={{ color: '#64748b', fontWeight: '600' }}>0 (0%)</span>
                   </div>
                 </div>
@@ -2842,7 +2842,7 @@ Thank you for your business!`;
                     <span>Action &amp; Support Queue</span>
                   </div>
                   <span onClick={() => setActiveTab('support_tickets')} style={{ fontSize: '11px', color: '#2563eb', fontWeight: '600', cursor: 'pointer' }}>
-                    View All →
+                    View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
                   </span>
                 </div>
 
@@ -2944,7 +2944,7 @@ Thank you for your business!`;
               <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <div style={{ fontSize: '13px', fontWeight: '800', color: '#0f172a' }}>Top Client Accounts</div>
-                  <span onClick={() => setActiveTab('companies')} style={{ fontSize: '11px', color: '#2563eb', fontWeight: '600', cursor: 'pointer' }}>View All →</span>
+                  <span onClick={() => setActiveTab('companies')} style={{ fontSize: '11px', color: '#2563eb', fontWeight: '600', cursor: 'pointer' }}>View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} /></span>
                 </div>
 
                 <div style={{ overflowX: 'auto' }}>
@@ -3445,7 +3445,7 @@ Thank you for your business!`;
                       gap: "6px"
                     }}
                   >
-                    <Building2 size={14} /> 🏢 Company Plans &amp; Tiers
+                    <Building2 size={14} /> Company Plans &amp; Tiers
                   </button>
                   <button
                     type="button"
@@ -3464,7 +3464,7 @@ Thank you for your business!`;
                       gap: "6px"
                     }}
                   >
-                    <CreditCard size={14} /> 📋 Subscriptions List ({companies.length})
+                    <CreditCard size={14} /> Subscriptions List ({companies.length})
                   </button>
                 </div>
               </div>
@@ -3502,7 +3502,7 @@ Thank you for your business!`;
                     >
                       {tenantList.map(t => (
                         <option key={t.id} value={t.id}>
-                          🏢 {t.name} ({activePlansMap[companyPlansMap[t.id] || "growth"]?.name || "Growth Pro"})
+                          {t.name} ({activePlansMap[companyPlansMap[t.id] || "growth"]?.name || "Growth Pro"})
                         </option>
                       ))}
                     </select>
@@ -3590,7 +3590,7 @@ Thank you for your business!`;
                               letterSpacing: "0.5px",
                               boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
                             }}>
-                              ✓ ACTIVE PLAN
+                              ACTIVE PLAN
                             </div>
                           )}
 
@@ -3784,7 +3784,7 @@ Thank you for your business!`;
             <div style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                  <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', margin: '0 0 4px 0', letterSpacing: '-0.02em', lineHeight: '1.25' }}>💼 Client CRM Sales Packages &amp; Pricing Plans</h2>
+                  <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', margin: '0 0 4px 0', letterSpacing: '-0.02em', lineHeight: '1.25' }}>Client CRM Sales Packages &amp; Pricing Plans</h2>
                   <p style={{ fontSize: '13.5px', color: '#64748b', margin: 0, fontWeight: '400', lineHeight: '1.5' }}>
                     Super Admin Control: Decide and customize package rates (₹), billing durations, and included quotas. Edited rates automatically reflect in new deal values.
                   </p>
@@ -3952,7 +3952,7 @@ Thank you for your business!`;
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
                     <Receipt size={22} color="#16a34a" />
-                    <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', margin: 0, letterSpacing: '-0.02em', lineHeight: '1.25' }}>📜 B2B Client Licensing &amp; Tax Invoicing Hub</h2>
+                    <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', margin: 0, letterSpacing: '-0.02em', lineHeight: '1.25' }}>B2B Client Licensing &amp; Tax Invoicing Hub</h2>
                   </div>
                   <p style={{ fontSize: "12.5px", color: "#64748b", margin: 0, maxWidth: "760px", lineHeight: "1.5" }}>
                     Super Admin Control Center: Register client emails after payment, choose &amp; activate plans, adjust custom user seats, grant discounts, issue cryptographic license numbers, and generate formal Tax Invoices.
@@ -4019,7 +4019,7 @@ Thank you for your business!`;
                   <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginTop: "4px" }}>
                     <span style={{ fontSize: "18px", fontWeight: "900", color: "#78350f" }}>ApexSales Global HQ</span>
                   </div>
-                  <div style={{ fontSize: "11px", color: "#92400e", fontWeight: "600", marginTop: "4px" }}>👑 Owner: {currentUser?.name || 'Platform Owner'}</div>
+                  <div style={{ fontSize: "11px", color: "#92400e", fontWeight: "600", marginTop: "4px" }}>Owner: {currentUser?.name || 'Platform Owner'}</div>
                 </div>
               </div>
 
@@ -4143,7 +4143,7 @@ Thank you for your business!`;
                                   {pDef.badge}
                                 </span>
                                 <span style={{ fontSize: "11.5px", fontWeight: '600', color: isCustomSeats ? "#15803d" : "#334155" }}>
-                                  {seatsAllocated} Seats {isCustomSeats ? "✨ Custom" : ""}
+                                  {seatsAllocated} Seats {isCustomSeats ? "Custom" : ""}
                                 </span>
                               </div>
                               <div style={{ fontSize: "10.5px", color: "#64748b", marginTop: "2px" }}>
@@ -4164,7 +4164,7 @@ Thank you for your business!`;
                                     if (typeof navigator !== 'undefined' && navigator.clipboard) {
                                       navigator.clipboard.writeText(lic.licenseNumber);
                                     }
-                                    showToast(`Copied ${lic.licenseNumber} 📋`, "success");
+                                    showToast(`Copied ${lic.licenseNumber}`, "success");
                                   }}
                                   style={{ background: "transparent", border: "none", cursor: "pointer", padding: "1px 3px", color: "#b45309" }}
                                   title="Copy License Number"
@@ -5893,7 +5893,7 @@ Thank you for your business!`;
                 {/* Mailchimp Graphic */}
                 <div style={{ width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
                   <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: '#ffe01b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000000', fontWeight: '900', fontSize: '18px' }}>
-                    🐒
+                    
                   </div>
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a', marginBottom: '14px' }}>Mailchimp</div>
@@ -7104,7 +7104,7 @@ Thank you for your business!`;
                     <Check size={16} /> Save &amp; Apply Changes
                   </button>
                   <span style={{ fontSize: '11px', color: '#16a34a', fontWeight: '600', textAlign: 'center' }}>
-                    ✓ Selections auto-save instantly
+                    Selections auto-save instantly
                   </span>
                 </div>
                 <button
@@ -7171,7 +7171,7 @@ Thank you for your business!`;
                     <Check size={16} /> Save &amp; Apply Changes
                   </button>
                   <span style={{ fontSize: '11px', color: '#16a34a', fontWeight: '600', textAlign: 'center' }}>
-                    ✓ Selections auto-save instantly
+                    Selections auto-save instantly
                   </span>
                 </div>
                 <button
@@ -7374,7 +7374,7 @@ Thank you for your business!`;
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Cloud Storage Verification:</span>
-                <strong style={{ color: '#16a34a' }}>✓ Verified in Supabase PostgreSQL</strong>
+                <strong style={{ color: '#16a34a' }}>Verified in Supabase PostgreSQL</strong>
               </div>
             </div>
 

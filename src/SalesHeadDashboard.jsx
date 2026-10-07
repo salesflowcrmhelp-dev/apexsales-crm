@@ -4,7 +4,7 @@ import {
   ArrowUpRight, ArrowDownRight, ChevronRight, Calendar, Bell,
   Shield, CheckCircle2, Clock, AlertTriangle, Download, Plus,
   FileText, Send, Settings, Sparkles, MessageSquare, Bot,
-  ExternalLink, Layers, Search, Filter, RefreshCw
+  ExternalLink, Layers, Search, Filter, RefreshCw, ArrowRight
 } from 'lucide-react';
 
 export default function SalesHeadDashboard({
@@ -312,7 +312,7 @@ export default function SalesHeadDashboard({
   const userGreetingName = currentUser?.displayName || currentUser?.name || "Harsh Goyal";
 
   return (
-    <div style={{ padding: "0 0 30px 0", color: "#0f172a", fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+    <div style={{ padding: "0 0 30px 0", color: "#0f172a", fontFamily: "'Inter', sans-serif" }}>
       
       {/* 1. Header Banner */}
       <div style={{
@@ -386,7 +386,7 @@ export default function SalesHeadDashboard({
       {/* Greeting Subtitle */}
       <div style={{ marginBottom: "16px" }}>
         <h1 style={{ fontSize: "24px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0", letterSpacing: "-0.02em", lineHeight: "1.25" }}>
-          {greetingText}, {userGreetingName} (Sales Head)! 👏
+          {greetingText}, {userGreetingName} (Sales Head)!
         </h1>
         <p style={{ fontSize: "13.5px", color: "#64748b", margin: 0, fontWeight: "400", lineHeight: "1.5" }}>
           Here's your company's live sales performance across all {totalLeadsCount} active leads.
@@ -613,7 +613,7 @@ export default function SalesHeadDashboard({
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                 <div style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a" }}>Top Performing Team Members</div>
                 <span onClick={() => onNavigate && onNavigate("team")} style={{ fontSize: "11px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>
-                  View All →
+                  View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
                 </span>
               </div>
 
@@ -672,7 +672,7 @@ export default function SalesHeadDashboard({
                   <span>Recent Leads</span>
                 </div>
                 <span onClick={() => onNavigate && onNavigate("sheet")} style={{ fontSize: "11px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>
-                  View All →
+                  View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
                 </span>
               </div>
 
@@ -722,7 +722,7 @@ export default function SalesHeadDashboard({
                   <span>Upcoming Follow-ups</span>
                 </div>
                 <span onClick={() => onNavigate && onNavigate("followups")} style={{ fontSize: "11px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>
-                  View All →
+                  View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
                 </span>
               </div>
 
@@ -754,7 +754,7 @@ export default function SalesHeadDashboard({
                   <span>Today's Tasks</span>
                 </div>
                 <span onClick={() => onNavigate && onNavigate("tasks")} style={{ fontSize: "11px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>
-                  View All →
+                  View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} />
                 </span>
               </div>
 
@@ -787,7 +787,7 @@ export default function SalesHeadDashboard({
             <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a" }}>Recent Activity ({recentActivities.length})</span>
-                <span onClick={() => onNavigate && onNavigate("sheet")} style={{ fontSize: "10px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>View All →</span>
+                <span onClick={() => onNavigate && onNavigate("sheet")} style={{ fontSize: "10px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} /></span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "11px" }}>
                 {recentActivities.map((act, i) => (
@@ -808,7 +808,7 @@ export default function SalesHeadDashboard({
             <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a" }}>Recent Payments ({recentPayments.length})</span>
-                <span onClick={() => onNavigate && onNavigate("deals")} style={{ fontSize: "10px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>View All →</span>
+                <span onClick={() => onNavigate && onNavigate("deals")} style={{ fontSize: "10px", color: "#2563eb", fontWeight: "700", cursor: "pointer" }}>View All <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '3px' }} /></span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "5px", fontSize: "11px" }}>
                 {recentPayments.map((p, i) => (
