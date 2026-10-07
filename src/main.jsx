@@ -75,7 +75,7 @@ class ErrorBoundary extends Component {
                 onClick={this.handleGoToSheet}
                 style={{ width: "100%", height: "40px", backgroundColor: "#f8fafc", color: "#334155", border: "1px solid #cbd5e1", borderRadius: "9px", fontSize: "13px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", transition: "all 0.15s ease" }}
               >
-                📊 Return to Pipeline Spreadsheet
+                📊 Return to Pipeline Table
               </button>
             </div>
 

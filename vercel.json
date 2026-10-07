@@ -2,7 +2,20 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "server/data/**"
+    }
+  },
   "rewrites": [
+    {
+      "source": "/api/send-invite",
+      "destination": "/api/send-invite"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

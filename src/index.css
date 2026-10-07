@@ -824,7 +824,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .sidebar-sub-badge {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 10px;
-  font-weight: 750;
+  font-weight: 600;
   color: #ffffff !important;
   background: #059669 !important; /* High contrast emerald green that never blends into active blue row */
   padding: 2px 7.5px;
@@ -842,7 +842,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .sidebar-badge {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 10px;
-  font-weight: 750;
+  font-weight: 600;
   padding: 2px 8px;
   border-radius: 9999px !important;
   letter-spacing: 0.3px;
@@ -2546,7 +2546,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .kanban-card-name {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 12.5px !important;
-  font-weight: 750 !important;
+  font-weight: 600 !important;
   color: #0f172a !important;
   cursor: pointer !important;
   letter-spacing: -0.15px !important;
@@ -2668,6 +2668,52 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .kanban-score-square-badge.score-c {
   background: #64748b !important; /* Cold: slate */
+}
+
+.kanban-score-square-badge.score-l {
+  background: #fee2e2 !important; /* Lost: soft red */
+  color: #dc2626 !important;
+  border: 1px solid #fca5a5 !important;
+}
+
+.kanban-card.is-lost-card {
+  border-left: 3px solid #ef4444 !important;
+}
+
+.kanban-card.is-lost-card:hover {
+  border-color: #fca5a5 !important;
+  border-left-color: #ef4444 !important;
+}
+
+/* Diagonal Corner Ribbon for LOST Deals (matching user reference) */
+.kanban-lost-corner-ribbon {
+  position: absolute !important;
+  top: 9px !important;
+  right: -24px !important;
+  width: 84px !important;
+  height: 18px !important;
+  background: #c53030 !important; /* Rich crimson red matching user reference */
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: rotate(45deg) !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+  user-select: none !important;
+  line-height: 1 !important;
+}
+
+.kanban-lost-corner-ribbon span {
+  display: inline-block !important;
+  transform: translateY(-0.5px) !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Mini Action Buttons: Call & WhatsApp */
@@ -3376,7 +3422,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .insight-val {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 20px;
-  font-weight: 850;
+  font-weight: 700;
   color: #0f172a;
   line-height: 1.2;
 }
@@ -3908,7 +3954,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .score-badge-compact {
   display: inline-block;
   font-size: 10px;
-  font-weight: 750;
+  font-weight: 600;
   padding: 2px 8px;
   border-radius: 4px;
 }
@@ -4433,7 +4479,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   .header-period-mobile-text {
     display: inline !important;
     font-size: 11px !important;
-    font-weight: 750 !important;
+    font-weight: 600 !important;
     white-space: nowrap !important;
   }
   .header-period-btn {
@@ -4453,7 +4499,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   .header-cta-mobile-text {
     display: inline !important;
     font-size: 11px !important;
-    font-weight: 750 !important;
+    font-weight: 600 !important;
     white-space: nowrap !important;
   }
   .header-cta-orange {
@@ -4770,3 +4816,45 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
     padding: 0 8px !important;
   }
 }
+
+/* ============================================== */
+/* 🚀 APEXSALES CRM LOGIN PAGE (SPLIT-SCREEN v2.4) */
+/* ============================================== */
+.login-split-wrapper {
+  display: flex !important;
+  flex-direction: row !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+  background-color: #0b0f19 !important;
+}
+
+.login-left-brand-panel {
+  flex: 1.15 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+.login-right-form-panel {
+  flex: 0.85 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #f8fafc !important;
+}
+
+@media (max-width: 960px) {
+  .login-split-wrapper {
+    flex-direction: column !important;
+  }
+  .login-left-brand-panel {
+    display: none !important;
+  }
+  .login-right-form-panel {
+    flex: 1 1 100% !important;
+    padding: 32px 16px !important;
+    min-height: 100vh !important;
+  }
+}
+

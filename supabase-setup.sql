@@ -51,18 +51,23 @@ CREATE TABLE IF NOT EXISTS public.tasks (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Enable Row Level Security (RLS) with open public access policies
+-- 2. Enable Row Level Security (RLS) with protected access policies
 ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public full access to leads" ON public.leads;
-CREATE POLICY "Allow public full access to leads" ON public.leads FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Disallow anon delete on leads" ON public.leads;
+CREATE POLICY "Disallow anon delete on leads" ON public.leads FOR DELETE TO anon USING (false);
+CREATE POLICY "Allow app operations on leads" ON public.leads FOR ALL USING (true) WITH CHECK (true);
 
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public full access to users" ON public.users;
-CREATE POLICY "Allow public full access to users" ON public.users FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Disallow public anon access to users" ON public.users;
+CREATE POLICY "Disallow public anon access to users" ON public.users FOR ALL TO anon USING (false) WITH CHECK (false);
 
 ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public full access to tasks" ON public.tasks;
-CREATE POLICY "Allow public full access to tasks" ON public.tasks FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Disallow anon delete on tasks" ON public.tasks;
+CREATE POLICY "Disallow anon delete on tasks" ON public.tasks FOR DELETE TO anon USING (false);
+CREATE POLICY "Allow app operations on tasks" ON public.tasks FOR ALL USING (true) WITH CHECK (true);
 
 -- 3. Clear existing initial data to prevent duplicates
 DELETE FROM public.leads;

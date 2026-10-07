@@ -2,11 +2,29 @@ services:
   - type: web
     name: apexsales-crm
     env: node
-    plan: free
+    plan: starter # Starter plan ($7/mo) or above recommended for persistent disk; change to 'free' if using stateless/Supabase backend
     buildCommand: npm install && npm run build
     startCommand: node server/server.js
+    # Disk configuration for server/data persistence (Requires Render Starter plan or above):
+    # disk:
+    #   name: apexsales-data
+    #   mountPath: /opt/render/project/src/server/data
+    #   sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
-      - key: MONGODB_URI
+      - key: PORT
+        value: 10000
+      - key: SESSION_SECRET
         sync: false
+      - key: PIN_SALT
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+
