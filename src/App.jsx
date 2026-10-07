@@ -11456,7 +11456,7 @@ export default function App({ onNavigateToLanding } = {}) {
           {/* Subtle System Version Info */}
           <div className="sidebar-version-info" title="ApexSales Production Environment">
             <span className="version-dot"></span>
-            <span className="version-text">v2.4.0 (Enterprise Edition)</span>
+            <span className="version-text">v2.5.0 (Enterprise Edition)</span>
           </div>
         </div>
       </aside>
