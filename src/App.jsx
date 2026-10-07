@@ -6955,7 +6955,7 @@ export default function App({ onNavigateToLanding } = {}) {
           // (including hot deals, won deals, followups) so the daily cockpit is fully active!
           scoped = scoped.filter((l, idx) => {
             const lOwner = (l.owner || "").trim().toLowerCase();
-            return lOwner.includes("prabhash") || lOwner.includes("sanjeev") || lOwner.includes("kashish") || (idx % 2 === 0);
+            return lOwner.includes("rohan") || lOwner.includes("sanjeev") || lOwner.includes("kashish") || (idx % 2 === 0);
           });
         } else {
           const repName = (currentUser.name || "").trim().toLowerCase();
@@ -17652,13 +17652,14 @@ export default function App({ onNavigateToLanding } = {}) {
                       {(() => {
                         const hr = new Date().getHours();
                         const greeting = hr < 12 ? "Good Morning" : hr < 17 ? "Good Afternoon" : "Good Evening";
-                        let name = currentUser?.displayName || currentUser?.name || userProfile.displayName || "Admin";
+                        const actualUserName = currentUser?.displayName || currentUser?.name || userProfile.displayName || "Admin";
+                        let name = actualUserName;
                         if (simulatedRole === CRM_ROLES.SALES_EXECUTIVE) {
-                          name = "Prabhash A Shah (Sales Executive)";
+                          name = `${actualUserName} (Sales Executive)`;
                         } else if (simulatedRole === CRM_ROLES.TEAM_LEADER) {
-                          name = "Sanjeev Mali (Team Leader)";
+                          name = `${actualUserName} (Team Leader)`;
                         } else if (simulatedRole === CRM_ROLES.SALES_HEAD) {
-                          name = `${currentUser?.name || "Harsh Goyal"} (Sales Head)`;
+                          name = `${actualUserName} (Sales Head)`;
                         }
                         return `${greeting}, ${name}! 👋`;
                       })()}
