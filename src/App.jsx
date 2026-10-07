@@ -10379,7 +10379,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       <input
                         id="login-email-input"
                         type="text"
-                        placeholder="harsh@apexsales.com"
+                        placeholder="name@company.com"
                         value={loginEmail}
                         onChange={(e) => {
                           setLoginEmail(e.target.value);
@@ -11159,24 +11159,24 @@ export default function App({ onNavigateToLanding } = {}) {
               title={
                 simulatedRole === CRM_ROLES.SALES_HEAD ? "Sales Head Dashboard" :
                 simulatedRole === CRM_ROLES.TEAM_LEADER ? "Team Leader Dashboard" :
-                "Sales Dashboard"
+                "Command Center"
               }
             >
               <TrendingUp className="nav-item-icon" />
               <span>
                 {simulatedRole === CRM_ROLES.SALES_HEAD ? "Sales Head Dashboard" :
                  simulatedRole === CRM_ROLES.TEAM_LEADER ? "Team Leader Dashboard" :
-                 "Sales Dashboard"}
+                 "Command Center"}
               </span>
             </button>
 
             <button 
               onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("intelligence"); }} 
               className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" && analyticsSubTab === "intelligence" ? "active" : ""}`}
-              title="Sales Intelligence"
+              title="AI Insights"
             >
               <Sparkles className="nav-item-icon" />
-              <span>Sales Intelligence</span>
+              <span>AI Insights</span>
             </button>
 
             {/* Collapsible Leads Parent & Sub-Navigation matching visual mockup */}
@@ -11208,19 +11208,19 @@ export default function App({ onNavigateToLanding } = {}) {
                 <div className="sidebar-tree-container">
                   <div className="sidebar-tree-node">
                     <button 
-                      type="button"
+                      type="button" 
                       onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
                       className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
-                      title="Pipeline Data Grid"
+                      title="All Leads (Grid)"
                     >
                       <Grid className="sub-item-icon" />
-                      <span>Pipeline Data Grid</span>
+                      <span>All Leads (Grid)</span>
                     </button>
                   </div>
 
                   <div className="sidebar-tree-node">
                     <button 
-                      type="button"
+                      type="button" 
                       onClick={() => { 
                         setActiveWorkspace("pipeline"); 
                         setPipelineView("split"); 
@@ -11235,31 +11235,31 @@ export default function App({ onNavigateToLanding } = {}) {
 
                   <div className="sidebar-tree-node">
                     <button 
-                      type="button"
+                      type="button" 
                       onClick={() => { 
                         setActiveWorkspace("pipeline"); 
                         setPipelineView("deals"); 
                       }} 
                       className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
-                      title="Deals Hub"
+                      title="Active Deals"
                     >
                       <Award className="sub-item-icon" />
-                      <span>Deals Hub</span>
+                      <span>Active Deals</span>
                     </button>
                   </div>
 
                   <div className="sidebar-tree-node">
                     <button 
-                      type="button"
+                      type="button" 
                       onClick={() => { 
                         setActiveWorkspace("pipeline"); 
                         setPipelineView("kanban"); 
                       }} 
                       className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "kanban" ? "active" : ""}`}
-                      title="Kanban Board"
+                      title="Visual Pipeline"
                     >
                       <Columns className="sub-item-icon" />
-                      <span style={{ flex: 1, textAlign: "left" }}>Kanban Board</span>
+                      <span style={{ flex: 1, textAlign: "left" }}>Visual Pipeline</span>
                       <span className="sidebar-sub-badge" style={{ marginLeft: "10px", flexShrink: 0 }}>New</span>
                     </button>
                   </div>
@@ -11267,7 +11267,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   {canAccessUnassignedQueue && (
                     <div className="sidebar-tree-node">
                       <button 
-                        type="button"
+                        type="button" 
                         onClick={() => { 
                           setActiveWorkspace("pipeline"); 
                           setPipelineView("unassigned"); 
@@ -11300,10 +11300,10 @@ export default function App({ onNavigateToLanding } = {}) {
               <button 
                 onClick={() => setActiveWorkspace("tasks")} 
                 className={`sidebar-nav-item ${activeWorkspace === "tasks" ? "active" : ""}`}
-                title="Task Manager"
+                title="Follow-ups & Tasks"
               >
                 <Calendar className="nav-item-icon" />
-                <span>Task Manager</span>
+                <span>Follow-ups & Tasks</span>
               </button>
             )}
 
@@ -11311,10 +11311,10 @@ export default function App({ onNavigateToLanding } = {}) {
               <button 
                 onClick={() => setActiveWorkspace("calendar")} 
                 className={`sidebar-nav-item ${activeWorkspace === "calendar" ? "active" : ""}`}
-                title="Sales Calendar"
+                title="Meetings & Schedule"
               >
                 <Calendar className="nav-item-icon" />
-                <span>Sales Calendar</span>
+                <span>Meetings & Schedule</span>
               </button>
             )}
 
@@ -11322,10 +11322,10 @@ export default function App({ onNavigateToLanding } = {}) {
               <button 
                 onClick={() => { setActiveWorkspace("reports"); setShowReportsModal(false); }} 
                 className={`sidebar-nav-item ${activeWorkspace === "reports" ? "active" : ""}`}
-                title="Reports"
+                title="Analytics & Reports"
               >
                 <BarChart2 className="nav-item-icon" />
-                <span>Reports</span>
+                <span>Analytics & Reports</span>
               </button>
             )}
 
@@ -11456,7 +11456,7 @@ export default function App({ onNavigateToLanding } = {}) {
           {/* Subtle System Version Info */}
           <div className="sidebar-version-info" title="ApexSales Production Environment">
             <span className="version-dot"></span>
-            <span className="version-text">v2.5.0 (Enterprise Edition)</span>
+            <span className="version-text">v2.5.1 (Enterprise Edition)</span>
           </div>
         </div>
       </aside>
