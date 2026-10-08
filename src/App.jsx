@@ -7337,59 +7337,27 @@ export default function App({ onNavigateToLanding } = {}) {
   const lastMonthKey = useMemo(() => getOffsetMonthKey(-1), [activeDateKey]);
   const nextMonthKey = useMemo(() => getOffsetMonthKey(1), [activeDateKey]);
 
+  const DEFAULT_BASELINE_TARGETS = {
+    "2026-08": 110000,
+    "2026-09": 120000,
+    "2026-10": 130000
+  };
+
   const [monthlyTargets, setMonthlyTargets] = useState(() => {
-    const saved = localStorage.getItem("salesflow_monthly_targets");
-    const explicitAssigned = localStorage.getItem("salesflow_explicit_targets");
-    let explicitMap = {};
-    if (explicitAssigned) {
-      try { explicitMap = JSON.parse(explicitAssigned); } catch(e) {}
-    }
-
-    if (saved) {
-      try { 
-        const parsed = JSON.parse(saved);
-        const cleaned = {};
-        if (parsed && typeof parsed === "object") {
-          for (const [k, v] of Object.entries(parsed)) {
-            // ONLY retain targets that have been explicitly assigned by the user/admin!
-            if (explicitMap[k] && Number(v) > 0) {
-              cleaned[k] = Number(v);
-            }
-          }
-        }
-        localStorage.setItem("salesflow_monthly_targets", JSON.stringify(cleaned));
-        return cleaned;
-      } catch (e) {}
-    }
-    return {};
-  });
-
-  // Active runtime sanitizer: ensures any stale memory state or unassigned dummy targets are purged immediately
-  useEffect(() => {
     try {
-      const explicitAssigned = localStorage.getItem("salesflow_explicit_targets");
-      let explicitMap = {};
-      if (explicitAssigned) {
-        try { explicitMap = JSON.parse(explicitAssigned); } catch(e) {}
+      const saved = localStorage.getItem("salesflow_monthly_targets");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
+          return { ...DEFAULT_BASELINE_TARGETS, ...parsed };
+        }
       }
-      setMonthlyTargets(prev => {
-        let hasChanges = false;
-        const cleaned = {};
-        for (const [k, v] of Object.entries(prev || {})) {
-          if (explicitMap[k] && Number(v) > 0) {
-            cleaned[k] = Number(v);
-          } else {
-            hasChanges = true;
-          }
-        }
-        if (hasChanges || !explicitAssigned) {
-          localStorage.setItem("salesflow_monthly_targets", JSON.stringify(cleaned));
-          return cleaned;
-        }
-        return prev;
-      });
     } catch (e) {}
-  }, []);
+    try {
+      localStorage.setItem("salesflow_monthly_targets", JSON.stringify(DEFAULT_BASELINE_TARGETS));
+    } catch(e) {}
+    return DEFAULT_BASELINE_TARGETS;
+  });
 
   const [selectedPeriodMonth, setSelectedPeriodMonth] = useState(() => getCurrentMonthKey());
   const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
@@ -7412,40 +7380,27 @@ export default function App({ onNavigateToLanding } = {}) {
     const effectiveRole = simulatedRole || normalizeRole(currentUserRole || currentUser?.role);
     const isExecutive = effectiveRole === CRM_ROLES.SALES_EXECUTIVE;
     
-    // For a Sales Executive, only return target if explicitly assigned to this executive personally
+    // For a Sales Executive: if individual personal target is configured, prioritize it
     if (isExecutive) {
       const execTarget = currentUser?.target || currentUser?.salesTarget;
       if (execTarget && Number(execTarget) > 0) return Number(execTarget);
       const userTargetKey = `salesflow_target_${currentUser?.id || currentUser?.username}`;
       const savedUserTarget = localStorage.getItem(userTargetKey);
       if (savedUserTarget && Number(savedUserTarget) > 0) return Number(savedUserTarget);
-      return 0; // Pure 0 / Pending for executive without assigned personal target!
-    }
-
-    const explicitAssigned = localStorage.getItem("salesflow_explicit_targets");
-    let explicitMap = {};
-    if (explicitAssigned) {
-      try { explicitMap = JSON.parse(explicitAssigned); } catch(e) {}
+      // Fallback: use monthly quota (e.g. ₹1,30,000)
     }
 
     if (selectedPeriodMonth === "all") {
-      const total = Object.entries(monthlyTargets).reduce((acc, [k, v]) => {
-        return acc + (explicitMap[k] ? (Number(v) || 0) : 0);
-      }, 0);
-      return total > 0 ? total : 0;
-    }
-
-    // Strict rule: If this specific month has not been explicitly assigned by user/admin, return 0 (Pending)
-    if (!explicitMap[selectedPeriodMonth]) {
-      return 0;
+      const total = Object.values(monthlyTargets || {}).reduce((acc, v) => acc + (Number(v) || 0), 0);
+      return total > 0 ? total : 130000;
     }
 
     const val = monthlyTargets[selectedPeriodMonth];
     if (val !== undefined && val !== null && Number(val) > 0) {
       return Number(val);
     }
-    return 0; // Pure 0 / Pending when not explicitly assigned!
-  }, [monthlyTargets, selectedPeriodMonth, currentUser, currentUserRole, simulatedRole]);
+    return monthlyTargets[currentMonthKey] || 130000;
+  }, [monthlyTargets, selectedPeriodMonth, currentMonthKey, currentUser, currentUserRole, simulatedRole]);
 
   const startEditingTarget = (chosenMonth) => {
     const monthKey = chosenMonth || (selectedPeriodMonth === "all" ? currentMonthKey : selectedPeriodMonth);
@@ -7461,27 +7416,24 @@ export default function App({ onNavigateToLanding } = {}) {
     const numericTarget = Number(amount) || 0;
     const numericSpot = Number(spotAmount) || 0;
 
-    let explicitMap = {};
-    try {
-      explicitMap = JSON.parse(localStorage.getItem("salesflow_explicit_targets") || "{}");
-    } catch(e) {}
-
     const updatedTargets = { ...monthlyTargets };
     if (numericTarget > 0) {
       updatedTargets[monthKey] = numericTarget;
-      explicitMap[monthKey] = true;
     } else {
       delete updatedTargets[monthKey];
-      delete explicitMap[monthKey];
     }
 
     setMonthlyTargets(updatedTargets);
-    localStorage.setItem("salesflow_monthly_targets", JSON.stringify(updatedTargets));
-    localStorage.setItem("salesflow_explicit_targets", JSON.stringify(explicitMap));
+    try {
+      localStorage.setItem("salesflow_monthly_targets", JSON.stringify(updatedTargets));
+      localStorage.setItem("salesflow_explicit_targets", JSON.stringify(updatedTargets));
+    } catch(e) {}
 
     const updatedSpots = { ...spotIncentives, [monthKey]: { amount: numericSpot, note: spotNote || "" } };
     setSpotIncentives(updatedSpots);
-    localStorage.setItem("salesflow_spot_incentives", JSON.stringify(updatedSpots));
+    try {
+      localStorage.setItem("salesflow_spot_incentives", JSON.stringify(updatedSpots));
+    } catch(e) {}
 
     if (numericTarget > 0) {
       showToast(`Target ₹${numericTarget.toLocaleString("en-IN")} saved for ${formatMonthLabel(monthKey)}!`, "success");
