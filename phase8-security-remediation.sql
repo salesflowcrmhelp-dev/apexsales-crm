@@ -253,7 +253,7 @@ BEGIN
     END IF;
 
     v_permissions := COALESCE(p_user->'permissions', v_existing_user.permissions, '{}'::jsonb);
-    v_company_name := COALESCE(p_user->>'company', p_user->>'companyName', p_user->>'company_name', v_permissions->>'companyName', 'ApexSales Global HQ');
+    v_company_name := COALESCE(p_user->>'company', p_user->>'companyName', p_user->>'company_name', v_permissions->>'companyName', 'Apex Sales');
     v_company_id := COALESCE(p_user->>'companyId', p_user->>'company_id', v_permissions->>'companyId', '');
     
     IF v_company_name <> '' THEN

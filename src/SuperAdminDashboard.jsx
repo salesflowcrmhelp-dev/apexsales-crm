@@ -2085,7 +2085,7 @@ export default function SuperAdminDashboard({
     if (!inv || !inv.id) return;
     if (!window.confirm(`Generate and download tax invoice document for ${inv.id} (${inv.company})?`)) return;
     const content = `================================================
-APEXSALES GLOBAL CRM - OFFICIAL TAX INVOICE
+APEX SALES CRM - OFFICIAL TAX INVOICE
 ================================================
 Invoice No:    ${inv.id}
 Client:        ${inv.company}
@@ -2375,7 +2375,7 @@ Thank you for your business!`;
       `Monthly SaaS MRR,INR ${saasMRR},Active Subscriptions`,
       `Projected Annual ARR,INR ${saasARR},Annual Projection`,
       `Active Client Companies,${clientLicenses.length || 1},Subscribed Tenant Organizations`,
-      `Master Platform Hub,1,ApexSales Global HQ`,
+      `Master Platform Hub,1,Apex Sales`,
       `Provisioned Seats,${totalProvisionedSeats},Allocated to Tenants`,
       `Active Platform Users,${usersList.length},Real System Users`,
       `Cloud Infrastructure Health,100% Live,Supabase PostgreSQL (36ms)`
@@ -4017,7 +4017,7 @@ Thank you for your business!`;
                 <div style={{ padding: "16px 18px", backgroundColor: "#fef3c7", borderRadius: "10px", border: "1.5px solid #fde68a", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
                   <div style={{ fontSize: "11px", fontWeight: "800", color: "#b45309", textTransform: "uppercase" }}>Master Platform License</div>
                   <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginTop: "4px" }}>
-                    <span style={{ fontSize: "18px", fontWeight: "900", color: "#78350f" }}>ApexSales Global HQ</span>
+                    <span style={{ fontSize: "18px", fontWeight: "900", color: "#78350f" }}>Apex Sales</span>
                   </div>
                   <div style={{ fontSize: "11px", color: "#92400e", fontWeight: "600", marginTop: "4px" }}>Owner: {currentUser?.name || 'Platform Owner'}</div>
                 </div>
@@ -6847,7 +6847,7 @@ Thank you for your business!`;
                     <label style={{ display: 'block', fontSize: '11px', fontWeight: '600', marginBottom: '3px' }}>Platform Name</label>
                     <input
                       type="text"
-                      value={editableSettings.platformName ?? systemSettingsMap?.general?.platformName ?? 'ApexSales Global HQ'}
+                      value={editableSettings.platformName ?? systemSettingsMap?.general?.platformName ?? 'Apex Sales'}
                       onChange={e => setEditableSettings(prev => ({ ...prev, platformName: e.target.value }))}
                       style={{ width: '100%', padding: '7px 9px', borderRadius: '5px', border: '1px solid #cbd5e1', fontSize: '12px' }}
                     />

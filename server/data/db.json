@@ -12,7 +12,7 @@
       "active": true,
       "packageTier": "super_admin",
       "companyId": "tenant_apexsales",
-      "companyName": "ApexSales Global HQ",
+      "companyName": "Apex Sales",
       "permissions": {},
       "reportsTo": "",
       "managerId": "",
@@ -31,10 +31,10 @@
       "packageTier": "growth",
       "reportsTo": "Harsh Goyal",
       "companyId": "tenant_apexsales",
-      "companyName": "ApexSales Global HQ",
+      "companyName": "Apex Sales",
       "permissions": {
         "companyId": "tenant_apexsales",
-        "companyName": "ApexSales Global HQ",
+        "companyName": "Apex Sales",
         "reportsTo": "Harsh Goyal",
         "canAccessPipeline": true,
         "canAccessTasks": true,
@@ -53,11 +53,11 @@
       "active": true,
       "packageTier": "growth",
       "reportsTo": "Vikram Malhotra",
-      "companyId": "tenant_kashish",
-      "companyName": "Kashish Enterprises",
+      "companyId": "tenant_apexsales",
+      "companyName": "Apex Sales",
       "permissions": {
-        "companyId": "tenant_kashish",
-        "companyName": "Kashish Enterprises",
+        "companyId": "tenant_apexsales",
+        "companyName": "Apex Sales",
         "reportsTo": "Vikram Malhotra",
         "managerId": "usr_vikram",
         "canAccessPipeline": true,
@@ -77,11 +77,11 @@
       "phone": "7240705579",
       "active": true,
       "packageTier": "starter",
-      "companyId": "tenant_kashish",
-      "companyName": "Kashish Enterprises",
+      "companyId": "tenant_apexsales",
+      "companyName": "Apex Sales",
       "permissions": {
-        "companyId": "tenant_kashish",
-        "companyName": "Kashish Enterprises",
+        "companyId": "tenant_apexsales",
+        "companyName": "Apex Sales",
         "canAccessPipeline": true,
         "canAccessTasks": true,
         "canAccessCalendar": true
@@ -92,7 +92,7 @@
   "companies": [
     {
       "id": "c_apexsales",
-      "name": "ApexSales Global HQ",
+      "name": "Apex Sales",
       "domain": "apexsales.com",
       "plan": "Enterprise",
       "status": "Active",
@@ -345,9 +345,9 @@
     {
       "id": "cplan_tenant_apexsales",
       "company_id": "tenant_apexsales",
-      "company_name": "ApexSales Global HQ",
+      "company_name": "Apex Sales",
       "plan_id": "super_admin",
-      "plan_name": "Apex Global Platform HQ",
+      "plan_name": "Apex Sales Platform HQ",
       "price": 0,
       "billing_cycle": "lifetime",
       "status": "active",
@@ -417,9 +417,9 @@
     {
       "id": "cplan_tenant_apexsales",
       "company_id": "tenant_apexsales",
-      "company_name": "ApexSales Global HQ",
+      "company_name": "Apex Sales",
       "plan_id": "super_admin",
-      "plan_name": "Apex Global Platform HQ",
+      "plan_name": "Apex Sales Platform HQ",
       "price": 0,
       "billing_cycle": "lifetime",
       "status": "active",
@@ -1998,7 +1998,7 @@
     "general": {
       "currency": "INR",
       "timezone": "Asia/Kolkata",
-      "platformName": "ApexSales Global HQ"
+      "platformName": "Apex Sales"
     },
     "security": {
       "minPasswordLength": 8,
@@ -2028,7 +2028,7 @@
     "general": {
       "currency": "INR",
       "timezone": "Asia/Kolkata",
-      "platformName": "ApexSales Global HQ"
+      "platformName": "Apex Sales"
     },
     "security": {
       "minPasswordLength": 8,

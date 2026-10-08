@@ -1393,7 +1393,7 @@ app.all('/api/auth/demo', async (req, res) => {
       email: user.email || '',
       phone: user.phone || '',
       companyId: user.companyId || user.permissions?.companyId || 'tenant_apexsales',
-      companyName: user.companyName || user.permissions?.companyName || 'ApexSales Global HQ'
+      companyName: user.companyName || user.permissions?.companyName || 'Apex Sales'
     },
     token
   });
