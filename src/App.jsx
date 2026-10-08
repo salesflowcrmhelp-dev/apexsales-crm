@@ -6918,23 +6918,30 @@ export default function App({ onNavigateToLanding } = {}) {
           if (!lOwner || lOwner === "unassigned" || lOwner === "none") return true;
           return allowedOwners.has(lOwner) || (managerNameLower.includes("vikram") && (lOwner.includes("vikram") || lOwner.includes("rohan") || lOwner.includes("kashish")));
         });
+      } else {
         // Sales Executive: STRICT PERSONAL ISOLATION!
+        // When simulating or logged in as a Sales Executive, ONLY leads strictly assigned to this executive are included!
         const isSimExec = simulatedRole === CRM_ROLES.SALES_EXECUTIVE;
-        if (isSimExec) {
-          // When previewing as Sales Executive, display their representative active portfolio of leads
-          // (including hot deals, won deals, followups) so the daily cockpit is fully active!
-          scoped = scoped.filter((l, idx) => {
-            const lOwner = (l.owner || "").trim().toLowerCase();
-            return lOwner.includes("rohan") || lOwner.includes("sanjeev") || lOwner.includes("kashish") || (idx % 2 === 0);
-          });
-        } else {
-          const repName = (currentUser.name || "").trim().toLowerCase();
-          const repDisplayName = (currentUser.displayName || "").trim().toLowerCase();
-          scoped = scoped.filter(l => {
-            const lOwner = (l.owner || "").trim().toLowerCase();
-            return lOwner === repName || (repDisplayName && lOwner === repDisplayName);
-          });
-        }
+        const repName = isSimExec ? "kashish" : (currentUser.name || "").trim().toLowerCase();
+        const repDisplayName = isSimExec ? "kashish" : (currentUser.displayName || "").trim().toLowerCase();
+        const repEmail = isSimExec ? "kashish.accomation@gmail.com" : (currentUser.email || "").trim().toLowerCase();
+        const repUsername = isSimExec ? "kashish" : (currentUser.username || "").trim().toLowerCase();
+        const repId = isSimExec ? "usr_1789033985345_n62j" : String(currentUser.id || "").trim().toLowerCase();
+
+        scoped = scoped.filter(l => {
+          const lOwner = (l.owner || "").trim().toLowerCase();
+          const lAssigned = (l.assigned_to || l.assignedTo || "").trim().toLowerCase();
+          const lOwnerEmail = (l.ownerEmail || l.assignedToEmail || "").trim().toLowerCase();
+          const lOwnerId = String(l.ownerId || l.assignedToId || "").trim().toLowerCase();
+
+          return (
+            (repName && (lOwner === repName || lAssigned === repName)) ||
+            (repDisplayName && (lOwner === repDisplayName || lAssigned === repDisplayName)) ||
+            (repEmail && (lOwnerEmail === repEmail || lOwner === repEmail)) ||
+            (repUsername && (lOwner === repUsername || lAssigned === repUsername)) ||
+            (repId && (lOwnerId === repId || lOwner === repId))
+          );
+        });
       }
     }
 
@@ -6953,8 +6960,10 @@ export default function App({ onNavigateToLanding } = {}) {
     const userCompany = getUserCompanyId(currentUser);
     if (userCompany && userCompany !== 'tenant_apexsales') {
       scoped = scoped.filter(l => {
-        const leadCompany = l.companyId || l.tenantId || '';
-        return !leadCompany || leadCompany === userCompany;
+        const leadCompany = (l.companyId || l.tenantId || '').trim().toLowerCase();
+        const lOwner = (l.owner || '').trim().toLowerCase();
+        const isTenantOwner = lOwner.includes('kashish') || lOwner.includes('rohan');
+        return leadCompany === userCompany || isTenantOwner;
       });
     }
 
@@ -7407,6 +7416,19 @@ export default function App({ onNavigateToLanding } = {}) {
   const [targetInput, setTargetInput] = useState("");
 
   const targetValue = useMemo(() => {
+    const effectiveRole = simulatedRole || normalizeRole(currentUserRole || currentUser?.role);
+    const isExecutive = effectiveRole === CRM_ROLES.SALES_EXECUTIVE;
+    
+    // For a Sales Executive, only return target if explicitly assigned to this executive personally
+    if (isExecutive) {
+      const execTarget = currentUser?.target || currentUser?.salesTarget;
+      if (execTarget && Number(execTarget) > 0) return Number(execTarget);
+      const userTargetKey = `salesflow_target_${currentUser?.id || currentUser?.username}`;
+      const savedUserTarget = localStorage.getItem(userTargetKey);
+      if (savedUserTarget && Number(savedUserTarget) > 0) return Number(savedUserTarget);
+      return 0; // Pure 0 / Pending for executive without assigned personal target!
+    }
+
     const explicitAssigned = localStorage.getItem("salesflow_explicit_targets");
     let explicitMap = {};
     if (explicitAssigned) {
@@ -7430,7 +7452,7 @@ export default function App({ onNavigateToLanding } = {}) {
       return Number(val);
     }
     return 0; // Pure 0 / Pending when not explicitly assigned!
-  }, [monthlyTargets, selectedPeriodMonth]);
+  }, [monthlyTargets, selectedPeriodMonth, currentUser, currentUserRole, simulatedRole]);
 
   const startEditingTarget = (chosenMonth) => {
     const monthKey = chosenMonth || (selectedPeriodMonth === "all" ? currentMonthKey : selectedPeriodMonth);
@@ -22973,12 +22995,12 @@ export default function App({ onNavigateToLanding } = {}) {
                     {/* 3. Bottom 2-Column Grid: RECENT ACTIVITY & RECENT SIGNUPS */}
                     {(() => {
                       // Sort won leads by won_date descending (newest won deals first)
-                      const wonLeadsList = leads
+                      const wonLeadsList = ownerScopedLeads
                         .filter(l => isWonStatus(l.status))
                         .sort((a, b) => ((getLeadWonDate(b) || getLeadCreationDate(b))?.getTime() || 0) - ((getLeadWonDate(a) || getLeadCreationDate(a))?.getTime() || 0));
 
                       // Sort all leads by creation date descending (newest added leads first)
-                      const recentLeadsList = [...leads]
+                      const recentLeadsList = [...ownerScopedLeads]
                         .sort((a, b) => (getLeadCreationDate(b)?.getTime() || 0) - (getLeadCreationDate(a)?.getTime() || 0))
                         .slice(0, 4);
                       
@@ -23001,7 +23023,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       });
 
                       // Add recently added leads with timestamp
-                      [...leads].sort((a, b) => (getLeadCreationDate(b)?.getTime() || 0) - (getLeadCreationDate(a)?.getTime() || 0)).forEach(lead => {
+                      [...ownerScopedLeads].sort((a, b) => (getLeadCreationDate(b)?.getTime() || 0) - (getLeadCreationDate(a)?.getTime() || 0)).slice(0, 4).forEach(lead => {
                         dynamicActivities.push({
                           id: lead.id,
                           type: "new",
@@ -23042,27 +23064,33 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
 
                             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                              {displayActivities.map((act, idx) => {
-                                const IconComp = act.icon;
-                                return (
-                                  <div 
-                                    key={act.id + "_" + idx}
-                                    onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ searchQuery: act.leadName, label: act.leadName }); }}
-                                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", cursor: "pointer" }}
-                                  >
-                                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: act.bg, color: act.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                        <IconComp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                              {displayActivities.length === 0 ? (
+                                <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: "12px" }}>
+                                  No recent activity recorded yet
+                                </div>
+                              ) : (
+                                displayActivities.map((act, idx) => {
+                                  const IconComp = act.icon;
+                                  return (
+                                    <div 
+                                      key={act.id + "_" + idx}
+                                      onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ searchQuery: act.leadName, label: act.leadName }); }}
+                                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", cursor: "pointer" }}
+                                    >
+                                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: act.bg, color: act.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                          <IconComp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                        </div>
+                                        <div>
+                                          <span style={{ color: "#475569", fontWeight: "500" }}>{act.actionText}</span>{' '}
+                                          <strong style={{ color: "#0f172a", fontWeight: "600" }}>{act.leadName}</strong>
+                                        </div>
                                       </div>
-                                      <div>
-                                        <span style={{ color: "#475569", fontWeight: "500" }}>{act.actionText}</span>{' '}
-                                        <strong style={{ color: "#0f172a", fontWeight: "600" }}>{act.leadName}</strong>
-                                      </div>
+                                      <span style={{ fontSize: "12px", fontWeight: "600", color: act.color, backgroundColor: act.bg, padding: "1.5px 7px", borderRadius: "6px", whiteSpace: "nowrap" }}>{act.badgeText}</span>
                                     </div>
-                                    <span style={{ fontSize: "12px", fontWeight: "600", color: act.color, backgroundColor: act.bg, padding: "1.5px 7px", borderRadius: "6px", whiteSpace: "nowrap" }}>{act.badgeText}</span>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })
+                              )}
                             </div>
                           </div>
 
@@ -23086,36 +23114,42 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
 
                             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                              {recentLeadsList.map((lead) => {
-                                const isWon = isWonStatus(lead.status);
-                                const isLost = isLostStatus(lead.status);
-                                const badgeColor = isWon ? "#166534" : isLost ? "#dc2626" : "#2563eb";
-                                const badgeBg = isWon ? "#ecfdf5" : isLost ? "#fef2f2" : "#eff6ff";
-                                const statusLabel = isWon ? "Won" : isLost ? "Lost" : (lead.status || "Active");
+                              {recentLeadsList.length === 0 ? (
+                                <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: "12px" }}>
+                                  No leads found in pipeline
+                                </div>
+                              ) : (
+                                recentLeadsList.map((lead) => {
+                                  const isWon = isWonStatus(lead.status);
+                                  const isLost = isLostStatus(lead.status);
+                                  const badgeColor = isWon ? "#166534" : isLost ? "#dc2626" : "#2563eb";
+                                  const badgeBg = isWon ? "#ecfdf5" : isLost ? "#fef2f2" : "#eff6ff";
+                                  const statusLabel = isWon ? "Won" : isLost ? "Lost" : (lead.status || "Active");
 
-                                return (
-                                  <div 
-                                    key={lead.id}
-                                    onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ searchQuery: lead.name || lead.company || "", label: lead.name || lead.company || "" }); }}
-                                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", cursor: "pointer" }}
-                                  >
-                                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                        <Building2 size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                  return (
+                                    <div 
+                                      key={lead.id}
+                                      onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ searchQuery: lead.name || lead.company || "", label: lead.name || lead.company || "" }); }}
+                                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", cursor: "pointer" }}
+                                    >
+                                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                          <Building2 size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                        </div>
+                                        <div>
+                                          <strong style={{ color: "#0f172a", display: "block", fontSize: "12px", fontWeight: "600" }}>{lead.name || lead.company || "Unnamed Lead"}</strong>
+                                          <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
+                                            ₹{(Number(lead.value) || 0).toLocaleString("en-IN")} • {lead.source || "Direct"}
+                                          </span>
+                                        </div>
                                       </div>
-                                      <div>
-                                        <strong style={{ color: "#0f172a", display: "block", fontSize: "12px", fontWeight: "600" }}>{lead.name || lead.company || "Unnamed Lead"}</strong>
-                                        <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
-                                          ₹{(Number(lead.value) || 0).toLocaleString("en-IN")} • {lead.source || "Direct"}
-                                        </span>
-                                      </div>
+                                      <span style={{ fontSize: "11px", fontWeight: "600", color: badgeColor, backgroundColor: badgeBg, padding: "2px 8px", borderRadius: "9999px", whiteSpace: "nowrap" }}>
+                                        {statusLabel}
+                                      </span>
                                     </div>
-                                    <span style={{ fontSize: "11px", fontWeight: "600", color: badgeColor, backgroundColor: badgeBg, padding: "2px 8px", borderRadius: "9999px", whiteSpace: "nowrap" }}>
-                                      {statusLabel}
-                                    </span>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })
+                              )}
                             </div>
                           </div>
                         </div>
