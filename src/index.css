@@ -637,12 +637,16 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .brand-name {
   font-family: 'Inter', sans-serif;
-  font-size: 15.5px;
+  font-size: 14.5px;
   font-weight: 800;
   color: #0b192c;
   line-height: 1.15;
   display: block;
   letter-spacing: -0.3px;
+  max-width: 155px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .brand-tag {
