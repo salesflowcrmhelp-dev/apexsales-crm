@@ -2604,6 +2604,76 @@ app.delete('/api/tasks/:id', async (req, res) => {
   });
 });
 
+// --- TARGETS & SPOT INCENTIVES BACKEND STORE ---
+app.get('/api/targets', async (req, res) => {
+  const local = readLocalDB();
+  const defaultBaseline = {
+    "2026-08": 110000,
+    "2026-09": 120000,
+    "2026-10": 130000
+  };
+  const targets = local.targets || {
+    monthly: defaultBaseline,
+    spotIncentives: { "2026-10": { amount: 0, note: "" } },
+    userTargets: { usr_admin: 130000, usr_vikram: 130000, usr_rohan: 130000, "usr_1789033985345_n62j": 130000 }
+  };
+  res.json({
+    success: true,
+    targets,
+    monthlyTargets: targets.monthly || defaultBaseline,
+    spotIncentives: targets.spotIncentives || {},
+    userTargets: targets.userTargets || {}
+  });
+});
+
+app.post('/api/targets', async (req, res) => {
+  const { monthKey, amount, spotAmount, spotNote, monthlyTargets, spotIncentives, userTargets } = req.body;
+  const local = readLocalDB();
+  if (!local.targets) {
+    local.targets = {
+      monthly: {
+        "2026-08": 110000,
+        "2026-09": 120000,
+        "2026-10": 130000
+      },
+      spotIncentives: { "2026-10": { amount: 0, note: "" } },
+      userTargets: {}
+    };
+  }
+  if (monthlyTargets && typeof monthlyTargets === 'object') {
+    local.targets.monthly = { ...local.targets.monthly, ...monthlyTargets };
+  }
+  if (spotIncentives && typeof spotIncentives === 'object') {
+    local.targets.spotIncentives = { ...local.targets.spotIncentives, ...spotIncentives };
+  }
+  if (userTargets && typeof userTargets === 'object') {
+    local.targets.userTargets = { ...local.targets.userTargets, ...userTargets };
+  }
+  if (monthKey) {
+    const num = Number(amount) || 0;
+    if (num > 0) {
+      local.targets.monthly[monthKey] = num;
+    } else {
+      delete local.targets.monthly[monthKey];
+    }
+    if (spotAmount !== undefined) {
+      if (!local.targets.spotIncentives) local.targets.spotIncentives = {};
+      local.targets.spotIncentives[monthKey] = {
+        amount: Number(spotAmount) || 0,
+        note: spotNote || ""
+      };
+    }
+  }
+  writeLocalDB(local);
+  res.json({
+    success: true,
+    targets: local.targets,
+    monthlyTargets: local.targets.monthly,
+    spotIncentives: local.targets.spotIncentives,
+    message: 'Targets successfully saved to database.'
+  });
+});
+
 // SMS Rate Limiter Store
 const smsAttempts = new Map();
 function checkSmsRateLimit(key) {

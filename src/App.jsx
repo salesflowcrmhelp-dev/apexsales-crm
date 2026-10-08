@@ -2423,15 +2423,9 @@ export default function App({ onNavigateToLanding } = {}) {
       if (!savedUser && !savedToken) {
         return []; // Strict isolation: Not logged in = ZERO leads in memory!
       }
-      // Instant reload resilience: restore cached edited leads immediately
-      const cached = localStorage.getItem("salesflow_active_leads");
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-      return [];
+      return INITIAL_LEADS;
     } catch(e) {
-      return [];
+      return INITIAL_LEADS;
     }
   });
   const [selectedCell, setSelectedCell] = useState(null); // { rowIndex, colIndex }
@@ -2903,19 +2897,13 @@ export default function App({ onNavigateToLanding } = {}) {
       if (savedUser) {
         const u = JSON.parse(savedUser);
         if (checkIsSuperAdmin(u)) {
-          const saved = localStorage.getItem("crm_team_members");
-          let list = saved ? JSON.parse(saved) : ["Harsh Goyal"];
-          list = list.map(m => (m === "Admin User" || m === "Admin") ? "Harsh Goyal" : m);
-          if (!list.includes("Harsh Goyal")) {
-            list.unshift("Harsh Goyal");
-          }
-          return list;
+          return ["Harsh Goyal", "Vikram Malhotra", "Kashish", "Rohan Sharma"];
         }
-        return u.name ? [u.name] : [];
+        return u.name ? [u.name] : ["Harsh Goyal"];
       }
-      return [];
+      return ["Harsh Goyal", "Vikram Malhotra", "Kashish", "Rohan Sharma"];
     } catch(e) {
-      return [];
+      return ["Harsh Goyal", "Vikram Malhotra", "Kashish", "Rohan Sharma"];
     }
   });
   // Multi-User & Role-Based Access Control (RBAC) States
@@ -3095,23 +3083,12 @@ export default function App({ onNavigateToLanding } = {}) {
     return sanitized;
   };
 
-  const [allUsersList, setAllUsersList] = useState(() => {
-    try {
-      const saved = localStorage.getItem("crm_all_users_list");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return sanitizeUserList(parsed);
-        }
-      }
-    } catch(e) {}
-    return [
-      { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal", username: "admin", email: "harsh@apexsales.com", role: "company_owner", companyId: "tenant_apexsales", companyName: "Apex Sales", packageTier: "super_admin", permissions: { ...EMPLOYEE_PACKAGES.enterprise.permissions } },
-      { id: "usr_vikram", name: "Vikram Malhotra", displayName: "Vikram Malhotra", username: "vikram", email: "vikram@apexsales.com", role: "team_leader", reportsTo: "Harsh Goyal", companyId: "tenant_apexsales", companyName: "Apex Sales", packageTier: "super_admin", permissions: { ...EMPLOYEE_PACKAGES.growth.permissions } },
-      { id: "usr_1789033985345_n62j", name: "Kashish", displayName: "Kashish", username: "kashish", email: "kashish.accomation@gmail.com", secondaryEmail: "kashish@apexsales.com", pin: "Admin@123", role: "sales_rep", companyId: "tenant_apexsales", companyName: "Apex Sales", packageTier: "starter", permissions: { ...EMPLOYEE_PACKAGES.starter.permissions } },
-      { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", email: "rohan@apexsales.com", role: "sales_executive", reportsTo: "Harsh Goyal", companyId: "tenant_apexsales", companyName: "Apex Sales", packageTier: "starter", permissions: { ...EMPLOYEE_PACKAGES.starter.permissions } }
-    ];
-  });
+  const [allUsersList, setAllUsersList] = useState(() => [
+    { id: "usr_admin", name: "Harsh Goyal", displayName: "Harsh Goyal", username: "admin", email: "harsh@apexsales.com", role: "company_owner", companyId: "tenant_apexsales", companyName: "Apex Sales", packageTier: "super_admin", permissions: { ...EMPLOYEE_PACKAGES.enterprise.permissions } },
+    { id: "usr_vikram", name: "Vikram Malhotra", displayName: "Vikram Malhotra", username: "vikram", email: "vikram@apexsales.com", role: "team_leader", reportsTo: "Harsh Goyal", companyId: "tenant_apexsales", companyName: "Apex Sales", packageTier: "super_admin", permissions: { ...EMPLOYEE_PACKAGES.growth.permissions } },
+    { id: "usr_1789033985345_n62j", name: "Kashish", displayName: "Kashish", username: "kashish", email: "kashish.accomation@gmail.com", secondaryEmail: "kashish@apexsales.com", pin: "Admin@123", role: "sales_rep", companyId: "tenant_apexsales", companyName: "Apex Sales", packageTier: "starter", permissions: { ...EMPLOYEE_PACKAGES.starter.permissions } },
+    { id: "usr_rohan", name: "Rohan Sharma", displayName: "Rohan Sharma", username: "rohan", email: "rohan@apexsales.com", role: "sales_executive", reportsTo: "Harsh Goyal", companyId: "tenant_apexsales", companyName: "Apex Sales", packageTier: "starter", permissions: { ...EMPLOYEE_PACKAGES.starter.permissions } }
+  ]);
   const [currentLoggedInUser, setCurrentLoggedInUser] = useState(() => currentUser?.name || "");
   const [teamTab, setTeamTab] = useState(() => {
     try {
@@ -3151,28 +3128,12 @@ export default function App({ onNavigateToLanding } = {}) {
   });
 
   // Dynamic Package State (Client Deal Packages & Employee Subscription Tiers)
-  const [clientDealPackages, setClientDealPackages] = useState(() => {
-    try {
-      const saved = localStorage.getItem("crm_client_deal_packages");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch(e) {}
-    return CLIENT_DEAL_PACKAGES;
-  });
+  const [clientDealPackages, setClientDealPackages] = useState(() => CLIENT_DEAL_PACKAGES);
 
   // 🏢 Company Subscription Plans State (Organization-level SaaS Subscription)
-  const [companyPlansMap, setCompanyPlansMap] = useState(() => {
-    try {
-      const saved = localStorage.getItem("crm_company_plans_map");
-      if (saved) return JSON.parse(saved);
-    } catch(e) {}
-    return {
-      "tenant_apexsales": "super_admin",
-      "tenant_kashish": "growth"
-    };
-  });
+  const [companyPlansMap, setCompanyPlansMap] = useState(() => ({
+    "tenant_apexsales": "super_admin"
+  }));
 
   const activeCompanyId = getUserCompanyId(currentUser);
   const activeCompanyPlanKey = (companyPlansMap && companyPlansMap[activeCompanyId]) || 
@@ -3198,14 +3159,8 @@ export default function App({ onNavigateToLanding } = {}) {
       return;
     }
 
-    // 2. Commit state & cache
-    setCompanyPlansMap(prev => {
-      const updated = { ...prev, [targetComp]: newPlanId };
-      try {
-        localStorage.setItem("crm_company_plans_map", JSON.stringify(updated));
-      } catch(e) {}
-      return updated;
-    });
+    // 2. Commit state
+    setCompanyPlansMap(prev => ({ ...prev, [targetComp]: newPlanId }));
     showToast(`Company Plan updated to ${planDef.name || newPlanId} 🚀`, "success");
   };
   const handleUpgradeCompanyPlan = (newPlanId, companyId) => handleUpdateCompanyPlan(companyId, newPlanId);
@@ -3216,11 +3171,11 @@ export default function App({ onNavigateToLanding } = {}) {
   // 📜 B2B Client Licensing & Tax Invoicing System
   const DEFAULT_INITIAL_LICENSES = [
     {
-      id: "lic_kashish_enterprises",
+      id: "lic_apexsales_master",
       licenseNumber: "2026-89421",
       invoiceNumber: "INV-2026-001",
-      companyId: "tenant_kashish",
-      companyName: "Kashish Enterprises",
+      companyId: "tenant_apexsales",
+      companyName: "Apex Sales",
       clientName: "Harsh Goyal",
       clientEmail: "harsh.accomation@gmail.com",
       clientPhone: "7240705579",
@@ -3248,20 +3203,11 @@ export default function App({ onNavigateToLanding } = {}) {
       validFrom: "2026-09-01",
       validUntil: "2026-10-01",
       status: "active",
-      notes: "Verified client subscription license for Kashish Enterprises"
+      notes: "Verified client subscription license for Apex Sales"
     }
   ];
 
-  const [clientLicenses, setClientLicenses] = useState(() => {
-    try {
-      const saved = localStorage.getItem("crm_client_licenses");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch(e) {}
-    return DEFAULT_INITIAL_LICENSES;
-  });
+  const [clientLicenses, setClientLicenses] = useState(() => DEFAULT_INITIAL_LICENSES);
 
   const [showLicenseModal, setShowLicenseModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
@@ -3281,14 +3227,12 @@ export default function App({ onNavigateToLanding } = {}) {
       const pkgsRes = await fetchDealPackagesFromSupabase();
       if (pkgsRes.success && Array.isArray(pkgsRes.data) && pkgsRes.data.length > 0) {
         setClientDealPackages(pkgsRes.data);
-        try { localStorage.setItem("crm_client_deal_packages", JSON.stringify(pkgsRes.data)); } catch(e) {}
       }
 
       // 3. Fetch Client Licenses
       const licsRes = await fetchClientLicensesFromSupabase();
       if (licsRes.success && Array.isArray(licsRes.data) && licsRes.data.length > 0) {
         setClientLicenses(licsRes.data);
-        try { localStorage.setItem("crm_client_licenses", JSON.stringify(licsRes.data)); } catch(e) {}
       }
 
       // 4. Fetch System Settings
@@ -3298,23 +3242,13 @@ export default function App({ onNavigateToLanding } = {}) {
       }
 
       // 5. Automatic Safe Idempotent Migration
-      const localPlans = (() => {
-        try { return JSON.parse(localStorage.getItem("crm_company_plans_map") || "{}"); } catch(e) { return {}; }
-      })();
-      const localPkgs = (() => {
-        try { return JSON.parse(localStorage.getItem("crm_client_deal_packages") || "[]"); } catch(e) { return []; }
-      })();
-      const localLics = (() => {
-        try { return JSON.parse(localStorage.getItem("crm_client_licenses") || "[]"); } catch(e) { return []; }
-      })();
-
       if ((!plansRes.data || plansRes.data.length === 0) ||
           (!pkgsRes.data || pkgsRes.data.length === 0) ||
           (!licsRes.data || licsRes.data.length === 0)) {
         migrateSuperAdminDataToSupabase({
-          localCompanyPlansMap: localPlans,
-          localDealPackages: localPkgs.length > 0 ? localPkgs : CLIENT_DEAL_PACKAGES,
-          localLicenses: localLics.length > 0 ? localLics : DEFAULT_INITIAL_LICENSES
+          localCompanyPlansMap: { "tenant_apexsales": "super_admin" },
+          localDealPackages: CLIENT_DEAL_PACKAGES,
+          localLicenses: DEFAULT_INITIAL_LICENSES
         });
       }
     } catch(err) {
@@ -3505,17 +3439,11 @@ export default function App({ onNavigateToLanding } = {}) {
       // 2. Update Local State
       setClientLicenses(prev => {
         const filtered = prev.filter(l => l.id !== licenseRecord.id && l.companyId !== licenseRecord.companyId);
-        const updated = [licenseRecord, ...filtered];
-        try { localStorage.setItem("crm_client_licenses", JSON.stringify(updated)); } catch(e) {}
-        return updated;
+        return [licenseRecord, ...filtered];
       });
 
       // Update Company Plans Map
-      setCompanyPlansMap(prev => {
-        const updated = { ...prev, [companyId]: planKey };
-        try { localStorage.setItem("crm_company_plans_map", JSON.stringify(updated)); } catch(e) {}
-        return updated;
-      });
+      setCompanyPlansMap(prev => ({ ...prev, [companyId]: planKey }));
 
       setShowLicenseModal(false);
       setSelectedLicenseForInvoice(licenseRecord);
@@ -3541,11 +3469,7 @@ export default function App({ onNavigateToLanding } = {}) {
       return;
     }
 
-    setClientLicenses(prev => {
-      const updated = prev.filter(l => l.id !== licId && l.licenseNumber !== licId);
-      try { localStorage.setItem("crm_client_licenses", JSON.stringify(updated)); } catch(e) {}
-      return updated;
-    });
+    setClientLicenses(prev => prev.filter(l => l.id !== licId && l.licenseNumber !== licId));
     showToast("License revoked successfully", "info");
   };
 
@@ -3561,22 +3485,11 @@ export default function App({ onNavigateToLanding } = {}) {
         const p = new URLSearchParams(window.location.search).get("org") || new URLSearchParams(window.location.search).get("company");
         if (p) return p;
       }
-      const saved = localStorage.getItem("crm_selected_org_filter");
-      if (saved) return saved;
     } catch(e) {}
     return "all";
   });
 
-  const [employeePackagesList, setEmployeePackagesList] = useState(() => {
-    try {
-      const saved = localStorage.getItem("crm_employee_packages");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === "object") return { ...EMPLOYEE_PACKAGES, ...parsed };
-      }
-    } catch(e) {}
-    return EMPLOYEE_PACKAGES;
-  });
+  const [employeePackagesList, setEmployeePackagesList] = useState(() => EMPLOYEE_PACKAGES);
 
   // Package Rate Editor State
   const [showEditPackageModal, setShowEditPackageModal] = useState(false);
@@ -5090,9 +5003,6 @@ export default function App({ onNavigateToLanding } = {}) {
           setAllUsersList(sanitizedSupa);
           const names = sanitizedSupa.map(u => u.name);
           setTeamMembers(names);
-          try {
-            localStorage.setItem("crm_team_members", JSON.stringify(names));
-          } catch(e) {}
           if (currentUser) {
             const me = sanitizedSupa.find(u => 
               (currentUser.id && u.id === currentUser.id) || 
@@ -5126,9 +5036,6 @@ export default function App({ onNavigateToLanding } = {}) {
           setAllUsersList(sanitizedApi);
           const names = sanitizedApi.map(u => u.name);
           setTeamMembers(names);
-          try {
-            localStorage.setItem("crm_team_members", JSON.stringify(names));
-          } catch(e) {}
 
           // Synchronize currentUser role, packageTier & permissions with latest database from server
           if (currentUser) {
@@ -5191,51 +5098,10 @@ export default function App({ onNavigateToLanding } = {}) {
       const token = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const mergeWithLocalCache = (incomingLeads) => {
-        try {
-          const cachedStr = localStorage.getItem("salesflow_active_leads");
-          if (!cachedStr) return incomingLeads;
-          const cachedList = JSON.parse(cachedStr);
-          if (!Array.isArray(cachedList) || cachedList.length === 0) return incomingLeads;
-
-          const incomingIds = new Set(incomingLeads.map(l => String(l.id)));
-          const cachedMap = new Map();
-          cachedList.forEach(l => {
-            if (l && l.id) cachedMap.set(String(l.id), l);
-          });
-
-          const merged = incomingLeads.map(lead => {
-            const cached = cachedMap.get(String(lead.id));
-            if (!cached) return lead;
-
-            const cachedTime = new Date(cached.stageUpdatedAt || cached.lastModified || cached.lastModifiedAt || 0).getTime();
-            const incomingTime = new Date(lead.stageUpdatedAt || lead.lastModified || lead.lastModifiedAt || 0).getTime();
-
-            if (cachedTime > incomingTime) {
-              return { ...lead, ...cached };
-            }
-            if (isWonStatus(cached.status) && !isWonStatus(lead.status)) {
-              return { ...lead, ...cached };
-            }
-            return lead;
-          });
-
-          cachedList.forEach(l => {
-            if (l && l.id && !incomingIds.has(String(l.id))) {
-              merged.push(l);
-            }
-          });
-
-          return merged;
-        } catch(e) {
-          return incomingLeads;
-        }
-      };
-
       // 🚀 1. FAST-PATH: Fetch from Supabase PostgreSQL Cloud Database (Zero Cold Start)
       try {
         const supaLeads = await fetchLeadsFromSupabase();
-        if (Array.isArray(supaLeads)) {
+        if (Array.isArray(supaLeads) && supaLeads.length > 0) {
           let sanitized = supaLeads.map(sanitizeLeadObject);
           const canViewAll = isSuper || activeUser.role === "admin";
           if (!canViewAll) {
@@ -5244,11 +5110,7 @@ export default function App({ onNavigateToLanding } = {}) {
               sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
             }
           }
-          sanitized = mergeWithLocalCache(sanitized);
           setLeads(sanitized);
-          try {
-            localStorage.setItem("salesflow_active_leads", JSON.stringify(sanitized));
-          } catch(e) {}
           setHasLoadedFromCloud(true);
           return sanitized;
         }
@@ -5268,11 +5130,7 @@ export default function App({ onNavigateToLanding } = {}) {
               sanitized = sanitized.filter(l => (l.owner || "").trim().toLowerCase() === userNameLower);
             }
           }
-          sanitized = mergeWithLocalCache(sanitized);
           setLeads(sanitized);
-          try {
-            localStorage.setItem("salesflow_active_leads", JSON.stringify(sanitized));
-          } catch(e) {}
           return sanitized;
         }
       }
@@ -5314,28 +5172,11 @@ export default function App({ onNavigateToLanding } = {}) {
         const data = await res.json();
         if (data && data.success && Array.isArray(data.tasks)) {
           setTasks(data.tasks);
-          try {
-            localStorage.setItem(`salesflow_tasks_${activeUser.id || activeUser.email}`, JSON.stringify(data.tasks));
-          } catch(e) {}
           return data.tasks;
         }
       }
     } catch(err) {
       console.warn("Failed to load tasks from backend:", err);
-      // Fallback to user-isolated storage
-      const u = userToUse || currentUser;
-      if (u) {
-        const cached = localStorage.getItem(`salesflow_tasks_${u.id || u.email}`);
-        if (cached) {
-          try {
-            const parsed = JSON.parse(cached);
-            if (Array.isArray(parsed)) {
-              setTasks(parsed);
-              return parsed;
-            }
-          } catch(e) {}
-        }
-      }
     }
     return [];
   };
@@ -5958,13 +5799,24 @@ export default function App({ onNavigateToLanding } = {}) {
       console.warn("Supabase signOut error:", e);
     }
 
-    // 2. Clear legacy fallback session data
+    // 2. Clear legacy fallback session data & purge any stale localStorage keys
     try {
       sessionStorage.removeItem("crm_auth_user");
       sessionStorage.removeItem("crm_auth_token");
       localStorage.removeItem("crm_auth_user");
       localStorage.removeItem("crm_auth_token");
       localStorage.removeItem("salesflow_standalone_tasks");
+      localStorage.removeItem("salesflow_active_leads");
+      localStorage.removeItem("crm_all_users_list");
+      localStorage.removeItem("crm_team_members");
+      localStorage.removeItem("salesflow_monthly_targets");
+      localStorage.removeItem("salesflow_explicit_targets");
+      localStorage.removeItem("salesflow_spot_incentives");
+      localStorage.removeItem("crm_client_licenses");
+      localStorage.removeItem("crm_client_deal_packages");
+      localStorage.removeItem("crm_company_plans_map");
+      localStorage.removeItem("crm_employee_packages");
+      localStorage.removeItem("crm_selected_org_filter");
     } catch(e) {}
     showToast("Logged out successfully.", "info");
   };
@@ -6147,7 +5999,6 @@ export default function App({ onNavigateToLanding } = {}) {
 
         // 2. Commit state
         setClientDealPackages(updatedList);
-        try { localStorage.setItem("crm_client_deal_packages", JSON.stringify(updatedList)); } catch(e) {}
         showToast(` Client package "${updatedPkg.name}" rate updated to ₹${(Number(updatedPkg.price) || 0).toLocaleString("en-IN")}!`, "success");
 
         try {
@@ -6170,7 +6021,6 @@ export default function App({ onNavigateToLanding } = {}) {
           }
         };
         setEmployeePackagesList(updatedObj);
-        try { localStorage.setItem("crm_employee_packages", JSON.stringify(updatedObj)); } catch(e) {}
         showToast(` Employee tier "${updatedPkg.name}" rate & quota updated!`, "success");
 
         try {
@@ -6196,7 +6046,6 @@ export default function App({ onNavigateToLanding } = {}) {
         await upsertDealPackageToSupabase(defaultPkg);
         const updatedList = clientDealPackages.map(p => p.id === pkgId ? defaultPkg : p);
         setClientDealPackages(updatedList);
-        try { localStorage.setItem("crm_client_deal_packages", JSON.stringify(updatedList)); } catch(e) {}
         showToast(`Package reset to default rate (₹${defaultPkg.price})`, "info");
         setShowEditPackageModal(false);
       }
@@ -6205,7 +6054,6 @@ export default function App({ onNavigateToLanding } = {}) {
       if (defaultPkg) {
         const updatedObj = { ...employeePackagesList, [pkgId]: defaultPkg };
         setEmployeePackagesList(updatedObj);
-        try { localStorage.setItem("crm_employee_packages", JSON.stringify(updatedObj)); } catch(e) {}
         showToast(`Tier reset to default (${defaultPkg.price})`, "info");
         setShowEditPackageModal(false);
       }
@@ -6244,12 +6092,6 @@ export default function App({ onNavigateToLanding } = {}) {
       };
       
       setAllUsersList(prev => prev.map(u => u.id === userId ? updatedUser : u));
-      try {
-        const currentCached = JSON.parse(localStorage.getItem("crm_all_users_list") || "[]");
-        localStorage.setItem("crm_all_users_list", JSON.stringify(
-          currentCached.map(u => u.id === userId ? updatedUser : u)
-        ));
-      } catch(e) {}
 
       await upsertUserToSupabase(updatedUser);
       showToast(`Updated role of "${targetUser.name}" to ${getRoleBadgeInfo(targetRole).label} 🎯`, "success");
@@ -6452,11 +6294,6 @@ export default function App({ onNavigateToLanding } = {}) {
 
   const saveTasksToStorage = (updatedTasks) => {
     setTasks(updatedTasks);
-    if (currentUser) {
-      try {
-        localStorage.setItem(`salesflow_tasks_${currentUser.id || currentUser.email}`, JSON.stringify(updatedTasks));
-      } catch(e) {}
-    }
   };
 
   const handleAddTask = async (e) => {
@@ -6940,8 +6777,16 @@ export default function App({ onNavigateToLanding } = {}) {
 
     if (filterOwner) {
       if (filterOwner === "__my_leads__") {
-        const myName = (currentLoggedInUser || currentUser?.name || "").trim().toLowerCase();
-        scoped = scoped.filter(l => (l.owner || "").trim().toLowerCase() === myName);
+        const isSimExec = simulatedRole === CRM_ROLES.SALES_EXECUTIVE;
+        const isSimLead = simulatedRole === CRM_ROLES.TEAM_LEADER;
+        if (isSimExec) {
+          scoped = scoped.filter(l => (l.owner || "").trim().toLowerCase().includes("kashish"));
+        } else if (isSimLead) {
+          scoped = scoped.filter(l => (l.owner || "").trim().toLowerCase().includes("vikram"));
+        } else {
+          const myName = (currentLoggedInUser || currentUser?.name || "").trim().toLowerCase();
+          scoped = scoped.filter(l => (l.owner || "").trim().toLowerCase() === myName);
+        }
       } else if (filterOwner === "__unassigned__") {
         scoped = scoped.filter(l => !l.owner || l.owner === "Unassigned" || l.owner === "none");
       } else if (filterOwner !== "") {
@@ -7343,34 +7188,39 @@ export default function App({ onNavigateToLanding } = {}) {
     "2026-10": 130000
   };
 
-  const [monthlyTargets, setMonthlyTargets] = useState(() => {
-    try {
-      const saved = localStorage.getItem("salesflow_monthly_targets");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
-          return { ...DEFAULT_BASELINE_TARGETS, ...parsed };
+  const [monthlyTargets, setMonthlyTargets] = useState(DEFAULT_BASELINE_TARGETS);
+  const [spotIncentives, setSpotIncentives] = useState({});
+
+  // 🎯 Fetch Targets from Backend Database (Authoritative Source of Truth)
+  useEffect(() => {
+    let isMounted = true;
+    const fetchTargets = async () => {
+      try {
+        const res = await fetch("/api/targets");
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success && isMounted) {
+            if (data.monthlyTargets && typeof data.monthlyTargets === "object" && Object.keys(data.monthlyTargets).length > 0) {
+              setMonthlyTargets(prev => ({ ...DEFAULT_BASELINE_TARGETS, ...data.monthlyTargets }));
+            }
+            if (data.spotIncentives && typeof data.spotIncentives === "object") {
+              setSpotIncentives(data.spotIncentives);
+            }
+          }
         }
+      } catch (err) {
+        console.warn("Backend targets fetch deferred:", err);
       }
-    } catch (e) {}
-    try {
-      localStorage.setItem("salesflow_monthly_targets", JSON.stringify(DEFAULT_BASELINE_TARGETS));
-    } catch(e) {}
-    return DEFAULT_BASELINE_TARGETS;
-  });
+    };
+    fetchTargets();
+    return () => { isMounted = false; };
+  }, []);
 
   const [selectedPeriodMonth, setSelectedPeriodMonth] = useState(() => getCurrentMonthKey());
   const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [targetModalMonth, setTargetModalMonth] = useState(() => getCurrentMonthKey());
   const [targetModalInput, setTargetModalInput] = useState("");
-  const [spotIncentives, setSpotIncentives] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("salesflow_spot_incentives")) || {};
-    } catch(e) {
-      return {};
-    }
-  });
   const [targetModalSpotInput, setTargetModalSpotInput] = useState("0");
   const [targetModalSpotNote, setTargetModalSpotNote] = useState("");
   const [isEditingTarget, setIsEditingTarget] = useState(false);
@@ -7384,9 +7234,6 @@ export default function App({ onNavigateToLanding } = {}) {
     if (isExecutive) {
       const execTarget = currentUser?.target || currentUser?.salesTarget;
       if (execTarget && Number(execTarget) > 0) return Number(execTarget);
-      const userTargetKey = `salesflow_target_${currentUser?.id || currentUser?.username}`;
-      const savedUserTarget = localStorage.getItem(userTargetKey);
-      if (savedUserTarget && Number(savedUserTarget) > 0) return Number(savedUserTarget);
       // Fallback: use monthly quota (e.g. ₹1,30,000)
     }
 
@@ -7412,7 +7259,7 @@ export default function App({ onNavigateToLanding } = {}) {
     setShowTargetModal(true);
   };
 
-  const saveMonthlyTarget = (monthKey, amount, spotAmount = targetModalSpotInput, spotNote = targetModalSpotNote) => {
+  const saveMonthlyTarget = async (monthKey, amount, spotAmount = targetModalSpotInput, spotNote = targetModalSpotNote) => {
     const numericTarget = Number(amount) || 0;
     const numericSpot = Number(spotAmount) || 0;
 
@@ -7424,16 +7271,25 @@ export default function App({ onNavigateToLanding } = {}) {
     }
 
     setMonthlyTargets(updatedTargets);
-    try {
-      localStorage.setItem("salesflow_monthly_targets", JSON.stringify(updatedTargets));
-      localStorage.setItem("salesflow_explicit_targets", JSON.stringify(updatedTargets));
-    } catch(e) {}
 
     const updatedSpots = { ...spotIncentives, [monthKey]: { amount: numericSpot, note: spotNote || "" } };
     setSpotIncentives(updatedSpots);
+
+    // 🚀 Authoritative Backend Persistence to /api/targets
     try {
-      localStorage.setItem("salesflow_spot_incentives", JSON.stringify(updatedSpots));
-    } catch(e) {}
+      await fetch("/api/targets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          monthKey,
+          amount: numericTarget,
+          spotAmount: numericSpot,
+          spotNote: spotNote || ""
+        })
+      });
+    } catch(err) {
+      console.warn("Backend target save error:", err);
+    }
 
     if (numericTarget > 0) {
       showToast(`Target ₹${numericTarget.toLocaleString("en-IN")} saved for ${formatMonthLabel(monthKey)}!`, "success");
@@ -8557,9 +8413,6 @@ export default function App({ onNavigateToLanding } = {}) {
   const saveLeadsToStorage = (updatedLeads) => {
     const cleaned = Array.isArray(updatedLeads) ? updatedLeads.map(sanitizeLeadObject) : [];
     setLeads(cleaned);
-    try {
-      localStorage.setItem("salesflow_active_leads", JSON.stringify(cleaned));
-    } catch(e) {}
     // Directly sync updates to Supabase PostgreSQL & Central Backend
     syncLeadsToBackend(cleaned);
   };

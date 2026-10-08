@@ -3125,5 +3125,24 @@
       "notes": "demo done 1 oct ko connect krna hai"
     }
   ],
-  "tasks": []
+  "tasks": [],
+  "targets": {
+    "monthly": {
+      "2026-08": 110000,
+      "2026-09": 120000,
+      "2026-10": 130000
+    },
+    "spotIncentives": {
+      "2026-10": {
+        "amount": 0,
+        "note": ""
+      }
+    },
+    "userTargets": {
+      "usr_admin": 130000,
+      "usr_vikram": 130000,
+      "usr_rohan": 130000,
+      "usr_1789033985345_n62j": 130000
+    }
+  }
 }
