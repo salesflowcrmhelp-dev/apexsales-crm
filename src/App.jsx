@@ -1866,31 +1866,25 @@ export function checkIsSuperAdmin(u) {
 // 🏢 Multi-Tenant Company Helpers
 export function getUserCompanyId(user) {
   if (!user) return 'tenant_apexsales';
-  if (user.companyId) return String(user.companyId).trim().toLowerCase();
-  if (user.company_id) return String(user.company_id).trim().toLowerCase();
-  if (user.tenantId) return String(user.tenantId).trim().toLowerCase();
-  const nameLower = (user.name || '').toLowerCase();
-  const userLower = (user.username || '').toLowerCase();
-  const idLower = String(user.id || '').toLowerCase();
-  if (nameLower.includes('kashish') || nameLower.includes('rohan') || userLower === 'kashish' || userLower === 'rohan' || idLower.includes('kashish') || idLower.includes('rohan') || idLower === 'usr_1789033985345_n62j') {
-    return 'tenant_kashish';
-  }
-  if (user.organization && user.organization.trim()) {
+  if (user.companyId && user.companyId !== 'tenant_kashish') return String(user.companyId).trim().toLowerCase();
+  if (user.company_id && user.company_id !== 'tenant_kashish') return String(user.company_id).trim().toLowerCase();
+  if (user.tenantId && user.tenantId !== 'tenant_kashish') return String(user.tenantId).trim().toLowerCase();
+  if (user.organization && user.organization.trim() && !user.organization.toLowerCase().includes('kashish')) {
     return 'tenant_' + user.organization.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
   }
-  if (user.company && user.company.trim()) {
+  if (user.company && user.company.trim() && !user.company.toLowerCase().includes('kashish')) {
     return 'tenant_' + user.company.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
   }
   return 'tenant_apexsales';
 }
 
 export function getUserCompanyName(user) {
-  if (!user) return 'ApexSales Global HQ';
-  if (user.companyName) return user.companyName;
-  if (user.company_name) return user.company_name;
-  const compId = getUserCompanyId(user);
-  if (compId === 'tenant_kashish') return 'Kashish Enterprises';
-  return user.organization || user.company || 'ApexSales Global HQ';
+  if (!user) return 'ApexSales Global';
+  if (user.companyName && !user.companyName.toLowerCase().includes('kashish')) return user.companyName;
+  if (user.company_name && !user.company_name.toLowerCase().includes('kashish')) return user.company_name;
+  if (user.organization && !user.organization.toLowerCase().includes('kashish')) return user.organization;
+  if (user.company && !user.company.toLowerCase().includes('kashish')) return user.company;
+  return 'ApexSales Global';
 }
 
 export const isCompanyOwner = (user) => {
@@ -2956,6 +2950,8 @@ export default function App({ onNavigateToLanding } = {}) {
         if (isKashish) {
           u.role = "sales_rep";
           u.packageTier = "starter";
+          u.companyId = "tenant_apexsales";
+          u.companyName = "ApexSales Global";
           if (u.permissions) {
             u.permissions.canViewAllLeads = false;
             u.permissions.canDeleteLeads = false;
@@ -3019,30 +3015,21 @@ export default function App({ onNavigateToLanding } = {}) {
     let role = normalizeRole(u.role);
     let reportsTo = u.reportsTo || "";
 
-    if (nameLower.includes("kashish") || username === "kashish" || idLower.includes("kashish") || idLower === "usr_1789033985345_n62j") {
-      companyId = "tenant_kashish";
-      companyName = "Kashish Enterprises";
-      // Respect configured role from DB / SuperAdmin:
-      role = normalizeRole(u.role || CRM_ROLES.SALES_EXECUTIVE);
-      reportsTo = u.reportsTo || "";
-    } else if (nameLower.includes("rohan") || username === "rohan" || idLower.includes("rohan")) {
-      companyId = "tenant_kashish";
-      companyName = "Kashish Enterprises";
-      role = normalizeRole(u.role || CRM_ROLES.SALES_EXECUTIVE);
-      reportsTo = u.reportsTo || "Harsh Goyal";
-    } else if (nameLower.includes("harsh") || username === "admin" || idLower === "usr_admin") {
+    if (nameLower.includes("harsh") || username === "admin" || idLower === "usr_admin") {
       companyId = "tenant_apexsales";
-      companyName = "ApexSales Global HQ";
+      companyName = "ApexSales Global";
       role = normalizeRole(u.role || CRM_ROLES.COMPANY_OWNER);
       reportsTo = "";
     } else if (nameLower.includes("vikram") || username === "vikram" || idLower === "usr_vikram") {
       companyId = "tenant_apexsales";
-      companyName = "ApexSales Global HQ";
+      companyName = "ApexSales Global";
       role = normalizeRole(u.role || CRM_ROLES.TEAM_LEADER);
       reportsTo = "Harsh Goyal";
     } else {
-      if (!companyId) companyId = "tenant_apexsales";
-      if (!companyName) companyName = "ApexSales Global HQ";
+      companyId = "tenant_apexsales";
+      companyName = "ApexSales Global";
+      role = normalizeRole(u.role || CRM_ROLES.SALES_EXECUTIVE);
+      reportsTo = u.reportsTo || "Harsh Goyal";
     }
 
     const isOwnerRole = role === CRM_ROLES.COMPANY_OWNER;
@@ -3053,9 +3040,9 @@ export default function App({ onNavigateToLanding } = {}) {
       displayName: u.displayName || displayName,
       role,
       reportsTo,
-      companyId,
-      companyName,
-      packageTier: u.packageTier ? u.packageTier : (isOwnerRole ? (companyId === "tenant_kashish" ? "growth" : "super_admin") : "starter")
+      companyId: "tenant_apexsales",
+      companyName: "ApexSales Global",
+      packageTier: u.packageTier ? u.packageTier : (isOwnerRole ? "super_admin" : "starter")
     };
   };
 
@@ -3072,8 +3059,8 @@ export default function App({ onNavigateToLanding } = {}) {
         pin: "Admin@123",
         password: "Admin@123",
         role: CRM_ROLES.SALES_EXECUTIVE,
-        companyId: "tenant_kashish",
-        companyName: "Kashish Enterprises",
+        companyId: "tenant_apexsales",
+        companyName: "ApexSales Global",
         packageTier: "starter",
         email: "kashish.accomation@gmail.com",
         phone: "7240705579",
@@ -3091,10 +3078,10 @@ export default function App({ onNavigateToLanding } = {}) {
         password: "Rohan@2026",
         role: CRM_ROLES.SALES_EXECUTIVE,
         reportsTo: "Harsh Goyal",
-        companyId: "tenant_kashish",
-        companyName: "Kashish Enterprises",
+        companyId: "tenant_apexsales",
+        companyName: "ApexSales Global",
         packageTier: "starter",
-        email: "rohan@kashishenterprises.com",
+        email: "rohan@apexsales.com",
         phone: "9819922334",
         active: true
       });
@@ -10888,7 +10875,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 {getUserCompanyName(currentUser)}
               </span>
               <span className="brand-tag" style={{ fontSize: "12px", color: "#475569", fontWeight: "700", whiteSpace: "nowrap", letterSpacing: "0.2px" }}>
-                {currentUser?.companyName ? "Company Workspace" : "Revenue Intelligence"}
+                Revenue Intelligence
               </span>
             </div>
           </div>
