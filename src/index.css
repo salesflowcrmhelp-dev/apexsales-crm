@@ -193,13 +193,13 @@
 
 /* Standardized Card Navigation Action Button (Issue 13 & 14) */
 .btn-card-action {
-  height: 28px;
-  min-width: 58px;
+  height: 32px;
+  min-width: 72px;
   padding: 0 12px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: #2563eb;
-  background-color: #ffffff;
+  background-color: #eff6ff;
   border: 1px solid #bfdbfe;
   border-radius: 6px;
   display: inline-flex;
@@ -212,12 +212,12 @@
   font-family: inherit;
 }
 .btn-card-action:hover {
-  background-color: #eff6ff;
+  background-color: #dbeafe;
   border-color: #93c5fd;
 }
 .btn-card-action.btn-card-action-danger {
-  color: #ef4444;
-  background-color: #ffffff;
+  color: #dc2626;
+  background-color: #fef2f2;
   border-color: #fecaca;
 }
 .btn-card-action.btn-card-action-danger:hover {
@@ -276,11 +276,11 @@
 }
 
 .dashboard-tab-item[aria-selected="true"] {
-  background-color: #2563eb;
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
-  border: 1px solid #2563eb;
+  background-color: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #cbd5e1;
 }
 
 .dashboard-tab-item:hover:not([aria-selected="true"]) {
@@ -702,18 +702,9 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .sidebar-nav-item.active {
-  background-color: #2563eb;
-  color: #ffffff;
+  background-color: #eff6ff;
+  color: #2563eb;
   font-weight: 600;
-}
-
-.sidebar-nav-item.active:hover {
-  background-color: #1d4ed8;
-  color: #ffffff;
-}
-
-.sidebar-nav-item.active .nav-item-icon {
-  color: #ffffff !important;
 }
 
 .sidebar-nav-item .nav-item-icon {
