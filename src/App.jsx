@@ -35,6 +35,10 @@ import {
   verifyCurrentSessionIsSuperAdmin
 } from "./lib/supabaseService";
 import { supabase } from "./lib/supabase";
+import { RecordPaymentModal, FullPaymentRequiredModal } from "./components/PaymentModal";
+import { MarkLostModal, MarkJunkModal } from "./components/LostJunkModal";
+import { DuplicateLeadModal } from "./components/DuplicateLeadModal";
+import { CustomersView } from "./components/CustomersView";
 
 // Dropdown options
 const STATUS_OPTIONS = ["New", "Contacted", "Qualified", "Demo Booked", "Proposal Sent", "Demo Done", "Payment Follow Up", "Negotiation", "Renewal", "Renewal Won", "Won", "Lost", "Junk"];
@@ -3620,6 +3624,22 @@ export default function App({ onNavigateToLanding } = {}) {
   const [selectedLeadForDetails, setSelectedLeadForDetails] = useState(null); // lead object
   const [newNoteText, setNewNoteText] = useState("");
 
+  // Payments & Full Payment Won Guard States (Blueprint Section 21 & 35)
+  const [paymentModalLead, setPaymentModalLead] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [wonBlockedLead, setWonBlockedLead] = useState(null);
+  const [showWonBlockedModal, setShowWonBlockedModal] = useState(false);
+
+  // Lost & Junk Mandatory Reason States (Blueprint Section 23 & 24)
+  const [lostModalLead, setLostModalLead] = useState(null);
+  const [showLostModal, setShowLostModal] = useState(false);
+  const [junkModalLead, setJunkModalLead] = useState(null);
+  const [showJunkModal, setShowJunkModal] = useState(false);
+
+  // Duplicate Lead Prevention States (Blueprint Section 14 & 27)
+  const [duplicateModalLead, setDuplicateModalLead] = useState(null);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+
   // Start My Day Modal state
   const [showStartMyDay, setShowStartMyDay] = useState(false);
 
@@ -4234,6 +4254,35 @@ export default function App({ onNavigateToLanding } = {}) {
     const isNowLost = isLostStatus(newStatus);
     const amt = Number(stageModalAmount) || 0;
 
+    // Strict Won Rule: Full Payment Required (Blueprint §21 & §35)
+    if (isNowWon) {
+      const dealVal = amt || Number(lead.value) || 0;
+      const paidVal = Number(lead.paidAmount) || 0;
+      if (dealVal <= 0 || paidVal < dealVal) {
+        setStageModalError(`Full payment is required before this lead can be marked Won. Current pending balance: ₹${Math.max(0, dealVal - paidVal).toLocaleString('en-IN')}.`);
+        setStageModalData(null);
+        setWonBlockedLead(lead);
+        setShowWonBlockedModal(true);
+        return;
+      }
+    }
+
+    // Mandatory Lost Reason (Blueprint §23)
+    if (isNowLost) {
+      setStageModalData(null);
+      setLostModalLead(lead);
+      setShowLostModal(true);
+      return;
+    }
+
+    // Mandatory Junk Reason (Blueprint §24)
+    if (newStatus === "Junk") {
+      setStageModalData(null);
+      setJunkModalLead(lead);
+      setShowJunkModal(true);
+      return;
+    }
+
     // Strict Mandatory Validation ONLY for active mid-pipeline stages
     if (!isNowWon && !isNowLost) {
       if (!stageModalAmount || isNaN(amt) || amt <= 0) {
@@ -4266,7 +4315,7 @@ export default function App({ onNavigateToLanding } = {}) {
       // Build updated notes array
       const noteEntry = {
         id: "note_" + Date.now(),
-        text: `[Stage Change: ${oldStatus}  ${newStatus}] ${discussionNoteText}`,
+        text: `[Stage Change: ${oldStatus} ➔ ${newStatus}] ${discussionNoteText}`,
         createdAt: new Date().toISOString()
       };
       let updatedNotes = Array.isArray(targetLead.notes) 
@@ -4324,6 +4373,140 @@ export default function App({ onNavigateToLanding } = {}) {
   const handleCancelStageModal = () => {
     setStageModalError("");
     setStageModalData(null);
+  };
+
+  // Payment Recorded Callback (Blueprint Section 21 & 35)
+  const handlePaymentRecorded = (updatedLeadFromServer, paymentRecord) => {
+    if (!updatedLeadFromServer) return;
+    const actualIndex = leads.findIndex(l => l.id === updatedLeadFromServer.id);
+    if (actualIndex !== -1) {
+      const updatedLeads = [...leads];
+      updatedLeads[actualIndex] = updatedLeadFromServer;
+      setLeads(updatedLeads);
+      saveLeadsToStorage(updatedLeads);
+    }
+    if (selectedLeadForDetails && selectedLeadForDetails.id === updatedLeadFromServer.id) {
+      setSelectedLeadForDetails(updatedLeadFromServer);
+    }
+    showToast(`Payment of ₹${Number(paymentRecord?.amount || 0).toLocaleString('en-IN')} recorded successfully!`, "success");
+
+    // Prompt if now 100% paid in full
+    const dealVal = Number(updatedLeadFromServer.value) || 0;
+    const paidVal = Number(updatedLeadFromServer.paidAmount) || 0;
+    if (dealVal > 0 && paidVal >= dealVal && !isWonStatus(updatedLeadFromServer.status)) {
+      setTimeout(() => {
+        const markNow = window.confirm(`🎉 This deal is now 100% Paid in Full (₹${paidVal.toLocaleString('en-IN')} / ₹${dealVal.toLocaleString('en-IN')})!\n\nWould you like to move this deal to "Won" stage now?`);
+        if (markNow) {
+          const wonIndex = leads.findIndex(l => l.id === updatedLeadFromServer.id);
+          if (wonIndex !== -1) {
+            const todayYmd = new Date().toISOString().split('T')[0];
+            const finalWonLead = {
+              ...updatedLeadFromServer,
+              status: "Won",
+              stageUpdatedAt: new Date().toISOString(),
+              won_date: todayYmd
+            };
+            const updatedLeads = [...leads];
+            updatedLeads[wonIndex] = finalWonLead;
+            setLeads(updatedLeads);
+            saveLeadsToStorage(updatedLeads);
+            syncSingleLeadToBackend(finalWonLead);
+            setWonLeadName(finalWonLead.name || "Lead");
+            setWonDealData(finalWonLead);
+            setShowWonModal(true);
+            if (selectedLeadForDetails && selectedLeadForDetails.id === finalWonLead.id) {
+              setSelectedLeadForDetails(finalWonLead);
+            }
+          }
+        }
+      }, 300);
+    }
+  };
+
+  // Mandatory Lost Reason Confirm Handler (Blueprint Section 23)
+  const handleConfirmLost = (lead, { lost_reason, lost_competitor, lost_notes, lost_date }) => {
+    if (!lead) return;
+    const actualIndex = leads.findIndex(l => l.id === lead.id);
+    if (actualIndex === -1) return;
+
+    const updatedLeadObj = {
+      ...lead,
+      status: "Lost",
+      lost_reason,
+      lost_competitor,
+      lost_notes,
+      lost_date: lost_date || new Date().toISOString().split('T')[0],
+      stageUpdatedAt: new Date().toISOString(),
+      won_date: ""
+    };
+
+    const updatedLeads = [...leads];
+    updatedLeads[actualIndex] = updatedLeadObj;
+    setLeads(updatedLeads);
+    saveLeadsToStorage(updatedLeads);
+    syncSingleLeadToBackend(updatedLeadObj);
+    logLeadActivity(lead.id, "stage_change", "Deal Closed Lost", `Marked Lost: ${lost_reason}. Notes: ${lost_notes}`);
+    showToast(`Lead marked as Lost (${lost_reason})`, "info");
+    if (selectedLeadForDetails && selectedLeadForDetails.id === lead.id) {
+      setSelectedLeadForDetails(updatedLeadObj);
+    }
+
+    // Auto-close open tasks linked to this lost lead
+    const updatedTasksList = tasks.map(t => {
+      const matchesLead = (t.linkedLeadId && t.linkedLeadId === lead.id) || 
+                          (lead.name && lead.name.length > 2 && t.title.toLowerCase().includes(lead.name.toLowerCase()));
+      if (matchesLead && !t.completed) {
+        return {
+          ...t,
+          completed: true,
+          completedAt: new Date().toISOString(),
+          outcome: `Deal Lost - ${lost_reason}`,
+          completionRemark: `Auto-closed: Lead marked Lost (${lost_reason})`
+        };
+      }
+      return t;
+    });
+    saveTasksToStorage(updatedTasksList);
+  };
+
+  // Mandatory Junk Reason Confirm Handler (Blueprint Section 24)
+  const handleConfirmJunk = (lead, { junk_reason, junk_notes, junk_date }) => {
+    if (!lead) return;
+    const actualIndex = leads.findIndex(l => l.id === lead.id);
+    if (actualIndex === -1) return;
+
+    const updatedLeadObj = {
+      ...lead,
+      status: "Junk",
+      junk_reason,
+      junk_notes,
+      junk_date: junk_date || new Date().toISOString().split('T')[0],
+      stageUpdatedAt: new Date().toISOString(),
+      won_date: ""
+    };
+
+    const updatedLeads = [...leads];
+    updatedLeads[actualIndex] = updatedLeadObj;
+    setLeads(updatedLeads);
+    saveLeadsToStorage(updatedLeads);
+    syncSingleLeadToBackend(updatedLeadObj);
+    logLeadActivity(lead.id, "stage_change", "Lead Marked Junk", `Marked Junk: ${junk_reason}. Notes: ${junk_notes}`);
+    showToast(`Lead marked as Junk (${junk_reason})`, "info");
+    if (selectedLeadForDetails && selectedLeadForDetails.id === lead.id) {
+      setSelectedLeadForDetails(updatedLeadObj);
+    }
+  };
+
+  // Duplicate Lead Action Handlers (Blueprint Section 14 & 27)
+  const handleProceedDuplicateAnyway = () => {
+    setShowDuplicateModal(false);
+    actuallyCreateLead({ ...newLeadData, allowDuplicate: true });
+  };
+
+  const handleViewExistingDuplicate = (dupLead) => {
+    setShowAddLeadModal(false);
+    setShowDuplicateModal(false);
+    setSelectedLeadForDetails(dupLead);
   };
 
   // Pipeline sub-views (Spreadsheet Grid vs Visual Analytics Dashboard vs Split-Screen Workspace vs Deals Hub)
@@ -8581,7 +8764,33 @@ export default function App({ onNavigateToLanding } = {}) {
       const isNowWon = isWonStatus(processedValue);
       const isNowLost = isLostStatus(processedValue);
 
-      // If marked as Won: save status, set won_date, auto-complete tasks & celebrate!
+      // Strict Won Rule: Full Payment Required (Blueprint §21 & §35)
+      if (isNowWon) {
+        const dealVal = Number(lead.value) || 0;
+        const paidVal = Number(lead.paidAmount) || 0;
+        if (dealVal <= 0 || paidVal < dealVal) {
+          setWonBlockedLead(lead);
+          setShowWonBlockedModal(true);
+          showToast("Full payment is required before this lead can be marked Won.", "error");
+          return;
+        }
+      }
+
+      // Mandatory Lost Reason Modal (Blueprint §23)
+      if (isNowLost) {
+        setLostModalLead(lead);
+        setShowLostModal(true);
+        return;
+      }
+
+      // Mandatory Junk Reason Modal (Blueprint §24)
+      if (processedValue === "Junk") {
+        setJunkModalLead(lead);
+        setShowJunkModal(true);
+        return;
+      }
+
+      // If marked as Won (with 100% full payment verified): save status, set won_date, auto-complete tasks & celebrate!
       if (isNowWon) {
         const todayYmd = new Date().toISOString().split('T')[0];
         const isFromRenewal = (oldValue || "").toLowerCase() === "renewal" || isRenewalLead(lead);
@@ -8743,6 +8952,67 @@ export default function App({ onNavigateToLanding } = {}) {
     openAddLeadModal();
   };
 
+  const actuallyCreateLead = (leadPayload) => {
+    const assignedOwner = leadPayload.owner || currentLoggedInUser || "Harsh Goyal";
+    const dealVal = parseFloat(leadPayload.value) || 0;
+    const leadId = "lead_" + Date.now();
+
+    const createdLead = {
+      id: leadId,
+      name: leadPayload.name.trim(),
+      company: (leadPayload.company || "").trim(),
+      status: leadPayload.status || "New",
+      value: dealVal,
+      paidAmount: 0,
+      pendingAmount: dealVal,
+      paymentStatus: "unpaid",
+      packageId: leadPayload.packageId || "",
+      email: (leadPayload.email || "").trim(),
+      phone: (leadPayload.phone || "").trim(),
+      source: leadPayload.source || "Manual",
+      score: leadPayload.score || "Warm",
+      owner: assignedOwner,
+      next_follow_up: leadPayload.next_follow_up || "",
+      next_follow_up_time: leadPayload.next_follow_up ? (leadPayload.next_follow_up_time || "11:00 AM") : "",
+      custom_fields: leadPayload.custom_fields || {},
+      activities: [
+        {
+          id: "act_" + Date.now(),
+          type: "created",
+          title: "Lead Created",
+          desc: `Lead added to pipeline and assigned to ${assignedOwner}.`,
+          timestamp: new Date().toISOString(),
+          performedBy: currentLoggedInUser || "Harsh Goyal"
+        }
+      ],
+      notes: leadPayload.notes && leadPayload.notes.trim() 
+        ? leadPayload.notes.trim() 
+        : generateAutoAiRemarkForLead({ status: leadPayload.status || "New", next_follow_up: leadPayload.next_follow_up })
+    };
+
+    if (leadPayload.notes && leadPayload.notes.trim()) {
+      createdLead.activities.push({
+        id: "act_note_" + Date.now(),
+        type: "note",
+        title: "Initial Note Added",
+        desc: leadPayload.notes.trim(),
+        timestamp: new Date().toISOString(),
+        performedBy: currentLoggedInUser || "Harsh Goyal"
+      });
+    }
+
+    const updated = [createdLead, ...leads];
+    setLeads(updated);
+    saveLeadsToStorage(updated);
+    syncSingleLeadToBackend(createdLead);
+    setShowAddLeadModal(false);
+    showToast(`Lead "${createdLead.name}" added successfully!`, "success");
+
+    if (webhookUrl) {
+      syncWithGoogleSheetWebhook(createdLead);
+    }
+  };
+
   const handleCreateLead = (e) => {
     if (e) e.preventDefault();
     const effectivePerms = getUserEffectivePermissions(currentUser);
@@ -8766,59 +9036,27 @@ export default function App({ onNavigateToLanding } = {}) {
       return;
     }
 
-    const leadId = "lead_" + Date.now();
-    const assignedOwner = newLeadData.owner || currentLoggedInUser || "Harsh Goyal";
-    const dealVal = parseFloat(newLeadData.value) || 0;
+    // Duplicate Lead Prevention (Blueprint §14 & §27)
+    const cleanPhone = (newLeadData.phone || '').replace(/\D/g, '').slice(-10);
+    const cleanEmail = (newLeadData.email || '').trim().toLowerCase();
 
-    const createdLead = {
-      id: leadId,
-      name: newLeadData.name.trim(),
-      company: (newLeadData.company || "").trim(),
-      status: newLeadData.status || "New",
-      value: dealVal,
-      packageId: newLeadData.packageId || "",
-      email: (newLeadData.email || "").trim(),
-      phone: (newLeadData.phone || "").trim(),
-      source: newLeadData.source || "Manual",
-      score: newLeadData.score || "Warm",
-      owner: assignedOwner,
-      next_follow_up: newLeadData.next_follow_up || "",
-      next_follow_up_time: newLeadData.next_follow_up ? (newLeadData.next_follow_up_time || "11:00 AM") : "",
-      custom_fields: newLeadData.custom_fields || {},
-      activities: [
-        {
-          id: "act_" + Date.now(),
-          type: "created",
-          title: "Lead Created",
-          desc: `Lead added to pipeline and assigned to ${assignedOwner}.`,
-          timestamp: new Date().toISOString(),
-          performedBy: currentLoggedInUser || "Harsh Goyal"
-        }
-      ],
-      notes: newLeadData.notes && newLeadData.notes.trim() 
-        ? newLeadData.notes.trim() 
-        : generateAutoAiRemarkForLead({ status: newLeadData.status || "New", next_follow_up: newLeadData.next_follow_up })
-    };
-
-    if (newLeadData.notes && newLeadData.notes.trim()) {
-      createdLead.activities.push({
-        id: "act_note_" + Date.now(),
-        type: "note",
-        title: "Initial Note Added",
-        desc: newLeadData.notes.trim(),
-        timestamp: new Date().toISOString(),
-        performedBy: currentLoggedInUser || "Harsh Goyal"
+    if (!newLeadData.allowDuplicate && (cleanPhone.length >= 10 || (cleanEmail && cleanEmail.includes('@')))) {
+      const duplicate = leads.find(l => {
+        const lPhone = (l.phone || '').replace(/\D/g, '').slice(-10);
+        const lEmail = (l.email || '').trim().toLowerCase();
+        if (cleanPhone.length >= 10 && lPhone === cleanPhone) return true;
+        if (cleanEmail && cleanEmail.includes('@') && lEmail === cleanEmail) return true;
+        return false;
       });
+
+      if (duplicate) {
+        setDuplicateModalLead(duplicate);
+        setShowDuplicateModal(true);
+        return;
+      }
     }
 
-    const updated = [createdLead, ...leads];
-    saveLeadsToStorage(updated);
-    setShowAddLeadModal(false);
-    showToast(`Lead "${createdLead.name}" added successfully!`, "success");
-
-    if (webhookUrl) {
-      syncWithGoogleSheetWebhook(createdLead);
-    }
+    actuallyCreateLead(newLeadData);
   };
 
 
@@ -17685,7 +17923,11 @@ export default function App({ onNavigateToLanding } = {}) {
                 </div>
               )}
 
-              {pipelineView === "sheet" ? (() => {
+              {currentTab === "Customers & Renewals" ? (
+                <div style={{ backgroundColor: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0", overflow: "hidden", marginTop: "12px" }}>
+                  <CustomersView currentUser={currentUser} />
+                </div>
+              ) : pipelineView === "sheet" ? (() => {
               const totalLeadsCount = filteredLeads.length;
               const totalPages = Math.max(1, Math.ceil(totalLeadsCount / pageSize));
               const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
@@ -17749,7 +17991,8 @@ export default function App({ onNavigateToLanding } = {}) {
                       { label: "Active Pipeline", count: ownerScopedLeads.filter(l => isActiveStatus(l.status)).length },
                       { label: "Won Deals", count: ownerScopedLeads.filter(l => isWonStatus(l.status)).length },
                       { label: "Lost Deals", count: ownerScopedLeads.filter(l => isLostStatus(l.status)).length },
-                      { label: "All Leads", count: ownerScopedLeads.length }
+                      { label: "All Leads", count: ownerScopedLeads.length },
+                      { label: "Customers & Renewals", count: null }
                     ].map(tab => {
                       const isActive = currentTab === tab.label;
                       return (
@@ -17781,17 +18024,19 @@ export default function App({ onNavigateToLanding } = {}) {
                           }}
                         >
                           <span>{tab.label}</span>
-                          <span style={{
-                            backgroundColor: isActive ? "#eff6ff" : "#e2e8f0",
-                            color: isActive ? "#2563eb" : "#64748b",
-                            fontWeight: "700",
-                            fontSize: "11px",
-                            padding: "1px 6px",
-                            borderRadius: "6px",
-                            lineHeight: "1.2"
-                          }}>
-                            {tab.count}
-                          </span>
+                          {tab.count !== null && (
+                            <span style={{
+                              backgroundColor: isActive ? "#eff6ff" : "#e2e8f0",
+                              color: isActive ? "#2563eb" : "#64748b",
+                              fontWeight: "700",
+                              fontSize: "11px",
+                              padding: "1px 6px",
+                              borderRadius: "6px",
+                              lineHeight: "1.2"
+                            }}>
+                              {tab.count}
+                            </span>
+                          )}
                         </button>
                       );
                     })}
@@ -25091,14 +25336,65 @@ export default function App({ onNavigateToLanding } = {}) {
                     </span>
                   </div>
 
-                  {/* Deal Value & Stage */}
-                  <div style={{ marginBottom: "12px", display: "flex", flexDirection: "column", gap: "4px", fontSize: "12px" }}>
-                    <div>
-                      <span style={{ color: "#475569" }}>Deal Value: </span>
-                      <strong style={{ color: "#166534", fontWeight: "800" }}>
-                        ₹{(Number(selectedLeadForDetails.value) || 0).toLocaleString("en-IN")}
-                      </strong>
+                  {/* Financial Ledger & Revenue Realization (Blueprint §21 & §35) */}
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                      <span style={{ color: "#475569", fontSize: "11px", fontWeight: "700", textTransform: "uppercase" }}>Financial Ledger</span>
+                      <span style={{
+                        fontSize: "10px",
+                        fontWeight: "800",
+                        padding: "2px 7px",
+                        borderRadius: "10px",
+                        backgroundColor: (Number(selectedLeadForDetails.paidAmount || 0) >= Number(selectedLeadForDetails.value || 0) && Number(selectedLeadForDetails.value || 0) > 0) ? "#dcfce7" : (Number(selectedLeadForDetails.paidAmount || 0) > 0 ? "#fef3c7" : "#fee2e2"),
+                        color: (Number(selectedLeadForDetails.paidAmount || 0) >= Number(selectedLeadForDetails.value || 0) && Number(selectedLeadForDetails.value || 0) > 0) ? "#15803d" : (Number(selectedLeadForDetails.paidAmount || 0) > 0 ? "#b45309" : "#b91c1c")
+                      }}>
+                        {(Number(selectedLeadForDetails.paidAmount || 0) >= Number(selectedLeadForDetails.value || 0) && Number(selectedLeadForDetails.value || 0) > 0) ? "PAID IN FULL" : (Number(selectedLeadForDetails.paidAmount || 0) > 0 ? "PARTIALLY PAID" : "UNPAID")}
+                      </span>
                     </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", textAlign: "center", marginBottom: "8px" }}>
+                      <div style={{ backgroundColor: "#f8fafc", padding: "6px", borderRadius: "6px", border: "1px solid #f1f5f9" }}>
+                        <span style={{ fontSize: "10px", color: "#64748b", display: "block" }}>Deal Value</span>
+                        <strong style={{ fontSize: "12px", color: "#0f172a" }}>₹{(Number(selectedLeadForDetails.value) || 0).toLocaleString("en-IN")}</strong>
+                      </div>
+                      <div style={{ backgroundColor: "#f0fdf4", padding: "6px", borderRadius: "6px", border: "1px solid #dcfce7" }}>
+                        <span style={{ fontSize: "10px", color: "#166534", display: "block" }}>Paid</span>
+                        <strong style={{ fontSize: "12px", color: "#15803d" }}>₹{(Number(selectedLeadForDetails.paidAmount) || 0).toLocaleString("en-IN")}</strong>
+                      </div>
+                      <div style={{ backgroundColor: "#fff7ed", padding: "6px", borderRadius: "6px", border: "1px solid #ffedd5" }}>
+                        <span style={{ fontSize: "10px", color: "#9a3412", display: "block" }}>Balance</span>
+                        <strong style={{ fontSize: "12px", color: "#ea580c" }}>₹{Math.max(0, (Number(selectedLeadForDetails.value) || 0) - (Number(selectedLeadForDetails.paidAmount) || 0)).toLocaleString("en-IN")}</strong>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPaymentModalLead(selectedLeadForDetails);
+                        setShowPaymentModal(true);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "6px 10px",
+                        borderRadius: "6px",
+                        border: "none",
+                        backgroundColor: "#10b981",
+                        color: "#ffffff",
+                        fontSize: "11px",
+                        fontWeight: "700",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "5px",
+                        boxShadow: "0 1px 2px rgba(16, 185, 129, 0.2)"
+                      }}
+                    >
+                      <CreditCard size={13} />
+                      <span>+ Record Payment</span>
+                    </button>
+                  </div>
+
+                  {/* Stage Dropdown & Action Buttons */}
+                  <div style={{ marginBottom: "12px", display: "flex", flexDirection: "column", gap: "4px", fontSize: "12px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                       <span style={{ color: "#475569" }}>Stage: </span>
                       <select
@@ -25107,6 +25403,26 @@ export default function App({ onNavigateToLanding } = {}) {
                           const newStat = e.target.value;
                           const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
                           if (actualIndex !== -1) {
+                            if (isWonStatus(newStat)) {
+                              const dVal = Number(selectedLeadForDetails.value) || 0;
+                              const pVal = Number(selectedLeadForDetails.paidAmount) || 0;
+                              if (dVal <= 0 || pVal < dVal) {
+                                setWonBlockedLead(selectedLeadForDetails);
+                                setShowWonBlockedModal(true);
+                                showToast("Full payment is required before this lead can be marked Won.", "error");
+                                return;
+                              }
+                            }
+                            if (isLostStatus(newStat)) {
+                              setLostModalLead(selectedLeadForDetails);
+                              setShowLostModal(true);
+                              return;
+                            }
+                            if (newStat === "Junk") {
+                              setJunkModalLead(selectedLeadForDetails);
+                              setShowJunkModal(true);
+                              return;
+                            }
                             saveCellChange(actualIndex, 1, newStat);
                             setSelectedLeadForDetails(prev => ({ ...prev, status: newStat }));
                           }
@@ -25136,13 +25452,8 @@ export default function App({ onNavigateToLanding } = {}) {
                         <button
                           type="button"
                           onClick={() => {
-                            const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
-                            if (actualIndex !== -1) {
-                              saveCellChange(actualIndex, 1, "Lost");
-                              setSelectedLeadForDetails(prev => ({ ...prev, status: "Lost" }));
-                              logLeadActivity(selectedLeadForDetails.id, "stage_change", "Deal Closed Lost", "Marked deal as Lost.");
-                              showToast("Lead marked as Lost", "info");
-                            }
+                            setLostModalLead(selectedLeadForDetails);
+                            setShowLostModal(true);
                           }}
                           style={{
                             padding: "3px 8px",
@@ -25846,6 +26157,33 @@ export default function App({ onNavigateToLanding } = {}) {
                       >
                         <Pencil size={12} color={activeQuickAction === "note" ? "#ffffff" : "#ea580c"} />
                         <span>Add Note</span>
+                      </button>
+
+                      {/* 💳 Record Payment Button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPaymentModalLead(selectedLeadForDetails);
+                          setShowPaymentModal(true);
+                        }}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "5px",
+                          padding: "5px 12px",
+                          borderRadius: "6px",
+                          border: "1px solid #a7f3d0",
+                          backgroundColor: "#ecfdf5",
+                          color: "#047857",
+                          cursor: "pointer",
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          transition: "all 0.15s ease",
+                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+                        }}
+                      >
+                        <CreditCard size={12} color="#047857" />
+                        <span>Record Payment</span>
                       </button>
                     </div>
                   </div>
@@ -31049,6 +31387,65 @@ export default function App({ onNavigateToLanding } = {}) {
           </div>
         </div>
       )}
+
+      {/* 💳 RECORD PAYMENT MODAL (Blueprint Section 21 & 35) */}
+      <RecordPaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => {
+          setShowPaymentModal(false);
+          setPaymentModalLead(null);
+        }}
+        lead={paymentModalLead}
+        onPaymentRecorded={handlePaymentRecorded}
+      />
+
+      {/* ⚠️ FULL PAYMENT REQUIRED TO MARK WON MODAL (Blueprint Section 21 & 35) */}
+      <FullPaymentRequiredModal
+        isOpen={showWonBlockedModal}
+        onClose={() => {
+          setShowWonBlockedModal(false);
+          setWonBlockedLead(null);
+        }}
+        lead={wonBlockedLead}
+        onOpenRecordPayment={(lead) => {
+          setPaymentModalLead(lead);
+          setShowPaymentModal(true);
+        }}
+      />
+
+      {/* ❌ MANDATORY LOST REASON MODAL (Blueprint Section 23) */}
+      <MarkLostModal
+        isOpen={showLostModal}
+        onClose={() => {
+          setShowLostModal(false);
+          setLostModalLead(null);
+        }}
+        lead={lostModalLead}
+        onConfirmLost={handleConfirmLost}
+      />
+
+      {/* 🗑️ MANDATORY JUNK REASON MODAL (Blueprint Section 24) */}
+      <MarkJunkModal
+        isOpen={showJunkModal}
+        onClose={() => {
+          setShowJunkModal(false);
+          setJunkModalLead(null);
+        }}
+        lead={junkModalLead}
+        onConfirmJunk={handleConfirmJunk}
+      />
+
+      {/* 🔍 DUPLICATE LEAD DETECTION MODAL (Blueprint Section 14 & 27) */}
+      <DuplicateLeadModal
+        isOpen={showDuplicateModal}
+        onClose={() => {
+          setShowDuplicateModal(false);
+          setDuplicateModalLead(null);
+        }}
+        duplicateLead={duplicateModalLead}
+        onProceedAnyway={handleProceedDuplicateAnyway}
+        onViewExisting={handleViewExistingDuplicate}
+      />
 
     </div>
   );

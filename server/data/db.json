@@ -3144,5 +3144,59 @@
       "usr_rohan": 130000,
       "usr_1789033985345_n62j": 130000
     }
-  }
+  },
+  "payments": [
+    {
+      "id": "pay_1791462284966_xvy9g",
+      "leadId": "lead_test_1791462278639",
+      "amount": 30000,
+      "paymentDate": "2026-10-08",
+      "paymentTime": "05:54 PM",
+      "paymentMethod": "Bank Transfer",
+      "reference": "NEFT/HDFC/9988776655",
+      "invoiceNumber": "",
+      "notes": "Final 60% balance received",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-08T12:24:44.967Z"
+    },
+    {
+      "id": "pay_1791462282766_99lsa",
+      "leadId": "lead_test_1791462278639",
+      "amount": 20000,
+      "paymentDate": "2026-10-08",
+      "paymentTime": "05:54 PM",
+      "paymentMethod": "UPI",
+      "reference": "UPI/987654321/REF1",
+      "invoiceNumber": "",
+      "notes": "Initial 40% advance payment",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-08T12:24:42.772Z"
+    }
+  ],
+  "customers": [
+    {
+      "id": "cust_1791462285924_uo47l",
+      "leadId": "lead_test_1791462278639",
+      "name": "Alpha Enterprises Deal",
+      "company": "Alpha Enterprises Ltd",
+      "email": "deal@alphaenterprises.in",
+      "phone": "9876599999",
+      "dealValue": 50000,
+      "totalRevenue": 50000,
+      "status": "active",
+      "wonDate": "2026-10-08",
+      "accountManager": "Harsh Goyal",
+      "tenantId": "tenant_apexsales",
+      "renewalDate": "2027-10-08",
+      "renewalStatus": "active",
+      "createdAt": "2026-10-08T12:24:45.925Z",
+      "updatedAt": "2026-10-08T12:24:45.925Z"
+    }
+  ]
 }

@@ -557,11 +557,13 @@ function readLocalDB() {
         writeLocalDB(b);
         return b;
       }
-      return { users: [], leads: [], tasks: [] };
+      return { users: [], leads: [], tasks: [], payments: [], customers: [] };
     }
     const raw = fs.readFileSync(activeDb, 'utf8');
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed.tasks)) parsed.tasks = [];
+    if (!Array.isArray(parsed.payments)) parsed.payments = [];
+    if (!Array.isArray(parsed.customers)) parsed.customers = [];
     if ((!parsed.leads || parsed.leads.length === 0) && fs.existsSync(BACKUP_FILE)) {
       console.log('🛡️ Zero leads in db.json: Auto-healing from db_backup.json');
       const b = JSON.parse(fs.readFileSync(BACKUP_FILE, 'utf8'));
@@ -569,6 +571,8 @@ function readLocalDB() {
         parsed.leads = b.leads;
         if (!parsed.users || parsed.users.length === 0) parsed.users = b.users || [];
         if (!parsed.tasks || parsed.tasks.length === 0) parsed.tasks = b.tasks || [];
+        if (!parsed.payments || parsed.payments.length === 0) parsed.payments = b.payments || [];
+        if (!parsed.customers || parsed.customers.length === 0) parsed.customers = b.customers || [];
         writeLocalDB(parsed);
       }
     }
@@ -579,10 +583,12 @@ function readLocalDB() {
       try {
         const backup = JSON.parse(fs.readFileSync(BACKUP_FILE, 'utf8'));
         if (!Array.isArray(backup.tasks)) backup.tasks = [];
+        if (!Array.isArray(backup.payments)) backup.payments = [];
+        if (!Array.isArray(backup.customers)) backup.customers = [];
         return backup;
       } catch(e) {}
     }
-    return { users: [], leads: [], tasks: [] };
+    return { users: [], leads: [], tasks: [], payments: [], customers: [] };
   }
 }
 
@@ -753,7 +759,26 @@ async function getLeads() {
       console.error('Supabase getLeads error:', e);
     }
   }
-  return readLocalDB().leads || [];
+  const local = readLocalDB();
+  const rawLeads = local.leads || [];
+  const payments = local.payments || [];
+  return rawLeads.map(l => {
+    const leadPayments = payments.filter(p => String(p.leadId) === String(l.id));
+    const totalPaid = leadPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+    const dealVal = Number(l.value) || 0;
+    const effectivePaid = totalPaid > 0 ? totalPaid : (Number(l.paidAmount) || 0);
+    const effectivePending = dealVal > 0 ? Math.max(0, dealVal - effectivePaid) : 0;
+    let paymentStatus = l.paymentStatus || 'unpaid';
+    if (effectivePaid >= dealVal && dealVal > 0) paymentStatus = 'paid_in_full';
+    else if (effectivePaid > 0) paymentStatus = 'partially_paid';
+
+    return {
+      ...l,
+      paidAmount: effectivePaid,
+      pendingAmount: effectivePending,
+      paymentStatus: paymentStatus
+    };
+  });
 }
 
 async function saveLead(lead) {
@@ -2162,7 +2187,7 @@ app.post('/api/admin/backup/save', async (req, res) => {
   }
 });
 
-// Create Lead
+// Create Lead with Duplicate Detection (Blueprint Section 14 & 27)
 app.post('/api/leads', async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -2174,16 +2199,54 @@ app.post('/api/leads', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Lead name is required.' });
   }
 
+  // Duplicate Lead Prevention
+  const cleanPhone = (leadData.phone || '').replace(/\D/g, '').slice(-10);
+  const cleanEmail = (leadData.email || '').trim().toLowerCase();
+  if (!leadData.allowDuplicate && (cleanPhone.length >= 10 || (cleanEmail && cleanEmail.includes('@')))) {
+    const allLeads = await getLeads();
+    const duplicate = allLeads.find(l => {
+      const lPhone = (l.phone || '').replace(/\D/g, '').slice(-10);
+      const lEmail = (l.email || '').trim().toLowerCase();
+      if (cleanPhone.length >= 10 && lPhone === cleanPhone) return true;
+      if (cleanEmail && cleanEmail.includes('@') && lEmail === cleanEmail) return true;
+      return false;
+    });
+    if (duplicate) {
+      return res.status(409).json({
+        success: false,
+        code: 'DUPLICATE_LEAD_DETECTED',
+        message: `A lead with this ${cleanPhone.length >= 10 && (duplicate.phone || '').replace(/\D/g, '').slice(-10) === cleanPhone ? 'phone number' : 'email address'} already exists (${duplicate.name} - ${duplicate.company || 'No Company'}).`,
+        duplicateLead: duplicate
+      });
+    }
+  }
+
   const isSuper = isSuperAdminEmailOrName(user);
   let assignedOwner = isSuper ? (leadData.owner || 'Harsh Goyal') : (user.name || 'Sales Rep');
+  const dealValue = Number(leadData.value) || 0;
+  const initialPaid = Number(leadData.paidAmount) || 0;
 
   const newLead = {
     ...leadData,
     id: leadData.id || `lead_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+    value: dealValue,
+    paidAmount: initialPaid,
+    pendingAmount: Math.max(0, dealValue - initialPaid),
+    paymentStatus: (initialPaid >= dealValue && dealValue > 0) ? 'paid_in_full' : (initialPaid > 0 ? 'partially_paid' : 'unpaid'),
     owner: assignedOwner,
     tenantId: getUserTenantId(user),
     createdAt: leadData.createdAt || new Date().toISOString(),
-    status: leadData.status || 'Contacted'
+    status: leadData.status || 'Contacted',
+    activities: [
+      {
+        id: `act_${Date.now()}_create`,
+        type: 'created',
+        desc: `Lead created by ${user.name || 'Sales Rep'}`,
+        timestamp: new Date().toISOString(),
+        performedBy: user.name || 'Sales Rep'
+      },
+      ...(Array.isArray(leadData.activities) ? leadData.activities : [])
+    ]
   };
 
   await saveLead(newLead);
@@ -2292,8 +2355,100 @@ app.put('/api/leads/:id', async (req, res) => {
     delete updates.owner;
   }
 
+  // --- BLUEPRINT SECTION 21 & 35: WON STAGE REQUIRES 100% FULL PAYMENT ---
+  const newStatusNorm = updates.status ? String(updates.status).trim().toLowerCase() : '';
+  const isMovingToWon = ['won', 'closed won', 'renewal won'].includes(newStatusNorm);
+  
+  if (isMovingToWon) {
+    const local = readLocalDB();
+    const leadPayments = (local.payments || []).filter(p => String(p.leadId) === String(id));
+    const totalPaidFromPayments = leadPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    const paidAmount = Math.max(totalPaidFromPayments, Number(updates.paidAmount !== undefined ? updates.paidAmount : (currentLead.paidAmount || 0)));
+    const dealValue = Number(updates.value !== undefined ? updates.value : (currentLead.value || 0));
+
+    if (dealValue <= 0 || paidAmount < dealValue) {
+      const pendingBalance = Math.max(0, dealValue - paidAmount);
+      return res.status(400).json({
+        success: false,
+        code: 'FULL_PAYMENT_REQUIRED',
+        dealValue,
+        paidAmount,
+        pendingBalance,
+        message: `Full payment is required before this lead can be marked Won. Current pending balance: ₹${pendingBalance.toLocaleString('en-IN')}. Please record remaining payment first.`
+      });
+    }
+
+    if (!updates.won_date && !currentLead.won_date) {
+      updates.won_date = new Date().toISOString().split('T')[0];
+    }
+  }
+
+  // --- BLUEPRINT SECTION 23: MANDATORY LOST REASON ---
+  if (newStatusNorm === 'lost') {
+    if (!updates.lost_reason && !currentLead.lost_reason) {
+      return res.status(400).json({ success: false, code: 'LOST_REASON_REQUIRED', message: 'A valid Lost Reason is required to mark a deal as Lost.' });
+    }
+    if (!updates.lost_date) {
+      updates.lost_date = new Date().toISOString().split('T')[0];
+    }
+  }
+
+  // --- BLUEPRINT SECTION 24: MANDATORY JUNK REASON ---
+  if (newStatusNorm === 'junk') {
+    if (!updates.junk_reason && !currentLead.junk_reason) {
+      return res.status(400).json({ success: false, code: 'JUNK_REASON_REQUIRED', message: 'A valid Junk Reason is required to mark a lead as Junk.' });
+    }
+    if (!updates.junk_date) {
+      updates.junk_date = new Date().toISOString().split('T')[0];
+    }
+  }
+
+  // Activity tracking for stage changes
+  const existingActivities = Array.isArray(updates.activities || currentLead.activities) ? (updates.activities || currentLead.activities) : [];
+  if (updates.status && updates.status !== currentLead.status) {
+    const stageActivity = {
+      id: `act_${Date.now()}_stage`,
+      type: 'stage_change',
+      desc: `Stage moved from "${currentLead.status}" to "${updates.status}"${updates.lost_reason ? ` (Reason: ${updates.lost_reason})` : ''}${updates.junk_reason ? ` (Reason: ${updates.junk_reason})` : ''}`,
+      timestamp: new Date().toISOString(),
+      performedBy: user.name || 'Sales Rep'
+    };
+    updates.activities = [stageActivity, ...existingActivities];
+  }
+
   const updatedLead = { ...currentLead, ...updates, updatedAt: new Date().toISOString() };
   await saveLead(updatedLead);
+
+  // --- BLUEPRINT SECTION 36: POST-WON AUTO-CONVERT TO CUSTOMER ---
+  if (isMovingToWon) {
+    const local = readLocalDB();
+    if (!local.customers) local.customers = [];
+    const custIdx = local.customers.findIndex(c => String(c.leadId) === String(id));
+    const customerRecord = {
+      id: custIdx !== -1 ? local.customers[custIdx].id : `cust_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      leadId: String(id),
+      name: updatedLead.name,
+      company: updatedLead.company || updatedLead.name,
+      email: updatedLead.email || '',
+      phone: updatedLead.phone || '',
+      dealValue: Number(updatedLead.value) || 0,
+      totalRevenue: Number(updatedLead.paidAmount || updatedLead.value) || 0,
+      status: 'active',
+      wonDate: updatedLead.won_date || new Date().toISOString().split('T')[0],
+      accountManager: updatedLead.owner || user.name || 'Harsh Goyal',
+      tenantId: updatedLead.tenantId || getUserTenantId(user),
+      renewalDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      renewalStatus: 'active',
+      createdAt: custIdx !== -1 ? local.customers[custIdx].createdAt : new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    if (custIdx !== -1) {
+      local.customers[custIdx] = customerRecord;
+    } else {
+      local.customers.unshift(customerRecord);
+    }
+    writeLocalDB(local);
+  }
 
   res.json({ success: true, lead: updatedLead, message: 'Lead updated successfully!' });
 });
@@ -2672,6 +2827,266 @@ app.post('/api/targets', async (req, res) => {
     spotIncentives: local.targets.spotIncentives,
     message: 'Targets successfully saved to database.'
   });
+});
+
+// --- BLUEPRINT SECTION 14 & 27: DUPLICATE DETECTION API ---
+app.post('/api/leads/check-duplicate', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
+  const { phone, email, leadId } = req.body;
+  const cleanPhone = (phone || '').replace(/\D/g, '').slice(-10);
+  const cleanEmail = (email || '').trim().toLowerCase();
+
+  if (!cleanPhone && (!cleanEmail || !cleanEmail.includes('@'))) {
+    return res.json({ isDuplicate: false });
+  }
+
+  const allLeads = await getLeads();
+  const duplicate = allLeads.find(l => {
+    if (leadId && String(l.id) === String(leadId)) return false;
+    const lPhone = (l.phone || '').replace(/\D/g, '').slice(-10);
+    const lEmail = (l.email || '').trim().toLowerCase();
+    if (cleanPhone && cleanPhone.length >= 10 && lPhone === cleanPhone) return true;
+    if (cleanEmail && cleanEmail.includes('@') && lEmail === cleanEmail) return true;
+    return false;
+  });
+
+  if (duplicate) {
+    return res.json({
+      isDuplicate: true,
+      duplicateLead: duplicate,
+      matchedField: cleanPhone && (duplicate.phone || '').replace(/\D/g, '').slice(-10) === cleanPhone ? 'Phone' : 'Email'
+    });
+  }
+
+  return res.json({ isDuplicate: false });
+});
+
+// --- BLUEPRINT SECTION 21 & 35: PAYMENTS ENGINE API ---
+app.get('/api/payments', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
+  const { leadId } = req.query;
+  const local = readLocalDB();
+  let payments = local.payments || [];
+  if (leadId) {
+    payments = payments.filter(p => String(p.leadId) === String(leadId));
+  }
+  res.json({ success: true, payments });
+});
+
+app.post('/api/payments', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
+
+  const { leadId, amount, paymentDate, paymentTime, paymentMethod, reference, notes, invoiceNumber } = req.body;
+  if (!leadId) {
+    return res.status(400).json({ success: false, message: 'Lead ID is required.' });
+  }
+  const payAmount = Number(amount);
+  if (isNaN(payAmount) || payAmount <= 0) {
+    return res.status(400).json({ success: false, message: 'Valid payment amount greater than 0 is required.' });
+  }
+
+  const allLeads = await getLeads();
+  const currentLead = allLeads.find(l => String(l.id) === String(leadId));
+  if (!currentLead) {
+    return res.status(404).json({ success: false, message: 'Lead not found.' });
+  }
+
+  const local = readLocalDB();
+  if (!local.payments) local.payments = [];
+
+  const paymentRecord = {
+    id: `pay_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+    leadId: String(leadId),
+    amount: payAmount,
+    paymentDate: paymentDate || new Date().toISOString().split('T')[0],
+    paymentTime: paymentTime || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    paymentMethod: paymentMethod || 'Bank Transfer',
+    reference: reference || '',
+    invoiceNumber: invoiceNumber || '',
+    notes: notes || '',
+    paymentStatus: 'received',
+    recordedBy: user.name || 'Sales Rep',
+    recordedById: user.id || '',
+    tenantId: currentLead.tenantId || getUserTenantId(user),
+    createdAt: new Date().toISOString()
+  };
+
+  local.payments.unshift(paymentRecord);
+
+  // Recalculate lead paid amount and pending amount
+  const leadPayments = local.payments.filter(p => String(p.leadId) === String(leadId));
+  const totalPaid = leadPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  const dealValue = Number(currentLead.value) || 0;
+  const pendingAmount = Math.max(0, dealValue - totalPaid);
+
+  let paymentStatus = 'unpaid';
+  if (totalPaid >= dealValue && dealValue > 0) {
+    paymentStatus = 'paid_in_full';
+  } else if (totalPaid > 0) {
+    paymentStatus = 'partially_paid';
+  }
+
+  const newActivity = {
+    id: `act_${Date.now()}_pay`,
+    type: 'payment',
+    desc: `Payment of ₹${payAmount.toLocaleString('en-IN')} received via ${paymentMethod || 'Bank Transfer'}${reference ? ` (Ref: ${reference})` : ''}`,
+    timestamp: new Date().toISOString(),
+    performedBy: user.name || 'Sales Rep'
+  };
+
+  const existingActivities = Array.isArray(currentLead.activities) ? currentLead.activities : [];
+  const updatedActivities = [newActivity, ...existingActivities];
+
+  const updatedLead = {
+    ...currentLead,
+    paidAmount: totalPaid,
+    pendingAmount: pendingAmount,
+    paymentStatus: paymentStatus,
+    activities: updatedActivities,
+    updatedAt: new Date().toISOString()
+  };
+
+  if (paymentStatus === 'partially_paid' && ['New', 'Contacted', 'Qualified'].includes(currentLead.status)) {
+    updatedLead.status = 'Payment Follow-up';
+  }
+
+  await saveLead(updatedLead);
+  writeLocalDB(local);
+
+  res.json({
+    success: true,
+    payment: paymentRecord,
+    lead: updatedLead,
+    message: `Payment of ₹${payAmount.toLocaleString('en-IN')} recorded successfully!`
+  });
+});
+
+app.delete('/api/payments/:id', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
+  const isSuper = isSuperAdminEmailOrName(user) || user.role === 'admin' || user.role === 'company_owner';
+  if (!isSuper) {
+    return res.status(403).json({ success: false, message: 'Only administrators can delete payment records.' });
+  }
+
+  const { id } = req.params;
+  const local = readLocalDB();
+  const paymentIdx = (local.payments || []).findIndex(p => String(p.id) === String(id));
+  if (paymentIdx === -1) {
+    return res.status(404).json({ success: false, message: 'Payment record not found.' });
+  }
+
+  const removed = local.payments.splice(paymentIdx, 1)[0];
+  writeLocalDB(local);
+
+  // Recalculate lead
+  const allLeads = await getLeads();
+  const currentLead = allLeads.find(l => String(l.id) === String(removed.leadId));
+  if (currentLead) {
+    const leadPayments = (local.payments || []).filter(p => String(p.leadId) === String(removed.leadId));
+    const totalPaid = leadPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    const dealValue = Number(currentLead.value) || 0;
+    const pendingAmount = Math.max(0, dealValue - totalPaid);
+    let paymentStatus = 'unpaid';
+    if (totalPaid >= dealValue && dealValue > 0) paymentStatus = 'paid_in_full';
+    else if (totalPaid > 0) paymentStatus = 'partially_paid';
+
+    const updatedLead = {
+      ...currentLead,
+      paidAmount: totalPaid,
+      pendingAmount: pendingAmount,
+      paymentStatus: paymentStatus,
+      updatedAt: new Date().toISOString()
+    };
+    await saveLead(updatedLead);
+  }
+
+  res.json({ success: true, message: 'Payment record deleted successfully.' });
+});
+
+// --- BLUEPRINT SECTION 36: CUSTOMERS & RENEWALS ENGINE API ---
+app.get('/api/customers', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
+  const local = readLocalDB();
+  let customers = local.customers || [];
+  
+  const isSuper = isSuperAdminEmailOrName(user) || user.role === 'admin' || user.role === 'company_owner';
+  if (!isSuper && (user.role === 'sales_rep' || user.role === 'executive')) {
+    customers = customers.filter(c => (c.accountManager || '').toLowerCase() === (user.name || '').toLowerCase());
+  }
+  res.json({ success: true, customers });
+});
+
+app.post('/api/customers', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
+  const data = req.body;
+  if (!data.name || !data.company) {
+    return res.status(400).json({ success: false, message: 'Customer name and company are required.' });
+  }
+
+  const local = readLocalDB();
+  if (!local.customers) local.customers = [];
+
+  const newCustomer = {
+    id: data.id || `cust_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+    leadId: data.leadId || '',
+    name: data.name,
+    company: data.company,
+    email: data.email || '',
+    phone: data.phone || '',
+    dealValue: Number(data.dealValue) || 0,
+    totalRevenue: Number(data.totalRevenue || data.dealValue) || 0,
+    status: data.status || 'active',
+    wonDate: data.wonDate || new Date().toISOString().split('T')[0],
+    accountManager: data.accountManager || user.name || 'Harsh Goyal',
+    renewalDate: data.renewalDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    renewalStatus: data.renewalStatus || 'active',
+    notes: data.notes || '',
+    tenantId: getUserTenantId(user),
+    createdAt: new Date().toISOString()
+  };
+
+  local.customers.unshift(newCustomer);
+  writeLocalDB(local);
+
+  res.json({ success: true, customer: newCustomer, message: 'Customer record created successfully!' });
+});
+
+app.put('/api/customers/:id', async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Authentication required.' });
+  }
+  const { id } = req.params;
+  const updates = req.body;
+  const local = readLocalDB();
+  if (!local.customers) local.customers = [];
+  const idx = local.customers.findIndex(c => String(c.id) === String(id));
+  if (idx === -1) {
+    return res.status(404).json({ success: false, message: 'Customer not found.' });
+  }
+
+  local.customers[idx] = { ...local.customers[idx], ...updates, updatedAt: new Date().toISOString() };
+  writeLocalDB(local);
+
+  res.json({ success: true, customer: local.customers[idx], message: 'Customer updated successfully!' });
 });
 
 // SMS Rate Limiter Store
