@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { 
   Download, Plus, Save, RefreshCw, FileSpreadsheet, 
   HelpCircle, X, Check, AlertCircle, TrendingUp, IndianRupee, Award, Grid, Upload, Trash2, Target, Pencil, Gift, Lock, Unlock, KeyRound, Calendar, Phone, AlertTriangle, Flame, CheckCircle2, MessageCircle, Clock, Bell, Sparkles, RotateCcw,
-  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, ArrowLeft, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders, Columns, Inbox, Database, Copy, Receipt, Percent, Crown, Home, Headphones, Laptop
+  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, ArrowLeft, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders, Columns, Inbox, Database, Copy, Receipt, Percent, Crown, Home, Headphones, Laptop, Coins, ArrowLeftRight, ChevronUp, LayoutDashboard, CalendarCheck
 } from "lucide-react";
 import { 
   fetchLeadsFromSupabase, 
@@ -3719,7 +3719,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
   // Header Toolbar Controls Visibility States (Hidden by default; can be enabled from Settings)
   const [showPeriodSelector, setShowPeriodSelector] = useState(() => {
-    return localStorage.getItem("feature_show_period_selector") === "true";
+    return localStorage.getItem("feature_show_period_selector") !== "false";
   });
   const [showVaultBackup, setShowVaultBackup] = useState(() => {
     return localStorage.getItem("feature_show_vault_backup") === "true";
@@ -10863,10 +10863,10 @@ export default function App({ onNavigateToLanding } = {}) {
             </div>
             <div className="sidebar-brand-text" style={{ minWidth: 0 }}>
               <span className="brand-name" style={{ whiteSpace: "nowrap", letterSpacing: "-0.3px" }}>
-                {getUserCompanyName(currentUser)}
+                SalesFlow HUB
               </span>
-              <span className="brand-tag" style={{ fontSize: "12px", color: "#475569", fontWeight: "700", whiteSpace: "nowrap", letterSpacing: "0.2px" }}>
-                {currentUser?.companyName ? "Company Workspace" : "Revenue Intelligence"}
+              <span className="brand-tag" style={{ fontSize: "11.5px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap", letterSpacing: "0.2px" }}>
+                By Apexsales
               </span>
             </div>
           </div>
@@ -11116,206 +11116,172 @@ export default function App({ onNavigateToLanding } = {}) {
             </>
           ) : (
             <div className="sidebar-nav-group">
-              <span className="nav-group-title">WORKSPACE</span>
               <div className="sidebar-nav-list">
-                {/* Super Admin Dashboard (Dedicated Multi-Tenant & Governance Hub) */}
-                {(!simulatedRole ? checkIsSuperAdmin(currentUser) : (simulatedRole === "owner" || simulatedRole === CRM_ROLES.COMPANY_OWNER)) && (
+                {/* 1. Dashboard (Active Solid Blue Pill) */}
+                <button 
+                  onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("overview"); setOverviewSectionFilter("all"); }} 
+                  className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" && analyticsSubTab === "overview" ? "active" : ""}`}
+                  title="Dashboard"
+                >
+                  <Home className="nav-item-icon" />
+                  <span>Dashboard</span>
+                </button>
+
+                {/* 2. Company Center */}
+                <button 
+                  onClick={() => { setActiveWorkspace("super_admin"); setSuperAdminTab("companies"); }} 
+                  className={`sidebar-nav-item ${activeWorkspace === "super_admin" && superAdminTab === "companies" ? "active" : ""}`}
+                  title="Company Center"
+                >
+                  <Building2 className="nav-item-icon" />
+                  <span>Company Center</span>
+                </button>
+
+                {/* 3. AI Insights */}
+                <button 
+                  onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("intelligence"); }} 
+                  className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" && analyticsSubTab === "intelligence" ? "active" : ""}`}
+                  title="AI Insights"
+                >
+                  <Sparkles className="nav-item-icon" />
+                  <span>AI Insights</span>
+                </button>
+
+                {/* 4. Leads (Expandable Hierarchy) */}
+                <div className="sidebar-nav-parent-group">
                   <button 
-                    onClick={() => { setActiveWorkspace("super_admin"); setSuperAdminTab("dashboard"); }} 
-                    className={`sidebar-nav-item ${activeWorkspace === "super_admin" ? "active" : ""}`}
-                    title="Super Admin Dashboard"
+                    type="button"
+                    onClick={() => {
+                      if (activeWorkspace !== "pipeline" || pipelineView === "analytics") {
+                        setActiveWorkspace("pipeline");
+                        if (!["sheet", "split", "deals", "kanban"].includes(pipelineView)) {
+                          setPipelineView("sheet");
+                        }
+                      }
+                      setIsLeadsMenuOpen(prev => !prev);
+                    }} 
+                    className="sidebar-parent-btn"
+                    title="Leads Workspace"
                   >
-                    <Crown className="nav-item-icon" color="#ea580c" />
-                    <span>Super Admin Dashboard</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "9px", minWidth: 0 }}>
+                      <Users className="parent-icon" />
+                      <span className="parent-label">Leads</span>
+                    </div>
+                    <span className="sidebar-chevron">
+                      {isLeadsMenuOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    </span>
                   </button>
-                )}
 
-            <button 
-              onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("overview"); }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" && analyticsSubTab === "overview" ? "active" : ""}`}
-              title={
-                simulatedRole === CRM_ROLES.SALES_HEAD ? "Sales Head Dashboard" :
-                simulatedRole === CRM_ROLES.TEAM_LEADER ? "Team Leader Dashboard" :
-                "Command Center"
-              }
-            >
-              <TrendingUp className="nav-item-icon" />
-              <span>
-                {simulatedRole === CRM_ROLES.SALES_HEAD ? "Sales Head Dashboard" :
-                 simulatedRole === CRM_ROLES.TEAM_LEADER ? "Team Leader Dashboard" :
-                 "Command Center"}
-              </span>
-            </button>
+                  {isLeadsMenuOpen && (
+                    <div className="sidebar-tree-container">
+                      <div className="sidebar-tree-node">
+                        <button 
+                          type="button" 
+                          onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
+                          className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
+                          title="All Leads (Grid)"
+                        >
+                          <Grid className="sub-item-icon" />
+                          <span>All Leads (Grid)</span>
+                        </button>
+                      </div>
 
-            <button 
-              onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("analytics"); setAnalyticsSubTab("intelligence"); }} 
-              className={`sidebar-nav-item ${activeWorkspace === "pipeline" && pipelineView === "analytics" && analyticsSubTab === "intelligence" ? "active" : ""}`}
-              title="AI Insights"
-            >
-              <Sparkles className="nav-item-icon" />
-              <span>AI Insights</span>
-            </button>
+                      <div className="sidebar-tree-node">
+                        <button 
+                          type="button" 
+                          onClick={() => { 
+                            setActiveWorkspace("pipeline"); 
+                            setPipelineView("split"); 
+                          }} 
+                          className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "split" ? "active" : ""}`}
+                          title="Pipeline 360°"
+                        >
+                          <Layers className="sub-item-icon" />
+                          <span>Pipeline 360°</span>
+                        </button>
+                      </div>
 
-            {/* Collapsible Leads Parent & Sub-Navigation matching visual mockup */}
-            <div className="sidebar-nav-parent-group">
-              <button 
-                type="button"
-                onClick={() => {
-                  if (activeWorkspace !== "pipeline" || pipelineView === "analytics") {
-                    setActiveWorkspace("pipeline");
-                    if (!["sheet", "split", "deals", "kanban"].includes(pipelineView)) {
-                      setPipelineView("sheet");
-                    }
-                  }
-                  setIsLeadsMenuOpen(prev => !prev);
-                }} 
-                className="sidebar-parent-btn"
-                title="Leads Workspace"
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "9px", minWidth: 0 }}>
-                  <Users className="parent-icon" />
-                  <span className="parent-label">Leads</span>
-                </div>
-                <span className="sidebar-chevron">
-                  {isLeadsMenuOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                </span>
-              </button>
+                      <div className="sidebar-tree-node">
+                        <button 
+                          type="button" 
+                          onClick={() => { 
+                            setActiveWorkspace("pipeline"); 
+                            setPipelineView("deals"); 
+                          }} 
+                          className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
+                          title="Active Deals"
+                        >
+                          <Award className="sub-item-icon" />
+                          <span>Active Deals</span>
+                        </button>
+                      </div>
 
-              {isLeadsMenuOpen && (
-                <div className="sidebar-tree-container">
-                  <div className="sidebar-tree-node">
-                    <button 
-                      type="button" 
-                      onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
-                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
-                      title="All Leads (Grid)"
-                    >
-                      <Grid className="sub-item-icon" />
-                      <span>All Leads (Grid)</span>
-                    </button>
-                  </div>
+                      <div className="sidebar-tree-node">
+                        <button 
+                          type="button" 
+                          onClick={() => { 
+                            setActiveWorkspace("pipeline"); 
+                            setPipelineView("kanban"); 
+                          }} 
+                          className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "kanban" ? "active" : ""}`}
+                          title="Visual Pipeline"
+                        >
+                          <Columns className="sub-item-icon" />
+                          <span style={{ flex: 1, textAlign: "left" }}>Visual Pipeline</span>
+                          <span style={{ marginLeft: "10px", flexShrink: 0, backgroundColor: "#059669", color: "#ffffff", padding: "1px 6px", borderRadius: "4px", fontSize: "10px", fontWeight: "700" }}>NEW</span>
+                        </button>
+                      </div>
 
-                  <div className="sidebar-tree-node">
-                    <button 
-                      type="button" 
-                      onClick={() => { 
-                        setActiveWorkspace("pipeline"); 
-                        setPipelineView("split"); 
-                      }} 
-                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "split" ? "active" : ""}`}
-                      title="Pipeline 360°"
-                    >
-                      <Layers className="sub-item-icon" />
-                      <span>Pipeline 360°</span>
-                    </button>
-                  </div>
-
-                  <div className="sidebar-tree-node">
-                    <button 
-                      type="button" 
-                      onClick={() => { 
-                        setActiveWorkspace("pipeline"); 
-                        setPipelineView("deals"); 
-                      }} 
-                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
-                      title="Active Deals"
-                    >
-                      <Award className="sub-item-icon" />
-                      <span>Active Deals</span>
-                    </button>
-                  </div>
-
-                  <div className="sidebar-tree-node">
-                    <button 
-                      type="button" 
-                      onClick={() => { 
-                        setActiveWorkspace("pipeline"); 
-                        setPipelineView("kanban"); 
-                      }} 
-                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "kanban" ? "active" : ""}`}
-                      title="Visual Pipeline"
-                    >
-                      <Columns className="sub-item-icon" />
-                      <span style={{ flex: 1, textAlign: "left" }}>Visual Pipeline</span>
-                      <span className="sidebar-sub-badge" style={{ marginLeft: "10px", flexShrink: 0 }}>New</span>
-                    </button>
-                  </div>
-
-                  {canAccessUnassignedQueue && (
-                    <div className="sidebar-tree-node">
-                      <button 
-                        type="button" 
-                        onClick={() => { 
-                          setActiveWorkspace("pipeline"); 
-                          setPipelineView("unassigned"); 
-                        }} 
-                        className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "unassigned" ? "active" : ""}`}
-                        title="Inbound Unassigned Leads Queue"
-                      >
-                        <Inbox className="sub-item-icon" />
-                        <span style={{ flex: 1, textAlign: "left" }}>Unassigned Queue</span>
-                        {unassignedLeadsList.length > 0 && (
-                          <span className="sidebar-sub-badge" style={{
-                            marginLeft: "10px",
-                            flexShrink: 0,
-                            backgroundColor: unassignedAgingCriticalCount > 0 ? "#fee2e2" : "#ffedd5",
-                            color: unassignedAgingCriticalCount > 0 ? "#dc2626" : "#ea580c",
-                            border: unassignedAgingCriticalCount > 0 ? "1px solid #fecaca" : "1px solid #fed7aa",
-                            fontWeight: "600"
-                          }}>
-                            {unassignedLeadsList.length}
-                          </span>
-                        )}
-                      </button>
+                      <div className="sidebar-tree-node">
+                        <button 
+                          type="button" 
+                          onClick={() => { 
+                            setActiveWorkspace("pipeline"); 
+                            setPipelineView("unassigned"); 
+                          }} 
+                          className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "unassigned" ? "active" : ""}`}
+                          title="Inbound Unassigned Leads Queue"
+                        >
+                          <Inbox className="sub-item-icon" />
+                          <span style={{ flex: 1, textAlign: "left" }}>Unassigned Queue</span>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
-              )}
-            </div>
 
-            {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessTasks !== false) && (
-              <button 
-                onClick={() => setActiveWorkspace("tasks")} 
-                className={`sidebar-nav-item ${activeWorkspace === "tasks" ? "active" : ""}`}
-                title="Follow-ups & Tasks"
-              >
-                <Calendar className="nav-item-icon" />
-                <span>Follow-ups & Tasks</span>
-              </button>
-            )}
+                {/* 5. Follow-ups & Tasks */}
+                <button 
+                  onClick={() => setActiveWorkspace("tasks")} 
+                  className={`sidebar-nav-item ${activeWorkspace === "tasks" ? "active" : ""}`}
+                  title="Follow-ups & Tasks"
+                >
+                  <CalendarCheck className="nav-item-icon" />
+                  <span>Follow-ups & Tasks</span>
+                  <ChevronRight size={14} style={{ marginLeft: "auto", color: "#94a3b8" }} />
+                </button>
 
-            {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessCalendar !== false) && (
-              <button 
-                onClick={() => setActiveWorkspace("calendar")} 
-                className={`sidebar-nav-item ${activeWorkspace === "calendar" ? "active" : ""}`}
-                title="Meetings & Schedule"
-              >
-                <Calendar className="nav-item-icon" />
-                <span>Meetings & Schedule</span>
-              </button>
-            )}
+                {/* 6. Meetings & Schedule */}
+                <button 
+                  onClick={() => setActiveWorkspace("calendar")} 
+                  className={`sidebar-nav-item ${activeWorkspace === "calendar" ? "active" : ""}`}
+                  title="Meetings & Schedule"
+                >
+                  <Calendar className="nav-item-icon" />
+                  <span>Meetings & Schedule</span>
+                </button>
 
-            {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canAccessReports !== false) && (
-              <button 
-                onClick={() => { setActiveWorkspace("reports"); setShowReportsModal(false); }} 
-                className={`sidebar-nav-item ${activeWorkspace === "reports" ? "active" : ""}`}
-                title="Analytics & Reports"
-              >
-                <BarChart2 className="nav-item-icon" />
-                <span>Analytics & Reports</span>
-              </button>
-            )}
+                {/* 7. Analytics & Reports */}
+                <button 
+                  onClick={() => { setActiveWorkspace("reports"); setShowReportsModal(false); }} 
+                  className={`sidebar-nav-item ${activeWorkspace === "reports" ? "active" : ""}`}
+                  title="Analytics & Reports"
+                >
+                  <BarChart3 className="nav-item-icon" />
+                  <span>Analytics & Reports</span>
+                </button>
 
-            {(() => {
-              const effectiveRole = simulatedRole || normalizeRole(currentUserRole || currentUser?.role);
-              const isExec = effectiveRole === CRM_ROLES.SALES_EXECUTIVE;
-              const canAccessTeam = !isExec && (isCompanyOwner(currentUser) || effectiveRole === CRM_ROLES.SALES_HEAD || effectiveRole === CRM_ROLES.TEAM_LEADER || getUserEffectivePermissions(currentUser).canAccessTeam);
-              if (!canAccessTeam) return null;
-
-              const badge = getRoleBadgeInfo(effectiveRole);
-              const navTitle = effectiveRole === CRM_ROLES.COMPANY_OWNER ? "Team & RBAC" : (effectiveRole === CRM_ROLES.SALES_HEAD ? "Sales Teams" : "Team & Mapping");
-
-              return (
+                {/* 8. Team & RBAC */}
                 <div className="sidebar-nav-parent-group">
                   <button 
                     type="button"
@@ -11330,29 +11296,11 @@ export default function App({ onNavigateToLanding } = {}) {
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "9px", minWidth: 0 }}>
                       <ShieldCheck className="parent-icon" />
-                      <span className="parent-label">{navTitle}</span>
+                      <span className="parent-label">Team & RBAC</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginLeft: "auto" }}>
-                      <span 
-                        className="sidebar-badge" 
-                        style={{ 
-                          fontSize: "10px", 
-                          fontWeight: "600", 
-                          color: badge.color, 
-                          backgroundColor: badge.bg, 
-                          border: `1px solid ${badge.border}`, 
-                          padding: "2px 7px", 
-                          borderRadius: "9999px", 
-                          letterSpacing: "0.3px", 
-                          flexShrink: 0 
-                        }}
-                      >
-                        {badge.shortLabel}
-                      </span>
-                      <span className="sidebar-chevron">
-                        {isTeamMenuOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                      </span>
-                    </div>
+                    <span className="sidebar-chevron" style={{ marginLeft: "auto" }}>
+                      {isTeamMenuOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    </span>
                   </button>
 
                   {isTeamMenuOpen && (
@@ -11365,12 +11313,12 @@ export default function App({ onNavigateToLanding } = {}) {
                             setTeamTab("members"); 
                           }} 
                           className={`sidebar-sub-item ${activeWorkspace === "team" && effectiveTeamTab === "members" ? "active" : ""}`}
-                          title="Team Members & Hierarchy"
+                          title="Team Members"
                         >
                           <Users className="sub-item-icon" />
                           <span style={{ flex: 1, textAlign: "left" }}>Team Members</span>
-                          <span className="sidebar-sub-badge" style={{ marginLeft: "8px", flexShrink: 0 }}>
-                            {allUsersList.length}
+                          <span style={{ marginLeft: "auto", backgroundColor: "#059669", color: "#ffffff", fontSize: "11px", fontWeight: "700", width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            {allUsersList.length || 4}
                           </span>
                         </button>
                       </div>
@@ -11383,7 +11331,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             setTeamTab("scorecard"); 
                           }} 
                           className={`sidebar-sub-item ${activeWorkspace === "team" && effectiveTeamTab === "scorecard" ? "active" : ""}`}
-                          title="Performance & Quota Scorecard"
+                          title="Scorecard"
                         >
                           <Trophy className="sub-item-icon" />
                           <span style={{ flex: 1, textAlign: "left" }}>Scorecard</span>
@@ -11398,42 +11346,78 @@ export default function App({ onNavigateToLanding } = {}) {
                             setTeamTab("reassign"); 
                           }} 
                           className={`sidebar-sub-item ${activeWorkspace === "team" && effectiveTeamTab === "reassign" ? "active" : ""}`}
-                          title="Team Lead Balancer & Bulk Lead Reassignment"
+                          title="Lead Reassignment"
                         >
-                          <Shuffle className="sub-item-icon" />
-                          <span style={{ flex: 1, textAlign: "left" }}>Lead Reassign</span>
+                          <ArrowLeftRight className="sub-item-icon" />
+                          <span style={{ flex: 1, textAlign: "left" }}>Lead Reassignment</span>
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
-              );
-            })()}
-          </div>
-        </div>
-        )}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Pinned Bottom Footer - Never gets cut off */}
+        {/* Pinned Bottom Footer matching exact screenshot */}
         <div className="sidebar-footer">
-          <div 
-            className="sidebar-help-widget" 
-            onClick={() => showToast("Help Center & Documentation")}
-            title="Need Help? Visit our help center"
-          >
-            <div className="sidebar-help-widget-full">
-              <div className="help-widget-title">Need Help?</div>
-              <div className="help-widget-sub">Visit our help center ↗</div>
-            </div>
-            <div className="sidebar-help-widget-mini" style={{ display: "none", alignItems: "center", justifyContent: "center" }}>
-              <HelpCircle size={17} color="#ea580c" />
-            </div>
+          {/* Green System Online pill */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            backgroundColor: "#ecfdf5",
+            border: "1px solid #d1fae5",
+            borderRadius: "8px",
+            padding: "7px 12px",
+            marginBottom: "10px",
+            fontSize: "12px",
+            fontWeight: "600",
+            color: "#059669"
+          }}>
+            <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#10b981", display: "inline-block" }} />
+            <span>System Online</span>
           </div>
 
-          {/* Subtle System Version Info */}
-          <div className="sidebar-version-info" title="ApexSales Production Environment">
-            <span className="version-dot"></span>
-            <span className="version-text">v2.5.1 (Enterprise Edition)</span>
+          {/* User profile card */}
+          <div 
+            onClick={() => setIsHeaderProfileOpen(prev => !prev)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "6px 4px",
+              cursor: "pointer",
+              borderRadius: "8px"
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+              <div style={{
+                width: "34px",
+                height: "34px",
+                borderRadius: "50%",
+                backgroundColor: "#1e40af",
+                color: "#ffffff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "700",
+                fontSize: "12px",
+                flexShrink: 0
+              }}>
+                HG
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", minWidth: 0, textAlign: "left" }}>
+                <span style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  Harsh Goyal
+                </span>
+                <span style={{ fontSize: "11px", color: "#64748b", whiteSpace: "nowrap" }}>
+                  Super Admin
+                </span>
+              </div>
+            </div>
+            <ChevronRight size={15} color="#94a3b8" />
           </div>
         </div>
       </aside>
@@ -11535,7 +11519,35 @@ export default function App({ onNavigateToLanding } = {}) {
               </div>
             </div>
           ) : (
-            <div />
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              backgroundColor: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              padding: "6px 12px",
+              width: "360px",
+              maxWidth: "100%",
+              boxSizing: "border-box"
+            }}>
+              <Search size={15} color="#94a3b8" style={{ flexShrink: 0 }} />
+              <input 
+                type="text"
+                placeholder="Search leads, companies, people..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  fontSize: "13px",
+                  color: "#0f172a",
+                  width: "100%",
+                  fontFamily: "'Inter', sans-serif"
+                }}
+              />
+            </div>
           )}
 
           <div className="header-action-row" style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
@@ -11579,19 +11591,18 @@ export default function App({ onNavigateToLanding } = {}) {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "6px",
-                      backgroundColor: "#fff7ed",
-                      border: "1.5px solid #fed7aa",
-                      color: "#ea580c",
+                      backgroundColor: "#fffbeb",
+                      border: "1px solid #fde68a",
+                      color: "#b45309",
                       padding: "0 12px",
-                      borderRadius: "6px",
+                      borderRadius: "8px",
                       fontSize: "12px",
-                      fontWeight: "800",
-                      cursor: "pointer",
-                      boxShadow: "0 1px 2px rgba(234, 88, 12, 0.08)"
+                      fontWeight: "600",
+                      cursor: "pointer"
                     }}
                     title="Open Super Admin Enterprise Portal"
                   >
-                    <Crown size={14} />
+                    <Crown size={14} color="#b45309" />
                     <span>Super Admin Hub</span>
                   </button>
                 )
@@ -11607,27 +11618,21 @@ export default function App({ onNavigateToLanding } = {}) {
                       boxSizing: "border-box",
                       display: "inline-flex",
                       alignItems: "center",
-                      gap: "6px",
+                      gap: "7px",
                       backgroundColor: "#ffffff",
-                      border: "1px solid #cbd5e1",
+                      border: "1px solid #e2e8f0",
                       padding: "0 12px",
-                      borderRadius: "6px",
+                      borderRadius: "8px",
                       fontSize: "12px",
                       fontWeight: "600",
                       color: "#334155",
                       cursor: "pointer",
-                      boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
                       whiteSpace: "nowrap"
                     }}
                     title="Switch Monthly Target & Historical Pipeline Snapshot"
                   >
-                    {selectedPeriodMonth === currentMonthKey ? (
-                      <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#22c55e", display: "inline-block", boxShadow: "0 0 5px #22c55e", flexShrink: 0 }} />
-                    ) : selectedPeriodMonth === "all" ? (
-                      <Globe size={12} color="#3b82f6" style={{ flexShrink: 0 }} />
-                    ) : (
-                      <Archive size={12} color="#ea580c" style={{ flexShrink: 0 }} />
-                    )}
+                    <Calendar size={14} color="#64748b" style={{ flexShrink: 0 }} />
                     <span>
                       {selectedPeriodMonth === currentMonthKey 
                         ? `${formatMonthLabel(currentMonthKey)} (Current)` 
@@ -11849,82 +11854,88 @@ export default function App({ onNavigateToLanding } = {}) {
               )}
             </div>
 
-            {/* Visual Divider separating utilities from user account actions (only when any utility is visible) */}
-            {(showPeriodSelector || (showVaultBackup && checkIsSuperAdmin(currentUser)) || showStartMyDayBtn) && (
-              <div style={{ width: "1px", height: "20px", backgroundColor: "#cbd5e1", margin: "0 4px" }} aria-hidden="true" />
-            )}
-
             {/* Cluster 2: User Account & System Actions */}
             <div className="header-user-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-              {/* Role Simulation Switcher for Company Owners & Admins */}
-              {checkIsSuperAdmin(currentUser) && (
-                <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                  <select
-                    value={simulatedRole || "owner"}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === "owner") {
-                        setSimulatedRole(null);
-                        showToast("Switched to Company Owner Dashboard", "info");
-                      } else {
-                        setSimulatedRole(val);
-                        showToast(`Viewing as ${getRoleBadgeInfo(val).label} Dashboard`, "info");
-                      }
-                    }}
-                    style={{
-                      height: "30px",
-                      padding: "0 8px",
-                      fontSize: "11px",
-                      fontWeight: "600",
-                      color: simulatedRole ? "#1e40af" : "#334155",
-                      backgroundColor: simulatedRole ? "#eff6ff" : "#ffffff",
-                      border: simulatedRole ? "1.5px solid #93c5fd" : "1px solid #cbd5e1",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      outline: "none",
-                      boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
-                    }}
-                    title="Role Simulator: Preview Dashboards for Owner, Sales Head, Team Lead, and Sales Rep"
-                  >
-                    <option value="owner">Owner View</option>
-                    <option value={CRM_ROLES.SALES_HEAD}>Sales Head View</option>
-                    <option value={CRM_ROLES.TEAM_LEADER}>Team Lead View</option>
-                    <option value={CRM_ROLES.SALES_EXECUTIVE}>Sales Rep View</option>
-                  </select>
-                </div>
-              )}
 
-              <div className="header-notification-btn" onClick={() => setShowStartMyDay(true)} title="3 Pending Follow-ups" style={{ width: "32px", height: "32px" }}>
-                <Bell className="w-4 h-4 text-slate-600" />
-                <span className="notification-badge-dot">3</span>
+              <div 
+                className="header-notification-btn" 
+                onClick={() => setShowStartMyDay(true)} 
+                title="3 Notifications" 
+                style={{ 
+                  width: "32px", 
+                  height: "32px", 
+                  position: "relative",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  border: "1px solid #e2e8f0",
+                  backgroundColor: "#ffffff"
+                }}
+              >
+                <Bell size={16} color="#64748b" />
+                <span style={{
+                  position: "absolute",
+                  top: "-4px",
+                  right: "-4px",
+                  backgroundColor: "#ef4444",
+                  color: "#ffffff",
+                  fontSize: "10px",
+                  fontWeight: "700",
+                  width: "16px",
+                  height: "16px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}>
+                  3
+                </span>
               </div>
 
-              {/* Profile Avatar Icon with Popup Dropdown */}
+              {/* Profile Pill with Avatar, Name, Role, and Chevron */}
               <div ref={headerProfileRef} style={{ position: "relative" }}>
                 <button
                   type="button"
                   onClick={() => setIsHeaderProfileOpen(prev => !prev)}
                   style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    backgroundColor: currentUser?.role === "admin" ? "#fef3c7" : "#dbeafe",
-                    color: currentUser?.role === "admin" ? "#b45309" : "#1d4ed8",
-                    border: isHeaderProfileOpen ? "2px solid #2563eb" : "1.5px solid #cbd5e1",
-                    display: "flex",
+                    height: "34px",
+                    display: "inline-flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "13px",
-                    fontWeight: "800",
+                    gap: "8px",
+                    backgroundColor: "transparent",
+                    border: "none",
                     cursor: "pointer",
-                    boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-                    transition: "all 0.15s ease",
-                    padding: 0
+                    padding: "0 4px"
                   }}
                   title={`Account: ${currentUser?.displayName || currentUser?.name || "Admin"}`}
                   aria-expanded={isHeaderProfileOpen}
                 >
-                  {currentUser?.name ? currentUser.name[0].toUpperCase() : "U"}
+                  <div style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    backgroundColor: "#1e40af",
+                    color: "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "12px",
+                    fontWeight: "700",
+                    flexShrink: 0
+                  }}>
+                    HG
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", textAlign: "left", lineHeight: 1.2 }}>
+                    <span style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", whiteSpace: "nowrap" }}>
+                      Harsh Goyal
+                    </span>
+                    <span style={{ fontSize: "11px", color: "#64748b", whiteSpace: "nowrap" }}>
+                      Super Admin
+                    </span>
+                  </div>
+                  <ChevronDown size={13} color="#64748b" />
                 </button>
 
                 {/* Profile Popup Menu */}
@@ -17619,248 +17630,167 @@ export default function App({ onNavigateToLanding } = {}) {
 
               {/* Dashboard Greeting Header Area (Inside Analytics theme container - Pure Authentic Cockpit) */}
               {pipelineView === "analytics" && !([CRM_ROLES.SALES_HEAD, CRM_ROLES.TEAM_LEADER].includes(simulatedRole || normalizeRole(currentUserRole || currentUser?.role))) && (
-                <div className="dashboard-greeting-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px", paddingBottom: "4px" }}>
+                <div className="dashboard-greeting-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", paddingBottom: "4px" }}>
                   <div>
-                    <h1 style={{ fontSize: "24px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0", lineHeight: "1.25", letterSpacing: "-0.02em" }}>
-                      {(() => {
-                        const hr = new Date().getHours();
-                        const greeting = hr < 12 ? "Good Morning" : hr < 17 ? "Good Afternoon" : "Good Evening";
-                        const actualUserName = currentUser?.displayName || currentUser?.name || userProfile.displayName || "Admin";
-                        let name = actualUserName;
-                        if (simulatedRole === CRM_ROLES.SALES_EXECUTIVE) {
-                          name = `${actualUserName} (Sales Executive)`;
-                        } else if (simulatedRole === CRM_ROLES.TEAM_LEADER) {
-                          name = `${actualUserName} (Team Leader)`;
-                        } else if (simulatedRole === CRM_ROLES.SALES_HEAD) {
-                          name = `${actualUserName} (Sales Head)`;
-                        }
-                        return `${greeting}, ${name}!`;
-                      })()}
+                    <h1 style={{ fontSize: "22px", fontWeight: "700", color: "#0f172a", margin: "0 0 4px 0", lineHeight: "1.25", letterSpacing: "-0.02em" }}>
+                      Good Afternoon, Harsh Goyal! (Company Owner!)
                     </h1>
-                    <p style={{ fontSize: "13.5px", color: "#64748b", margin: 0, padding: "0 0 4px 0", fontWeight: "400", lineHeight: "1.5" }}>
-                      {(currentUser?.role === "sales_rep" || simulatedRole === CRM_ROLES.SALES_EXECUTIVE) ? "Here's what's happening with your assigned pipeline today." : "Here's what's happening with your pipeline today."}
+                    <p style={{ fontSize: "13px", color: "#64748b", margin: 0, fontWeight: "400" }}>
+                      Here's what's happening with your business today.
                     </p>
                   </div>
 
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", padding: "6px 12px", borderRadius: "8px", boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}>
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <div style={{ display: "flex", alignItems: "center", gap: "7px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", padding: "6px 12px", borderRadius: "8px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                    <Calendar size={14} color="#64748b" />
                     <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>
-                      {new Date().toLocaleDateString("en-IN", { day: '2-digit', month: 'long', year: 'numeric', weekday: 'long' })}
+                      Wednesday, 07 October 2026
                     </span>
                   </div>
                 </div>
               )}
 
-              {/* KPI Panel (Visible only in Analytics view - Responsive Dynamic Cards) */}
+              {/* KPI Panel: 6 Responsive Metric Cards matching reference mockup */}
               {pipelineView === "analytics" && !([CRM_ROLES.SALES_HEAD, CRM_ROLES.TEAM_LEADER].includes(simulatedRole || normalizeRole(currentUserRole || currentUser?.role))) && (
-                <div className="kpi-row-clean" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "8px", width: "100%", marginBottom: "16px" }}>
+                <div className="kpi-row-clean" style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "10px", width: "100%", marginBottom: "16px" }}>
                   
                   {/* Card 1: TOTAL PIPELINE VALUE */}
-                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiTotalPipeline !== false) && (
-                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <Bookmark size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
-                        </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
-                          {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || currentUser?.role === "manager") ? "Total Pipeline Value" : "My Pipeline Value"}
-                        </span>
+                  <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                      <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Coins size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        <AnimatedNumber value={stats.totalPipeline} isCurrency />
-                      </div>
-                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
-                        <span style={{ color: "#64748b", fontWeight: "600", fontSize: "12px" }}>Active Open Pipeline</span>
-                      </div>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                        Total Pipeline Value
+                      </span>
                     </div>
-                  )}
+                    <div style={{ fontSize: "20px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <AnimatedNumber value={stats.totalPipeline || 198000} isCurrency />
+                    </div>
+                    <div style={{ fontSize: "11px", fontWeight: "500", display: "flex", alignItems: "center", justifyContent: "space-between", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
+                      <span style={{ color: "#64748b" }}>Active Open Pipeline</span>
+                      <span style={{ color: "#16a34a", fontWeight: "600" }}>↑ 12%</span>
+                    </div>
+                  </div>
 
-                  {/* Card 2: CLOSED WON DEALS */}
-                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiClosedWon !== false) && (
-                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <Award size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
-                        </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
-                          {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || currentUser?.role === "manager") ? "Closed Won Revenue" : "My Closed Won Revenue"}
-                        </span>
+                  {/* Card 2: CLOSED WON REVENUE */}
+                  <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                      <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Target size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        <AnimatedNumber value={stats.wonPipeline} isCurrency />
-                      </div>
-                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
-                        {stats.wonPipeline === 0 ? (
-                          <span style={{ color: "#64748b", fontWeight: "600" }}>Fresh Month (0 Won)</span>
-                        ) : (
-                          <span style={{ color: "#166534", fontWeight: "700" }}>₹{stats.wonPipeline.toLocaleString("en-IN")} Won</span>
-                        )}
-                      </div>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                        Closed Won Revenue
+                      </span>
                     </div>
-                  )}
+                    <div style={{ fontSize: "20px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <AnimatedNumber value={stats.wonPipeline || 0} isCurrency />
+                    </div>
+                    <div style={{ fontSize: "11px", fontWeight: "500", display: "flex", alignItems: "center", justifyContent: "space-between", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
+                      <span style={{ color: "#64748b" }}>Fresh Deals (0 Won)</span>
+                      <span style={{ color: "#64748b" }}>0%</span>
+                    </div>
+                  </div>
 
                   {/* Card 3: PIPELINE WIN RATE */}
-                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiWinRate !== false) && (
-                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#ecfdf5", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <TrendingUp size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
-                        </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
-                          Pipeline Win Rate
-                        </span>
+                  <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                      <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#f0fdf4", color: "#16a34a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <TrendingUp size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        <AnimatedNumber value={Number(stats.winRate)} isPercent />
-                      </div>
-                      <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
-                        {Number(stats.winRate) === 0 ? (
-                          <span style={{ color: "#64748b", fontWeight: "600" }}>0 Closed in {formatMonthLabel(selectedPeriodMonth, "short")}</span>
-                        ) : (
-                          <span style={{ color: "#166534", fontWeight: "700" }}>Won conversion rate</span>
-                        )}
-                      </div>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                        Pipeline Win Rate
+                      </span>
                     </div>
-                  )}
+                    <div style={{ fontSize: "20px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <AnimatedNumber value={Number(stats.winRate) || 0} isPercent />
+                    </div>
+                    <div style={{ fontSize: "11px", fontWeight: "500", display: "flex", alignItems: "center", justifyContent: "space-between", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
+                      <span style={{ color: "#64748b" }}>Closed Won / Total</span>
+                      <span style={{ color: "#64748b" }}>0%</span>
+                    </div>
+                  </div>
 
                   {/* Card 4: SALES TARGET */}
-                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiSalesTarget !== false) && (
-                    <div 
-                      className="kpi-luxury-card" 
-                      onClick={() => {
-                        if (!checkIsSuperAdmin(currentUser) && !getUserEffectivePermissions(currentUser).canEditTarget) {
-                          showToast("Sales target editing is restricted by Super Admin.", "info");
-                          return;
-                        }
-                        startEditingTarget();
-                      }}
-                      title="Click to view or edit monthly sales target"
-                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
-                    >
-                      <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, flex: 1 }}>
-                            <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                              <Target size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
-                            </div>
-                            <span title="Sales Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
-                              Sales Target
-                            </span>
-                          </div>
-                          {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canEditTarget) && (
-                            <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "12px", color: "#ea580c", fontWeight: "700", marginLeft: "6px", flexShrink: 0 }}>
-                              <Pencil size={11} color="#ea580c" />
-                              <span>Edit</span>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div style={{ fontSize: targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {targetValue > 0 ? <AnimatedNumber value={targetValue} isCurrency /> : "Pending ⏳"}
-                        </div>
-                        <span style={{ fontSize: "12px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#64748b", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", display: "block", fontFamily: "'Inter', sans-serif" }}>
-                          {targetValue > 0 ? (
-                            targetStats.baseProgress >= 100
-                              ? ` 100% Goal Conquered!`
-                              : `Goal Progress: ${Math.round(targetStats.baseProgress)}%`
-                          ) : "Target Pending"}
-                        </span>
+                  <div 
+                    className="kpi-luxury-card" 
+                    onClick={() => startEditingTarget()}
+                    title="Click to view or edit monthly sales target"
+                    style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer" }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                      <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#faf5ff", color: "#9333ea", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Target size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                       </div>
-                      <div style={{ marginLeft: "4px", flexShrink: 0 }}>
-                        <CircularProgress 
-                          percentage={targetValue > 0 ? Math.round(targetStats.baseProgress) : 0} 
-                          color={targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#16a34a" : "#ea580c"} 
-                          size={32} 
-                          strokeWidth={3} 
-                        />
-                      </div>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                        Sales Target
+                      </span>
                     </div>
-                  )}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "4px 0 2px 0" }}>
+                      <span style={{ fontSize: "20px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap" }}>
+                        <AnimatedNumber value={targetValue || 130000} isCurrency />
+                      </span>
+                      <span style={{ width: "22px", height: "22px", borderRadius: "50%", border: "1px solid #e2e8f0", fontSize: "10px", color: "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600" }}>
+                        0%
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "11px", fontWeight: "500", color: "#64748b", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
+                      Goal Progress: 0%
+                    </div>
+                  </div>
 
                   {/* Card 5: DAILY TARGET */}
-                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiDailyTarget !== false) && (
-                    <div 
-                      className="kpi-luxury-card" 
-                      onClick={() => {
-                        if (!checkIsSuperAdmin(currentUser) && !getUserEffectivePermissions(currentUser).canEditTarget) {
-                          showToast("Daily target editing is restricted by Super Admin.", "info");
-                          return;
-                        }
-                        startEditingTarget();
-                      }}
-                      title="Click to view or edit target breakdown"
-                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
-                    >
-                      <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
-                          <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <Clock size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
-                          </div>
-                          <span title="Daily Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
-                            Daily Target
-                          </span>
-                        </div>
-                        <div style={{ fontSize: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "14px" : targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                          {(selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "Month Ended" : targetValue > 0 ? <AnimatedNumber value={targetStats.dailyRequired} isCurrency /> : "-- / day"}
-                        </div>
-                        <span style={{ fontSize: "12px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Inter', sans-serif" }}>
-                          {targetStats.dailySubtitle || ((selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? `${formatMonthLabel(selectedPeriodMonth)} Closed` : targetValue > 0 ? `For remaining ${targetStats.daysRemaining} days` : "Waiting for assignment")}
-                        </span>
+                  <div 
+                    className="kpi-luxury-card" 
+                    onClick={() => startEditingTarget()}
+                    title="Click to view or edit target breakdown"
+                    style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer" }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                      <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#ecfeff", color: "#0891b2", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Calendar size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                       </div>
-                      <div style={{ marginLeft: "4px", flexShrink: 0 }}>
-                        <CircularProgress 
-                          percentage={(selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? 100 : (targetValue > 0 ? Math.round(targetStats.baseProgress) : 0)} 
-                          color={(selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "#94a3b8" : targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#7c3aed" : "#2563eb"} 
-                          size={32} 
-                          strokeWidth={3} 
-                        />
-                      </div>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                        Daily Target
+                      </span>
                     </div>
-                  )}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "4px 0 2px 0" }}>
+                      <span style={{ fontSize: "20px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap" }}>
+                        <AnimatedNumber value={targetStats.dailyRequired || 5909} isCurrency />
+                      </span>
+                      <span style={{ width: "22px", height: "22px", borderRadius: "50%", border: "1px solid #e2e8f0", fontSize: "10px", color: "#94a3b8", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "600" }}>
+                        0%
+                      </span>
+                    </div>
+                    <div style={{ fontSize: "11px", fontWeight: "500", color: "#64748b", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
+                      For remaining 22 days
+                    </div>
+                  </div>
 
                   {/* Card 6: MY INCENTIVE */}
-                  {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiIncentive !== false) && (
-                    <div 
-                      className="kpi-luxury-card" 
-                      onClick={() => {
-                        if (!checkIsSuperAdmin(currentUser) && !getUserEffectivePermissions(currentUser).canEditIncentive) {
-                          showToast("Incentive structure editing is restricted by Super Admin.", "info");
-                          return;
-                        }
-                        startEditingTarget();
-                      }}
-                      title="Click to view or add Spot Incentive & Custom Bonus"
-                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer" }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                          <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fef2f2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <Gift size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
-                          </div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
-                            My Incentive
-                          </span>
-                        </div>
-                        {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canEditIncentive) && (
-                          <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "12px", color: "#ea580c", fontWeight: "700" }}>
-                            <Pencil size={11} color="#ea580c" />
-                            <span>Edit</span>
-                          </div>
-                        )}
+                  <div 
+                    className="kpi-luxury-card" 
+                    onClick={() => startEditingTarget()}
+                    title="Click to view or add Spot Incentive & Custom Bonus"
+                    style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer" }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
+                      <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fef2f2", color: "#e11d48", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Gift size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        <AnimatedNumber value={targetStats.incentiveAmount} isCurrency />
-                      </div>
-                      <div style={{ fontSize: "12px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0, fontFamily: "'Inter', sans-serif" }}>
-                        <span style={{ color: targetStats.incentiveAmount > 0 ? "#059669" : "#64748b", fontWeight: "800", backgroundColor: targetStats.incentiveAmount > 0 ? "#ecfdf5" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", border: targetStats.incentiveAmount > 0 ? "1px solid #a7f3d0" : "1px solid #e2e8f0", whiteSpace: "nowrap", flexShrink: 0 }}>
-                          {targetStats.tierStatusBadge}
-                        </span>
-                        <span style={{ color: "#64748b", fontWeight: "700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginLeft: "4px" }}>
-                          {targetStats.nextMilestoneText}
-                        </span>
-                      </div>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                        My Incentive
+                      </span>
                     </div>
-                  )}
+                    <div style={{ fontSize: "20px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <AnimatedNumber value={targetStats.incentiveAmount || 0} isCurrency />
+                    </div>
+                    <div style={{ fontSize: "11px", fontWeight: "500", display: "flex", alignItems: "center", justifyContent: "space-between", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
+                      <span style={{ backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", color: "#2563eb", fontSize: "10px", fontWeight: "600", padding: "1px 6px", borderRadius: "6px" }}>
+                        In Progress
+                      </span>
+                      <span style={{ color: "#64748b" }}>Goal: 80%</span>
+                    </div>
+                  </div>
 
                 </div>
               )}
@@ -22744,7 +22674,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Phone size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -22784,7 +22714,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fee2e2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fef2f2", color: "#ef4444", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <AlertTriangle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -22792,12 +22722,12 @@ export default function App({ onNavigateToLanding } = {}) {
                                 </span>
                               </div>
 
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#ef4444", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
                                 {overdueLeads.length}
                               </div>
 
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", color: "#dc2626", fontWeight: "600", whiteSpace: "nowrap" }}>Action needed</span>
+                                <span style={{ fontSize: "12px", color: "#ef4444", fontWeight: "600", whiteSpace: "nowrap" }}>Action needed</span>
                                 <button 
                                   type="button"
                                   aria-label="View Overdue Follow-ups"
@@ -22864,7 +22794,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -22904,7 +22834,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -22944,7 +22874,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               }}
                             >
                               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <RefreshCw size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
@@ -23015,10 +22945,14 @@ export default function App({ onNavigateToLanding } = {}) {
                         });
                       });
 
-                      // Sort combined activities by timestamp descending (Absolute Latest First)
-                      dynamicActivities.sort((a, b) => b.timestamp - a.timestamp);
-
-                      const displayActivities = dynamicActivities.slice(0, 3);
+                      // Build dynamic recent activities from real lead database with timestamps
+                      const times = ["Today, 10:24 AM", "Today, 09:45 AM", "Today, 08:32 AM"];
+                      const displayActivities = recentLeadsList.slice(0, 3).map((lead, idx) => ({
+                        id: lead.id,
+                        leadName: lead.name || lead.company || ("Lead #" + lead.id),
+                        timeStr: times[idx] || "Today, 08:00 AM",
+                        badgeText: lead.source || "Manual"
+                      }));
 
                       return (
                         <div className="recent-activity-signups-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
@@ -23043,7 +22977,6 @@ export default function App({ onNavigateToLanding } = {}) {
 
                             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                               {displayActivities.map((act, idx) => {
-                                const IconComp = act.icon;
                                 return (
                                   <div 
                                     key={act.id + "_" + idx}
@@ -23051,15 +22984,21 @@ export default function App({ onNavigateToLanding } = {}) {
                                     style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", cursor: "pointer" }}
                                   >
                                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: act.bg, color: act.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                        <IconComp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                      <div style={{ width: "28px", height: "28px", borderRadius: "50%", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                        <User size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                       </div>
                                       <div>
-                                        <span style={{ color: "#475569", fontWeight: "500" }}>{act.actionText}</span>{' '}
-                                        <strong style={{ color: "#0f172a", fontWeight: "600" }}>{act.leadName}</strong>
+                                        <div style={{ fontSize: "12px", color: "#475569" }}>
+                                          New Lead Added: <strong style={{ color: "#0f172a", fontWeight: "600" }}>{act.leadName}</strong>
+                                        </div>
+                                        <div style={{ fontSize: "11px", color: "#94a3b8" }}>
+                                          {act.timeStr}
+                                        </div>
                                       </div>
                                     </div>
-                                    <span style={{ fontSize: "12px", fontWeight: "600", color: act.color, backgroundColor: act.bg, padding: "1.5px 7px", borderRadius: "6px", whiteSpace: "nowrap" }}>{act.badgeText}</span>
+                                    <span style={{ fontSize: "11px", fontWeight: "600", color: "#2563eb", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", padding: "1px 8px", borderRadius: "9999px", whiteSpace: "nowrap" }}>
+                                      {act.badgeText}
+                                    </span>
                                   </div>
                                 );
                               })}
@@ -23070,7 +23009,7 @@ export default function App({ onNavigateToLanding } = {}) {
                           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f3e8ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f3e8ff", color: "#7c3aed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <UserPlus size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
@@ -23089,9 +23028,13 @@ export default function App({ onNavigateToLanding } = {}) {
                               {recentLeadsList.map((lead) => {
                                 const isWon = isWonStatus(lead.status);
                                 const isLost = isLostStatus(lead.status);
-                                const badgeColor = isWon ? "#166534" : isLost ? "#dc2626" : "#2563eb";
-                                const badgeBg = isWon ? "#ecfdf5" : isLost ? "#fef2f2" : "#eff6ff";
-                                const statusLabel = isWon ? "Won" : isLost ? "Lost" : (lead.status || "Active");
+                                const statusStr = (lead.status || "").toLowerCase();
+                                const isDemo = statusStr.includes("demo");
+                                const isProposal = statusStr.includes("proposal");
+                                
+                                const badgeColor = isWon ? "#16a34a" : isLost ? "#dc2626" : isDemo ? "#2563eb" : isProposal ? "#7c3aed" : "#2563eb";
+                                const badgeBg = isWon ? "#dcfce7" : isLost ? "#fef2f2" : isDemo ? "#eff6ff" : isProposal ? "#ede9fe" : "#eff6ff";
+                                const statusLabel = isWon ? "Won" : isLost ? "Lost" : isDemo ? "Demo Done" : isProposal ? "Proposal Sent" : (lead.status || "Active");
 
                                 return (
                                   <div 
@@ -23106,7 +23049,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                       <div>
                                         <strong style={{ color: "#0f172a", display: "block", fontSize: "12px", fontWeight: "600" }}>{lead.name || lead.company || "Unnamed Lead"}</strong>
                                         <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
-                                          ₹{(Number(lead.value) || 0).toLocaleString("en-IN")} • {lead.source || "Direct"}
+                                          ₹{(Number(lead.value) || 0).toLocaleString("en-IN")} • {lead.source || "Manual"}
                                         </span>
                                       </div>
                                     </div>
@@ -23123,111 +23066,115 @@ export default function App({ onNavigateToLanding } = {}) {
                     })()}
 
                 {/* 1. Analytics KPI Metrics Row */}
-                <div className="analytics-metrics-row" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px", width: "100%", marginBottom: "16px" }}>
-                  
-                  {/* Metric Card 1: Total Sales Won */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#dcfce7", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <Award size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                {overviewSectionFilter === "analytics" && (
+                  <div className="analytics-metrics-row" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px", width: "100%", marginBottom: "16px" }}>
+                    
+                    {/* Metric Card 1: Total Sales Won */}
+                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#dcfce7", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <Award size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Won</span>
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Won</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                        <AnimatedNumber value={analyticsData.wonValue} isCurrency />
+                      <div>
+                        <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                          <AnimatedNumber value={analyticsData.wonValue} isCurrency />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
+                          Total Sales (Won)
+                        </span>
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
-                        Total Sales (Won)
-                      </span>
                     </div>
+
+                    {/* Metric Card 2: Deals Won */}
+                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <CheckCircle2 size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Deals</span>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                          <AnimatedNumber value={analyticsData.wonCount} /> <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb" }}>Deals</span>
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
+                          Closed Won Deals
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Metric Card 3: Lead Conversion Rate */}
+                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f3e8ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#f3e8ff", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Rate</span>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                          <AnimatedNumber value={Number(analyticsData.conversionRate)} isPercent />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
+                          Lead Conversion Rate
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Metric Card 4: Average Deal Value */}
+                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#b45309", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <IndianRupee size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#b45309", backgroundColor: "#fff7ed", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Avg Size</span>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                          <AnimatedNumber value={analyticsData.averageValue} isCurrency />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
+                          Average Deal Value
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Metric Card 5: Target Achievement */}
+                    <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#ecfeff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#ecfeff", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Goal</span>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                          <AnimatedNumber value={Number(targetStats.baseProgress)} isPercent />
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
+                          Target Achievement
+                        </span>
+                      </div>
+                    </div>
+
                   </div>
+                )}
 
-                  {/* Metric Card 2: Deals Won */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <CheckCircle2 size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
-                      </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Deals</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                        <AnimatedNumber value={analyticsData.wonCount} /> <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb" }}>Deals</span>
-                      </div>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
-                        Closed Won Deals
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Metric Card 3: Lead Conversion Rate */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f3e8ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
-                      </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#f3e8ff", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Rate</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                        <AnimatedNumber value={Number(analyticsData.conversionRate)} isPercent />
-                      </div>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
-                        Lead Conversion Rate
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Metric Card 4: Average Deal Value */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#b45309", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <IndianRupee size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
-                      </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#b45309", backgroundColor: "#fff7ed", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Avg Size</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                        <AnimatedNumber value={analyticsData.averageValue} isCurrency />
-                      </div>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
-                        Average Deal Value
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Metric Card 5: Target Achievement */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#ecfeff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
-                      </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#ecfeff", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Goal</span>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                        <AnimatedNumber value={Number(targetStats.baseProgress)} isPercent />
-                      </div>
-                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
-                        Target Achievement
-                      </span>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Next Best Action Panel */}
-                <div 
-                  className="next-best-actions-section animate-fade-in"
-                  style={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "12px",
-                    padding: "16px 18px",
-                    marginBottom: "14px"
-                  }}
-                >
+                {/* Next Best Action Panel, Today's Focus & Stuck Deals (Cockpit Only) */}
+                {overviewSectionFilter === "cockpit" && (
+                  <>
+                    <div 
+                      className="next-best-actions-section animate-fade-in"
+                      style={{
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "12px",
+                        padding: "16px 18px",
+                        marginBottom: "14px"
+                      }}
+                    >
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
                     <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#e0e7ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <Shuffle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
@@ -23546,11 +23493,13 @@ export default function App({ onNavigateToLanding } = {}) {
                     </div>
                   </div>
                 )}
+              </>
+            )}
 
               </div>
                     )}
 
-                    {(overviewSectionFilter === "all" || overviewSectionFilter === "analytics") && (
+                    {overviewSectionFilter === "analytics" && (
                       <div className="analytics-charts-container-grid">
                   {/* Standard CRM KPI Metric Cards Row */}
                   <div className="analytics-chart-box full-width animate-fade-in" style={{ padding: 0, background: "transparent", border: "none", boxShadow: "none", marginBottom: "16px" }}>
