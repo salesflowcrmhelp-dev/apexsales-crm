@@ -22325,107 +22325,108 @@ export default function App({ onNavigateToLanding } = {}) {
 
                 return (
                   <div className="kanban-workspace-wrapper animate-fade-in" style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-                    {/* Kanban Top Toolbar - Balanced 2-Row Architecture */}
-                    <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "12px 14px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
-                      {/* Row 1: Search & Filter Controls (Left) <---> Total Pipeline Metric (Right) */}
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", flex: 1, minWidth: "280px" }}>
-                          {/* Search Input (Issue 9: Flexible width; Issue 4: Strict vertical center alignment) */}
-                          <div style={{ position: "relative", flex: "1 1 240px", minWidth: "200px", maxWidth: "340px", height: "32px", display: "flex", alignItems: "center" }}>
-                            <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
-                            <input
-                              type="text"
-                              placeholder="Search board leads..."
-                              value={kanbanSearchQuery}
-                              onChange={(e) => setKanbanSearchQuery(e.target.value)}
-                              style={{ width: "100%", height: "32px", padding: "0 10px 0 30px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
-                            />
-                            {kanbanSearchQuery && (
-                              <button onClick={() => setKanbanSearchQuery("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", color: "#94a3b8" }}><X size={14} /></button>
-                            )}
-                          </div>
-
-                          {/* Month / Timeline Filter */}
-                          <CustomDropdown
-                            value={kanbanMonthFilter}
-                            onChange={(val) => setKanbanMonthFilter(val)}
-                            title="Filter Kanban by Timeline"
-                            icon={<Calendar size={13} color={kanbanMonthFilter !== "all" ? "#2563eb" : "#64748b"} />}
-                            style={{ height: "32px" }}
-                            options={[
-                              { value: "all", label: "All Time Pipeline" },
-                              { value: getCurrentMonthKey(), label: `${formatMonthLabel(getCurrentMonthKey())} (Current)` },
-                              { value: getOffsetMonthKey(-1), label: `⏮️ ${formatMonthLabel(getOffsetMonthKey(-1))} (Last Month)` },
-                              { value: getOffsetMonthKey(-2), label: formatMonthLabel(getOffsetMonthKey(-2)) }
-                            ]}
+                    {/* Kanban Top Toolbar - Streamlined Single-Row Architecture */}
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", padding: "10px 14px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      {/* Left Side: Search & Filter Controls */}
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", flex: 1, minWidth: "280px" }}>
+                        {/* Search Input (Issue 9: Flexible width; Issue 4: Strict vertical center alignment) */}
+                        <div style={{ position: "relative", flex: "1 1 220px", minWidth: "180px", maxWidth: "320px", height: "32px", display: "flex", alignItems: "center" }}>
+                          <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
+                          <input
+                            type="text"
+                            placeholder="Search board leads..."
+                            value={kanbanSearchQuery}
+                            onChange={(e) => setKanbanSearchQuery(e.target.value)}
+                            style={{ width: "100%", height: "32px", padding: "0 10px 0 30px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
                           />
-
-                          {/* Owner Filter (if Super Admin or Manager) */}
-                          {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && (
-                            <CustomDropdown
-                              value={kanbanOwnerFilter}
-                              onChange={(val) => setKanbanOwnerFilter(val)}
-                              title="Filter Kanban by Sales Rep"
-                              icon={<User size={13} color={kanbanOwnerFilter !== "all" ? "#2563eb" : "#64748b"} />}
-                              style={{ height: "32px" }}
-                              options={[
-                                { value: "all", label: "All Sales Reps" },
-                                { isSeparator: true },
-                                ...(allUsersList || []).map(u => ({
-                                  value: u.name,
-                                  label: `${u.name} (${u.role})`
-                                }))
-                              ]}
-                            />
+                          {kanbanSearchQuery && (
+                            <button onClick={() => setKanbanSearchQuery("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", color: "#94a3b8" }}><X size={14} /></button>
                           )}
-
-                          {/* Score Filter Dropdown */}
-                          <CustomDropdown
-                            value={kanbanScoreFilter}
-                            onChange={(val) => setKanbanScoreFilter(val)}
-                            title="Filter Kanban by Priority Score"
-                            icon={
-                              kanbanScoreFilter === "hot" ? (
-                                <Flame size={13} color="#e11d48" />
-                              ) : kanbanScoreFilter === "warm" ? (
-                                <Sparkles size={13} color="#f59e0b" />
-                              ) : kanbanScoreFilter === "cold" ? (
-                                <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#64748b", display: "inline-block" }} />
-                              ) : kanbanScoreFilter === "lost" ? (
-                                <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#ef4444", display: "inline-block" }} />
-                              ) : (
-                                <Flame size={13} color="#64748b" />
-                              )
-                            }
-                            style={{ height: "32px" }}
-                            options={[
-                              { value: "all", label: "Score: All" },
-                              { isSeparator: true },
-                              { 
-                                value: "hot", 
-                                label: "Score: Hot", 
-                                icon: <Flame size={12} color="#e11d48" /> 
-                              },
-                              { 
-                                value: "warm", 
-                                label: "Score: Warm", 
-                                icon: <Sparkles size={12} color="#f59e0b" /> 
-                              },
-                              { 
-                                value: "cold", 
-                                label: "Score: Cold", 
-                                icon: <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#64748b", display: "inline-block" }} /> 
-                              },
-                              { 
-                                value: "lost", 
-                                label: "Score: Lost Deals", 
-                                icon: <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#ef4444", display: "inline-block" }} /> 
-                              }
-                            ]}
-                          />
                         </div>
 
-                        {/* Total Pipeline Analytical Metric Card (Aligned Right) */}
+                        {/* Month / Timeline Filter */}
+                        <CustomDropdown
+                          value={kanbanMonthFilter}
+                          onChange={(val) => setKanbanMonthFilter(val)}
+                          title="Filter Kanban by Timeline"
+                          icon={<Calendar size={13} color={kanbanMonthFilter !== "all" ? "#2563eb" : "#64748b"} />}
+                          style={{ height: "32px" }}
+                          options={[
+                            { value: "all", label: "All Time Pipeline" },
+                            { value: getCurrentMonthKey(), label: `${formatMonthLabel(getCurrentMonthKey())} (Current)` },
+                            { value: getOffsetMonthKey(-1), label: `⏮️ ${formatMonthLabel(getOffsetMonthKey(-1))} (Last Month)` },
+                            { value: getOffsetMonthKey(-2), label: formatMonthLabel(getOffsetMonthKey(-2)) }
+                          ]}
+                        />
+
+                        {/* Owner Filter (if Super Admin or Manager) */}
+                        {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && (
+                          <CustomDropdown
+                            value={kanbanOwnerFilter}
+                            onChange={(val) => setKanbanOwnerFilter(val)}
+                            title="Filter Kanban by Sales Rep"
+                            icon={<User size={13} color={kanbanOwnerFilter !== "all" ? "#2563eb" : "#64748b"} />}
+                            style={{ height: "32px" }}
+                            options={[
+                              { value: "all", label: "All Sales Reps" },
+                              { isSeparator: true },
+                              ...(allUsersList || []).map(u => ({
+                                value: u.name,
+                                label: `${u.name} (${u.role})`
+                              }))
+                            ]}
+                          />
+                        )}
+
+                        {/* Score Filter Dropdown */}
+                        <CustomDropdown
+                          value={kanbanScoreFilter}
+                          onChange={(val) => setKanbanScoreFilter(val)}
+                          title="Filter Kanban by Priority Score"
+                          icon={
+                            kanbanScoreFilter === "hot" ? (
+                              <Flame size={13} color="#e11d48" />
+                            ) : kanbanScoreFilter === "warm" ? (
+                              <Sparkles size={13} color="#f59e0b" />
+                            ) : kanbanScoreFilter === "cold" ? (
+                              <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#64748b", display: "inline-block" }} />
+                            ) : kanbanScoreFilter === "lost" ? (
+                              <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#ef4444", display: "inline-block" }} />
+                            ) : (
+                              <Flame size={13} color="#64748b" />
+                            )
+                          }
+                          style={{ height: "32px" }}
+                          options={[
+                            { value: "all", label: "Score: All" },
+                            { isSeparator: true },
+                            { 
+                              value: "hot", 
+                              label: "Score: Hot", 
+                              icon: <Flame size={12} color="#e11d48" /> 
+                            },
+                            { 
+                              value: "warm", 
+                              label: "Score: Warm", 
+                              icon: <Sparkles size={12} color="#f59e0b" /> 
+                            },
+                            { 
+                              value: "cold", 
+                              label: "Score: Cold", 
+                              icon: <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#64748b", display: "inline-block" }} /> 
+                            },
+                            { 
+                              value: "lost", 
+                              label: "Score: Lost Deals", 
+                              icon: <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#ef4444", display: "inline-block" }} /> 
+                            }
+                          ]}
+                        />
+                      </div>
+
+                      {/* Right Side: Total Pipeline Metric + Configure Stages + Add Lead */}
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0, marginLeft: "auto" }}>
+                        {/* Total Pipeline Analytical Metric Card */}
                         <div 
                           role="status"
                           aria-label="Total Pipeline Value Summary"
@@ -22435,75 +22436,28 @@ export default function App({ onNavigateToLanding } = {}) {
                             display: "inline-flex", 
                             alignItems: "center", 
                             gap: "6px", 
-                            padding: "0 12px", 
+                            padding: "0 10px", 
                             backgroundColor: kanbanScoreFilter === "lost" ? "#fff5f5" : "#f8fafc", 
                             border: kanbanScoreFilter === "lost" ? "1px solid #fecaca" : "1px solid #cbd5e1", 
                             borderRadius: "6px", 
                             fontSize: "12px", 
                             fontWeight: "700", 
-                            color: "#334155",
-                            flexShrink: 0,
-                            marginLeft: "auto"
+                            color: "#334155"
                           }}
                         >
                           <span style={{ color: kanbanScoreFilter === "lost" ? "#dc2626" : "#475569" }}>
-                            {kanbanScoreFilter === "lost" ? "Total Lost Deals:" : "Total Pipeline:"}
+                            {kanbanScoreFilter === "lost" ? "Lost:" : "Total Pipeline:"}
                           </span>
                           <span style={{ color: kanbanScoreFilter === "lost" ? "#dc2626" : "#2563eb", fontWeight: "800" }}>
                             ₹{totalPipelineValue.toLocaleString("en-IN")}
                           </span>
                           <span style={{ fontSize: "10.5px", color: "#64748b", fontWeight: "600" }}>
-                            ({filteredKanbanLeads.length} {kanbanScoreFilter === "lost" ? "lost leads" : "leads"})
+                            ({filteredKanbanLeads.length})
                           </span>
                         </div>
-                      </div>
 
-                      {/* Row 2: View Switcher (Left) <---> Configure Stages & Add Lead (Right) */}
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", paddingTop: "8px", borderTop: "1px solid #f1f5f9" }}>
-                        {/* View switcher tabs */}
-                        <div style={{ display: "flex", alignItems: "center", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "7px" }}>
-                          <button
-                            type="button"
-                            onClick={() => setPipelineView("sheet")}
-                            style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "transparent", color: "#64748b", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
-                          >
-                            <Contact size={13} /> Sheet
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setPipelineView("split")}
-                            style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "transparent", color: "#64748b", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
-                          >
-                            <Layers size={13} /> Split 360°
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setPipelineView("deals")}
-                            style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "transparent", color: "#64748b", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
-                          >
-                            <Award size={13} /> Deals
-                          </button>
-                          <button
-                            type="button"
-                            style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "#ffffff", color: "#2563eb", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "default", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
-                          >
-                            <Columns size={13} /> Kanban
-                          </button>
-                          {canAccessUnassignedQueue && (
-                            <button
-                              type="button"
-                              onClick={() => setPipelineView("unassigned")}
-                              style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "transparent", color: "#64748b", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
-                            >
-                              <Inbox size={13} /> Unassigned ({unassignedLeadsList.length})
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Right Actions: Configure Stages & Add Lead */}
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
-                          {/* Configure Stages Button with Dropdown Popover */}
-                          <div style={{ position: "relative" }} ref={kanbanConfigRef}>
+                        {/* Configure Stages Button with Dropdown Popover */}
+                        <div style={{ position: "relative" }} ref={kanbanConfigRef}>
                             <button
                               type="button"
                               onClick={() => setIsKanbanStageConfigOpen(prev => !prev)}
@@ -22757,7 +22711,6 @@ export default function App({ onNavigateToLanding } = {}) {
                           </button>
                         </div>
                       </div>
-                    </div>
 
                     {/* Kanban Board Columns Container */}
                     <div className="kanban-board" style={{ flex: 1, minHeight: 0 }}>
