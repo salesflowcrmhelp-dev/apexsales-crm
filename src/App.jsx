@@ -19771,7 +19771,6 @@ export default function App({ onNavigateToLanding } = {}) {
                                     fontWeight: "600",
                                     height: "24px"
                                   }}
-                                  icon={<span style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: stageStyle.dot, flexShrink: 0, display: "inline-block" }} />}
                                   options={STATUS_OPTIONS.map(opt => {
                                     const optStyle = getStageBadgeStyle(opt);
                                     return {

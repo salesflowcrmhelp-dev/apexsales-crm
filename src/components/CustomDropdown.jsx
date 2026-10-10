@@ -102,8 +102,11 @@ export default function CustomDropdown({
           ...style
         }}
       >
-        {icon && <span style={{ display: "inline-flex", alignItems: "center" }}>{icon}</span>}
-        {selectedOpt?.icon && <span style={{ display: "inline-flex", alignItems: "center" }}>{selectedOpt.icon}</span>}
+        {(selectedOpt?.icon || icon) && (
+          <span style={{ display: "inline-flex", alignItems: "center", flexShrink: 0 }}>
+            {selectedOpt?.icon || icon}
+          </span>
+        )}
         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {selectedOpt ? selectedOpt.label : placeholder}
         </span>
