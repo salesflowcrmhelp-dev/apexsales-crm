@@ -3083,6 +3083,10 @@ export default function App({ onNavigateToLanding } = {}) {
     try {
       if (typeof window !== "undefined") {
         const params = new URLSearchParams(window.location.search);
+        // If explicit token parameter is present in URL, DO NOT preload demo user!
+        if (params.get("token") || params.get("loginToken") || params.get("magicToken")) {
+          return null;
+        }
         if (params.get("auth") === "demo" || params.get("demo") === "true") {
           const demoAdmin = {
             id: "usr_admin",
@@ -5611,6 +5615,35 @@ export default function App({ onNavigateToLanding } = {}) {
     const restoreSession = async () => {
       try {
         const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const loginToken = urlParams ? (urlParams.get("token") || urlParams.get("loginToken") || urlParams.get("magicToken")) : null;
+
+        // Priority -1: Token Authentication Hydration (e.g. from weekly performance reports / magic links)
+        if (loginToken) {
+          try {
+            const tokenRes = await fetch(`/api/auth/token-login?token=${encodeURIComponent(loginToken)}`);
+            const tokenData = await tokenRes.json();
+            if (tokenData.success && tokenData.user && isMounted) {
+              const u = tokenData.user;
+              setIsLoggedIn(true);
+              setCurrentUser(u);
+              setCurrentLoggedInUser(u.name);
+              setCurrentUserRole(u.role || "sales_rep");
+              try {
+                sessionStorage.setItem("crm_auth_user", JSON.stringify(u));
+                sessionStorage.setItem("crm_auth_token", tokenData.token || loginToken);
+                localStorage.setItem("crm_auth_user", JSON.stringify(u));
+                localStorage.setItem("crm_auth_token", tokenData.token || loginToken);
+              } catch(e) {}
+              loadLeadsFromBackend(u);
+              loadUsersFromBackend();
+              loadTasksFromBackend(u);
+              return;
+            }
+          } catch(e) {
+            console.warn("Token-based login error:", e);
+          }
+        }
+
         const isDemo = urlParams && (urlParams.get("auth") === "demo" || urlParams.get("demo") === "true");
 
         // Priority 0: Demo Mode Authentication Hydration (fetches signed HMAC token from backend)

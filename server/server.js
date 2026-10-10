@@ -1175,6 +1175,41 @@ app.post('/api/auth/login', async (req, res) => {
   });
 });
 
+// Validate & Authenticate using secure token (e.g. from weekly reports / magic links)
+app.get('/api/auth/token-login', async (req, res) => {
+  const token = req.query.token;
+  if (!token) return res.status(400).json({ success: false, message: 'Login token is required.' });
+
+  const decoded = verifySecureToken(token);
+  if (!decoded) {
+    return res.status(401).json({ success: false, message: 'Invalid or expired login link.' });
+  }
+
+  const allUsers = await getUsers();
+  const user = allUsers.find(u => u.id === decoded.userId) || allUsers.find(u => u.role === decoded.role);
+  if (!user || user.active === false) {
+    return res.status(404).json({ success: false, message: 'User account not found or deactivated.' });
+  }
+
+  res.json({
+    success: true,
+    user: {
+      id: user.id,
+      name: user.name,
+      displayName: user.displayName || user.name,
+      username: user.username,
+      role: user.role === 'company_owner' || user.role === 'admin' ? 'admin' : (user.role || 'sales_rep'),
+      actualRole: user.role,
+      packageTier: user.packageTier || (user.role === 'admin' || user.role === 'company_owner' ? 'super_admin' : 'starter'),
+      permissions: user.permissions || null,
+      maxLeadsLimit: user.maxLeadsLimit || (user.role === 'admin' || user.role === 'company_owner' ? 999999 : 50),
+      email: user.email || '',
+      phone: user.phone || ''
+    },
+    token
+  });
+});
+
 // Validate Invite Token (when recipient clicks invite link)
 app.get('/api/auth/invite/:token', async (req, res) => {
   const { token } = req.params;

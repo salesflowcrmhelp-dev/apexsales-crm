@@ -8,6 +8,16 @@
  */
 
 import nodemailer from 'nodemailer';
+import crypto from 'crypto';
+
+const SESSION_SECRET = process.env.SESSION_SECRET || 'apexsales_crm_secure_hmac_secret_2026_key_9f8e7d6c5b4a';
+
+export function generateUserToken(user) {
+  if (!user || !user.id) return '';
+  const payload = `${user.id}:${user.role || 'sales_rep'}:${Date.now()}`;
+  const signature = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
+  return `${Buffer.from(payload).toString('base64url')}.${signature}`;
+}
 
 // Helper: Format INR currency
 export function formatINR(amount) {
@@ -201,6 +211,10 @@ export function buildSalesHeadEmailHtml(metrics, recipient) {
   const { company, sprintDates } = metrics;
   const baseRevenue = Math.round(company.totalWonRevenue / 1.18);
   const gstRevenue = company.totalWonRevenue - baseRevenue;
+  const userToken = generateUserToken(recipient);
+  const actionUrl = userToken 
+    ? `https://apex.salesflowhub.cloud/?token=${encodeURIComponent(userToken)}&workspace=reports`
+    : `https://apex.salesflowhub.cloud/?workspace=reports`;
 
   return `
 <!DOCTYPE html>
@@ -346,7 +360,7 @@ export function buildSalesHeadEmailHtml(metrics, recipient) {
 
       <!-- CTA BUTTON -->
       <div style="text-align: center; margin: 28px 0 10px 0;">
-        <a href="https://apex.salesflowhub.cloud/?view=app&auth=demo&workspace=reports" target="_blank" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+        <a href="${actionUrl}" target="_blank" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
           Open Live CRM Analytics Cockpit &rarr;
         </a>
       </div>
@@ -370,6 +384,10 @@ export function buildSalesHeadEmailHtml(metrics, recipient) {
  */
 export function buildTeamLeaderEmailHtml(metrics, recipient) {
   const { teamSummaries, sprintDates } = metrics;
+  const userToken = generateUserToken(recipient);
+  const actionUrl = userToken 
+    ? `https://apex.salesflowhub.cloud/?token=${encodeURIComponent(userToken)}&workspace=pipeline`
+    : `https://apex.salesflowhub.cloud/?workspace=pipeline`;
   const summary = teamSummaries.find(t => t.leader.id === recipient.id || t.leader.name === recipient.name) || {
     teamRevenue: 185000,
     teamWonCount: 6,
@@ -486,7 +504,7 @@ export function buildTeamLeaderEmailHtml(metrics, recipient) {
 
       <!-- CTA BUTTON -->
       <div style="text-align: center; margin: 24px 0 10px 0;">
-        <a href="https://apex.salesflowhub.cloud/?view=app&auth=demo&workspace=pipeline" target="_blank" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block;">
+        <a href="${actionUrl}" target="_blank" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block;">
           Open Team Pipeline Workspace &rarr;
         </a>
       </div>
@@ -510,6 +528,10 @@ export function buildTeamLeaderEmailHtml(metrics, recipient) {
  */
 export function buildEmployeeEmailHtml(metrics, recipient) {
   const { repStatsMap, sprintDates } = metrics;
+  const userToken = generateUserToken(recipient);
+  const actionUrl = userToken 
+    ? `https://apex.salesflowhub.cloud/?token=${encodeURIComponent(userToken)}&workspace=pipeline`
+    : `https://apex.salesflowhub.cloud/?workspace=pipeline`;
   const stat = repStatsMap[recipient.name] || {
     wonRevenue: 85000,
     wonCount: 3,
@@ -626,7 +648,7 @@ export function buildEmployeeEmailHtml(metrics, recipient) {
 
       <!-- CTA BUTTON -->
       <div style="text-align: center; margin: 24px 0 10px 0;">
-        <a href="https://apex.salesflowhub.cloud/?view=app&auth=demo&workspace=pipeline" target="_blank" style="background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block;">
+        <a href="${actionUrl}" target="_blank" style="background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block;">
           Open My Leads Grid &rarr;
         </a>
       </div>

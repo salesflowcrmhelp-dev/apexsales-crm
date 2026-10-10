@@ -3,7 +3,12 @@ let appPromise = null;
 export default async function handler(req, res) {
   try {
     if (!appPromise) {
-      appPromise = import('../server/server.js').then(m => m.default || m.app);
+      appPromise = import('../server/server.js').then(async m => {
+        if (m.initDatabase) {
+          try { await m.initDatabase(); } catch(e) {}
+        }
+        return m.default || m.app;
+      });
     }
     const app = await appPromise;
     if (req.url && !req.url.startsWith('/api')) {
