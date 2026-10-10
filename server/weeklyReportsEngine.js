@@ -211,10 +211,8 @@ export function buildSalesHeadEmailHtml(metrics, recipient) {
   const { company, sprintDates } = metrics;
   const baseRevenue = Math.round(company.totalWonRevenue / 1.18);
   const gstRevenue = company.totalWonRevenue - baseRevenue;
-  const userToken = generateUserToken(recipient);
-  const actionUrl = userToken 
-    ? `https://apex.salesflowhub.cloud/?token=${encodeURIComponent(userToken)}&workspace=reports`
-    : `https://apex.salesflowhub.cloud/?workspace=reports`;
+  const targetUser = encodeURIComponent(recipient?.username || recipient?.name?.toLowerCase() || 'admin');
+  const actionUrl = `https://apex.salesflowhub.cloud/?user=${targetUser}&workspace=reports`;
 
   return `
 <!DOCTYPE html>
@@ -384,10 +382,8 @@ export function buildSalesHeadEmailHtml(metrics, recipient) {
  */
 export function buildTeamLeaderEmailHtml(metrics, recipient) {
   const { teamSummaries, sprintDates } = metrics;
-  const userToken = generateUserToken(recipient);
-  const actionUrl = userToken 
-    ? `https://apex.salesflowhub.cloud/?token=${encodeURIComponent(userToken)}&workspace=pipeline`
-    : `https://apex.salesflowhub.cloud/?workspace=pipeline`;
+  const targetUser = encodeURIComponent(recipient?.username || recipient?.name?.toLowerCase() || 'team_leader');
+  const actionUrl = `https://apex.salesflowhub.cloud/?user=${targetUser}&workspace=pipeline`;
   const summary = teamSummaries.find(t => t.leader.id === recipient.id || t.leader.name === recipient.name) || {
     teamRevenue: 185000,
     teamWonCount: 6,
@@ -528,10 +524,8 @@ export function buildTeamLeaderEmailHtml(metrics, recipient) {
  */
 export function buildEmployeeEmailHtml(metrics, recipient) {
   const { repStatsMap, sprintDates } = metrics;
-  const userToken = generateUserToken(recipient);
-  const actionUrl = userToken 
-    ? `https://apex.salesflowhub.cloud/?token=${encodeURIComponent(userToken)}&workspace=pipeline`
-    : `https://apex.salesflowhub.cloud/?workspace=pipeline`;
+  const targetUser = encodeURIComponent(recipient?.username || recipient?.name?.toLowerCase() || 'employee');
+  const actionUrl = `https://apex.salesflowhub.cloud/?user=${targetUser}&workspace=pipeline`;
   const stat = repStatsMap[recipient.name] || {
     wonRevenue: 85000,
     wonCount: 3,

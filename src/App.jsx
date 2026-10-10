@@ -3083,6 +3083,21 @@ export default function App({ onNavigateToLanding } = {}) {
     try {
       if (typeof window !== "undefined") {
         const params = new URLSearchParams(window.location.search);
+        const targetUser = (params.get("user") || params.get("username") || "").toLowerCase().trim();
+        const saved = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
+        if (targetUser) {
+          if (saved) {
+            try {
+              const u = JSON.parse(saved);
+              const uName = (u.username || "").toLowerCase().trim();
+              const name = (u.name || "").toLowerCase().trim();
+              const email = (u.email || "").toLowerCase().trim();
+              const isMatch = uName === targetUser || name.includes(targetUser) || email.includes(targetUser);
+              if (isMatch) return u;
+            } catch(e) {}
+          }
+          return null; // Force password prompt for target user!
+        }
         // If explicit token parameter is present in URL, DO NOT preload demo user!
         if (params.get("token") || params.get("loginToken") || params.get("magicToken")) {
           return null;
@@ -3724,7 +3739,17 @@ export default function App({ onNavigateToLanding } = {}) {
   const [inviteAccepting, setInviteAccepting] = useState(false);
 
   // Email Login & Created Invite Sharing States
-  const [loginEmail, setLoginEmail] = useState("");
+  const [loginEmail, setLoginEmail] = useState(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const p = new URLSearchParams(window.location.search);
+        return p.get("user") || p.get("email") || p.get("username") || "";
+      }
+      return "";
+    } catch(e) {
+      return "";
+    }
+  });
   const [createdInviteInfo, setCreatedInviteInfo] = useState(null);
   const [customFields, setCustomFields] = useState(() => {
     try {
@@ -5105,13 +5130,29 @@ export default function App({ onNavigateToLanding } = {}) {
       if (typeof window !== "undefined") {
         const params = new URLSearchParams(window.location.search);
         if (params.get("lock") === "true") return false;
+        const targetUser = (params.get("user") || params.get("username") || "").toLowerCase().trim();
+        const savedUser = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
+        const savedToken = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
+
+        if (targetUser) {
+          if (savedUser && savedToken) {
+            try {
+              const u = JSON.parse(savedUser);
+              const uName = (u.username || "").toLowerCase().trim();
+              const name = (u.name || "").toLowerCase().trim();
+              const email = (u.email || "").toLowerCase().trim();
+              const isMatch = uName === targetUser || name.includes(targetUser) || email.includes(targetUser);
+              if (isMatch) return true; // Only open directly if THIS user is already active in Chrome!
+            } catch(e) {}
+          }
+          return false; // Not logged in or different user -> demand password!
+        }
+
         if (params.get("auth") === "demo" || params.get("demo") === "true") return true;
-      }
-      const savedUser = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
-      const savedToken = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
-      if (savedUser && savedToken) {
-        const u = JSON.parse(savedUser);
-        if (u && (u.id || u.name)) return true;
+        if (savedUser && savedToken) {
+          const u = JSON.parse(savedUser);
+          if (u && (u.id || u.name)) return true;
+        }
       }
       return false; // Strict privacy: Workspace locked until valid login/PIN verification!
     } catch(e) {
@@ -5615,6 +5656,42 @@ export default function App({ onNavigateToLanding } = {}) {
     const restoreSession = async () => {
       try {
         const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const targetUser = urlParams ? (urlParams.get("user") || urlParams.get("username") || "").toLowerCase().trim() : "";
+
+        // 🛡️ User-Scoped Link Verification (from weekly reports):
+        // Only open directly if THIS user's active session is ALREADY open in Chrome.
+        // Otherwise, enforce ID & Password / PIN verification!
+        if (targetUser) {
+          const savedUserStr = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
+          const savedToken = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
+          if (savedUserStr && savedToken) {
+            try {
+              const u = JSON.parse(savedUserStr);
+              const uName = (u.username || "").toLowerCase().trim();
+              const name = (u.name || "").toLowerCase().trim();
+              const email = (u.email || "").toLowerCase().trim();
+              const isMatch = uName === targetUser || name.includes(targetUser) || email.includes(targetUser);
+              if (isMatch && isMounted) {
+                setIsLoggedIn(true);
+                setCurrentUser(u);
+                setCurrentLoggedInUser(u.name);
+                setCurrentUserRole(u.role || "sales_rep");
+                loadLeadsFromBackend(u);
+                loadUsersFromBackend();
+                loadTasksFromBackend(u);
+                return;
+              }
+            } catch(e) {}
+          }
+          // Not logged in or different user: Stop at login screen & demand password!
+          if (isMounted) {
+            setIsLoggedIn(false);
+            setCurrentUser(null);
+            setLoginEmail(targetUser);
+          }
+          return;
+        }
+
         const loginToken = urlParams ? (urlParams.get("token") || urlParams.get("loginToken") || urlParams.get("magicToken")) : null;
 
         // Priority -1: Token Authentication Hydration (e.g. from weekly performance reports / magic links)
