@@ -8,6 +8,13 @@ import https from 'node:https';
 import nodemailer from 'nodemailer';
 import crypto from 'node:crypto';
 import { hash as argon2Hash, verify as argon2Verify, Algorithm as Argon2Algorithm } from '@node-rs/argon2';
+import {
+  computeWeeklyMetrics,
+  buildSalesHeadEmailHtml,
+  buildTeamLeaderEmailHtml,
+  buildEmployeeEmailHtml,
+  sendWeeklyEmail
+} from './weeklyReportsEngine.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -3955,6 +3962,284 @@ app.put('/api/meetings/:id', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
+// ============================================
+// AUTOMATED WEEKLY DIGEST & ROLE REPORTS ENGINE
+// ============================================
+
+app.get('/api/reports/weekly-digest/config', async (req, res) => {
+  try {
+    const local = readLocalDB();
+    const cfg = await getEmailConfig();
+    const config = local.settings?.weekly_digest || {
+      enabled: true,
+      scheduleDay: 'Monday',
+      scheduleTime: '09:00',
+      timezone: 'Asia/Kolkata',
+      lastRunTimestamp: null,
+      lastRunSprint: null
+    };
+
+    res.json({
+      success: true,
+      config: {
+        ...config,
+        nextRun: 'Monday, 09:00 AM IST',
+        provider: cfg?.type || 'not_configured',
+        senderEmail: cfg?.fromEmail || cfg?.user || 'onboarding@resend.dev'
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching weekly digest config:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/reports/weekly-digest/config', async (req, res) => {
+  try {
+    const local = readLocalDB();
+    if (!local.settings) local.settings = {};
+    local.settings.weekly_digest = {
+      ...(local.settings.weekly_digest || {}),
+      ...req.body
+    };
+    writeLocalDB(local);
+    res.json({ success: true, config: local.settings.weekly_digest });
+  } catch (err) {
+    console.error('Error updating weekly digest config:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.get('/api/reports/weekly-digest/preview', async (req, res) => {
+  try {
+    const role = req.query.role || 'sales_head'; // sales_head | team_leader | sales_executive
+    const userId = req.query.userId;
+    const users = await getUsers();
+    const leads = await getLeads();
+
+    const metrics = computeWeeklyMetrics(leads, users);
+    let recipient = users.find(u => u.id === userId) || users.find(u => {
+      if (role === 'sales_head') return u.role === 'company_owner' || u.role === 'admin';
+      if (role === 'team_leader') return u.role === 'team_leader' || u.role === 'manager';
+      return u.role === 'sales_executive';
+    }) || users[0];
+
+    let html = '';
+    let subject = '';
+
+    if (role === 'team_leader') {
+      subject = `👔 [ApexSales] Weekly Team Performance Digest — ${metrics.sprintDates}`;
+      html = buildTeamLeaderEmailHtml(metrics, recipient);
+    } else if (role === 'sales_executive') {
+      subject = `💼 [ApexSales] Your Weekly Sales Performance Scorecard — ${metrics.sprintDates}`;
+      html = buildEmployeeEmailHtml(metrics, recipient);
+    } else {
+      subject = `👑 [ApexSales] Executive Weekly Sales Digest — ${metrics.sprintDates}`;
+      html = buildSalesHeadEmailHtml(metrics, recipient);
+    }
+
+    res.json({
+      success: true,
+      role,
+      subject,
+      html,
+      recipientName: recipient.name,
+      recipientRole: recipient.role,
+      sprintDates: metrics.sprintDates
+    });
+  } catch (err) {
+    console.error('Error generating weekly digest preview:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/reports/weekly-digest/send-test', async (req, res) => {
+  try {
+    const { toEmail, role = 'sales_head', userId } = req.body;
+    const users = await getUsers();
+    const leads = await getLeads();
+    const cfg = await getEmailConfig();
+
+    const targetEmail = toEmail || 'salesflowcrmhelp@gmail.com';
+    const metrics = computeWeeklyMetrics(leads, users);
+
+    let recipient = users.find(u => u.id === userId) || users.find(u => {
+      if (role === 'sales_head') return u.role === 'company_owner' || u.role === 'admin';
+      if (role === 'team_leader') return u.role === 'team_leader' || u.role === 'manager';
+      return u.role === 'sales_executive';
+    }) || users[0];
+
+    let html = '';
+    let subject = '';
+
+    if (role === 'team_leader') {
+      subject = `👔 [ApexSales TEST] Weekly Team Performance Digest — ${metrics.sprintDates}`;
+      html = buildTeamLeaderEmailHtml(metrics, recipient);
+    } else if (role === 'sales_executive') {
+      subject = `💼 [ApexSales TEST] Your Weekly Sales Performance Scorecard — ${metrics.sprintDates}`;
+      html = buildEmployeeEmailHtml(metrics, recipient);
+    } else {
+      subject = `👑 [ApexSales TEST] Executive Weekly Sales Digest — ${metrics.sprintDates}`;
+      html = buildSalesHeadEmailHtml(metrics, recipient);
+    }
+
+    const result = await sendWeeklyEmail({
+      cfg,
+      toEmail: targetEmail,
+      recipientName: recipient.name,
+      subject,
+      htmlContent: html
+    });
+
+    if (!result.sent) {
+      return res.status(400).json({
+        success: false,
+        message: result.reason || 'Failed to dispatch test email',
+        details: result
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Test ${role} report sent successfully to ${targetEmail}`,
+      messageId: result.messageId,
+      provider: result.provider,
+      targetEmail
+    });
+  } catch (err) {
+    console.error('Error sending test weekly digest:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/reports/weekly-digest/dispatch-all', async (req, res) => {
+  try {
+    const users = await getUsers();
+    const leads = await getLeads();
+    const cfg = await getEmailConfig();
+    const activeUsers = users.filter(u => u.active !== false && u.email);
+
+    const metrics = computeWeeklyMetrics(leads, users);
+    const results = [];
+
+    for (const u of activeUsers) {
+      let role = 'sales_executive';
+      let subject = `💼 [ApexSales] Your Weekly Sales Performance Scorecard — ${metrics.sprintDates}`;
+      let html = '';
+
+      if (u.role === 'company_owner' || u.role === 'admin' || u.role === 'sales_head') {
+        role = 'sales_head';
+        subject = `👑 [ApexSales] Executive Weekly Sales Digest — ${metrics.sprintDates}`;
+        html = buildSalesHeadEmailHtml(metrics, u);
+      } else if (u.role === 'team_leader' || u.role === 'manager') {
+        role = 'team_leader';
+        subject = `👔 [ApexSales] Weekly Team Performance Digest — ${metrics.sprintDates}`;
+        html = buildTeamLeaderEmailHtml(metrics, u);
+      } else {
+        html = buildEmployeeEmailHtml(metrics, u);
+      }
+
+      // If in sandbox mode, fallback to registered recipient
+      const sendRes = await sendWeeklyEmail({
+        cfg,
+        toEmail: u.email,
+        recipientName: u.name,
+        subject,
+        htmlContent: html
+      });
+
+      results.push({
+        user: u.name,
+        role,
+        email: u.email,
+        sent: sendRes.sent,
+        messageId: sendRes.messageId,
+        reason: sendRes.reason
+      });
+    }
+
+    // Update last run
+    const local = readLocalDB();
+    if (!local.settings) local.settings = {};
+    if (!local.settings.weekly_digest) local.settings.weekly_digest = {};
+    local.settings.weekly_digest.lastRunTimestamp = new Date().toISOString();
+    writeLocalDB(local);
+
+    res.json({
+      success: true,
+      dispatchedCount: results.filter(r => r.sent).length,
+      totalUsers: activeUsers.length,
+      results
+    });
+  } catch (err) {
+    console.error('Error dispatching all weekly reports:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Automated Monday 09:00 AM IST Scheduler
+setInterval(async () => {
+  try {
+    const local = readLocalDB();
+    const config = local.settings?.weekly_digest || { enabled: true };
+    if (config.enabled === false) return;
+
+    const nowIST = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    const day = nowIST.getDay(); // 1 = Monday
+    const hour = nowIST.getHours();
+    const minute = nowIST.getMinutes();
+
+    // Trigger on Mondays between 09:00 and 09:15 AM IST
+    if (day === 1 && hour === 9 && minute <= 15) {
+      const year = nowIST.getFullYear();
+      const firstDayOfYear = new Date(year, 0, 1);
+      const pastDaysOfYear = (nowIST - firstDayOfYear) / 86400000;
+      const weekNum = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+      const sprintKey = `${year}-W${weekNum}`;
+
+      if (config.lastRunSprint !== sprintKey) {
+        console.log(`⏰ [AUTOMATED CRON] Dispatching Monday 09:00 AM IST Weekly Digests (${sprintKey})...`);
+        const users = await getUsers();
+        const leads = await getLeads();
+        const cfg = await getEmailConfig();
+        const activeUsers = users.filter(u => u.active !== false && u.email);
+        const metrics = computeWeeklyMetrics(leads, users);
+
+        for (const u of activeUsers) {
+          let subject = `💼 [ApexSales] Your Weekly Sales Scorecard — ${metrics.sprintDates}`;
+          let html = '';
+
+          if (u.role === 'company_owner' || u.role === 'admin') {
+            subject = `👑 [ApexSales] Executive Weekly Sales Digest — ${metrics.sprintDates}`;
+            html = buildSalesHeadEmailHtml(metrics, u);
+          } else if (u.role === 'team_leader' || u.role === 'manager') {
+            subject = `👔 [ApexSales] Weekly Team Performance Digest — ${metrics.sprintDates}`;
+            html = buildTeamLeaderEmailHtml(metrics, u);
+          } else {
+            html = buildEmployeeEmailHtml(metrics, u);
+          }
+
+          await sendWeeklyEmail({
+            cfg,
+            toEmail: u.email,
+            recipientName: u.name,
+            subject,
+            htmlContent: html
+          });
+        }
+
+        config.lastRunSprint = sprintKey;
+        config.lastRunTimestamp = new Date().toISOString();
+        local.settings.weekly_digest = config;
+        writeLocalDB(local);
+        console.log(`✅ [AUTOMATED CRON] Weekly digest dispatch complete for ${sprintKey}.`);
+      }
+    }
+  } catch (cronErr) {
+    console.error('Error in weekly digest cron runner:', cronErr);
+  }
+}, 10 * 60 * 1000); // Check every 10 minutes
 
 // Health check endpoint
 app.get('/api/health', async (req, res) => {

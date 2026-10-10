@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { 
   Download, Plus, Save, RefreshCw, FileSpreadsheet, 
   HelpCircle, X, Check, AlertCircle, TrendingUp, IndianRupee, Award, LayoutGrid, Upload, Trash2, Target, Pencil, Gift, Lock, Unlock, KeyRound, Calendar, Phone, AlertTriangle, Flame, CheckCircle2, MessageCircle, Clock, Bell, Sparkles, RotateCcw,
-  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, ArrowLeft, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, Contact, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders, Columns, Inbox, Database, Copy, Receipt, Percent, Crown, Home, Headphones, Laptop
+  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, ArrowLeft, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, Contact, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Send, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders, Columns, Inbox, Database, Copy, Receipt, Percent, Crown, Home, Headphones, Laptop
 } from "lucide-react";
 import { 
   fetchLeadsFromSupabase, 
@@ -3032,6 +3032,13 @@ export default function App({ onNavigateToLanding } = {}) {
       return false;
     }
   });
+  const [weeklyDigestRole, setWeeklyDigestRole] = useState("sales_head"); // "sales_head" | "team_leader" | "sales_executive"
+  const [weeklyDigestPreviewHtml, setWeeklyDigestPreviewHtml] = useState("");
+  const [weeklyDigestSubject, setWeeklyDigestSubject] = useState("");
+  const [weeklyDigestLoading, setWeeklyDigestLoading] = useState(false);
+  const [weeklyDigestSendingTest, setWeeklyDigestSendingTest] = useState(false);
+  const [weeklyDigestDispatchingAll, setWeeklyDigestDispatchingAll] = useState(false);
+  const [weeklyDigestTestEmail, setWeeklyDigestTestEmail] = useState("");
   const [hoveredTrendMonth, setHoveredTrendMonth] = useState(null);
   const [hoveredDonutSlice, setHoveredDonutSlice] = useState(null);
   const [cockpitDisplayMode, setCockpitDisplayMode] = useState("graph");
@@ -8875,6 +8882,69 @@ export default function App({ onNavigateToLanding } = {}) {
     setTimeout(() => {
       setToast(null);
     }, 4500);
+  };
+
+  // Automated Weekly Role Digest Preview & Dispatch Handlers
+  useEffect(() => {
+    if (!showWeeklyDigestModal) return;
+    setWeeklyDigestLoading(true);
+    fetch(`/api/reports/weekly-digest/preview?role=${weeklyDigestRole}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setWeeklyDigestPreviewHtml(data.html || "");
+          setWeeklyDigestSubject(data.subject || "");
+        }
+      })
+      .catch(err => console.error("Error loading weekly digest preview:", err))
+      .finally(() => setWeeklyDigestLoading(false));
+  }, [showWeeklyDigestModal, weeklyDigestRole]);
+
+  const handleSendTestWeeklyDigest = async () => {
+    const emailToSend = (weeklyDigestTestEmail || "").trim() || currentUser?.email || "salesflowcrmhelp@gmail.com";
+    setWeeklyDigestSendingTest(true);
+    try {
+      const res = await fetch("/api/reports/weekly-digest/send-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          toEmail: emailToSend,
+          role: weeklyDigestRole,
+          userId: currentUser?.id
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Test ${weeklyDigestRole === "sales_head" ? "Sales Head" : weeklyDigestRole === "team_leader" ? "Team Leader" : "Sales Executive"} report sent to ${emailToSend}!`);
+      } else {
+        showToast(data.message || "Failed to send test email", "error");
+      }
+    } catch (err) {
+      showToast("Network error while sending test email", "error");
+    } finally {
+      setWeeklyDigestSendingTest(false);
+    }
+  };
+
+  const handleDispatchAllWeeklyDigests = async () => {
+    if (!window.confirm("Are you sure you want to dispatch weekly reports to all active team members according to their roles right now?")) return;
+    setWeeklyDigestDispatchingAll(true);
+    try {
+      const res = await fetch("/api/reports/weekly-digest/dispatch-all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Dispatched reports to ${data.dispatchedCount} team members successfully!`);
+      } else {
+        showToast(data.message || "Dispatch failed", "error");
+      }
+    } catch (err) {
+      showToast("Network error while dispatching reports", "error");
+    } finally {
+      setWeeklyDigestDispatchingAll(false);
+    }
   };
 
   // Period-Aware KPI Calculations (Scoped to active owner filter)
@@ -29642,128 +29712,239 @@ export default function App({ onNavigateToLanding } = {}) {
         </div>
       )}
 
-      {/* 🚀 WEEKLY EXECUTIVE REVENUE DIGEST PREVIEW & DISPATCH MODAL */}
+      {/* 🚀 AUTOMATED WEEKLY ROLE-SCOPED REPORTS & DISPATCH ENGINE */}
       {showWeeklyDigestModal && (
         <div className="weekly-digest-modal-overlay" onClick={() => setShowWeeklyDigestModal(false)}>
           <div className="weekly-digest-modal-card" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div style={{ padding: "12px 16px", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#0f172a", color: "#ffffff", borderTopLeftRadius: "12px", borderTopRightRadius: "12px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Mail size={15} color="#38bdf8" />
+            <div style={{ padding: "14px 18px", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#0f172a", color: "#ffffff", borderTopLeftRadius: "12px", borderTopRightRadius: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "32px", height: "32px", borderRadius: "8px", backgroundColor: "#1e293b", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Mail size={16} color="#38bdf8" />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: "13px", fontWeight: "700", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
-                    Executive Weekly Sales Digest
-                    <span style={{ fontSize: "10px", fontWeight: "600", color: "#166534", backgroundColor: "#064e3b", padding: "1px 6px", borderRadius: "6px" }}>
-                      Monday 9:00 AM Cron
+                  <h3 style={{ fontSize: "14px", fontWeight: "750", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
+                    Automated Weekly Role Reports & Digest
+                    <span style={{ fontSize: "10.5px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "2px 8px", borderRadius: "9999px" }}>
+                      ⏰ Monday 9:00 AM IST Cron Active
                     </span>
                   </h3>
-                  <span style={{ fontSize: "10px", color: "#64748b" }}>Auto-generated summary ready for dispatch to leadership</span>
+                  <span style={{ fontSize: "11px", color: "#94a3b8" }}>
+                    Dispatches role-scoped weekly briefings to Sales Head, Team Leaders & Sales Executives from Admin Account
+                  </span>
                 </div>
               </div>
-              <button
-                onClick={() => setShowWeeklyDigestModal(false)}
-                style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "16px", padding: "2px 6px" }}
-              ><X size={14} /></button>
-            </div>
-
-            {/* Modal Body */}
-            <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: "10px" }}>
-              {/* Subject line preview */}
-              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px 10px", fontSize: "12px" }}>
-                <span style={{ fontWeight: "700", color: "#475569" }}>Subject: </span>
-                <span style={{ fontWeight: "600", color: "#0f172a" }}>
-                  [ApexSales] Weekly Executive Revenue Digest — Realized ₹4.85L (MoM +14.2%) | Expected ₹6.20L
-                </span>
-              </div>
-
-              {/* Formatted Email Content Box */}
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", backgroundColor: "#ffffff", fontSize: "12px", lineHeight: "1.5", color: "#0f172a" }}>
-                <p style={{ margin: "0 0 8px 0" }}>Dear Management & Leadership,</p>
-                <p style={{ margin: "0 0 10px 0" }}>
-                  Here is the automated executive briefing on sales velocity, pipeline conversion, and cash flow projections for the current sprint:
-                </p>
-
-                {/* KPI highlights table */}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "12px" }}>
-                  <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: "6px", padding: "6px 8px" }}>
-                    <span style={{ fontSize: "10px", fontWeight: "600", color: "#166534", textTransform: "uppercase" }}>Realized Revenue</span>
-                    <div style={{ fontSize: "13px", fontWeight: "700", color: "#166534" }}>₹4,85,000</div>
-                    <span style={{ fontSize: "10px", color: "#166534" }}>inc. 18% GST (MoM +14.2%)</span>
-                  </div>
-                  <div style={{ backgroundColor: "#fff7ed", border: "1px solid #ffedd5", borderRadius: "6px", padding: "6px 8px" }}>
-                    <span style={{ fontSize: "10px", fontWeight: "600", color: "#b45309", textTransform: "uppercase" }}>Expected Month-End</span>
-                    <div style={{ fontSize: "13px", fontWeight: "700", color: "#ea580c" }}>₹6,20,000</div>
-                    <span style={{ fontSize: "10px", color: "#b45309" }}>Weighted Confidence</span>
-                  </div>
-                  <div style={{ backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px", padding: "6px 8px" }}>
-                    <span style={{ fontSize: "10px", fontWeight: "600", color: "#2563eb", textTransform: "uppercase" }}>Win Rate & Velocity</span>
-                    <div style={{ fontSize: "13px", fontWeight: "700", color: "#2563eb" }}>68% • 3.2 Days</div>
-                    <span style={{ fontSize: "10px", color: "#2563eb" }}>Above Target (65%)</span>
-                  </div>
-                </div>
-
-                <div style={{ backgroundColor: "#f8fafc", borderRadius: "6px", padding: "8px 10px", border: "1px solid #e2e8f0", marginBottom: "10px" }}>
-                  <strong style={{ display: "block", marginBottom: "4px", color: "#0f172a" }}>Key Sprint Highlights:</strong>
-                  <ul style={{ margin: 0, paddingLeft: "16px", display: "flex", flexDirection: "column", gap: "3px", color: "#475569", fontSize: "12px" }}>
-                    <li><strong>Top Sales Closer:</strong> Harsh Goyal closed ₹1,80,000 (28 deals, 115% target achievement).</li>
-                    <li><strong>Pipeline Distribution:</strong> 42 active qualified leads totaling ₹6.20L across Negotiation (35%) & Proposal Sent (28%).</li>
-                    <li><strong>Client Renewal Health:</strong> ₹1,24,000 ARR secured in renewals with 100% on-time retention.</li>
-                    <li><strong>Pace vs Target:</strong> Trending +14.2% ahead of last month's velocity pace.</li>
-                  </ul>
-                </div>
-
-                <p style={{ margin: 0, color: "#64748b", fontSize: "10px" }}>
-                  This digest was auto-compiled by ApexSales Intelligence Engine. No manual data entry required.
-                </p>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div style={{ padding: "10px 16px", borderTop: "1px solid #e2e8f0", backgroundColor: "#f8fafc", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px" }}>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const text = `*[ApexSales] Weekly Executive Revenue Digest*\n\n*Realized Revenue (M-T-D):* ₹4,85,000 (inc. 18% GST)\n*Expected Month-End:* ₹6,20,000 (Weighted Forecast)\n*Team Win Rate:* 68% (Target: 65%)\n*Avg Closing Velocity:* 3.2 Days\n*Top Performer:* Harsh Goyal (₹1,80,000 | 115% Quota)\n*Client Renewal ARR:* ₹1,24,000 Protected\n\n_Auto-dispatched via ApexSales CRM Intelligence_`;
-                    navigator.clipboard.writeText(text);
-                    showToast("Copied digest for WhatsApp broadcast!");
-                  }}
-                  style={{ padding: "5px 10px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#0f172a", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
-                >
-                  <MessageCircle size={12} color="#16a34a" /> Copy for WhatsApp
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const subject = encodeURIComponent("[ApexSales] Weekly Executive Revenue Digest");
-                    const body = encodeURIComponent(
-                      "Good morning Team,\n\nHere is the Weekly Executive Sales Digest:\n\n" +
-                      "- Realized Revenue (M-T-D): ₹4,85,000 (inc. 18% GST)\n" +
-                      "- Expected Month-End: ₹6,20,000 (Weighted Forecast)\n" +
-                      "- Team Win Rate: 68% (Target: 65%)\n" +
-                      "- Top Performer: Harsh Goyal (₹1,80,000 | 115% Quota)\n" +
-                      "- Retention & Renewal ARR: ₹1,24,000 Protected\n\n" +
-                      "Regards,\nApexSales Intelligence Cockpit"
-                    );
-                    window.open(`mailto:leadership@company.com?subject=${subject}&body=${body}`, "_blank");
-                    showToast("Opening email client with pre-filled digest!");
-                  }}
-                  style={{ padding: "5px 10px", backgroundColor: "#ffffff", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", color: "#0f172a", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
-                >
-                  <Mail size={12} color="#2563eb" /> Open in Email Client
-                </button>
-              </div>
-
               <button
                 type="button"
                 onClick={() => setShowWeeklyDigestModal(false)}
-                style={{ padding: "5px 12px", backgroundColor: "#0f172a", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}
+                style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "16px", padding: "4px" }}
               >
-                Close
+                <X size={16} />
               </button>
+            </div>
+
+            {/* Role Switcher Tabs */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 18px", backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", marginRight: "6px" }}>
+                Preview Role Report:
+              </span>
+              <button
+                type="button"
+                onClick={() => setWeeklyDigestRole("sales_head")}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  border: weeklyDigestRole === "sales_head" ? "1.5px solid #2563eb" : "1px solid #cbd5e1",
+                  backgroundColor: weeklyDigestRole === "sales_head" ? "#eff6ff" : "#ffffff",
+                  color: weeklyDigestRole === "sales_head" ? "#1d4ed8" : "#334155",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                👑 Sales Head / Owner
+              </button>
+              <button
+                type="button"
+                onClick={() => setWeeklyDigestRole("team_leader")}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  border: weeklyDigestRole === "team_leader" ? "1.5px solid #0284c7" : "1px solid #cbd5e1",
+                  backgroundColor: weeklyDigestRole === "team_leader" ? "#f0f9ff" : "#ffffff",
+                  color: weeklyDigestRole === "team_leader" ? "#0369a1" : "#334155",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                👔 Team Leader
+              </button>
+              <button
+                type="button"
+                onClick={() => setWeeklyDigestRole("sales_executive")}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  border: weeklyDigestRole === "sales_executive" ? "1.5px solid #0f766e" : "1px solid #cbd5e1",
+                  backgroundColor: weeklyDigestRole === "sales_executive" ? "#f0fdfa" : "#ffffff",
+                  color: weeklyDigestRole === "sales_executive" ? "#0f766e" : "#334155",
+                  transition: "all 0.15s ease"
+                }}
+              >
+                💼 Sales Executive (Employee)
+              </button>
+            </div>
+
+            {/* Subject preview */}
+            <div style={{ padding: "8px 18px", backgroundColor: "#ffffff", borderBottom: "1px solid #f1f5f9", fontSize: "12px" }}>
+              <span style={{ fontWeight: "700", color: "#475569" }}>Email Subject: </span>
+              <span style={{ fontWeight: "600", color: "#0f172a" }}>
+                {weeklyDigestSubject || "[ApexSales] Weekly Role Performance Digest"}
+              </span>
+            </div>
+
+            {/* Modal Body: Live Email Preview iframe */}
+            <div style={{ padding: "14px 18px", flex: 1, minHeight: "420px", maxHeight: "560px", overflowY: "auto", backgroundColor: "#f8fafc" }}>
+              {weeklyDigestLoading ? (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "360px", color: "#64748b", gap: "10px" }}>
+                  <RotateCcw className="animate-spin" size={24} color="#2563eb" />
+                  <span style={{ fontSize: "13px", fontWeight: "600" }}>Compiling live weekly performance metrics...</span>
+                </div>
+              ) : (
+                <iframe
+                  title="Weekly Digest Email Preview"
+                  srcDoc={weeklyDigestPreviewHtml}
+                  style={{
+                    width: "100%",
+                    height: "460px",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "10px",
+                    backgroundColor: "#ffffff",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.04)"
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Modal Footer Controls */}
+            <div style={{ padding: "12px 18px", borderTop: "1px solid #e2e8f0", backgroundColor: "#ffffff", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", borderBottomLeftRadius: "12px", borderBottomRightRadius: "12px" }}>
+              {/* Test Email Section */}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <input
+                  type="email"
+                  placeholder="Enter test recipient email..."
+                  value={weeklyDigestTestEmail}
+                  onChange={(e) => setWeeklyDigestTestEmail(e.target.value)}
+                  style={{
+                    height: "32px",
+                    padding: "0 10px",
+                    fontSize: "12px",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "6px",
+                    width: "220px",
+                    outline: "none"
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleSendTestWeeklyDigest}
+                  disabled={weeklyDigestSendingTest}
+                  style={{
+                    height: "32px",
+                    padding: "0 12px",
+                    backgroundColor: "#2563eb",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    cursor: weeklyDigestSendingTest ? "not-allowed" : "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    opacity: weeklyDigestSendingTest ? 0.7 : 1
+                  }}
+                >
+                  <Send size={12} />
+                  {weeklyDigestSendingTest ? "Sending Test..." : "Send Test Email"}
+                </button>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <button
+                  type="button"
+                  onClick={handleDispatchAllWeeklyDigests}
+                  disabled={weeklyDigestDispatchingAll}
+                  style={{
+                    height: "32px",
+                    padding: "0 12px",
+                    backgroundColor: "#16a34a",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: "700",
+                    cursor: weeklyDigestDispatchingAll ? "not-allowed" : "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    boxShadow: "0 1px 2px rgba(22, 163, 74, 0.2)"
+                  }}
+                >
+                  <Zap size={12} />
+                  {weeklyDigestDispatchingAll ? "Dispatching..." : "Dispatch All Roles Now"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = `*[ApexSales] Weekly Executive Revenue Digest*\n\n*Schedule:* Monday 9:00 AM IST\n*Roles Supported:* Sales Head, Team Leader, Sales Executive\n*Delivery Engine:* Automated Admin SMTP / Resend API\n\n_Auto-dispatched via ApexSales CRM Intelligence_`;
+                    navigator.clipboard.writeText(text);
+                    showToast("Copied weekly briefing summary for WhatsApp!");
+                  }}
+                  style={{
+                    height: "32px",
+                    padding: "0 10px",
+                    backgroundColor: "#f8fafc",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    color: "#334155",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px"
+                  }}
+                >
+                  <MessageCircle size={12} color="#16a34a" /> WhatsApp
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowWeeklyDigestModal(false)}
+                  style={{
+                    height: "32px",
+                    padding: "0 14px",
+                    backgroundColor: "#0f172a",
+                    color: "#ffffff",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    cursor: "pointer"
+                  }}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
