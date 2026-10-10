@@ -22325,121 +22325,121 @@ export default function App({ onNavigateToLanding } = {}) {
 
                 return (
                   <div className="kanban-workspace-wrapper animate-fade-in" style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-                    {/* Kanban Top Toolbar */}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", padding: "10px 14px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                        {/* Search Input (Issue 9: Flexible width; Issue 4: Strict vertical center alignment) */}
-                        <div style={{ position: "relative", flex: "1 1 260px", minWidth: "220px", maxWidth: "360px", height: "32px", display: "flex", alignItems: "center" }}>
-                          <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
-                          <input
-                            type="text"
-                            placeholder="Search board leads..."
-                            value={kanbanSearchQuery}
-                            onChange={(e) => setKanbanSearchQuery(e.target.value)}
-                            style={{ width: "100%", height: "32px", padding: "0 10px 0 30px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
-                          />
-                          {kanbanSearchQuery && (
-                            <button onClick={() => setKanbanSearchQuery("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", color: "#94a3b8" }}><X size={14} /></button>
-                          )}
-                        </div>
+                    {/* Kanban Top Toolbar - Balanced 2-Row Architecture */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "12px 14px", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
+                      {/* Row 1: Search & Filter Controls (Left) <---> Total Pipeline Metric (Right) */}
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", flex: 1, minWidth: "280px" }}>
+                          {/* Search Input (Issue 9: Flexible width; Issue 4: Strict vertical center alignment) */}
+                          <div style={{ position: "relative", flex: "1 1 240px", minWidth: "200px", maxWidth: "340px", height: "32px", display: "flex", alignItems: "center" }}>
+                            <Search size={14} color="#94a3b8" style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
+                            <input
+                              type="text"
+                              placeholder="Search board leads..."
+                              value={kanbanSearchQuery}
+                              onChange={(e) => setKanbanSearchQuery(e.target.value)}
+                              style={{ width: "100%", height: "32px", padding: "0 10px 0 30px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", boxSizing: "border-box" }}
+                            />
+                            {kanbanSearchQuery && (
+                              <button onClick={() => setKanbanSearchQuery("")} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", cursor: "pointer", color: "#94a3b8" }}><X size={14} /></button>
+                            )}
+                          </div>
 
-                        {/* Month / Timeline Filter */}
-                        <CustomDropdown
-                          value={kanbanMonthFilter}
-                          onChange={(val) => setKanbanMonthFilter(val)}
-                          title="Filter Kanban by Timeline"
-                          icon={<Calendar size={13} color={kanbanMonthFilter !== "all" ? "#2563eb" : "#64748b"} />}
-                          style={{ height: "32px" }}
-                          options={[
-                            { value: "all", label: "All Time Pipeline" },
-                            { value: getCurrentMonthKey(), label: `${formatMonthLabel(getCurrentMonthKey())} (Current)` },
-                            { value: getOffsetMonthKey(-1), label: `⏮️ ${formatMonthLabel(getOffsetMonthKey(-1))} (Last Month)` },
-                            { value: getOffsetMonthKey(-2), label: formatMonthLabel(getOffsetMonthKey(-2)) }
-                          ]}
-                        />
-
-                        {/* Owner Filter (if Super Admin or Manager) */}
-                        {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && (
+                          {/* Month / Timeline Filter */}
                           <CustomDropdown
-                            value={kanbanOwnerFilter}
-                            onChange={(val) => setKanbanOwnerFilter(val)}
-                            title="Filter Kanban by Sales Rep"
-                            icon={<User size={13} color={kanbanOwnerFilter !== "all" ? "#2563eb" : "#64748b"} />}
+                            value={kanbanMonthFilter}
+                            onChange={(val) => setKanbanMonthFilter(val)}
+                            title="Filter Kanban by Timeline"
+                            icon={<Calendar size={13} color={kanbanMonthFilter !== "all" ? "#2563eb" : "#64748b"} />}
                             style={{ height: "32px" }}
                             options={[
-                              { value: "all", label: "All Sales Reps" },
-                              { isSeparator: true },
-                              ...(allUsersList || []).map(u => ({
-                                value: u.name,
-                                label: `${u.name} (${u.role})`
-                              }))
+                              { value: "all", label: "All Time Pipeline" },
+                              { value: getCurrentMonthKey(), label: `${formatMonthLabel(getCurrentMonthKey())} (Current)` },
+                              { value: getOffsetMonthKey(-1), label: `⏮️ ${formatMonthLabel(getOffsetMonthKey(-1))} (Last Month)` },
+                              { value: getOffsetMonthKey(-2), label: formatMonthLabel(getOffsetMonthKey(-2)) }
                             ]}
                           />
-                        )}
 
-                        {/* Segmented Score Filters (Issue 4: Aligned vertical centering) */}
-                        <div 
-                          role="group" 
-                          aria-label="Filter by Lead Score" 
-                          style={{ 
-                            height: "32px", 
-                            boxSizing: "border-box", 
-                            display: "inline-flex", 
-                            alignItems: "center", 
-                            backgroundColor: "#f1f5f9", 
-                            border: "1px solid #cbd5e1", 
-                            padding: "2px", 
-                            borderRadius: "6px",
-                            gap: "2px",
-                            verticalAlign: "middle",
-                            margin: 0
-                          }}
-                        >
-                          <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", padding: "0 6px" }}>Score:</span>
-                          {[
-                            { id: "all", label: "All" },
-                            { id: "hot", label: "Hot", dot: "#e11d48" },
-                            { id: "warm", label: "Warm", dot: "#f59e0b" },
-                            { id: "cold", label: "Cold", dot: "#64748b" },
-                            { id: "lost", label: "Lost", dot: "#ef4444" }
-                          ].map(pill => {
-                            const isSelected = kanbanScoreFilter === pill.id;
-                            return (
-                              <button
-                                key={pill.id}
-                                type="button"
-                                onClick={() => setKanbanScoreFilter(pill.id)}
-                                aria-pressed={isSelected}
-                                style={{
-                                  height: "26px",
-                                  padding: "0 9px",
-                                  fontSize: "11px",
-                                  fontWeight: isSelected ? "750" : "600",
-                                  borderRadius: "4px",
-                                  border: isSelected ? "1px solid #cbd5e1" : "1px solid transparent",
-                                  cursor: "pointer",
-                                  backgroundColor: isSelected ? (pill.id === "lost" ? "#fef2f2" : "#ffffff") : "transparent",
-                                  color: isSelected ? (pill.id === "lost" ? "#b91c1c" : "#0f172a") : "#64748b",
-                                  boxShadow: isSelected ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
-                                  display: "inline-flex",
-                                  alignItems: "center",
-                                  gap: "5px",
-                                  transition: "all 0.15s ease"
-                                }}
-                              >
-                                {pill.dot && (
-                                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: pill.dot, display: "inline-block" }} />
-                                )}
-                                {pill.label}
-                              </button>
-                            );
-                          })}
+                          {/* Owner Filter (if Super Admin or Manager) */}
+                          {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && (
+                            <CustomDropdown
+                              value={kanbanOwnerFilter}
+                              onChange={(val) => setKanbanOwnerFilter(val)}
+                              title="Filter Kanban by Sales Rep"
+                              icon={<User size={13} color={kanbanOwnerFilter !== "all" ? "#2563eb" : "#64748b"} />}
+                              style={{ height: "32px" }}
+                              options={[
+                                { value: "all", label: "All Sales Reps" },
+                                { isSeparator: true },
+                                ...(allUsersList || []).map(u => ({
+                                  value: u.name,
+                                  label: `${u.name} (${u.role})`
+                                }))
+                              ]}
+                            />
+                          )}
+
+                          {/* Segmented Score Filters (Issue 4: Aligned vertical centering) */}
+                          <div 
+                            role="group" 
+                            aria-label="Filter by Lead Score" 
+                            style={{ 
+                              height: "32px", 
+                              boxSizing: "border-box", 
+                              display: "inline-flex", 
+                              alignItems: "center", 
+                              backgroundColor: "#f1f5f9", 
+                              border: "1px solid #cbd5e1", 
+                              padding: "2px", 
+                              borderRadius: "6px",
+                              gap: "2px",
+                              verticalAlign: "middle",
+                              margin: 0
+                            }}
+                          >
+                            <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", padding: "0 6px" }}>Score:</span>
+                            {[
+                              { id: "all", label: "All" },
+                              { id: "hot", label: "Hot", dot: "#e11d48" },
+                              { id: "warm", label: "Warm", dot: "#f59e0b" },
+                              { id: "cold", label: "Cold", dot: "#64748b" },
+                              { id: "lost", label: "Lost", dot: "#ef4444" }
+                            ].map(pill => {
+                              const isSelected = kanbanScoreFilter === pill.id;
+                              return (
+                                <button
+                                  key={pill.id}
+                                  type="button"
+                                  onClick={() => setKanbanScoreFilter(pill.id)}
+                                  aria-pressed={isSelected}
+                                  style={{
+                                    height: "26px",
+                                    padding: "0 9px",
+                                    fontSize: "11px",
+                                    fontWeight: isSelected ? "750" : "600",
+                                    borderRadius: "4px",
+                                    border: isSelected ? "1px solid #cbd5e1" : "1px solid transparent",
+                                    cursor: "pointer",
+                                    backgroundColor: isSelected ? (pill.id === "lost" ? "#fef2f2" : "#ffffff") : "transparent",
+                                    color: isSelected ? (pill.id === "lost" ? "#b91c1c" : "#0f172a") : "#64748b",
+                                    boxShadow: isSelected ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "5px",
+                                    transition: "all 0.15s ease"
+                                  }}
+                                >
+                                  {pill.dot && (
+                                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: pill.dot, display: "inline-block" }} />
+                                  )}
+                                  {pill.label}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
 
-                        {/* Issue 7: Vertical Divider separating filter controls from analytical summary */}
-                        <div role="separator" aria-orientation="vertical" style={{ width: "1px", height: "20px", backgroundColor: "#cbd5e1", margin: "0 4px" }} />
-
-                        {/* Total Pipeline Analytical Metric Card */}
+                        {/* Total Pipeline Analytical Metric Card (Aligned Right) */}
                         <div 
                           role="status"
                           aria-label="Total Pipeline Value Summary"
@@ -22449,13 +22449,15 @@ export default function App({ onNavigateToLanding } = {}) {
                             display: "inline-flex", 
                             alignItems: "center", 
                             gap: "6px", 
-                            padding: "0 10px", 
+                            padding: "0 12px", 
                             backgroundColor: kanbanScoreFilter === "lost" ? "#fff5f5" : "#f8fafc", 
                             border: kanbanScoreFilter === "lost" ? "1px solid #fecaca" : "1px solid #cbd5e1", 
                             borderRadius: "6px", 
                             fontSize: "12px", 
                             fontWeight: "700", 
-                            color: "#334155" 
+                            color: "#334155",
+                            flexShrink: 0,
+                            marginLeft: "auto"
                           }}
                         >
                           <span style={{ color: kanbanScoreFilter === "lost" ? "#dc2626" : "#475569" }}>
@@ -22470,7 +22472,8 @@ export default function App({ onNavigateToLanding } = {}) {
                         </div>
                       </div>
 
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      {/* Row 2: View Switcher (Left) <---> Configure Stages & Add Lead (Right) */}
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", paddingTop: "8px", borderTop: "1px solid #f1f5f9" }}>
                         {/* View switcher tabs */}
                         <div style={{ display: "flex", alignItems: "center", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "7px" }}>
                           <button
@@ -22511,259 +22514,262 @@ export default function App({ onNavigateToLanding } = {}) {
                           )}
                         </div>
 
-                        {/* Configure Stages Button with Dropdown Popover */}
-                        <div style={{ position: "relative" }} ref={kanbanConfigRef}>
-                          <button
-                            type="button"
-                            onClick={() => setIsKanbanStageConfigOpen(prev => !prev)}
-                            title="Configure visible pipeline stages on this board"
-                            style={{
-                              height: "32px",
-                              padding: "0 10px",
-                              backgroundColor: isKanbanStageConfigOpen ? "#f1f5f9" : "#ffffff",
-                              border: isKanbanStageConfigOpen ? "1px solid #94a3b8" : "1px solid #cbd5e1",
-                              borderRadius: "6px",
-                              fontSize: "12px",
-                              fontWeight: "600",
-                              color: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#1d4ed8" : "#334155",
-                              cursor: "pointer",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "6px",
-                              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-                              transition: "all 0.15s ease",
-                            }}
-                          >
-                            <Sliders size={13} style={{ color: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#2563eb" : "#64748b" }} />
-                            <span>Configure Stages</span>
-                            <span
+                        {/* Right Actions: Configure Stages & Add Lead */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
+                          {/* Configure Stages Button with Dropdown Popover */}
+                          <div style={{ position: "relative" }} ref={kanbanConfigRef}>
+                            <button
+                              type="button"
+                              onClick={() => setIsKanbanStageConfigOpen(prev => !prev)}
+                              title="Configure visible pipeline stages on this board"
                               style={{
+                                height: "32px",
+                                padding: "0 10px",
+                                backgroundColor: isKanbanStageConfigOpen ? "#f1f5f9" : "#ffffff",
+                                border: isKanbanStageConfigOpen ? "1px solid #94a3b8" : "1px solid #cbd5e1",
+                                borderRadius: "6px",
+                                fontSize: "12px",
+                                fontWeight: "600",
+                                color: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#1d4ed8" : "#334155",
+                                cursor: "pointer",
                                 display: "inline-flex",
                                 alignItems: "center",
-                                justifyContent: "center",
-                                padding: "1px 6px",
-                                borderRadius: "9999px",
-                                fontSize: "10px",
-                                fontWeight: "700",
-                                backgroundColor: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#dbeafe" : "#f1f5f9",
-                                color: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#1e40af" : "#64748b",
+                                gap: "6px",
+                                boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                                transition: "all 0.15s ease",
                               }}
                             >
-                              {kanbanVisibleStages.length}/{KANBAN_STAGES.length}
-                            </span>
-                            <ChevronDown
-                              size={12}
-                              style={{
-                                color: "#94a3b8",
-                                transform: isKanbanStageConfigOpen ? "rotate(180deg)" : "none",
-                                transition: "transform 0.15s ease",
-                              }}
-                            />
-                          </button>
+                              <Sliders size={13} style={{ color: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#2563eb" : "#64748b" }} />
+                              <span>Configure Stages</span>
+                              <span
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  padding: "1px 6px",
+                                  borderRadius: "9999px",
+                                  fontSize: "10px",
+                                  fontWeight: "700",
+                                  backgroundColor: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#dbeafe" : "#f1f5f9",
+                                  color: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#1e40af" : "#64748b",
+                                }}
+                              >
+                                {kanbanVisibleStages.length}/{KANBAN_STAGES.length}
+                              </span>
+                              <ChevronDown
+                                size={12}
+                                style={{
+                                  color: "#94a3b8",
+                                  transform: isKanbanStageConfigOpen ? "rotate(180deg)" : "none",
+                                  transition: "transform 0.15s ease",
+                                }}
+                              />
+                            </button>
 
-                          {/* Dropdown Popover */}
-                          {isKanbanStageConfigOpen && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                top: "calc(100% + 6px)",
-                                right: 0,
-                                width: "310px",
-                                backgroundColor: "#ffffff",
-                                border: "1px solid #e2e8f0",
-                                borderRadius: "10px",
-                                boxShadow: "0 12px 28px -4px rgba(15, 23, 42, 0.16), 0 4px 10px -2px rgba(15, 23, 42, 0.08)",
-                                zIndex: 100,
-                                padding: "14px",
-                                boxSizing: "border-box",
-                                animation: "fadeInUp 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
-                              }}
-                            >
-                              {/* Header */}
-                              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px", paddingBottom: "10px", borderBottom: "1px solid #f1f5f9" }}>
-                                <div>
-                                  <div style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", display: "flex", alignItems: "center", gap: "6px" }}>
-                                    <Sliders size={13} color="#2563eb" />
-                                    <span>Configure Stages</span>
+                            {/* Dropdown Popover */}
+                            {isKanbanStageConfigOpen && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: "calc(100% + 6px)",
+                                  right: 0,
+                                  width: "310px",
+                                  backgroundColor: "#ffffff",
+                                  border: "1px solid #e2e8f0",
+                                  borderRadius: "10px",
+                                  boxShadow: "0 12px 28px -4px rgba(15, 23, 42, 0.16), 0 4px 10px -2px rgba(15, 23, 42, 0.08)",
+                                  zIndex: 100,
+                                  padding: "14px",
+                                  boxSizing: "border-box",
+                                  animation: "fadeInUp 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
+                                }}
+                              >
+                                {/* Header */}
+                                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px", paddingBottom: "10px", borderBottom: "1px solid #f1f5f9" }}>
+                                  <div>
+                                    <div style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", display: "flex", alignItems: "center", gap: "6px" }}>
+                                      <Sliders size={13} color="#2563eb" />
+                                      <span>Configure Stages</span>
+                                    </div>
+                                    <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
+                                      Toggle stages ON or OFF for your board
+                                    </div>
                                   </div>
-                                  <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
-                                    Toggle stages ON or OFF for your board
-                                  </div>
+                                  {kanbanVisibleStages.length < KANBAN_STAGES.length && (
+                                    <button
+                                      type="button"
+                                      onClick={resetAllKanbanStages}
+                                      style={{
+                                        border: "none",
+                                        background: "none",
+                                        color: "#2563eb",
+                                        fontSize: "11px",
+                                        fontWeight: "600",
+                                        cursor: "pointer",
+                                        padding: "2px 6px",
+                                        borderRadius: "4px",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "4px",
+                                      }}
+                                      title="Reset and show all stages"
+                                    >
+                                      <RotateCcw size={10} /> Reset
+                                    </button>
+                                  )}
                                 </div>
-                                {kanbanVisibleStages.length < KANBAN_STAGES.length && (
+
+                                {/* Stage list with toggle switches */}
+                                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                  {KANBAN_STAGES.map((stg) => {
+                                    const isVisible = kanbanVisibleStages.includes(stg.id);
+                                    const isOnlyOne = isVisible && kanbanVisibleStages.length === 1;
+
+                                    // Lead count in this stage
+                                    const count = filteredKanbanLeads.filter((l) => {
+                                      const effectiveStage = isLostStatus(l.status) ? getLeadLostStage(l) : (l.status || "New");
+                                      if (stg.includes) {
+                                        return stg.includes.some((s) => s.toLowerCase() === effectiveStage.toLowerCase());
+                                      }
+                                      return effectiveStage.toLowerCase() === stg.id.toLowerCase();
+                                    }).length;
+
+                                    return (
+                                      <div
+                                        key={stg.id}
+                                        onClick={() => {
+                                          if (!isOnlyOne) {
+                                            toggleKanbanStage(stg.id);
+                                          }
+                                        }}
+                                        style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "space-between",
+                                          padding: "8px 10px",
+                                          borderRadius: "6px",
+                                          backgroundColor: isVisible ? "#f8fafc" : "#ffffff",
+                                          border: `1px solid ${isVisible ? "#e2e8f0" : "#f1f5f9"}`,
+                                          cursor: isOnlyOne ? "not-allowed" : "pointer",
+                                          transition: "all 0.15s ease",
+                                          opacity: isVisible ? 1 : 0.6,
+                                        }}
+                                        title={isOnlyOne ? "At least one stage must stay visible" : isVisible ? `Click to turn OFF ${stg.name}` : `Click to turn ON ${stg.name}`}
+                                      >
+                                        {/* Left: Indicator dot, name, and count badge */}
+                                        <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
+                                          <span
+                                            style={{
+                                              width: "8px",
+                                              height: "8px",
+                                              borderRadius: "50%",
+                                              backgroundColor: stg.color,
+                                              flexShrink: 0,
+                                            }}
+                                          />
+                                          <span
+                                            style={{
+                                              fontSize: "12px",
+                                              fontWeight: isVisible ? "600" : "500",
+                                              color: isVisible ? "#1e293b" : "#64748b",
+                                              whiteSpace: "nowrap",
+                                              overflow: "hidden",
+                                              textOverflow: "ellipsis",
+                                            }}
+                                          >
+                                            {stg.name}
+                                          </span>
+                                          <span
+                                            style={{
+                                              fontSize: "10px",
+                                              fontWeight: "600",
+                                              color: "#64748b",
+                                              backgroundColor: "#f1f5f9",
+                                              padding: "1px 5px",
+                                              borderRadius: "9999px",
+                                            }}
+                                          >
+                                            {count}
+                                          </span>
+                                        </div>
+
+                                        {/* Right: iOS-style toggle switch */}
+                                        <div
+                                          style={{
+                                            width: "32px",
+                                            height: "18px",
+                                            borderRadius: "9999px",
+                                            backgroundColor: isVisible ? "#2563eb" : "#cbd5e1",
+                                            position: "relative",
+                                            transition: "background-color 0.2s ease",
+                                            flexShrink: 0,
+                                            marginLeft: "8px",
+                                          }}
+                                        >
+                                          <div
+                                            style={{
+                                              width: "14px",
+                                              height: "14px",
+                                              borderRadius: "50%",
+                                              backgroundColor: "#ffffff",
+                                              position: "absolute",
+                                              top: "2px",
+                                              left: isVisible ? "16px" : "2px",
+                                              transition: "left 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                                              boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                                            }}
+                                          />
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Footer */}
+                                <div
+                                  style={{
+                                    marginTop: "12px",
+                                    paddingTop: "10px",
+                                    borderTop: "1px solid #f1f5f9",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <span style={{ fontSize: "11px", color: "#64748b" }}>
+                                    {kanbanVisibleStages.length} of {KANBAN_STAGES.length} active
+                                  </span>
                                   <button
                                     type="button"
-                                    onClick={resetAllKanbanStages}
+                                    onClick={() => setIsKanbanStageConfigOpen(false)}
                                     style={{
+                                      height: "26px",
+                                      padding: "0 10px",
+                                      backgroundColor: "#2563eb",
+                                      color: "#ffffff",
                                       border: "none",
-                                      background: "none",
-                                      color: "#2563eb",
+                                      borderRadius: "5px",
                                       fontSize: "11px",
                                       fontWeight: "600",
                                       cursor: "pointer",
-                                      padding: "2px 6px",
-                                      borderRadius: "4px",
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      gap: "4px",
                                     }}
-                                    title="Reset and show all stages"
                                   >
-                                    <RotateCcw size={10} /> Reset
+                                    Done
                                   </button>
-                                )}
+                                </div>
                               </div>
+                            )}
+                          </div>
 
-                              {/* Stage list with toggle switches */}
-                              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                                {KANBAN_STAGES.map((stg) => {
-                                  const isVisible = kanbanVisibleStages.includes(stg.id);
-                                  const isOnlyOne = isVisible && kanbanVisibleStages.length === 1;
-
-                                  // Lead count in this stage
-                                  const count = filteredKanbanLeads.filter((l) => {
-                                    const effectiveStage = isLostStatus(l.status) ? getLeadLostStage(l) : (l.status || "New");
-                                    if (stg.includes) {
-                                      return stg.includes.some((s) => s.toLowerCase() === effectiveStage.toLowerCase());
-                                    }
-                                    return effectiveStage.toLowerCase() === stg.id.toLowerCase();
-                                  }).length;
-
-                                  return (
-                                    <div
-                                      key={stg.id}
-                                      onClick={() => {
-                                        if (!isOnlyOne) {
-                                          toggleKanbanStage(stg.id);
-                                        }
-                                      }}
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                        padding: "8px 10px",
-                                        borderRadius: "6px",
-                                        backgroundColor: isVisible ? "#f8fafc" : "#ffffff",
-                                        border: `1px solid ${isVisible ? "#e2e8f0" : "#f1f5f9"}`,
-                                        cursor: isOnlyOne ? "not-allowed" : "pointer",
-                                        transition: "all 0.15s ease",
-                                        opacity: isVisible ? 1 : 0.6,
-                                      }}
-                                      title={isOnlyOne ? "At least one stage must stay visible" : isVisible ? `Click to turn OFF ${stg.name}` : `Click to turn ON ${stg.name}`}
-                                    >
-                                      {/* Left: Indicator dot, name, and count badge */}
-                                      <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
-                                        <span
-                                          style={{
-                                            width: "8px",
-                                            height: "8px",
-                                            borderRadius: "50%",
-                                            backgroundColor: stg.color,
-                                            flexShrink: 0,
-                                          }}
-                                        />
-                                        <span
-                                          style={{
-                                            fontSize: "12px",
-                                            fontWeight: isVisible ? "600" : "500",
-                                            color: isVisible ? "#1e293b" : "#64748b",
-                                            whiteSpace: "nowrap",
-                                            overflow: "hidden",
-                                            textOverflow: "ellipsis",
-                                          }}
-                                        >
-                                          {stg.name}
-                                        </span>
-                                        <span
-                                          style={{
-                                            fontSize: "10px",
-                                            fontWeight: "600",
-                                            color: "#64748b",
-                                            backgroundColor: "#f1f5f9",
-                                            padding: "1px 5px",
-                                            borderRadius: "9999px",
-                                          }}
-                                        >
-                                          {count}
-                                        </span>
-                                      </div>
-
-                                      {/* Right: iOS-style toggle switch */}
-                                      <div
-                                        style={{
-                                          width: "32px",
-                                          height: "18px",
-                                          borderRadius: "9999px",
-                                          backgroundColor: isVisible ? "#2563eb" : "#cbd5e1",
-                                          position: "relative",
-                                          transition: "background-color 0.2s ease",
-                                          flexShrink: 0,
-                                          marginLeft: "8px",
-                                        }}
-                                      >
-                                        <div
-                                          style={{
-                                            width: "14px",
-                                            height: "14px",
-                                            borderRadius: "50%",
-                                            backgroundColor: "#ffffff",
-                                            position: "absolute",
-                                            top: "2px",
-                                            left: isVisible ? "16px" : "2px",
-                                            transition: "left 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                                            boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-                                          }}
-                                        />
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-
-                              {/* Footer */}
-                              <div
-                                style={{
-                                  marginTop: "12px",
-                                  paddingTop: "10px",
-                                  borderTop: "1px solid #f1f5f9",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "space-between",
-                                }}
-                              >
-                                <span style={{ fontSize: "11px", color: "#64748b" }}>
-                                  {kanbanVisibleStages.length} of {KANBAN_STAGES.length} active
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => setIsKanbanStageConfigOpen(false)}
-                                  style={{
-                                    height: "26px",
-                                    padding: "0 10px",
-                                    backgroundColor: "#2563eb",
-                                    color: "#ffffff",
-                                    border: "none",
-                                    borderRadius: "5px",
-                                    fontSize: "11px",
-                                    fontWeight: "600",
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Done
-                                </button>
-                              </div>
-                            </div>
-                          )}
+                          {/* Add Lead CTA */}
+                          <button
+                            type="button"
+                            onClick={() => openAddLeadModal("New")}
+                            style={{ height: "32px", padding: "0 12px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)" }}
+                          >
+                            <Plus size={14} /> Add Lead
+                          </button>
                         </div>
-
-                        {/* Add Lead CTA */}
-                        <button
-                          type="button"
-                          onClick={() => openAddLeadModal("New")}
-                          style={{ height: "32px", padding: "0 12px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)" }}
-                        >
-                          <Plus size={14} /> Add Lead
-                        </button>
                       </div>
                     </div>
 
