@@ -235,7 +235,7 @@ export function buildSalesHeadEmailHtml(metrics, recipient) {
     <div style="padding: 28px 24px; color: #334155;">
       
       <p style="font-size: 14px; color: #475569; margin: 0 0 18px 0;">
-        Hello <strong>${recipient?.name || 'Sales Head'}</strong>, yahan aapki company ka pichle 7 dino ka complete sales aur revenue report hai:
+        Hello <strong>${recipient?.name || 'Sales Head'}</strong>, here is the weekly executive sales and revenue performance briefing for your organization covering the past 7 days:
       </p>
 
       <!-- 4 TOP KPI CARDS -->
@@ -415,7 +415,7 @@ export function buildTeamLeaderEmailHtml(metrics, recipient) {
     <div style="padding: 28px 24px; color: #334155;">
       
       <p style="font-size: 14px; color: #475569; margin: 0 0 18px 0;">
-        Hello <strong>${recipient.name}</strong>, yahan aapki sales team ka pichle 7 dino ka activity aur closing breakdown diya gaya hai:
+        Hello <strong>${recipient.name}</strong>, here is your team's weekly sales activity, closing audit, and quota performance breakdown for the past 7 days:
       </p>
 
       <!-- 3 TEAM KPI CARDS -->
@@ -559,7 +559,7 @@ export function buildEmployeeEmailHtml(metrics, recipient) {
     <div style="padding: 28px 24px; color: #334155;">
       
       <p style="font-size: 14px; color: #475569; margin: 0 0 18px 0;">
-        Hello <strong>${recipient.name}</strong>, yahan aapka is week ka personal performance summary hai:
+        Hello <strong>${recipient.name}</strong>, here is your personal weekly sales performance scorecard and quota tracking for the past 7 days:
       </p>
 
       <!-- WEEKLY TARGET ACHIEVEMENT PROGRESS -->
