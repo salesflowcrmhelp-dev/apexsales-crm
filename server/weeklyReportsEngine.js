@@ -346,7 +346,7 @@ export function buildSalesHeadEmailHtml(metrics, recipient) {
 
       <!-- CTA BUTTON -->
       <div style="text-align: center; margin: 28px 0 10px 0;">
-        <a href="https://apexsales-crm.vercel.app/?view=app&auth=demo&workspace=reports" target="_blank" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+        <a href="https://apex.salesflowhub.cloud/?view=app&auth=demo&workspace=reports" target="_blank" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
           Open Live CRM Analytics Cockpit &rarr;
         </a>
       </div>
@@ -486,7 +486,7 @@ export function buildTeamLeaderEmailHtml(metrics, recipient) {
 
       <!-- CTA BUTTON -->
       <div style="text-align: center; margin: 24px 0 10px 0;">
-        <a href="https://apexsales-crm.vercel.app/?view=app&auth=demo&workspace=pipeline" target="_blank" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block;">
+        <a href="https://apex.salesflowhub.cloud/?view=app&auth=demo&workspace=pipeline" target="_blank" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block;">
           Open Team Pipeline Workspace &rarr;
         </a>
       </div>
@@ -626,7 +626,7 @@ export function buildEmployeeEmailHtml(metrics, recipient) {
 
       <!-- CTA BUTTON -->
       <div style="text-align: center; margin: 24px 0 10px 0;">
-        <a href="https://apexsales-crm.vercel.app/?view=app&auth=demo&workspace=pipeline" target="_blank" style="background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block;">
+        <a href="https://apex.salesflowhub.cloud/?view=app&auth=demo&workspace=pipeline" target="_blank" style="background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 13px; display: inline-block;">
           Open My Leads Grid &rarr;
         </a>
       </div>
