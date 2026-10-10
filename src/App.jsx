@@ -4954,6 +4954,57 @@ export default function App({ onNavigateToLanding } = {}) {
   const [kanbanMonthFilter, setKanbanMonthFilter] = useState("all"); // Defaults to all active pipeline, or dynamically selectable current/last month
   const [draggingCardId, setDraggingCardId] = useState(null);
   const [dragOverStageId, setDragOverStageId] = useState(null);
+  const [kanbanVisibleStages, setKanbanVisibleStages] = useState(() => {
+    try {
+      const saved = localStorage.getItem("crm_kanban_visible_stages");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    return ["New", "Contacted", "Qualified", "Proposal Sent", "Payment Follow Up", "Won"];
+  });
+  const [isKanbanStageConfigOpen, setIsKanbanStageConfigOpen] = useState(false);
+  const kanbanConfigRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      const userKey = currentUser?.id ? `crm_kanban_visible_stages_${currentUser.id}` : null;
+      if (userKey) {
+        localStorage.setItem(userKey, JSON.stringify(kanbanVisibleStages));
+      }
+      localStorage.setItem("crm_kanban_visible_stages", JSON.stringify(kanbanVisibleStages));
+    } catch (e) {}
+  }, [kanbanVisibleStages, currentUser?.id]);
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      try {
+        const saved = localStorage.getItem(`crm_kanban_visible_stages_${currentUser.id}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setKanbanVisibleStages(parsed);
+          }
+        }
+      } catch (e) {}
+    }
+  }, [currentUser?.id]);
+
+  useEffect(() => {
+    if (!isKanbanStageConfigOpen) return;
+    const handleOutsideKanbanConfig = (e) => {
+      if (kanbanConfigRef.current && !kanbanConfigRef.current.contains(e.target)) {
+        setIsKanbanStageConfigOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideKanbanConfig);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideKanbanConfig);
+    };
+  }, [isKanbanStageConfigOpen]);
 
   // Auto-close mobile sidebar drawer on workspace/tab changes
   useEffect(() => {
@@ -22100,6 +22151,25 @@ export default function App({ onNavigateToLanding } = {}) {
                   { id: "Won", name: "Closed Won", color: "#166534", bg: "#f0fdf4", borderColor: "#bbf7d0", includes: ["Won", "Renewal Won"] },
                 ];
 
+                const toggleKanbanStage = (stageId) => {
+                  setKanbanVisibleStages((prev) => {
+                    if (prev.includes(stageId)) {
+                      if (prev.length <= 1) {
+                        showToast("At least one stage must remain visible on the board", "warning");
+                        return prev;
+                      }
+                      return prev.filter((id) => id !== stageId);
+                    } else {
+                      return [...prev, stageId];
+                    }
+                  });
+                };
+
+                const resetAllKanbanStages = () => {
+                  setKanbanVisibleStages(["New", "Contacted", "Qualified", "Proposal Sent", "Payment Follow Up", "Won"]);
+                  showToast("All pipeline stages restored", "info");
+                };
+
                 const getDaysInStage = (lead) => {
                   const ts = lead.stageUpdatedAt || lead.lastModified || lead.created_at;
                   if (!ts) return "1d in stage";
@@ -22441,6 +22511,251 @@ export default function App({ onNavigateToLanding } = {}) {
                           )}
                         </div>
 
+                        {/* Configure Stages Button with Dropdown Popover */}
+                        <div style={{ position: "relative" }} ref={kanbanConfigRef}>
+                          <button
+                            type="button"
+                            onClick={() => setIsKanbanStageConfigOpen(prev => !prev)}
+                            title="Configure visible pipeline stages on this board"
+                            style={{
+                              height: "32px",
+                              padding: "0 10px",
+                              backgroundColor: isKanbanStageConfigOpen ? "#f1f5f9" : "#ffffff",
+                              border: isKanbanStageConfigOpen ? "1px solid #94a3b8" : "1px solid #cbd5e1",
+                              borderRadius: "6px",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                              color: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#1d4ed8" : "#334155",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                              transition: "all 0.15s ease",
+                            }}
+                          >
+                            <Sliders size={13} style={{ color: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#2563eb" : "#64748b" }} />
+                            <span>Configure Stages</span>
+                            <span
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                padding: "1px 6px",
+                                borderRadius: "9999px",
+                                fontSize: "10px",
+                                fontWeight: "700",
+                                backgroundColor: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#dbeafe" : "#f1f5f9",
+                                color: kanbanVisibleStages.length < KANBAN_STAGES.length ? "#1e40af" : "#64748b",
+                              }}
+                            >
+                              {kanbanVisibleStages.length}/{KANBAN_STAGES.length}
+                            </span>
+                            <ChevronDown
+                              size={12}
+                              style={{
+                                color: "#94a3b8",
+                                transform: isKanbanStageConfigOpen ? "rotate(180deg)" : "none",
+                                transition: "transform 0.15s ease",
+                              }}
+                            />
+                          </button>
+
+                          {/* Dropdown Popover */}
+                          {isKanbanStageConfigOpen && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "calc(100% + 6px)",
+                                right: 0,
+                                width: "310px",
+                                backgroundColor: "#ffffff",
+                                border: "1px solid #e2e8f0",
+                                borderRadius: "10px",
+                                boxShadow: "0 12px 28px -4px rgba(15, 23, 42, 0.16), 0 4px 10px -2px rgba(15, 23, 42, 0.08)",
+                                zIndex: 100,
+                                padding: "14px",
+                                boxSizing: "border-box",
+                                animation: "fadeInUp 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
+                              }}
+                            >
+                              {/* Header */}
+                              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px", paddingBottom: "10px", borderBottom: "1px solid #f1f5f9" }}>
+                                <div>
+                                  <div style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <Sliders size={13} color="#2563eb" />
+                                    <span>Configure Stages</span>
+                                  </div>
+                                  <div style={{ fontSize: "11px", color: "#64748b", marginTop: "2px" }}>
+                                    Toggle stages ON or OFF for your board
+                                  </div>
+                                </div>
+                                {kanbanVisibleStages.length < KANBAN_STAGES.length && (
+                                  <button
+                                    type="button"
+                                    onClick={resetAllKanbanStages}
+                                    style={{
+                                      border: "none",
+                                      background: "none",
+                                      color: "#2563eb",
+                                      fontSize: "11px",
+                                      fontWeight: "600",
+                                      cursor: "pointer",
+                                      padding: "2px 6px",
+                                      borderRadius: "4px",
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: "4px",
+                                    }}
+                                    title="Reset and show all stages"
+                                  >
+                                    <RotateCcw size={10} /> Reset
+                                  </button>
+                                )}
+                              </div>
+
+                              {/* Stage list with toggle switches */}
+                              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                                {KANBAN_STAGES.map((stg) => {
+                                  const isVisible = kanbanVisibleStages.includes(stg.id);
+                                  const isOnlyOne = isVisible && kanbanVisibleStages.length === 1;
+
+                                  // Lead count in this stage
+                                  const count = filteredKanbanLeads.filter((l) => {
+                                    const effectiveStage = isLostStatus(l.status) ? getLeadLostStage(l) : (l.status || "New");
+                                    if (stg.includes) {
+                                      return stg.includes.some((s) => s.toLowerCase() === effectiveStage.toLowerCase());
+                                    }
+                                    return effectiveStage.toLowerCase() === stg.id.toLowerCase();
+                                  }).length;
+
+                                  return (
+                                    <div
+                                      key={stg.id}
+                                      onClick={() => {
+                                        if (!isOnlyOne) {
+                                          toggleKanbanStage(stg.id);
+                                        }
+                                      }}
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        padding: "8px 10px",
+                                        borderRadius: "6px",
+                                        backgroundColor: isVisible ? "#f8fafc" : "#ffffff",
+                                        border: `1px solid ${isVisible ? "#e2e8f0" : "#f1f5f9"}`,
+                                        cursor: isOnlyOne ? "not-allowed" : "pointer",
+                                        transition: "all 0.15s ease",
+                                        opacity: isVisible ? 1 : 0.6,
+                                      }}
+                                      title={isOnlyOne ? "At least one stage must stay visible" : isVisible ? `Click to turn OFF ${stg.name}` : `Click to turn ON ${stg.name}`}
+                                    >
+                                      {/* Left: Indicator dot, name, and count badge */}
+                                      <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
+                                        <span
+                                          style={{
+                                            width: "8px",
+                                            height: "8px",
+                                            borderRadius: "50%",
+                                            backgroundColor: stg.color,
+                                            flexShrink: 0,
+                                          }}
+                                        />
+                                        <span
+                                          style={{
+                                            fontSize: "12px",
+                                            fontWeight: isVisible ? "600" : "500",
+                                            color: isVisible ? "#1e293b" : "#64748b",
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                          }}
+                                        >
+                                          {stg.name}
+                                        </span>
+                                        <span
+                                          style={{
+                                            fontSize: "10px",
+                                            fontWeight: "600",
+                                            color: "#64748b",
+                                            backgroundColor: "#f1f5f9",
+                                            padding: "1px 5px",
+                                            borderRadius: "9999px",
+                                          }}
+                                        >
+                                          {count}
+                                        </span>
+                                      </div>
+
+                                      {/* Right: iOS-style toggle switch */}
+                                      <div
+                                        style={{
+                                          width: "32px",
+                                          height: "18px",
+                                          borderRadius: "9999px",
+                                          backgroundColor: isVisible ? "#2563eb" : "#cbd5e1",
+                                          position: "relative",
+                                          transition: "background-color 0.2s ease",
+                                          flexShrink: 0,
+                                          marginLeft: "8px",
+                                        }}
+                                      >
+                                        <div
+                                          style={{
+                                            width: "14px",
+                                            height: "14px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "#ffffff",
+                                            position: "absolute",
+                                            top: "2px",
+                                            left: isVisible ? "16px" : "2px",
+                                            transition: "left 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                                            boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+
+                              {/* Footer */}
+                              <div
+                                style={{
+                                  marginTop: "12px",
+                                  paddingTop: "10px",
+                                  borderTop: "1px solid #f1f5f9",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                }}
+                              >
+                                <span style={{ fontSize: "11px", color: "#64748b" }}>
+                                  {kanbanVisibleStages.length} of {KANBAN_STAGES.length} active
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setIsKanbanStageConfigOpen(false)}
+                                  style={{
+                                    height: "26px",
+                                    padding: "0 10px",
+                                    backgroundColor: "#2563eb",
+                                    color: "#ffffff",
+                                    border: "none",
+                                    borderRadius: "5px",
+                                    fontSize: "11px",
+                                    fontWeight: "600",
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Done
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
                         {/* Add Lead CTA */}
                         <button
                           type="button"
@@ -22454,7 +22769,25 @@ export default function App({ onNavigateToLanding } = {}) {
 
                     {/* Kanban Board Columns Container */}
                     <div className="kanban-board" style={{ flex: 1, minHeight: 0 }}>
-                      {KANBAN_STAGES.map(stage => {
+                      {(() => {
+                        const visibleColumns = KANBAN_STAGES.filter(stage => kanbanVisibleStages.includes(stage.id));
+                        if (visibleColumns.length === 0) {
+                          return (
+                            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "48px 24px", color: "#64748b", width: "100%" }}>
+                              <Sliders size={32} color="#94a3b8" style={{ marginBottom: "12px" }} />
+                              <div style={{ fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "4px" }}>No Stages Visible</div>
+                              <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "16px" }}>All Kanban pipeline stages are currently turned off.</div>
+                              <button
+                                type="button"
+                                onClick={resetAllKanbanStages}
+                                style={{ height: "32px", padding: "0 14px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}
+                              >
+                                Show All Stages
+                              </button>
+                            </div>
+                          );
+                        }
+                        return visibleColumns.map(stage => {
                         const colLeads = filteredKanbanLeads.filter(l => {
                           const effectiveStage = isLostStatus(l.status)
                             ? getLeadLostStage(l)
@@ -22705,7 +23038,8 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
                           </div>
                         );
-                      })}
+                      });
+                    })()}
                     </div>
                   </div>
                 );
