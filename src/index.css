@@ -4923,5 +4923,8 @@ option {
     padding: 32px 16px !important;
     min-height: 100vh !important;
   }
+  .mobile-login-brand {
+    display: flex !important;
+  }
 }
 

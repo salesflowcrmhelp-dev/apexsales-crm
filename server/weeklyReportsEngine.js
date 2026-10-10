@@ -256,6 +256,10 @@ export function buildSalesHeadEmailHtml(metrics, recipient) {
           ${sprintDates}
         </span>
       </div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <img src="https://salesflowhub.cloud/favicon.png" alt="ApexSales" width="28" height="28" style="border-radius: 6px; vertical-align: middle; display: inline-block;" />
+        <span style="font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: -0.4px;">ApexSales CRM</span>
+      </div>
       <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff;">
         ApexSales Weekly Executive Digest
       </h1>
@@ -435,6 +439,10 @@ export function buildTeamLeaderEmailHtml(metrics, recipient) {
           ${sprintDates}
         </span>
       </div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <img src="https://salesflowhub.cloud/favicon.png" alt="ApexSales" width="28" height="28" style="border-radius: 6px; vertical-align: middle; display: inline-block;" />
+        <span style="font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: -0.4px;">ApexSales CRM</span>
+      </div>
       <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff;">
         Weekly Team Performance Audit
       </h1>
@@ -583,6 +591,10 @@ export function buildEmployeeEmailHtml(metrics, recipient) {
         <span style="font-size: 11px; color: #ccfbf1; font-weight: 600;">
           ${sprintDates}
         </span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <img src="https://salesflowhub.cloud/favicon.png" alt="ApexSales" width="28" height="28" style="border-radius: 6px; vertical-align: middle; display: inline-block;" />
+        <span style="font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: -0.4px;">ApexSales CRM</span>
       </div>
       <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff;">
         Your Weekly Sales Performance

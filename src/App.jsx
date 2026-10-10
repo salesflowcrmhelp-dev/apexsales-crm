@@ -10223,15 +10223,12 @@ export default function App({ onNavigateToLanding } = {}) {
 
           {/* Top Brand Logo */}
           <div style={{ display: "flex", alignItems: "center", gap: "12px", position: "relative", zIndex: 10 }}>
-            <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "linear-gradient(135deg, #ea580c 0%, #f59e0b 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 24px rgba(234, 88, 12, 0.35)" }}>
-              <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-                <path d="M16 2.5L2.5 28L9.5 23.5L16 13.5V2.5Z" fill="#ffffff" fillOpacity="0.95" />
-                <path d="M16 2.5V13.5L22.5 23.5L29.5 28L16 2.5Z" fill="#ffedd5" />
-              </svg>
+            <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 24px rgba(16, 185, 129, 0.2)" }}>
+              <img src="/apexsales_icon.png" alt="ApexSales" style={{ width: "32px", height: "32px", objectFit: "contain" }} />
             </div>
             <div>
               <span style={{ fontWeight: "900", color: "#ffffff", fontSize: "20px", letterSpacing: "-0.5px", display: "block" }}>ApexSales CRM</span>
-              <span style={{ fontSize: "11px", color: "#fb923c", fontWeight: "600", letterSpacing: "1.2px", textTransform: "uppercase", display: "block", marginTop: "-2px" }}>Revenue Intelligence</span>
+              <span style={{ fontSize: "11px", color: "#34d399", fontWeight: "600", letterSpacing: "1.2px", textTransform: "uppercase", display: "block", marginTop: "-2px" }}>Revenue Intelligence</span>
             </div>
           </div>
 
@@ -10327,6 +10324,15 @@ export default function App({ onNavigateToLanding } = {}) {
           )}
 
           <div style={{ width: "100%", maxWidth: "420px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            {/* Mobile Brand Header */}
+            <div className="mobile-login-brand" style={{ display: "none", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
+              <img src="/apexsales_icon.png" alt="ApexSales" style={{ width: "36px", height: "36px", objectFit: "contain" }} />
+              <div>
+                <span style={{ fontWeight: "900", color: "#0f172a", fontSize: "18px", letterSpacing: "-0.5px", display: "block" }}>ApexSales CRM</span>
+                <span style={{ fontSize: "10px", color: "#059669", fontWeight: "700", letterSpacing: "1px", textTransform: "uppercase", display: "block" }}>Revenue Intelligence</span>
+              </div>
+            </div>
+
             {isRegisterCompanyView ? (
               /* 🏢 Register New Company Workspace View */
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -11365,25 +11371,12 @@ export default function App({ onNavigateToLanding } = {}) {
             }}
             title={isSidebarCollapsed ? "ApexSales - Click to expand menu [Ctrl+B]" : "ApexSales Workspace"}
           >
-            <div className="brand-logo-icon" style={{ flexShrink: 0, width: "28px", height: "28px" }} title={isSidebarCollapsed ? "ApexSales - Click to expand [Ctrl+B]" : "ApexSales"}>
-              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: "block" }}>
-                <defs>
-                  <linearGradient id="apexBrandLeft" x1="16" y1="2" x2="2.5" y2="28" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#ff9330" />
-                    <stop offset="45%" stopColor="#f97316" />
-                    <stop offset="100%" stopColor="#ea580c" />
-                  </linearGradient>
-                  <linearGradient id="apexBrandRight" x1="16" y1="2" x2="29.5" y2="28" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#ea580c" />
-                    <stop offset="55%" stopColor="#c2410c" />
-                    <stop offset="100%" stopColor="#9a3412" />
-                  </linearGradient>
-                </defs>
-                {/* Left 3D Facet */}
-                <path d="M16 2.5L2.5 28L9.5 23.5L16 13.5V2.5Z" fill="url(#apexBrandLeft)" />
-                {/* Right 3D Facet */}
-                <path d="M16 2.5V13.5L22.5 23.5L29.5 28L16 2.5Z" fill="url(#apexBrandRight)" />
-              </svg>
+            <div className="brand-logo-icon" style={{ flexShrink: 0, width: "28px", height: "28px", display: "flex", alignItems: "center", justifyContent: "center" }} title={isSidebarCollapsed ? "ApexSales - Click to expand [Ctrl+B]" : "ApexSales"}>
+              <img 
+                src="/apexsales_icon.png" 
+                alt="ApexSales" 
+                style={{ width: "28px", height: "28px", objectFit: "contain", display: "block" }} 
+              />
             </div>
             <div className="sidebar-brand-text" style={{ minWidth: 0 }}>
               <span className="brand-name" style={{ whiteSpace: "nowrap", letterSpacing: "-0.3px", color: "#0f172a" }}>
