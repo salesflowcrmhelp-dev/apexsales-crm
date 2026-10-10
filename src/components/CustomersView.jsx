@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, RefreshCw, Search, Filter, Calendar, Phone, Mail, Award, Clock, ArrowUpRight, DollarSign } from 'lucide-react';
 
-export function CustomersView({ currentUser }) {
+export function CustomersView({ currentUser, onBackToLeads }) {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -80,7 +80,7 @@ export function CustomersView({ currentUser }) {
   return (
     <div style={{ padding: '24px', backgroundColor: '#f8fafc', minHeight: '100%', boxSizing: 'border-box' }}>
       {/* Top Banner */}
-      <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>
             Customer Directory & Renewals Hub
@@ -89,25 +89,48 @@ export function CustomersView({ currentUser }) {
             Post-Won Account Management, Realized Revenue & Annual Renewal Pipeline
           </p>
         </div>
-        <button
-          onClick={fetchCustomers}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '8px 14px',
-            backgroundColor: '#ffffff',
-            border: '1px solid #cbd5e1',
-            borderRadius: '7px',
-            color: '#334155',
-            fontSize: '12px',
-            fontWeight: '600',
-            cursor: 'pointer'
-          }}
-        >
-          <RefreshCw size={14} />
-          <span>Refresh</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {onBackToLeads && (
+            <button
+              onClick={onBackToLeads}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                backgroundColor: '#2563eb',
+                border: 'none',
+                borderRadius: '7px',
+                color: '#ffffff',
+                fontSize: '12px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(37, 99, 235, 0.2)'
+              }}
+            >
+              <span>← Back to Leads Pipeline</span>
+            </button>
+          )}
+          <button
+            onClick={fetchCustomers}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              backgroundColor: '#ffffff',
+              border: '1px solid #cbd5e1',
+              borderRadius: '7px',
+              color: '#334155',
+              fontSize: '12px',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            <RefreshCw size={14} />
+            <span>Refresh</span>
+          </button>
+        </div>
       </div>
 
       {/* Metric Cards */}

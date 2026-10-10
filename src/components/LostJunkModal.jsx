@@ -63,7 +63,10 @@ export function MarkLostModal({ isOpen, onClose, lead, onConfirmLost }) {
       zIndex: 100000,
       padding: '16px'
     }}>
-      <div style={{
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+        style={{
         backgroundColor: '#ffffff',
         borderRadius: '12px',
         maxWidth: '500px',
@@ -310,7 +313,10 @@ export function MarkJunkModal({ isOpen, onClose, lead, onConfirmJunk }) {
       zIndex: 100000,
       padding: '16px'
     }}>
-      <div style={{
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+        style={{
         backgroundColor: '#ffffff',
         borderRadius: '12px',
         maxWidth: '480px',

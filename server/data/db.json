@@ -5,7 +5,7 @@
       "name": "Harsh Goyal",
       "displayName": "Harsh Goyal (Company Owner)",
       "username": "admin",
-      "pin": "4f1ce13dd34ad5d63d06887b3dca0a0f7d8cc18455c26ca53714448b553144e8",
+      "pin": "$argon2id$v=19$m=19456,t=2,p=1$eX1iC2zoIEsxCDjddDGRkA$Y3w7fKH+sakkoDuL/CWsw9kcHXwwOxCdZHYUUangxbc",
       "role": "company_owner",
       "email": "harsh.accomation@gmail.com",
       "phone": "9876543210",
@@ -2069,7 +2069,10 @@
       "next_follow_up": "",
       "won_date": "2026-09-05",
       "notes": "Base + GST Renewal Won",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 6000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_narendra_kumar",
@@ -2084,7 +2087,10 @@
       "next_follow_up": "",
       "won_date": "2026-09-02",
       "notes": "Base ₹8,475 + GST ₹1,525",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 10000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_jaideep",
@@ -2099,7 +2105,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-29",
       "notes": "Base ₹10,593 + GST ₹1,907",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 12500,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_lokendra_singh",
@@ -2114,7 +2123,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-22",
       "notes": "Base ₹10,169 + GST ₹1,831",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 12000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_amol_singh",
@@ -2129,7 +2141,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-19",
       "notes": "Base ₹10,169 + GST ₹1,831",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 12000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_mohammed_imran",
@@ -2144,7 +2159,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-07",
       "notes": "Full payment received",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 6000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_arvind_pawar",
@@ -2159,7 +2177,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-06",
       "notes": "Consultancy license closed",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 7000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_vinay_shridhar",
@@ -2174,7 +2195,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-05",
       "notes": "Annual plan won",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 11000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_lingraj",
@@ -2189,7 +2213,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-08",
       "notes": "Single company license",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 8000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_sanjeev_mali",
@@ -2204,7 +2231,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-08",
       "notes": "Closed won deal",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 10000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_hetul",
@@ -2222,7 +2252,10 @@
       "owner": "Harsh Goyal",
       "deal_type": "new",
       "previous_stage": "Won",
-      "stageUpdatedAt": "2026-09-14T12:02:19.064Z"
+      "stageUpdatedAt": "2026-09-14T12:02:19.064Z",
+      "paidAmount": 0,
+      "pendingAmount": 10000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_modi",
@@ -2235,10 +2268,13 @@
       "source": "Manual",
       "score": "Warm",
       "next_follow_up": "2026-09-20",
-      "won_date": "2026-09-09",
+      "won_date": "",
       "notes": "20 ko payment kre ga",
       "owner": "Harsh Goyal",
-      "stageUpdatedAt": "2026-09-14T06:36:15.052Z"
+      "stageUpdatedAt": "2026-09-14T06:36:15.052Z",
+      "paidAmount": 0,
+      "pendingAmount": 15000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_anubhav",
@@ -2251,10 +2287,13 @@
       "source": "Manual",
       "score": "Hot",
       "next_follow_up": "",
-      "won_date": "2026-08-28",
+      "won_date": "",
       "notes": "15k+GST for 5 co. | 9910158681 Santosh",
       "owner": "Harsh Goyal",
-      "stageUpdatedAt": "2026-09-14T06:36:09.412Z"
+      "stageUpdatedAt": "2026-09-14T06:36:09.412Z",
+      "paidAmount": 0,
+      "pendingAmount": 15000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_sanjjay",
@@ -2267,10 +2306,13 @@
       "source": "Manual",
       "score": "Hot",
       "next_follow_up": "",
-      "won_date": "2026-08-20",
+      "won_date": "",
       "notes": "15k+GST for unlimited co.",
       "owner": "Harsh Goyal",
-      "stageUpdatedAt": "2026-09-14T06:35:16.940Z"
+      "stageUpdatedAt": "2026-09-14T06:35:16.940Z",
+      "paidAmount": 0,
+      "pendingAmount": 15000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_ramnath",
@@ -2285,7 +2327,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-19",
       "notes": "1-2 days mai batye ga offer k liye puch rha tha",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 8000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_prashant",
@@ -2300,7 +2345,10 @@
       "next_follow_up": "",
       "won_date": "2026-08-08",
       "notes": "10k+GST 5 co. 15k+GST unlimited co.",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 10000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_amit_miglani",
@@ -2318,7 +2366,10 @@
       "deal_type": "new",
       "previous_stage": "Payment Follow Up",
       "stageUpdatedAt": "2026-09-17T04:56:11.844Z",
-      "won_date": "2026-09-17"
+      "won_date": "2026-09-17",
+      "paidAmount": 0,
+      "pendingAmount": 10000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_anshul_lodha",
@@ -2332,7 +2383,11 @@
       "score": "Warm",
       "next_follow_up": "2026-09-02",
       "notes": "Renewal contract discussion",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 7000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_surabhi",
@@ -2346,7 +2401,11 @@
       "score": "Warm",
       "next_follow_up": "2026-08-26",
       "notes": "Payment follow up pending",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 7000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_ssivaa",
@@ -2360,7 +2419,11 @@
       "score": "Warm",
       "next_follow_up": "2026-08-23",
       "notes": "Demo completed. Awaiting final decision.",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 15000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_suman_saha",
@@ -2374,13 +2437,17 @@
       "score": "Warm",
       "next_follow_up": "2026-09-01",
       "notes": "Demo finished. Commercial discussion in progress.",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 5000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_juned",
       "name": "Juned Malkani",
       "company": "Direct Individual",
-      "status": "Negotiation",
+      "status": "Lost",
       "value": 20000,
       "email": "sumalkani@gmail.com",
       "phone": "9428730989",
@@ -2389,13 +2456,22 @@
       "next_follow_up": "2026-09-10",
       "notes": "Commercial quote shared, in negotiation",
       "owner": "Harsh Goyal",
-      "updatedAt": "2026-09-10T12:14:04.927Z"
+      "updatedAt": "2026-10-09T11:13:44.112Z",
+      "paidAmount": 0,
+      "pendingAmount": 20000,
+      "paymentStatus": "unpaid",
+      "won_date": "",
+      "lost_reason": "Price too high",
+      "lost_competitor": "",
+      "lost_notes": "price jada hai",
+      "lost_date": "2026-10-09",
+      "stageUpdatedAt": "2026-10-09T11:13:43.089Z"
     },
     {
       "id": "lead_chetan",
       "name": "Chetan Agarwal",
       "company": "Direct Individual",
-      "status": "Qualified",
+      "status": "Won",
       "value": 15000,
       "email": "chetanlko1@gmail.com",
       "phone": "7275061154",
@@ -2403,13 +2479,28 @@
       "score": "Hot",
       "next_follow_up": "2026-09-11",
       "notes": "Qualified lead",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 15000,
+      "pendingAmount": 0,
+      "paymentStatus": "paid_in_full",
+      "won_date": "2026-08-12",
+      "activities": [
+        {
+          "id": "act_1791543563317_pay",
+          "type": "payment",
+          "desc": "Payment of ₹15,000 received via UPI",
+          "timestamp": "2026-10-09T10:59:23.317Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "updatedAt": "2026-10-09T10:59:24.558Z",
+      "stageUpdatedAt": "2026-08-12T12:00:00.000Z"
     },
     {
       "id": "lead_kalpesh_p",
       "name": "Kalpesh Panchal",
       "company": "Direct Individual",
-      "status": "Contacted",
+      "status": "Won",
       "value": 10000,
       "email": "kalpeshpanchal47@gmail.com",
       "phone": "9898818993",
@@ -2417,21 +2508,51 @@
       "score": "Warm",
       "next_follow_up": "2026-09-12",
       "notes": "Initial pitch completed",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 10000,
+      "pendingAmount": 0,
+      "paymentStatus": "paid_in_full",
+      "won_date": "2026-08-18",
+      "activities": [
+        {
+          "id": "act_1791543383155_pay",
+          "type": "payment",
+          "desc": "Payment of ₹10,000 received via UPI",
+          "timestamp": "2026-10-09T10:56:23.178Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "updatedAt": "2026-10-09T10:56:23.178Z",
+      "stageUpdatedAt": "2026-08-18T12:00:00.000Z"
     },
     {
       "id": "lead_dipti",
       "name": "Dipti Shah",
       "company": "Direct Individual",
-      "status": "Renewal",
-      "value": 12000,
+      "status": "Won",
+      "value": 3000,
       "email": "diptishah567@rediffmail.com",
       "phone": "9687604578",
       "source": "Manual",
       "score": "Warm",
       "next_follow_up": "2026-09-14",
       "notes": "Renewal upcoming",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 3000,
+      "pendingAmount": 0,
+      "paymentStatus": "paid_in_full",
+      "won_date": "2026-08-04",
+      "activities": [
+        {
+          "id": "act_1791541707711_pay",
+          "type": "payment",
+          "desc": "Payment of ₹3,000 received via UPI",
+          "timestamp": "2026-10-09T10:28:27.711Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "updatedAt": "2026-10-09T10:28:29.242Z",
+      "stageUpdatedAt": "2026-08-04T12:00:00.000Z"
     },
     {
       "id": "lead_alok",
@@ -2445,7 +2566,11 @@
       "score": "Hot",
       "next_follow_up": "2026-09-10",
       "notes": "Proposal dispatched",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 18000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_nitin",
@@ -2459,7 +2584,11 @@
       "score": "Hot",
       "next_follow_up": "2026-09-10",
       "notes": "Follow up scheduled",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 10000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_ansari",
@@ -2473,13 +2602,17 @@
       "score": "Warm",
       "next_follow_up": "2026-09-11",
       "notes": "Requirements gathering",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 12000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_ashok",
       "name": "Ashok Kumar",
       "company": "Direct Individual",
-      "status": "Proposal Sent",
+      "status": "Won",
       "value": 15000,
       "email": "ak80980@gmail.com",
       "phone": "+91 96900 14241",
@@ -2487,7 +2620,22 @@
       "score": "Warm",
       "next_follow_up": "2026-09-12",
       "notes": "Proposal sent",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 15000,
+      "pendingAmount": 0,
+      "paymentStatus": "paid_in_full",
+      "won_date": "2026-09-09",
+      "activities": [
+        {
+          "id": "act_1791543488443_pay",
+          "type": "payment",
+          "desc": "Payment of ₹15,000 received via UPI",
+          "timestamp": "2026-10-09T10:58:08.443Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "updatedAt": "2026-10-09T10:58:08.443Z",
+      "stageUpdatedAt": "2026-09-09T12:00:00.000Z"
     },
     {
       "id": "lead_neha_sen",
@@ -2501,7 +2649,11 @@
       "score": "Cold",
       "next_follow_up": "",
       "notes": "Client postponed budget - closed lost",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 24000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_rahul_verma",
@@ -2515,7 +2667,11 @@
       "score": "Cold",
       "next_follow_up": "",
       "notes": "Went with competitor solution",
-      "owner": "Harsh Goyal"
+      "owner": "Harsh Goyal",
+      "paidAmount": 0,
+      "pendingAmount": 15000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_1789383913646",
@@ -2545,7 +2701,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T11:07:53.940Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 5000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789381402327",
@@ -2600,7 +2759,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T10:26:42.794Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 15000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789381475433",
@@ -2652,10 +2814,13 @@
       "deal_type": "new",
       "previous_stage": "Won",
       "stageUpdatedAt": "2026-09-18T06:19:36.900Z",
-      "won_date": "2026-09-14",
+      "won_date": "",
       "follow_up_time": "10:00",
       "lastActivityAt": "2026-09-18T06:19:36.902Z",
-      "updatedAt": "2026-09-14T10:26:39.536Z"
+      "updatedAt": "2026-09-14T10:26:39.536Z",
+      "paidAmount": 0,
+      "pendingAmount": 15000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789383775529",
@@ -2685,7 +2850,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T11:08:24.112Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 8000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789383806401",
@@ -2715,7 +2883,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T11:08:20.271Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 13000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789383996869",
@@ -2745,7 +2916,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T11:07:50.183Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 18000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789384053622",
@@ -2775,7 +2949,10 @@
       "deal_type": "new",
       "previous_stage": "New",
       "stageUpdatedAt": "2026-09-14T11:07:43.439Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 6000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789383835992",
@@ -2805,7 +2982,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T11:08:17.312Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 5000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789383885425",
@@ -2835,7 +3015,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T11:08:13.136Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 13000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789383953535",
@@ -2865,7 +3048,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T11:08:10.359Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 25000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789384011169",
@@ -2895,7 +3081,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T11:08:05.521Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 10000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789384066529",
@@ -2925,7 +3114,10 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T12:15:57.157Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 13000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789387993439",
@@ -2955,11 +3147,21 @@
       "deal_type": "new",
       "previous_stage": "Demo Done",
       "stageUpdatedAt": "2026-09-14T12:13:26.493Z",
-      "won_date": "2026-09-14"
+      "won_date": "2026-09-14",
+      "paidAmount": 0,
+      "pendingAmount": 7000,
+      "paymentStatus": "unpaid"
     },
     {
       "id": "lead_1789817705320",
       "activities": [
+        {
+          "id": "act_1791543532118_pay",
+          "type": "payment",
+          "desc": "Payment of ₹10,000 received via UPI",
+          "timestamp": "2026-10-09T10:58:52.118Z",
+          "performedBy": "Harsh Goyal"
+        },
         {
           "id": "act_1789817705320",
           "type": "created",
@@ -2981,12 +3183,25 @@
       "phone": "918435542500",
       "score": "Warm",
       "source": "Google Ads",
-      "status": "Payment Follow Up",
-      "value": 10000
+      "status": "Won",
+      "value": 10000,
+      "paidAmount": 10000,
+      "pendingAmount": 0,
+      "paymentStatus": "paid_in_full",
+      "won_date": "2026-09-09",
+      "updatedAt": "2026-10-09T10:58:52.118Z",
+      "stageUpdatedAt": "2026-09-09T12:00:00.000Z"
     },
     {
       "id": "lead_1789818687592",
       "activities": [
+        {
+          "id": "act_1791543916251_stage",
+          "type": "stage_change",
+          "desc": "Stage moved from \"Payment Follow Up\" to \"Lost\" (Reason: Feature mismatch)",
+          "timestamp": "2026-10-09T11:05:16.251Z",
+          "performedBy": "Harsh Goyal"
+        },
         {
           "id": "act_1789818687593",
           "type": "created",
@@ -3016,8 +3231,18 @@
       "phone": "919737003111",
       "score": "Warm",
       "source": "Facebook",
-      "status": "Payment Follow Up",
-      "value": 11000
+      "status": "Lost",
+      "value": 11000,
+      "paidAmount": 0,
+      "pendingAmount": 11000,
+      "paymentStatus": "unpaid",
+      "won_date": "",
+      "lost_reason": "Feature mismatch",
+      "lost_competitor": "",
+      "lost_notes": "jo chaiye vo nhi mil rha",
+      "lost_date": "2026-10-09",
+      "stageUpdatedAt": "2026-10-09T11:05:14.824Z",
+      "updatedAt": "2026-10-09T11:05:16.251Z"
     },
     {
       "id": "lead_1789818827047",
@@ -3052,7 +3277,11 @@
       "score": "Warm",
       "source": "Facebook",
       "status": "Payment Follow Up",
-      "value": 6000
+      "value": 6000,
+      "paidAmount": 0,
+      "pendingAmount": 6000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_1789819063408",
@@ -3087,14 +3316,18 @@
           "performedBy": "Harsh Goyal"
         }
       ],
-      "notes": "demo done payment follow up"
+      "notes": "demo done payment follow up",
+      "paidAmount": 0,
+      "pendingAmount": 10000,
+      "paymentStatus": "unpaid",
+      "won_date": ""
     },
     {
       "id": "lead_1789819261967",
       "name": "Kiran shinde",
       "company": "",
-      "status": "Payment Follow Up",
-      "value": 15000,
+      "status": "Won",
+      "value": 24000,
       "packageId": "",
       "email": "kirankshindeandco@gmail.com",
       "phone": "+91 75066 47791",
@@ -3105,6 +3338,13 @@
       "next_follow_up_time": "11:00 AM",
       "custom_fields": {},
       "activities": [
+        {
+          "id": "act_1791540843485_pay",
+          "type": "payment",
+          "desc": "Payment of ₹24,000 received via Other",
+          "timestamp": "2026-10-09T10:14:03.505Z",
+          "performedBy": "Harsh Goyal"
+        },
         {
           "id": "act_1789819261967",
           "type": "created",
@@ -3122,7 +3362,100 @@
           "performedBy": "Harsh Goyal"
         }
       ],
-      "notes": "demo done 1 oct ko connect krna hai"
+      "notes": "demo done 1 oct ko connect krna hai",
+      "paidAmount": 24000,
+      "pendingAmount": 0,
+      "paymentStatus": "paid_in_full",
+      "won_date": "2026-10-06",
+      "updatedAt": "2026-10-09T10:14:03.505Z",
+      "stageUpdatedAt": "2026-10-06T12:00:00.000Z"
+    },
+    {
+      "id": "lead_1791540967671",
+      "name": "Tejendra Patil",
+      "company": "",
+      "status": "Won",
+      "value": 11000,
+      "paidAmount": 11000,
+      "pendingAmount": 0,
+      "paymentStatus": "paid_in_full",
+      "packageId": "",
+      "email": "11111",
+      "phone": "72767 70967",
+      "source": "Manual",
+      "score": "Warm",
+      "owner": "Harsh Goyal",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "custom_fields": {},
+      "activities": [
+        {
+          "id": "act_1791541339817_stage",
+          "type": "stage_change",
+          "desc": "Stage moved from \"Payment Follow Up\" to \"Won\"",
+          "timestamp": "2026-10-09T10:22:19.817Z",
+          "performedBy": "Harsh Goyal"
+        },
+        {
+          "id": "act_1791541333129_pay",
+          "type": "payment",
+          "desc": "Payment of ₹11,000 received via Other",
+          "timestamp": "2026-10-09T10:22:13.129Z",
+          "performedBy": "Harsh Goyal"
+        },
+        {
+          "id": "act_1791540967671",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-10-09T10:16:07.671Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "notes": "Invoice & payment link shared. Awaiting transfer.",
+      "won_date": "2026-10-05",
+      "updatedAt": "2026-10-09T10:22:19.817Z",
+      "stageUpdatedAt": "2026-10-05T12:00:00.000Z"
+    },
+    {
+      "id": "lead_1791541653319",
+      "name": "GS Dokania",
+      "company": "",
+      "status": "Won",
+      "value": 10000,
+      "paidAmount": 10000,
+      "pendingAmount": 0,
+      "paymentStatus": "paid_in_full",
+      "packageId": "",
+      "email": "gsdokania@gmail.com",
+      "phone": "94312 13201",
+      "source": "Manual",
+      "score": "Warm",
+      "owner": "Harsh Goyal",
+      "next_follow_up": "",
+      "next_follow_up_time": "",
+      "custom_fields": {},
+      "activities": [
+        {
+          "id": "act_1791541669759_pay",
+          "type": "payment",
+          "desc": "Payment of ₹10,000 received via UPI",
+          "timestamp": "2026-10-09T10:27:49.759Z",
+          "performedBy": "Harsh Goyal"
+        },
+        {
+          "id": "act_1791541653319",
+          "type": "created",
+          "title": "Lead Created",
+          "desc": "Lead added to pipeline and assigned to Harsh Goyal.",
+          "timestamp": "2026-10-09T10:27:33.319Z",
+          "performedBy": "Harsh Goyal"
+        }
+      ],
+      "notes": "Product demo completed. Client showed positive interest.",
+      "won_date": "2026-10-05",
+      "updatedAt": "2026-10-09T10:27:49.759Z",
+      "stageUpdatedAt": "2026-10-05T12:00:00.000Z"
     }
   ],
   "tasks": [],
@@ -3146,6 +3479,134 @@
     }
   },
   "payments": [
+    {
+      "id": "pay_1791543563317_w45vx",
+      "leadId": "lead_chetan",
+      "amount": 15000,
+      "paymentDate": "2026-08-12",
+      "paymentTime": "16:29",
+      "paymentMethod": "UPI",
+      "reference": "",
+      "invoiceNumber": "",
+      "notes": "",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-09T10:59:23.317Z"
+    },
+    {
+      "id": "pay_1791543532117_e9z5x",
+      "leadId": "lead_1789817705320",
+      "amount": 10000,
+      "paymentDate": "2026-09-09",
+      "paymentTime": "16:28",
+      "paymentMethod": "UPI",
+      "reference": "",
+      "invoiceNumber": "",
+      "notes": "",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-09T10:58:52.118Z"
+    },
+    {
+      "id": "pay_1791543488443_mq0lr",
+      "leadId": "lead_ashok",
+      "amount": 15000,
+      "paymentDate": "2026-09-09",
+      "paymentTime": "16:28",
+      "paymentMethod": "UPI",
+      "reference": "",
+      "invoiceNumber": "",
+      "notes": "",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-09T10:58:08.443Z"
+    },
+    {
+      "id": "pay_1791543383154_m8pom",
+      "leadId": "lead_kalpesh_p",
+      "amount": 10000,
+      "paymentDate": "2026-08-18",
+      "paymentTime": "16:26",
+      "paymentMethod": "UPI",
+      "reference": "",
+      "invoiceNumber": "",
+      "notes": "",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-09T10:56:23.155Z"
+    },
+    {
+      "id": "pay_1791541707711_satoy",
+      "leadId": "lead_dipti",
+      "amount": 3000,
+      "paymentDate": "2026-08-04",
+      "paymentTime": "15:58",
+      "paymentMethod": "UPI",
+      "reference": "",
+      "invoiceNumber": "",
+      "notes": "",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-09T10:28:27.711Z"
+    },
+    {
+      "id": "pay_1791541669759_4imbu",
+      "leadId": "lead_1791541653319",
+      "amount": 10000,
+      "paymentDate": "2026-10-05",
+      "paymentTime": "15:57",
+      "paymentMethod": "UPI",
+      "reference": "",
+      "invoiceNumber": "",
+      "notes": "",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-09T10:27:49.759Z"
+    },
+    {
+      "id": "pay_1791541333129_amr8w",
+      "leadId": "lead_1791540967671",
+      "amount": 11000,
+      "paymentDate": "2026-10-05",
+      "paymentTime": "15:51",
+      "paymentMethod": "Other",
+      "reference": "",
+      "invoiceNumber": "",
+      "notes": "",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-09T10:22:13.129Z"
+    },
+    {
+      "id": "pay_1791540843485_f06kg",
+      "leadId": "lead_1789819261967",
+      "amount": 24000,
+      "paymentDate": "2026-10-06",
+      "paymentTime": "15:43",
+      "paymentMethod": "Other",
+      "reference": "",
+      "invoiceNumber": "",
+      "notes": "",
+      "paymentStatus": "received",
+      "recordedBy": "Harsh Goyal",
+      "recordedById": "usr_admin",
+      "tenantId": "tenant_apexsales",
+      "createdAt": "2026-10-09T10:14:03.485Z"
+    },
     {
       "id": "pay_1791462284966_xvy9g",
       "leadId": "lead_test_1791462278639",
@@ -3180,6 +3641,150 @@
     }
   ],
   "customers": [
+    {
+      "id": "cust_1791543564783_2cbqf",
+      "leadId": "lead_chetan",
+      "name": "Chetan Agarwal",
+      "company": "Direct Individual",
+      "email": "chetanlko1@gmail.com",
+      "phone": "7275061154",
+      "dealValue": 15000,
+      "totalRevenue": 15000,
+      "status": "active",
+      "wonDate": "2026-08-12",
+      "accountManager": "Harsh Goyal",
+      "tenantId": "tenant_apexsales",
+      "renewalDate": "2027-10-09",
+      "renewalStatus": "active",
+      "createdAt": "2026-10-09T10:59:24.783Z",
+      "updatedAt": "2026-10-09T10:59:24.783Z"
+    },
+    {
+      "id": "cust_1791543534107_fyfwl",
+      "leadId": "lead_1789817705320",
+      "name": "Chintan Agrawal",
+      "company": "Chintan Agrawal",
+      "email": "agrawal.chintan05@gmail.com",
+      "phone": "918435542500",
+      "dealValue": 10000,
+      "totalRevenue": 10000,
+      "status": "active",
+      "wonDate": "2026-09-09",
+      "accountManager": "Harsh Goyal",
+      "tenantId": "tenant_apexsales",
+      "renewalDate": "2027-10-09",
+      "renewalStatus": "active",
+      "createdAt": "2026-10-09T10:58:54.107Z",
+      "updatedAt": "2026-10-09T10:58:54.107Z"
+    },
+    {
+      "id": "cust_1791543490521_q1390",
+      "leadId": "lead_ashok",
+      "name": "Ashok Kumar",
+      "company": "Direct Individual",
+      "email": "ak80980@gmail.com",
+      "phone": "+91 96900 14241",
+      "dealValue": 15000,
+      "totalRevenue": 15000,
+      "status": "active",
+      "wonDate": "2026-09-09",
+      "accountManager": "Harsh Goyal",
+      "tenantId": "tenant_apexsales",
+      "renewalDate": "2027-10-09",
+      "renewalStatus": "active",
+      "createdAt": "2026-10-09T10:58:10.521Z",
+      "updatedAt": "2026-10-09T10:58:10.521Z"
+    },
+    {
+      "id": "cust_1791543385629_83l7b",
+      "leadId": "lead_kalpesh_p",
+      "name": "Kalpesh Panchal",
+      "company": "Direct Individual",
+      "email": "kalpeshpanchal47@gmail.com",
+      "phone": "9898818993",
+      "dealValue": 10000,
+      "totalRevenue": 10000,
+      "status": "active",
+      "wonDate": "2026-08-18",
+      "accountManager": "Harsh Goyal",
+      "tenantId": "tenant_apexsales",
+      "renewalDate": "2027-10-09",
+      "renewalStatus": "active",
+      "createdAt": "2026-10-09T10:56:25.629Z",
+      "updatedAt": "2026-10-09T10:56:25.630Z"
+    },
+    {
+      "id": "cust_1791541709452_ewh06",
+      "leadId": "lead_dipti",
+      "name": "Dipti Shah",
+      "company": "Direct Individual",
+      "email": "diptishah567@rediffmail.com",
+      "phone": "9687604578",
+      "dealValue": 3000,
+      "totalRevenue": 3000,
+      "status": "active",
+      "wonDate": "2026-10-09",
+      "accountManager": "Harsh Goyal",
+      "tenantId": "tenant_apexsales",
+      "renewalDate": "2027-10-09",
+      "renewalStatus": "active",
+      "createdAt": "2026-10-09T10:28:29.452Z",
+      "updatedAt": "2026-10-09T10:28:29.452Z"
+    },
+    {
+      "id": "cust_1791541671245_cax0t",
+      "leadId": "lead_1791541653319",
+      "name": "GS Dokania",
+      "company": "GS Dokania",
+      "email": "gsdokania@gmail.com",
+      "phone": "94312 13201",
+      "dealValue": 10000,
+      "totalRevenue": 10000,
+      "status": "active",
+      "wonDate": "2026-10-09",
+      "accountManager": "Harsh Goyal",
+      "tenantId": "tenant_apexsales",
+      "renewalDate": "2027-10-09",
+      "renewalStatus": "active",
+      "createdAt": "2026-10-09T10:27:51.245Z",
+      "updatedAt": "2026-10-09T10:27:51.245Z"
+    },
+    {
+      "id": "cust_1791541340056_gkkja",
+      "leadId": "lead_1791540967671",
+      "name": "Tejendra Patil",
+      "company": "Tejendra Patil",
+      "email": "11111",
+      "phone": "72767 70967",
+      "dealValue": 11000,
+      "totalRevenue": 11000,
+      "status": "active",
+      "wonDate": "2026-10-09",
+      "accountManager": "Harsh Goyal",
+      "tenantId": "tenant_apexsales",
+      "renewalDate": "2027-10-09",
+      "renewalStatus": "active",
+      "createdAt": "2026-10-09T10:22:20.056Z",
+      "updatedAt": "2026-10-09T10:22:20.056Z"
+    },
+    {
+      "id": "cust_1791540877026_nwtoc",
+      "leadId": "lead_1789819261967",
+      "name": "Kiran shinde",
+      "company": "Kiran shinde",
+      "email": "kirankshindeandco@gmail.com",
+      "phone": "+91 75066 47791",
+      "dealValue": 24000,
+      "totalRevenue": 24000,
+      "status": "active",
+      "wonDate": "2026-10-09",
+      "accountManager": "Harsh Goyal",
+      "tenantId": "tenant_apexsales",
+      "renewalDate": "2027-10-09",
+      "renewalStatus": "active",
+      "createdAt": "2026-10-09T10:14:37.026Z",
+      "updatedAt": "2026-10-09T10:14:37.026Z"
+    },
     {
       "id": "cust_1791462285924_uo47l",
       "leadId": "lead_test_1791462278639",

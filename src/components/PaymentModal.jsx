@@ -21,8 +21,6 @@ export function RecordPaymentModal({ isOpen, onClose, lead, onPaymentRecorded })
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const isElectronic = ['UPI', 'Bank Transfer', 'Credit / Debit Card', 'Payment Gateway'].includes(paymentMethod);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
@@ -39,10 +37,6 @@ export function RecordPaymentModal({ isOpen, onClose, lead, onPaymentRecorded })
       if (!confirmOverpay) return;
     }
 
-    if (isElectronic && !reference.trim()) {
-      setErrorMessage(`Transaction / UTR / Reference ID is required for ${paymentMethod}.`);
-      return;
-    }
 
     setIsSubmitting(true);
     try {
@@ -309,67 +303,14 @@ export function RecordPaymentModal({ isOpen, onClose, lead, onPaymentRecorded })
             </div>
           </div>
 
-          {/* Payment Method & Reference Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
-                Payment Mode <span style={{ color: '#dc2626' }}>*</span>
-              </label>
-              <select
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  borderRadius: '7px',
-                  border: '1.5px solid #cbd5e1',
-                  fontSize: '13px',
-                  outline: 'none',
-                  backgroundColor: '#ffffff',
-                  boxSizing: 'border-box'
-                }}
-              >
-                <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
-                <option value="Bank Transfer">Bank Transfer (NEFT / IMPS / RTGS)</option>
-                <option value="Credit / Debit Card">Credit / Debit Card</option>
-                <option value="Payment Gateway">Payment Gateway / Razorpay / Stripe</option>
-                <option value="Cheque">Cheque / Demand Draft</option>
-                <option value="Cash">Cash</option>
-                <option value="Other">Other Mode</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
-                Ref / UTR / Txn ID {isElectronic && <span style={{ color: '#dc2626' }}>*</span>}
-              </label>
-              <input
-                type="text"
-                value={reference}
-                onChange={(e) => setReference(e.target.value)}
-                placeholder={isElectronic ? 'Required for verification' : 'Optional reference'}
-                style={{
-                  width: '100%',
-                  padding: '8px 10px',
-                  borderRadius: '7px',
-                  border: '1.5px solid #cbd5e1',
-                  fontSize: '13px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Invoice Number */}
+          {/* Payment Mode */}
           <div>
             <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
-              Invoice / Receipt # (Optional)
+              Payment Mode <span style={{ color: '#dc2626' }}>*</span>
             </label>
-            <input
-              type="text"
-              value={invoiceNumber}
-              onChange={(e) => setInvoiceNumber(e.target.value)}
-              placeholder="e.g. INV-2026-089"
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
               style={{
                 width: '100%',
                 padding: '8px 10px',
@@ -377,10 +318,20 @@ export function RecordPaymentModal({ isOpen, onClose, lead, onPaymentRecorded })
                 border: '1.5px solid #cbd5e1',
                 fontSize: '13px',
                 outline: 'none',
+                backgroundColor: '#ffffff',
                 boxSizing: 'border-box'
               }}
-            />
+            >
+              <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
+              <option value="Bank Transfer">Bank Transfer (NEFT / IMPS / RTGS)</option>
+              <option value="Credit / Debit Card">Credit / Debit Card</option>
+              <option value="Payment Gateway">Payment Gateway / Razorpay / Stripe</option>
+              <option value="Cheque">Cheque / Demand Draft</option>
+              <option value="Cash">Cash</option>
+              <option value="Other">Other Mode</option>
+            </select>
           </div>
+
 
           {/* Notes */}
           <div>

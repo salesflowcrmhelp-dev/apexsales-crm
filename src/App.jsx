@@ -6,8 +6,8 @@ import * as XLSX from "xlsx";
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { 
   Download, Plus, Save, RefreshCw, FileSpreadsheet, 
-  HelpCircle, X, Check, AlertCircle, TrendingUp, IndianRupee, Award, Grid, Upload, Trash2, Target, Pencil, Gift, Lock, Unlock, KeyRound, Calendar, Phone, AlertTriangle, Flame, CheckCircle2, MessageCircle, Clock, Bell, Sparkles, RotateCcw,
-  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, ArrowLeft, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders, Columns, Inbox, Database, Copy, Receipt, Percent, Crown, Home, Headphones, Laptop
+  HelpCircle, X, Check, AlertCircle, TrendingUp, IndianRupee, Award, LayoutGrid, Upload, Trash2, Target, Pencil, Gift, Lock, Unlock, KeyRound, Calendar, Phone, AlertTriangle, Flame, CheckCircle2, MessageCircle, Clock, Bell, Sparkles, RotateCcw,
+  Bookmark, Sun, Layers, UserCheck, UserX, Briefcase, CheckSquare, BarChart2, Users, Settings, Activity, UserPlus, ArrowRightCircle, ArrowLeft, Building2, Shuffle, BarChart3, Hourglass, Monitor, CreditCard, Trophy, RotateCw, Eye, Search, PhoneCall, Handshake, Printer, PieChart, DollarSign, Camera, Zap, ShieldAlert, Video, Tag, Filter, Table, Contact, MoreVertical, MoreHorizontal, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Archive, Globe, User, Info, FileText, ListTodo, PlusCircle, CheckCircle, Smartphone, Shield, ShieldCheck, EyeOff, Fingerprint, ScanFace, Mail, Menu, ExternalLink, Maximize2, LogOut, Package, Sliders, Columns, Inbox, Database, Copy, Receipt, Percent, Crown, Home, Headphones, Laptop
 } from "lucide-react";
 import { 
   fetchLeadsFromSupabase, 
@@ -39,6 +39,8 @@ import { RecordPaymentModal, FullPaymentRequiredModal } from "./components/Payme
 import { MarkLostModal, MarkJunkModal } from "./components/LostJunkModal";
 import { DuplicateLeadModal } from "./components/DuplicateLeadModal";
 import { CustomersView } from "./components/CustomersView";
+import { LeadDetailWorkspace } from "./components/LeadDetailWorkspace";
+import CustomDropdown from "./components/CustomDropdown";
 
 // Dropdown options
 const STATUS_OPTIONS = ["New", "Contacted", "Qualified", "Demo Booked", "Proposal Sent", "Demo Done", "Payment Follow Up", "Negotiation", "Renewal", "Renewal Won", "Won", "Lost", "Junk"];
@@ -1728,17 +1730,18 @@ const INITIAL_LEADS = [
 ];
 
 // High-performance requestAnimationFrame numeric count-up component
-const AnimatedNumber = ({ value, duration = 1000, isCurrency = false, isPercent = false }) => {
-  const [current, setCurrent] = useState(0);
+const AnimatedNumber = ({ value, duration = 800, isCurrency = false, isPercent = false }) => {
+  const [current, setCurrent] = useState(() => Number(value) || 0);
 
   useEffect(() => {
-    let start = 0;
     const end = Number(value) || 0;
     if (end === 0) {
       setCurrent(0);
       return;
     }
     
+    let start = current;
+    let animationFrameId;
     const startTime = performance.now();
     
     const animate = (now) => {
@@ -1752,13 +1755,16 @@ const AnimatedNumber = ({ value, duration = 1000, isCurrency = false, isPercent 
       setCurrent(currentVal);
       
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        animationFrameId = requestAnimationFrame(animate);
       } else {
         setCurrent(end);
       }
     };
     
-    requestAnimationFrame(animate);
+    animationFrameId = requestAnimationFrame(animate);
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
   }, [value, duration]);
 
   if (isCurrency) {
@@ -2408,6 +2414,151 @@ export function formatLeadRevenue(val, user) {
   return `₹${(Number(val) || 0).toLocaleString("en-IN")}`;
 }
 
+export function ToastNotification({ toast, onClose }) {
+  if (!toast) return null;
+
+  const type = toast.type || "success";
+
+  const config = {
+    success: {
+      icon: <CheckCircle2 size={18} strokeWidth={2.4} color="#059669" />,
+      badgeBg: "#ecfdf5",
+      badgeBorder: "#a7f3d0",
+      label: "Success",
+      labelColor: "#059669",
+      barGrad: "linear-gradient(90deg, #10b981, #059669)",
+      cardBorder: "#bbf7d0",
+      shadowGlow: "rgba(16, 185, 129, 0.15)"
+    },
+    error: {
+      icon: <AlertCircle size={18} strokeWidth={2.4} color="#dc2626" />,
+      badgeBg: "#fef2f2",
+      badgeBorder: "#fecaca",
+      label: "Notice",
+      labelColor: "#dc2626",
+      barGrad: "linear-gradient(90deg, #ef4444, #dc2626)",
+      cardBorder: "#fecaca",
+      shadowGlow: "rgba(239, 68, 68, 0.15)"
+    },
+    info: {
+      icon: <Info size={18} strokeWidth={2.4} color="#2563eb" />,
+      badgeBg: "#eff6ff",
+      badgeBorder: "#bfdbfe",
+      label: "Update",
+      labelColor: "#2563eb",
+      barGrad: "linear-gradient(90deg, #3b82f6, #2563eb)",
+      cardBorder: "#bfdbfe",
+      shadowGlow: "rgba(37, 99, 235, 0.15)"
+    },
+    warning: {
+      icon: <AlertTriangle size={18} strokeWidth={2.4} color="#d97706" />,
+      badgeBg: "#fffbeb",
+      badgeBorder: "#fde68a",
+      label: "Warning",
+      labelColor: "#d97706",
+      barGrad: "linear-gradient(90deg, #f59e0b, #d97706)",
+      cardBorder: "#fde68a",
+      shadowGlow: "rgba(245, 158, 11, 0.15)"
+    }
+  }[type] || {
+    icon: <CheckCircle2 size={18} strokeWidth={2.4} color="#059669" />,
+    badgeBg: "#ecfdf5",
+    badgeBorder: "#a7f3d0",
+    label: "Notification",
+    labelColor: "#059669",
+    barGrad: "linear-gradient(90deg, #10b981, #059669)",
+    cardBorder: "#e2e8f0",
+    shadowGlow: "rgba(0, 0, 0, 0.05)"
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: "24px",
+        right: "24px",
+        zIndex: 999999,
+        backgroundColor: "#ffffff",
+        borderRadius: "14px",
+        border: `1.5px solid ${config.cardBorder}`,
+        boxShadow: `0 20px 40px -10px rgba(15, 23, 42, 0.16), 0 4px 12px ${config.shadowGlow}`,
+        padding: "13px 16px 15px 14px",
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        minWidth: "320px",
+        maxWidth: "480px",
+        overflow: "hidden",
+        animation: "toastSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        fontFamily: "'Inter', sans-serif"
+      }}
+    >
+      {/* Icon Badge */}
+      <div style={{
+        width: "34px",
+        height: "34px",
+        borderRadius: "10px",
+        backgroundColor: config.badgeBg,
+        border: `1px solid ${config.badgeBorder}`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0
+      }}>
+        {config.icon}
+      </div>
+
+      {/* Message Text */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: "10.5px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.6px", color: config.labelColor, marginBottom: "2px" }}>
+          {config.label}
+        </div>
+        <div style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a", lineHeight: "1.4", wordBreak: "break-word" }}>
+          {toast.message}
+        </div>
+      </div>
+
+      {/* Dismiss Button */}
+      <button
+        type="button"
+        onClick={onClose}
+        title="Close notification"
+        style={{
+          background: "none",
+          border: "none",
+          color: "#94a3b8",
+          cursor: "pointer",
+          padding: "5px",
+          borderRadius: "6px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "all 0.15s ease",
+          flexShrink: 0
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.color = "#334155"; e.currentTarget.style.backgroundColor = "#f1f5f9"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.backgroundColor = "transparent"; }}
+      >
+        <X size={15} />
+      </button>
+
+      {/* Animated Bottom Timer Progress Bar */}
+      <div 
+        key={toast.id || toast.message}
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          height: "3px",
+          width: "100%",
+          background: config.barGrad,
+          animation: "toastProgressShrink 4.2s linear forwards"
+        }}
+      />
+    </div>
+  );
+}
+
 export default function App({ onNavigateToLanding } = {}) {
   // 🛡️ Reliable Persistence Policy: Purge stale legacy backups but preserve user's active edited leads
   useEffect(() => {
@@ -2422,9 +2573,9 @@ export default function App({ onNavigateToLanding } = {}) {
   const [hasLoadedFromCloud, setHasLoadedFromCloud] = useState(false);
   const [leads, setLeads] = useState(() => {
     try {
-      const savedUser = sessionStorage.getItem("crm_auth_user") || localStorage.getItem("crm_auth_user");
-      const savedToken = sessionStorage.getItem("crm_auth_token") || localStorage.getItem("crm_auth_token");
-      if (!savedUser && !savedToken) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isDemo = urlParams.get("auth") === "demo" || urlParams.get("view") === "app";
+      if (!savedUser && !savedToken && !isDemo) {
         return []; // Strict isolation: Not logged in = ZERO leads in memory!
       }
       return INITIAL_LEADS;
@@ -2883,6 +3034,8 @@ export default function App({ onNavigateToLanding } = {}) {
   });
   const [hoveredTrendMonth, setHoveredTrendMonth] = useState(null);
   const [hoveredDonutSlice, setHoveredDonutSlice] = useState(null);
+  const [cockpitDisplayMode, setCockpitDisplayMode] = useState("graph");
+  const [hoveredCockpitSlice, setHoveredCockpitSlice] = useState(null);
 
   // Search & Filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -2890,6 +3043,14 @@ export default function App({ onNavigateToLanding } = {}) {
   const [selectedFilterStages, setSelectedFilterStages] = useState([]);
   const [isSheetStageOpen, setIsSheetStageOpen] = useState(false);
   const sheetStageDropdownRef = useRef(null);
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const roleDropdownRef = useRef(null);
+  const [isScoreDropdownOpen, setIsScoreDropdownOpen] = useState(false);
+  const scoreDropdownRef = useRef(null);
+  const [isSourceDropdownOpen, setIsSourceDropdownOpen] = useState(false);
+  const sourceDropdownRef = useRef(null);
+  const [isOwnerDropdownOpen, setIsOwnerDropdownOpen] = useState(false);
+  const ownerDropdownRef = useRef(null);
   const [filterScore, setFilterScore] = useState("");
   const [filterSource, setFilterSource] = useState("");
   const [filterMinVal, setFilterMinVal] = useState("");
@@ -3579,6 +3740,10 @@ export default function App({ onNavigateToLanding } = {}) {
   const [leadDetailsTab, setLeadDetailsTab] = useState("overview");
   const [quickActivityText, setQuickActivityText] = useState("");
   const [quickActivityOutcome, setQuickActivityOutcome] = useState("Connected - Interested");
+  const [quickCallType, setQuickCallType] = useState("Outgoing");
+  const [quickCallDuration, setQuickCallDuration] = useState("5 mins");
+  const [quickCallFollowUp, setQuickCallFollowUp] = useState("");
+  const [quickNoteCategory, setQuickNoteCategory] = useState("General Note");
   const [isEditingFollowUp, setIsEditingFollowUp] = useState(false);
   const [editFollowUpDate, setEditFollowUpDate] = useState("");
   const [editFollowUpTime, setEditFollowUpTime] = useState("10:00");
@@ -3620,9 +3785,18 @@ export default function App({ onNavigateToLanding } = {}) {
   const [hoveredChartIdx, setHoveredChartIdx] = useState(null);
   const [growthTimeframe, setGrowthTimeframe] = useState("30 Days"); // "7 Days", "30 Days", "This Month"
 
-  // Lead Details Modal states
   const [selectedLeadForDetails, setSelectedLeadForDetails] = useState(null); // lead object
   const [newNoteText, setNewNoteText] = useState("");
+
+  // Deep-link / auto-open lead support (SalesFlow HUB Blueprint §10 & §28)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get("openLead") === "1" && leads.length > 0 && !selectedLeadForDetails) {
+        setSelectedLeadForDetails(leads[0]);
+      }
+    }
+  }, [leads]);
 
   // Payments & Full Payment Won Guard States (Blueprint Section 21 & 35)
   const [paymentModalLead, setPaymentModalLead] = useState(null);
@@ -3879,18 +4053,30 @@ export default function App({ onNavigateToLanding } = {}) {
   const [reportActiveTab, setReportActiveTab] = useState("analytics");
   const [showMoreFilters, setShowMoreFilters] = useState(false);
 
-  // Click-outside listener to close Stage Multi-Select Dropdowns cleanly
+  // Click-outside listener to close Custom Dropdowns cleanly
   useEffect(() => {
-    const handleStageClickOutside = (e) => {
+    const handleDropdownClickOutside = (e) => {
       if (reportStageDropdownRef.current && !reportStageDropdownRef.current.contains(e.target)) {
         setIsReportStageOpen(false);
       }
       if (sheetStageDropdownRef.current && !sheetStageDropdownRef.current.contains(e.target)) {
         setIsSheetStageOpen(false);
       }
+      if (roleDropdownRef.current && !roleDropdownRef.current.contains(e.target)) {
+        setIsRoleDropdownOpen(false);
+      }
+      if (scoreDropdownRef.current && !scoreDropdownRef.current.contains(e.target)) {
+        setIsScoreDropdownOpen(false);
+      }
+      if (sourceDropdownRef.current && !sourceDropdownRef.current.contains(e.target)) {
+        setIsSourceDropdownOpen(false);
+      }
+      if (ownerDropdownRef.current && !ownerDropdownRef.current.contains(e.target)) {
+        setIsOwnerDropdownOpen(false);
+      }
     };
-    document.addEventListener("mousedown", handleStageClickOutside);
-    return () => document.removeEventListener("mousedown", handleStageClickOutside);
+    document.addEventListener("mousedown", handleDropdownClickOutside);
+    return () => document.removeEventListener("mousedown", handleDropdownClickOutside);
   }, []);
 
   // Interactive Sales Calendar States
@@ -4378,47 +4564,43 @@ export default function App({ onNavigateToLanding } = {}) {
   // Payment Recorded Callback (Blueprint Section 21 & 35)
   const handlePaymentRecorded = (updatedLeadFromServer, paymentRecord) => {
     if (!updatedLeadFromServer) return;
-    const actualIndex = leads.findIndex(l => l.id === updatedLeadFromServer.id);
+
+    // Attribute won_date to the actual payment date selected by the user!
+    const effectivePaymentDate = paymentRecord?.paymentDate || updatedLeadFromServer?.won_date || new Date().toISOString().split('T')[0];
+
+    const dealVal = Number(updatedLeadFromServer.value) || 0;
+    const paidVal = Number(updatedLeadFromServer.paidAmount) || 0;
+    const isPaidInFull = dealVal > 0 && paidVal >= dealVal;
+    const wasAlreadyWon = isWonStatus(updatedLeadFromServer.status);
+
+    const finalLead = {
+      ...updatedLeadFromServer,
+      ...(isPaidInFull || wasAlreadyWon ? {
+        status: "Won",
+        won_date: effectivePaymentDate,
+        stageUpdatedAt: effectivePaymentDate ? (effectivePaymentDate + "T12:00:00.000Z") : new Date().toISOString()
+      } : {})
+    };
+
+    const actualIndex = leads.findIndex(l => l.id === finalLead.id);
     if (actualIndex !== -1) {
       const updatedLeads = [...leads];
-      updatedLeads[actualIndex] = updatedLeadFromServer;
+      updatedLeads[actualIndex] = finalLead;
       setLeads(updatedLeads);
       saveLeadsToStorage(updatedLeads);
+      syncSingleLeadToBackend(finalLead);
     }
-    if (selectedLeadForDetails && selectedLeadForDetails.id === updatedLeadFromServer.id) {
-      setSelectedLeadForDetails(updatedLeadFromServer);
+    if (selectedLeadForDetails && selectedLeadForDetails.id === finalLead.id) {
+      setSelectedLeadForDetails(finalLead);
     }
     showToast(`Payment of ₹${Number(paymentRecord?.amount || 0).toLocaleString('en-IN')} recorded successfully!`, "success");
 
-    // Prompt if now 100% paid in full
-    const dealVal = Number(updatedLeadFromServer.value) || 0;
-    const paidVal = Number(updatedLeadFromServer.paidAmount) || 0;
-    if (dealVal > 0 && paidVal >= dealVal && !isWonStatus(updatedLeadFromServer.status)) {
+    // If deal just reached 100% paid and transitioned to Won, show celebration modal
+    if (isPaidInFull && !wasAlreadyWon) {
       setTimeout(() => {
-        const markNow = window.confirm(`🎉 This deal is now 100% Paid in Full (₹${paidVal.toLocaleString('en-IN')} / ₹${dealVal.toLocaleString('en-IN')})!\n\nWould you like to move this deal to "Won" stage now?`);
-        if (markNow) {
-          const wonIndex = leads.findIndex(l => l.id === updatedLeadFromServer.id);
-          if (wonIndex !== -1) {
-            const todayYmd = new Date().toISOString().split('T')[0];
-            const finalWonLead = {
-              ...updatedLeadFromServer,
-              status: "Won",
-              stageUpdatedAt: new Date().toISOString(),
-              won_date: todayYmd
-            };
-            const updatedLeads = [...leads];
-            updatedLeads[wonIndex] = finalWonLead;
-            setLeads(updatedLeads);
-            saveLeadsToStorage(updatedLeads);
-            syncSingleLeadToBackend(finalWonLead);
-            setWonLeadName(finalWonLead.name || "Lead");
-            setWonDealData(finalWonLead);
-            setShowWonModal(true);
-            if (selectedLeadForDetails && selectedLeadForDetails.id === finalWonLead.id) {
-              setSelectedLeadForDetails(finalWonLead);
-            }
-          }
-        }
+        setWonLeadName(finalLead.name || finalLead.company || "Lead");
+        setWonDealData(finalLead);
+        setShowWonModal(true);
       }, 300);
     }
   };
@@ -4517,9 +4699,9 @@ export default function App({ onNavigateToLanding } = {}) {
       if (pv) return pv;
       const v = p.get("view");
       if (v && v !== "app") return v;
-      return "analytics";
+      return "sheet";
     } catch(e) {
-      return "analytics";
+      return "sheet";
     }
   }); // "sheet", "analytics", "split", "deals", or "kanban"
   const [isLeadsMenuOpen, setIsLeadsMenuOpen] = useState(true);
@@ -5712,19 +5894,9 @@ export default function App({ onNavigateToLanding } = {}) {
           email: targetEmail,
           password: pinToVerify
         });
-
         if (authErr) {
-          setIsLoggingIn(false);
-          const msg = authErr.message || "";
-          if (msg.toLowerCase().includes("invalid login credentials")) {
-            setLoginError("Invalid Email or Password. Please try again.");
-          } else {
-            setLoginError(msg || "Authentication failed. Please try again.");
-          }
-          return;
-        }
-
-        if (authData && authData.user) {
+          console.warn("Supabase Auth error, attempting local backend auth fallback:", authErr.message);
+        } else if (authData && authData.user) {
           const profileRes = await getCurrentSupabaseUserProfile(authData.user.id);
           if (!profileRes.success || !profileRes.user) {
             setIsLoggingIn(false);
@@ -6702,6 +6874,52 @@ export default function App({ onNavigateToLanding } = {}) {
         headers
       }).catch(() => {});
     } catch(e) {}
+  };
+
+  const handleRescheduleTask = async (taskId, daysToAdd) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    const d = new Date();
+    d.setDate(d.getDate() + daysToAdd);
+    const newDueDate = d.toISOString().split("T")[0];
+
+    const updated = tasks.map(t => {
+      if (t.id === taskId) {
+        return { ...t, dueDate: newDueDate, lastModified: new Date().toISOString() };
+      }
+      return t;
+    });
+    saveTasksToStorage(updated);
+
+    if (task.linkedLeadId) {
+      const leadIdx = leads.findIndex(l => l.id === task.linkedLeadId);
+      if (leadIdx !== -1) {
+        const uLead = { ...leads[leadIdx], next_follow_up: newDueDate };
+        const uLeads = [...leads];
+        uLeads[leadIdx] = uLead;
+        saveLeadsToStorage(uLeads);
+        syncSingleLeadToBackend(uLead);
+      }
+    }
+
+    showToast(`Task rescheduled to ${newDueDate}`, "success");
+
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (currentUser) {
+        const isSuper = checkIsSuperAdmin(currentUser);
+        headers["x-user-role"] = isSuper ? "admin" : (currentUser.role || "sales_rep");
+        headers["x-user-name"] = currentUser.name || "";
+        headers["x-user-id"] = currentUser.id || "";
+      }
+      await fetch(`/api/tasks/${taskId}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ dueDate: newDueDate })
+      });
+    } catch(err) {
+      console.warn("Task reschedule sync error:", err);
+    }
   };
 
   const createTaskFromAction = (title, priority, dueDate, leadId) => {
@@ -8620,6 +8838,9 @@ export default function App({ onNavigateToLanding } = {}) {
       wonPipeline = wonLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
       const activeLeads = ownerScopedLeads.filter(l => isActiveStatus(l.status));
       totalPipeline = activeLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+      if (totalPipeline === 0 && leads.length > 0 && (checkIsSuperAdmin(currentUser) || !currentUser || currentUser?.role === "admin")) {
+        totalPipeline = leads.filter(l => isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+      }
       totalLeads = ownerScopedLeads.length;
       winRate = totalLeads > 0 ? ((wonLeads.length / totalLeads) * 100).toFixed(1) : "0.0";
     } else {
@@ -8633,6 +8854,9 @@ export default function App({ onNavigateToLanding } = {}) {
       
       const activeLeads = ownerScopedLeads.filter(l => isActiveStatus(l.status));
       totalPipeline = activeLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+      if (totalPipeline === 0 && leads.length > 0 && (checkIsSuperAdmin(currentUser) || !currentUser || currentUser?.role === "admin")) {
+        totalPipeline = leads.filter(l => isActiveStatus(l.status)).reduce((sum, l) => sum + (Number(l.value) || 0), 0);
+      }
       
       totalLeads = ownerScopedLeads.length;
       winRate = totalLeads > 0 ? ((periodWonLeads.length / totalLeads) * 100).toFixed(1) : "0.0";
@@ -8644,7 +8868,7 @@ export default function App({ onNavigateToLanding } = {}) {
       wonPipeline,
       winRate
     };
-  }, [ownerScopedLeads, selectedPeriodMonth]);
+  }, [ownerScopedLeads, selectedPeriodMonth, leads, currentUser]);
 
   // Real-time synchronization post request to Apps Script webhook
   const syncWithGoogleSheetWebhook = async (leadData) => {
@@ -8927,18 +9151,18 @@ export default function App({ onNavigateToLanding } = {}) {
     if (showToast) showToast("🤖 Auto AI generated smart remarks & AI Win % for all leads!", "success");
   };
 
-  // Open Add Lead Modal
-  const openAddLeadModal = () => {
+  // Open Add Lead Modal (supports specifying initial deal stage)
+  const openAddLeadModal = (initialStage = "New") => {
     setNewLeadData({
       name: "",
       company: "",
       phone: "",
       email: "",
       value: "",
-      status: "New",
+      status: initialStage || "New",
       source: "Manual",
       score: "Warm",
-      owner: currentLoggedInUser || "Harsh Goyal",
+      owner: currentLoggedInUser || currentUser?.name || "Harsh Goyal",
       next_follow_up: "",
       next_follow_up_time: "11:00 AM",
       notes: "",
@@ -8953,9 +9177,10 @@ export default function App({ onNavigateToLanding } = {}) {
   };
 
   const actuallyCreateLead = (leadPayload) => {
-    const assignedOwner = leadPayload.owner || currentLoggedInUser || "Harsh Goyal";
+    const assignedOwner = leadPayload.owner || currentLoggedInUser || currentUser?.name || "Harsh Goyal";
     const dealVal = parseFloat(leadPayload.value) || 0;
     const leadId = "lead_" + Date.now();
+    const isWon = isWonStatus(leadPayload.status);
 
     const createdLead = {
       id: leadId,
@@ -8963,9 +9188,13 @@ export default function App({ onNavigateToLanding } = {}) {
       company: (leadPayload.company || "").trim(),
       status: leadPayload.status || "New",
       value: dealVal,
-      paidAmount: 0,
-      pendingAmount: dealVal,
-      paymentStatus: "unpaid",
+      paidAmount: isWon ? dealVal : 0,
+      pendingAmount: isWon ? 0 : dealVal,
+      paymentStatus: isWon ? "full" : "unpaid",
+      won_date: isWon ? new Date().toISOString().slice(0, 10) : "",
+      stageUpdatedAt: new Date().toISOString(),
+      lastModified: new Date().toISOString(),
+      created_at: new Date().toISOString(),
       packageId: leadPayload.packageId || "",
       email: (leadPayload.email || "").trim(),
       phone: (leadPayload.phone || "").trim(),
@@ -9078,6 +9307,20 @@ export default function App({ onNavigateToLanding } = {}) {
 
   // Navigate using Keyboard arrows
   const handleKeyDown = useCallback((e) => {
+    // Never intercept typing if focus or target is an input, textarea, select, or modal!
+    const activeEl = document.activeElement;
+    const targetTag = (e.target?.tagName || "").toLowerCase();
+    const activeTag = (activeEl?.tagName || "").toLowerCase();
+    if (
+      targetTag === "input" || targetTag === "textarea" || targetTag === "select" ||
+      activeTag === "input" || activeTag === "textarea" || activeTag === "select" ||
+      e.target?.isContentEditable || activeEl?.isContentEditable ||
+      e.target?.closest?.(".modal-overlay") || activeEl?.closest?.(".modal-overlay") ||
+      showLostModal || showJunkModal || showPaymentModal || showDuplicateModal || showWonBlockedModal || showWonModal
+    ) {
+      return;
+    }
+
     if (!selectedCell || editingCell) return;
 
     const { rowIndex, colIndex } = selectedCell;
@@ -9139,7 +9382,7 @@ export default function App({ onNavigateToLanding } = {}) {
     }
 
     setSelectedCell({ rowIndex: nextRow, colIndex: nextCol });
-  }, [selectedCell, editingCell, filteredLeads, leads, startEditing]);
+  }, [selectedCell, editingCell, filteredLeads, leads, startEditing, showLostModal, showJunkModal, showPaymentModal, showDuplicateModal, showWonBlockedModal, showWonModal]);
 
   // Handle keypress when inside standard text input
   const handleInputKeyDown = (e) => {
@@ -10542,6 +10785,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
                   {/* Submit Button */}
                   <button
+                    id="login-submit-btn"
                     type="submit"
                     disabled={isLoggingIn}
                     style={{
@@ -10763,16 +11007,7 @@ export default function App({ onNavigateToLanding } = {}) {
             </div>
           )}
 
-          {toast && (
-            <div className={`toast-msg ${toast.type === "error" ? "error" : ""}`}>
-              {toast.type === "error" ? (
-                <AlertCircle className="w-4 h-4 text-red-500" />
-              ) : (
-                <Check className="w-4 h-4 text-emerald-500" />
-              )}
-              <span>{toast.message}</span>
-            </div>
-          )}
+          <ToastNotification toast={toast} onClose={() => setToast(null)} />
         </div>
       );
   }
@@ -10822,7 +11057,7 @@ export default function App({ onNavigateToLanding } = {}) {
         if (currentTab === "All Leads") {
           return { name: "Leads", icon: <Users size={15} strokeWidth={2.2} />, category: "Pipeline" };
         }
-        return { name: "Pipeline Grid", icon: <Grid size={15} strokeWidth={2.2} />, category: "Live CRM" };
+        return { name: "Pipeline Grid", icon: <Contact size={15} strokeWidth={2.2} />, category: "Live CRM" };
       }
       return { name: "Sales Pipeline", icon: <Layers size={15} strokeWidth={2.2} /> };
     }
@@ -10920,10 +11155,10 @@ export default function App({ onNavigateToLanding } = {}) {
               </svg>
             </div>
             <div className="sidebar-brand-text" style={{ minWidth: 0 }}>
-              <span className="brand-name" style={{ whiteSpace: "nowrap", letterSpacing: "-0.3px" }}>
+              <span className="brand-name" style={{ whiteSpace: "nowrap", letterSpacing: "-0.3px", color: "#0f172a" }}>
                 {getUserCompanyName(currentUser)}
               </span>
-              <span className="brand-tag" style={{ fontSize: "12px", color: "#475569", fontWeight: "700", whiteSpace: "nowrap", letterSpacing: "0.2px" }}>
+              <span className="brand-tag" style={{ fontSize: "10.5px", color: "#64748b", fontWeight: "600", whiteSpace: "nowrap", letterSpacing: "0.1px" }}>
                 Revenue Intelligence
               </span>
             </div>
@@ -11244,11 +11479,11 @@ export default function App({ onNavigateToLanding } = {}) {
                   <div className="sidebar-tree-node">
                     <button 
                       type="button" 
-                      onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); }} 
-                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" ? "active" : ""}`}
+                      onClick={() => { setActiveWorkspace("pipeline"); setPipelineView("sheet"); setCurrentTab("All Leads"); }} 
+                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "sheet" && currentTab !== "Customers & Renewals" ? "active" : ""}`}
                       title="All Leads (Grid)"
                     >
-                      <Grid className="sub-item-icon" />
+                      <Contact className="sub-item-icon" />
                       <span>All Leads (Grid)</span>
                     </button>
                   </div>
@@ -11259,6 +11494,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       onClick={() => { 
                         setActiveWorkspace("pipeline"); 
                         setPipelineView("split"); 
+                        setCurrentTab("All Leads");
                       }} 
                       className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "split" ? "active" : ""}`}
                       title="Pipeline 360°"
@@ -11274,11 +11510,12 @@ export default function App({ onNavigateToLanding } = {}) {
                       onClick={() => { 
                         setActiveWorkspace("pipeline"); 
                         setPipelineView("deals"); 
+                        setCurrentTab("Active Pipeline");
                       }} 
                       className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "deals" ? "active" : ""}`}
                       title="Active Deals"
                     >
-                      <Award className="sub-item-icon" />
+                      <Briefcase className="sub-item-icon" />
                       <span>Active Deals</span>
                     </button>
                   </div>
@@ -11289,6 +11526,7 @@ export default function App({ onNavigateToLanding } = {}) {
                       onClick={() => { 
                         setActiveWorkspace("pipeline"); 
                         setPipelineView("kanban"); 
+                        setCurrentTab("All Leads");
                       }} 
                       className={`sidebar-sub-item ${activeWorkspace === "pipeline" && pipelineView === "kanban" ? "active" : ""}`}
                       title="Visual Pipeline"
@@ -11296,6 +11534,22 @@ export default function App({ onNavigateToLanding } = {}) {
                       <Columns className="sub-item-icon" />
                       <span style={{ flex: 1, textAlign: "left" }}>Visual Pipeline</span>
                       <span className="sidebar-sub-badge" style={{ marginLeft: "10px", flexShrink: 0 }}>New</span>
+                    </button>
+                  </div>
+
+                  <div className="sidebar-tree-node">
+                    <button 
+                      type="button" 
+                      onClick={() => { 
+                        setActiveWorkspace("pipeline"); 
+                        setPipelineView("sheet"); 
+                        setCurrentTab("Customers & Renewals");
+                      }} 
+                      className={`sidebar-sub-item ${activeWorkspace === "pipeline" && currentTab === "Customers & Renewals" ? "active" : ""}`}
+                      title="Customers & Renewals Hub"
+                    >
+                      <UserCheck className="sub-item-icon" />
+                      <span style={{ flex: 1, textAlign: "left" }}>Customers & Renewals</span>
                     </button>
                   </div>
 
@@ -11337,7 +11591,7 @@ export default function App({ onNavigateToLanding } = {}) {
                 className={`sidebar-nav-item ${activeWorkspace === "tasks" ? "active" : ""}`}
                 title="Follow-ups & Tasks"
               >
-                <Calendar className="nav-item-icon" />
+                <CheckSquare className="nav-item-icon" />
                 <span>Follow-ups & Tasks</span>
               </button>
             )}
@@ -11914,41 +12168,114 @@ export default function App({ onNavigateToLanding } = {}) {
 
             {/* Cluster 2: User Account & System Actions */}
             <div className="header-user-cluster" style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}>
-              {/* Role Simulation Switcher for Company Owners & Admins */}
+              {/* Role Simulation Switcher for Company Owners & Admins (Sleek Custom Dropdown) */}
               {checkIsSuperAdmin(currentUser) && (
-                <div style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                  <select
-                    value={simulatedRole || "owner"}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === "owner") {
-                        setSimulatedRole(null);
-                        showToast("Switched to Company Owner Dashboard", "info");
-                      } else {
-                        setSimulatedRole(val);
-                        showToast(`Viewing as ${getRoleBadgeInfo(val).label} Dashboard`, "info");
-                      }
-                    }}
+                <div ref={roleDropdownRef} style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsRoleDropdownOpen(prev => !prev)}
                     style={{
                       height: "30px",
-                      padding: "0 8px",
-                      fontSize: "11px",
+                      padding: "0 10px",
+                      fontSize: "12px",
                       fontWeight: "600",
                       color: simulatedRole ? "#1e40af" : "#334155",
                       backgroundColor: simulatedRole ? "#eff6ff" : "#ffffff",
                       border: simulatedRole ? "1.5px solid #93c5fd" : "1px solid #cbd5e1",
                       borderRadius: "6px",
                       cursor: "pointer",
-                      outline: "none",
-                      boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+                      transition: "all 0.15s ease",
+                      fontFamily: "'Inter', sans-serif"
                     }}
                     title="Role Simulator: Preview Dashboards for Owner, Sales Head, Team Lead, and Sales Rep"
+                    aria-expanded={isRoleDropdownOpen}
                   >
-                    <option value="owner">Owner View</option>
-                    <option value={CRM_ROLES.SALES_HEAD}>Sales Head View</option>
-                    <option value={CRM_ROLES.TEAM_LEADER}>Team Lead View</option>
-                    <option value={CRM_ROLES.SALES_EXECUTIVE}>Sales Rep View</option>
-                  </select>
+                    <ShieldAlert size={14} color={simulatedRole ? "#2563eb" : "#64748b"} />
+                    <span>
+                      {simulatedRole === CRM_ROLES.SALES_HEAD ? "Sales Head View" :
+                       simulatedRole === CRM_ROLES.TEAM_LEADER ? "Team Lead View" :
+                       simulatedRole === CRM_ROLES.SALES_EXECUTIVE ? "Sales Rep View" : "Owner View"}
+                    </span>
+                    <ChevronDown 
+                      size={12} 
+                      style={{ 
+                        transform: isRoleDropdownOpen ? "rotate(180deg)" : "rotate(0deg)", 
+                        transition: "transform 0.15s ease",
+                        color: simulatedRole ? "#2563eb" : "#64748b" 
+                      }} 
+                    />
+                  </button>
+
+                  {isRoleDropdownOpen && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "calc(100% + 6px)",
+                        right: 0,
+                        zIndex: 1200,
+                        minWidth: "210px",
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)",
+                        padding: "6px",
+                        fontFamily: "'Inter', sans-serif"
+                      }}
+                    >
+                      <div style={{ padding: "4px 8px 6px", fontSize: "10px", fontWeight: "700", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.5px", borderBottom: "1px solid #f1f5f9", marginBottom: "4px" }}>
+                        Role Simulator View
+                      </div>
+                      {[
+                        { id: "owner", label: "Owner View", desc: "Full Master Access" },
+                        { id: CRM_ROLES.SALES_HEAD, label: "Sales Head View", desc: "Analytics & All Reps" },
+                        { id: CRM_ROLES.TEAM_LEADER, label: "Team Lead View", desc: "Team Pipeline Scope" },
+                        { id: CRM_ROLES.SALES_EXECUTIVE, label: "Sales Rep View", desc: "Individual Rep Scope" }
+                      ].map(item => {
+                        const isSelected = (!simulatedRole && item.id === "owner") || (simulatedRole === item.id);
+                        return (
+                          <div
+                            key={item.id}
+                            onClick={() => {
+                              if (item.id === "owner") {
+                                setSimulatedRole(null);
+                                showToast("Switched to Company Owner Dashboard", "info");
+                              } else {
+                                setSimulatedRole(item.id);
+                                showToast(`Viewing as ${getRoleBadgeInfo(item.id).label} Dashboard`, "info");
+                              }
+                              setIsRoleDropdownOpen(false);
+                            }}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              padding: "7px 9px",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              backgroundColor: isSelected ? "#eff6ff" : "transparent",
+                              transition: "background 0.12s ease"
+                            }}
+                            onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                            onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "transparent"; }}
+                          >
+                            <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+                              <span style={{ fontSize: "12px", fontWeight: isSelected ? "700" : "600", color: isSelected ? "#1d4ed8" : "#1e293b" }}>
+                                {item.label}
+                              </span>
+                              <span style={{ fontSize: "10px", color: isSelected ? "#3b82f6" : "#64748b" }}>
+                                {item.desc}
+                              </span>
+                            </div>
+                            {isSelected && <Check size={14} color="#2563eb" strokeWidth={2.5} />}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -12424,47 +12751,29 @@ export default function App({ onNavigateToLanding } = {}) {
                     const isManager = currentUser?.role === "manager";
                     const isRepOnly = !isSuper && !isManager;
 
+                    const calendarOptions = isRepOnly ? [
+                      { value: currentUser?.name, label: `My Calendar (${currentUser?.name})` }
+                    ] : isManager ? [
+                      { value: "", label: "Team: All Scheduled" },
+                      { value: "__my_events__", label: `My Follow-ups (${currentLoggedInUser})` },
+                      { isSeparator: true },
+                      ...teamMembers.filter(m => m !== currentLoggedInUser).map(m => ({ value: m, label: m }))
+                    ] : [
+                      { value: "", label: "Owner: All Scheduled" },
+                      { value: "__my_events__", label: `My Follow-ups (${currentLoggedInUser})` },
+                      { isSeparator: true },
+                      ...teamMembers.map(m => ({ value: m, label: m }))
+                    ];
+
                     return (
-                      <div style={{ position: "relative" }}>
-                        <select
-                          value={isRepOnly ? currentUser?.name : calendarOwnerFilter}
-                          disabled={isRepOnly}
-                          onChange={(e) => setCalendarOwnerFilter(e.target.value)}
-                          style={{
-                            appearance: "none",
-                            padding: "0 26px 0 10px",
-                            border: "1px solid #e2e8f0",
-                            borderRadius: "6px",
-                            fontSize: "12px",
-                            color: calendarOwnerFilter ? "#2563eb" : "#475569",
-                            backgroundColor: isRepOnly ? "#f8fafc" : (calendarOwnerFilter ? "#eff6ff" : "#ffffff"),
-                            outline: "none",
-                            cursor: isRepOnly ? "default" : "pointer",
-                            fontWeight: "600",
-                            fontFamily: "'Inter', sans-serif",
-                            height: "32px"
-                          }}
-                        >
-                          {isRepOnly ? (
-                            <option value={currentUser?.name}>My Calendar ({currentUser?.name})</option>
-                          ) : isManager ? (
-                            <>
-                              <option value="">Team: All Scheduled</option>
-                              <option value="__my_events__">My Follow-ups ({currentLoggedInUser})</option>
-                              {teamMembers.filter(m => m !== currentLoggedInUser).map(m => (
-                                <option key={m} value={m}>{m}</option>
-                              ))}
-                            </>
-                          ) : (
-                            <>
-                              <option value="">Owner: All Scheduled</option>
-                              <option value="__my_events__">My Follow-ups ({currentLoggedInUser})</option>
-                              {teamMembers.map(m => <option key={m} value={m}>{m}</option>)}
-                            </>
-                          )}
-                        </select>
-                        <ChevronDown size={12} style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none" }} />
-                      </div>
+                      <CustomDropdown
+                        value={isRepOnly ? currentUser?.name : calendarOwnerFilter}
+                        disabled={isRepOnly}
+                        onChange={(val) => setCalendarOwnerFilter(val)}
+                        icon={<Calendar size={13} color={calendarOwnerFilter ? "#2563eb" : "#64748b"} />}
+                        style={{ height: "32px" }}
+                        options={calendarOptions}
+                      />
                     );
                   })()}
                 </div>
@@ -12987,17 +13296,20 @@ export default function App({ onNavigateToLanding } = {}) {
                     
                     {/* Date Type Selector */}
                     <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <span style={{ fontSize: "12px", fontWeight: "500", color: "#475569" }}>Date:</span>
-                      <select
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569" }}>Date:</span>
+                      <CustomDropdown
                         value={reportDateType}
-                        onChange={(e) => setReportDateType(e.target.value)}
-                        style={{ padding: "2px 5px", height: "22px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
-                      >
-                        <option value="won_date">Sale / Won Date</option>
-                        <option value="createdAt">Created Date</option>
-                        <option value="next_follow_up">Next Follow-Up</option>
-                        <option value="stageUpdatedAt">Stage Updated</option>
-                      </select>
+                        onChange={(val) => setReportDateType(val)}
+                        variant="plain"
+                        size="sm"
+                        style={{ height: "26px", minWidth: "135px" }}
+                        options={[
+                          { value: "won_date", label: "Sale / Won Date" },
+                          { value: "createdAt", label: "Created Date" },
+                          { value: "next_follow_up", label: "Next Follow-Up" },
+                          { value: "stageUpdatedAt", label: "Stage Updated" }
+                        ]}
+                      />
                     </div>
 
                     {/* Timeframe Presets */}
@@ -13098,43 +13410,44 @@ export default function App({ onNavigateToLanding } = {}) {
                   <div className="reports-filter-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "16px", borderTop: "1px solid #f1f5f9", paddingTop: "12px", marginTop: "10px" }}>
                     <div>
                       <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "3px" }}>Stage</label>
-                      <select
+                      <CustomDropdown
                         value={reportStatusFilter}
-                        onChange={(e) => {
-                          setReportStatusFilter(e.target.value);
+                        onChange={(val) => {
+                          setReportStatusFilter(val);
                           setReportSelectedStages([]);
                         }}
-                        style={{ width: "100%", padding: "4px 8px", height: "30px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer" }}
-                      >
-                        <option value="all">All Stages</option>
-                        {STATUS_OPTIONS.map(stg => (
-                          <option key={stg} value={stg}>{stg}</option>
-                        ))}
-                      </select>
+                        style={{ width: "100%", height: "30px" }}
+                        options={[
+                          { value: "all", label: "All Stages" },
+                          ...STATUS_OPTIONS.map(stg => ({ value: stg, label: stg }))
+                        ]}
+                      />
                     </div>
 
                     <div>
-                      <label style={{ fontSize: "12px", fontWeight: "500", color: "#475569", display: "block", marginBottom: "1px" }}>Source</label>
-                      <select 
+                      <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "3px" }}>Source</label>
+                      <CustomDropdown
                         value={reportSourceFilter}
-                        onChange={(e) => setReportSourceFilter(e.target.value)}
-                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
-                      >
-                        <option value="all">All Sources</option>
-                        {SOURCE_OPTIONS.map(src => <option key={src} value={src}>{src}</option>)}
-                      </select>
+                        onChange={(val) => setReportSourceFilter(val)}
+                        style={{ width: "100%", height: "30px" }}
+                        options={[
+                          { value: "all", label: "All Sources" },
+                          ...SOURCE_OPTIONS.map(src => ({ value: src, label: src }))
+                        ]}
+                      />
                     </div>
 
                     <div>
-                      <label style={{ fontSize: "12px", fontWeight: "500", color: "#475569", display: "block", marginBottom: "1px" }}>Score</label>
-                      <select 
+                      <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "3px" }}>Score</label>
+                      <CustomDropdown
                         value={reportScoreFilter}
-                        onChange={(e) => setReportScoreFilter(e.target.value)}
-                        style={{ width: "100%", padding: "2px 4px", height: "22px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
-                      >
-                        <option value="all">All Scores</option>
-                        {SCORE_OPTIONS.map(sc => <option key={sc} value={sc}>{sc}</option>)}
-                      </select>
+                        onChange={(val) => setReportScoreFilter(val)}
+                        style={{ width: "100%", height: "30px" }}
+                        options={[
+                          { value: "all", label: "All Scores" },
+                          ...SCORE_OPTIONS.map(sc => ({ value: sc, label: sc }))
+                        ]}
+                      />
                     </div>
 
                     <div>
@@ -14051,21 +14364,24 @@ export default function App({ onNavigateToLanding } = {}) {
 
                   <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                      <span style={{ fontSize: "12px", color: "#475569", fontWeight: "500" }}>Show:</span>
-                      <select
+                      <span style={{ fontSize: "12px", color: "#475569", fontWeight: "600" }}>Show:</span>
+                      <CustomDropdown
                         value={reportPageSize}
-                        onChange={(e) => {
-                          setReportPageSize(e.target.value === "all" ? "all" : Number(e.target.value));
+                        variant="plain"
+                        size="sm"
+                        style={{ height: "26px", minWidth: "110px" }}
+                        options={[
+                          { value: 10, label: "10 per page" },
+                          { value: 20, label: "20 per page" },
+                          { value: 30, label: "30 per page" },
+                          { value: 50, label: "50 per page" },
+                          { value: "all", label: `Show All (${filteredReportLeads.length})` }
+                        ]}
+                        onChange={(val) => {
+                          setReportPageSize(val === "all" ? "all" : Number(val));
                           setReportCurrentPage(1);
                         }}
-                        style={{ padding: "0 6px", height: "24px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer" }}
-                      >
-                        <option value={10}>10 per page</option>
-                        <option value={20}>20 per page</option>
-                        <option value={30}>30 per page</option>
-                        <option value={50}>50 per page</option>
-                        <option value="all">Show All ({filteredReportLeads.length})</option>
-                      </select>
+                      />
                     </div>
 
                     <span style={{ fontSize: "12px", color: "#475569", fontWeight: "400" }}>
@@ -15253,31 +15569,19 @@ export default function App({ onNavigateToLanding } = {}) {
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
                   {/* View Selector Dropdown */}
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <label htmlFor="team-view-dropdown" style={{ fontSize: "12px", fontWeight: "700", color: "#475569" }}>
+                    <label style={{ fontSize: "12px", fontWeight: "700", color: "#475569" }}>
                       View:
                     </label>
-                    <select
-                      id="team-view-dropdown"
+                    <CustomDropdown
                       value={effectiveTeamTab}
-                      onChange={(e) => setTeamTab(e.target.value)}
-                      style={{
-                        height: "36px",
-                        padding: "0 10px",
-                        fontSize: "12px",
-                        fontWeight: "700",
-                        borderRadius: "6px",
-                        border: "1.5px solid #2563eb",
-                        backgroundColor: "#ffffff",
-                        color: "#1d4ed8",
-                        cursor: "pointer",
-                        outline: "none",
-                        boxShadow: "0 1px 3px rgba(37,99,235,0.15)"
-                      }}
-                    >
-                      <option value="members">Team Members & Hierarchy</option>
-                      <option value="scorecard">Performance & Quota Scorecard</option>
-                      <option value="reassign">Lead Reassignment Balancer</option>
-                    </select>
+                      onChange={(val) => setTeamTab(val)}
+                      style={{ height: "36px", minWidth: "240px" }}
+                      options={[
+                        { value: "members", label: "Team Members & Hierarchy", icon: <Users size={13} color="#2563eb" /> },
+                        { value: "scorecard", label: "Performance & Quota Scorecard", icon: <TrendingUp size={13} color="#16a34a" /> },
+                        { value: "reassign", label: "Lead Reassignment Balancer", icon: <Shuffle size={13} color="#ea580c" /> }
+                      ]}
+                    />
                   </div>
 
                   <button
@@ -17711,20 +18015,20 @@ export default function App({ onNavigateToLanding } = {}) {
 
               {/* KPI Panel (Visible only in Analytics view - Responsive Dynamic Cards) */}
               {pipelineView === "analytics" && !([CRM_ROLES.SALES_HEAD, CRM_ROLES.TEAM_LEADER].includes(simulatedRole || normalizeRole(currentUserRole || currentUser?.role))) && (
-                <div className="kpi-row-clean" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "8px", width: "100%", marginBottom: "16px" }}>
+                <div className="kpi-row-clean" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", width: "100%", marginBottom: "16px" }}>
                   
                   {/* Card 1: TOTAL PIPELINE VALUE */}
                   {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiTotalPipeline !== false) && (
-                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <Bookmark size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "100px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "7px", minWidth: 0 }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <Bookmark size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                        <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                           {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || currentUser?.role === "manager") ? "Total Pipeline Value" : "My Pipeline Value"}
                         </span>
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         <AnimatedNumber value={stats.totalPipeline} isCurrency />
                       </div>
                       <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
@@ -17735,16 +18039,16 @@ export default function App({ onNavigateToLanding } = {}) {
 
                   {/* Card 2: CLOSED WON DEALS */}
                   {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiClosedWon !== false) && (
-                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <Award size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "100px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "7px", minWidth: 0 }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <Award size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                        <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                           {(checkIsSuperAdmin(currentUser) || currentUser?.role === "admin" || currentUser?.role === "manager") ? "Closed Won Revenue" : "My Closed Won Revenue"}
                         </span>
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         <AnimatedNumber value={stats.wonPipeline} isCurrency />
                       </div>
                       <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
@@ -17759,16 +18063,16 @@ export default function App({ onNavigateToLanding } = {}) {
 
                   {/* Card 3: PIPELINE WIN RATE */}
                   {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canViewKpiWinRate !== false) && (
-                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                        <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#ecfdf5", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <TrendingUp size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                    <div className="kpi-luxury-card" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "100px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "7px", minWidth: 0 }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ecfdf5", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                        <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                           Pipeline Win Rate
                         </span>
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         <AnimatedNumber value={Number(stats.winRate)} isPercent />
                       </div>
                       <div style={{ fontSize: "12px", fontWeight: "500", display: "flex", alignItems: "center", gap: "3px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
@@ -17793,27 +18097,27 @@ export default function App({ onNavigateToLanding } = {}) {
                         startEditingTarget();
                       }}
                       title="Click to view or edit monthly sales target"
-                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
+                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "100px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
                     >
                       <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0, flex: 1 }}>
-                            <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                              <Target size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
+                          <div style={{ display: "flex", alignItems: "center", gap: "7px", minWidth: 0, flex: 1 }}>
+                            <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                             </div>
-                            <span title="Sales Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
+                            <span title="Sales Target" style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                               Sales Target
                             </span>
                           </div>
                           {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canEditTarget) && (
-                            <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "12px", color: "#ea580c", fontWeight: "700", marginLeft: "6px", flexShrink: 0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "11.5px", color: "#ea580c", fontWeight: "700", marginLeft: "6px", flexShrink: 0 }}>
                               <Pencil size={11} color="#ea580c" />
                               <span>Edit</span>
                             </div>
                           )}
                         </div>
                         
-                        <div style={{ fontSize: targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <div style={{ fontSize: targetValue > 0 ? "21px" : "14px", fontWeight: "800", color: targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {targetValue > 0 ? <AnimatedNumber value={targetValue} isCurrency /> : "Pending ⏳"}
                         </div>
                         <span style={{ fontSize: "12px", color: targetStats.baseProgress >= 100 ? "#16a34a" : "#64748b", fontWeight: targetStats.baseProgress >= 100 ? "700" : "500", whiteSpace: "nowrap", display: "block", fontFamily: "'Inter', sans-serif" }}>
@@ -17824,11 +18128,11 @@ export default function App({ onNavigateToLanding } = {}) {
                           ) : "Target Pending"}
                         </span>
                       </div>
-                      <div style={{ marginLeft: "4px", flexShrink: 0 }}>
+                      <div style={{ marginLeft: "6px", flexShrink: 0 }}>
                         <CircularProgress 
                           percentage={targetValue > 0 ? Math.round(targetStats.baseProgress) : 0} 
                           color={targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#16a34a" : "#ea580c"} 
-                          size={32} 
+                          size={34} 
                           strokeWidth={3} 
                         />
                       </div>
@@ -17847,29 +18151,29 @@ export default function App({ onNavigateToLanding } = {}) {
                         startEditingTarget();
                       }}
                       title="Click to view or edit target breakdown"
-                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
+                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", minHeight: "100px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer", transition: "all 0.15s ease" }}
                     >
                       <div style={{ minWidth: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
-                          <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <Clock size={13} style={{ width: "13px", height: "13px", strokeWidth: 1.8 }} />
+                        <div style={{ display: "flex", alignItems: "center", gap: "7px", minWidth: 0 }}>
+                          <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <Clock size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                           </div>
-                          <span title="Daily Target" style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
+                          <span title="Daily Target" style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" }}>
                             Daily Target
                           </span>
                         </div>
-                        <div style={{ fontSize: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "14px" : targetValue > 0 ? "18px" : "14px", fontWeight: "800", color: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <div style={{ fontSize: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "14px" : targetValue > 0 ? "21px" : "14px", fontWeight: "800", color: (selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "#64748b" : targetStats.isStretchActive ? "#7c3aed" : targetValue > 0 ? "#0f172a" : "#94a3b8", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {(selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "Month Ended" : targetValue > 0 ? <AnimatedNumber value={targetStats.dailyRequired} isCurrency /> : "-- / day"}
                         </div>
                         <span style={{ fontSize: "12px", color: targetStats.isStretchActive ? "#7c3aed" : "#94a3b8", fontWeight: targetStats.isStretchActive ? "700" : "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", fontFamily: "'Inter', sans-serif" }}>
                           {targetStats.dailySubtitle || ((selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? `${formatMonthLabel(selectedPeriodMonth)} Closed` : targetValue > 0 ? `For remaining ${targetStats.daysRemaining} days` : "Waiting for assignment")}
                         </span>
                       </div>
-                      <div style={{ marginLeft: "4px", flexShrink: 0 }}>
+                      <div style={{ marginLeft: "6px", flexShrink: 0 }}>
                         <CircularProgress 
                           percentage={(selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? 100 : (targetValue > 0 ? Math.round(targetStats.baseProgress) : 0)} 
                           color={(selectedPeriodMonth !== currentMonthKey && selectedPeriodMonth !== "all") ? "#94a3b8" : targetStats.baseProgress >= 125 ? "#10b981" : targetStats.baseProgress >= 100 ? "#7c3aed" : "#2563eb"} 
-                          size={32} 
+                          size={34} 
                           strokeWidth={3} 
                         />
                       </div>
@@ -17888,32 +18192,32 @@ export default function App({ onNavigateToLanding } = {}) {
                         startEditingTarget();
                       }}
                       title="Click to view or add Spot Incentive & Custom Bonus"
-                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 10px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "96px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer" }}
+                      style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "100px", minWidth: 0, boxShadow: "0 1px 3px rgba(0,0,0,0.02)", cursor: "pointer" }}
                     >
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                          <div style={{ width: "26px", height: "26px", borderRadius: "6px", backgroundColor: "#fef2f2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <Gift size={14} style={{ width: "14px", height: "14px", strokeWidth: 1.8 }} />
+                        <div style={{ display: "flex", alignItems: "center", gap: "7px", minWidth: 0 }}>
+                          <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fef2f2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <Gift size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                           </div>
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
+                          <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", fontFamily: "'Inter', sans-serif" }}>
                             My Incentive
                           </span>
                         </div>
                         {(checkIsSuperAdmin(currentUser) || getUserEffectivePermissions(currentUser).canEditIncentive) && (
-                          <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "12px", color: "#ea580c", fontWeight: "700" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "11.5px", color: "#ea580c", fontWeight: "700" }}>
                             <Pencil size={11} color="#ea580c" />
                             <span>Edit</span>
                           </div>
                         )}
                       </div>
-                      <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0", fontFamily: "'Inter', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         <AnimatedNumber value={targetStats.incentiveAmount} isCurrency />
                       </div>
                       <div style={{ fontSize: "12px", fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 0, fontFamily: "'Inter', sans-serif" }}>
-                        <span style={{ color: targetStats.incentiveAmount > 0 ? "#059669" : "#64748b", fontWeight: "800", backgroundColor: targetStats.incentiveAmount > 0 ? "#ecfdf5" : "#f1f5f9", padding: "1px 5px", borderRadius: "6px", border: targetStats.incentiveAmount > 0 ? "1px solid #a7f3d0" : "1px solid #e2e8f0", whiteSpace: "nowrap", flexShrink: 0 }}>
+                        <span style={{ color: targetStats.incentiveAmount > 0 ? "#059669" : "#64748b", fontWeight: "800", backgroundColor: targetStats.incentiveAmount > 0 ? "#ecfdf5" : "#f1f5f9", padding: "1.5px 6px", borderRadius: "6px", border: targetStats.incentiveAmount > 0 ? "1px solid #a7f3d0" : "1px solid #e2e8f0", whiteSpace: "nowrap", flexShrink: 0 }}>
                           {targetStats.tierStatusBadge}
                         </span>
-                        <span style={{ color: "#64748b", fontWeight: "700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginLeft: "4px" }}>
+                        <span style={{ color: "#64748b", fontWeight: "700", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginLeft: "5px" }}>
                           {targetStats.nextMilestoneText}
                         </span>
                       </div>
@@ -17925,7 +18229,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
               {currentTab === "Customers & Renewals" ? (
                 <div style={{ backgroundColor: "#ffffff", borderRadius: "12px", border: "1px solid #e2e8f0", overflow: "hidden", marginTop: "12px" }}>
-                  <CustomersView currentUser={currentUser} />
+                  <CustomersView currentUser={currentUser} onBackToLeads={() => setCurrentTab("All Leads")} />
                 </div>
               ) : pipelineView === "sheet" ? (() => {
               const totalLeadsCount = filteredLeads.length;
@@ -17969,7 +18273,7 @@ export default function App({ onNavigateToLanding } = {}) {
                   {/* Left Side: Parent-Child Breadcrumb & Stage Filter Tabs (Issue 7: Resolves wayfinding conflict) */}
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "12px", fontWeight: "700", color: "#64748b" }}>
-                      <Grid size={14} color="#2563eb" />
+                      <Contact size={14} color="#2563eb" />
                       <span>Pipeline Data Grid</span>
                       <span style={{ color: "#94a3b8" }}>›</span>
                     </div>
@@ -18087,7 +18391,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         title="Pipeline Grid"
                         style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "750" : "600", color: pipelineView === "sheet" ? "#2563eb" : "#64748b", border: pipelineView === "sheet" ? "1px solid #bfdbfe" : "1px solid transparent", backgroundColor: pipelineView === "sheet" ? "#eff6ff" : "transparent", borderRadius: "6px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(37, 99, 235, 0.12)" : "none", transition: "all 0.15s ease" }}
                       >
-                        <Grid size={13} />
+                        <Contact size={13} />
                         <span className="view-mode-label">Grid</span>
                       </button>
                     )}
@@ -18554,30 +18858,286 @@ export default function App({ onNavigateToLanding } = {}) {
                     )}
                   </div>
 
-                  {/* Score Filter */}
-                  <div style={{ position: "relative" }}>
-                    <select 
-                      value={filterScore}
-                      onChange={(e) => setFilterScore(e.target.value)}
-                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterScore ? "#1d4ed8" : "#475569", backgroundColor: filterScore ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Inter', sans-serif", height: "32px" }}
+                  {/* Score Filter (Custom Dropdown) */}
+                  <div style={{ position: "relative" }} ref={scoreDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsScoreDropdownOpen(prev => !prev)}
+                      style={{
+                        appearance: "none",
+                        padding: "4px 26px 4px 10px",
+                        border: filterScore ? "1px solid #3b82f6" : "1px solid #e2e8f0",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        color: filterScore ? "#1d4ed8" : "#475569",
+                        backgroundColor: filterScore ? "#eff6ff" : "#ffffff",
+                        outline: "none",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        fontFamily: "'Inter', sans-serif",
+                        height: "32px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        boxSizing: "border-box"
+                      }}
+                      title="Filter leads by Score (Hot, Warm, Cold)"
                     >
-                      <option value="">Score: All</option>
-                      {SCORE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                    <ChevronDown size={12} style={{ position: "absolute", right: "7px", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none" }} />
+                      {filterScore === "Hot" ? (
+                        <Flame size={13} color="#dc2626" />
+                      ) : filterScore === "Warm" ? (
+                        <Sparkles size={13} color="#d97706" />
+                      ) : filterScore === "Cold" ? (
+                        <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#0284c7" }} />
+                      ) : null}
+                      <span>{filterScore ? `Score: ${filterScore}` : "Score: All"}</span>
+                      <ChevronDown 
+                        size={12} 
+                        style={{ 
+                          position: "absolute", 
+                          right: "8px", 
+                          top: "50%", 
+                          transform: isScoreDropdownOpen ? "translateY(-50%) rotate(180deg)" : "translateY(-50%) rotate(0deg)", 
+                          color: filterScore ? "#2563eb" : "#94a3b8", 
+                          transition: "transform 0.15s ease" 
+                        }} 
+                      />
+                    </button>
+
+                    {isScoreDropdownOpen && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "calc(100% + 4px)",
+                          left: 0,
+                          zIndex: 1100,
+                          minWidth: "175px",
+                          backgroundColor: "#ffffff",
+                          border: "1px solid #cbd5e1",
+                          borderRadius: "8px",
+                          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                          padding: "6px",
+                          fontFamily: "'Inter', sans-serif"
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "3px 6px 6px", borderBottom: "1px solid #f1f5f9", marginBottom: "4px" }}>
+                          <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>Filter by Score</span>
+                          {filterScore && (
+                            <button
+                              type="button"
+                              onClick={() => { setFilterScore(""); setIsScoreDropdownOpen(false); }}
+                              style={{ border: "none", background: "none", color: "#ea580c", fontSize: "10px", fontWeight: "600", cursor: "pointer", padding: "1px 4px" }}
+                            >
+                              Reset
+                            </button>
+                          )}
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <div
+                            onClick={() => { setFilterScore(""); setIsScoreDropdownOpen(false); }}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              padding: "6px 8px",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              backgroundColor: !filterScore ? "#eff6ff" : "transparent",
+                              transition: "background 0.1s"
+                            }}
+                            onMouseEnter={(e) => { if (filterScore) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                            onMouseLeave={(e) => { if (filterScore) e.currentTarget.style.backgroundColor = "transparent"; }}
+                          >
+                            <span style={{ fontSize: "12px", fontWeight: !filterScore ? "700" : "500", color: !filterScore ? "#1d4ed8" : "#1e293b" }}>
+                              Score: All
+                            </span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", backgroundColor: "#f1f5f9", padding: "1px 6px", borderRadius: "8px" }}>
+                                {ownerScopedLeads.length}
+                              </span>
+                              {!filterScore && <Check size={13} color="#2563eb" strokeWidth={2.5} />}
+                            </div>
+                          </div>
+
+                          {[
+                            { name: "Hot", icon: <Flame size={13} color="#dc2626" />, pillBg: "#fef2f2", pillText: "#dc2626" },
+                            { name: "Warm", icon: <Sparkles size={13} color="#d97706" />, pillBg: "#fff7ed", pillText: "#c2410c" },
+                            { name: "Cold", icon: <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#0284c7" }} />, pillBg: "#f0f9ff", pillText: "#0369a1" }
+                          ].map(item => {
+                            const isSelected = filterScore === item.name;
+                            const count = ownerScopedLeads.filter(l => (l.score || "Warm").toLowerCase() === item.name.toLowerCase()).length;
+                            return (
+                              <div
+                                key={item.name}
+                                onClick={() => { setFilterScore(item.name); setIsScoreDropdownOpen(false); }}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  padding: "6px 8px",
+                                  borderRadius: "6px",
+                                  cursor: "pointer",
+                                  backgroundColor: isSelected ? "#eff6ff" : "transparent",
+                                  transition: "background 0.1s"
+                                }}
+                                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                                onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "transparent"; }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  {item.icon}
+                                  <span style={{ fontSize: "11px", fontWeight: "700", backgroundColor: item.pillBg, color: item.pillText, padding: "2px 7px", borderRadius: "6px" }}>
+                                    {item.name}
+                                  </span>
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <span style={{ fontSize: "10px", fontWeight: "600", color: isSelected ? "#2563eb" : "#64748b", backgroundColor: isSelected ? "#dbeafe" : "#f1f5f9", padding: "1px 6px", borderRadius: "8px" }}>
+                                    {count}
+                                  </span>
+                                  {isSelected && <Check size={13} color="#2563eb" strokeWidth={2.5} />}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Source Filter */}
-                  <div style={{ position: "relative" }}>
-                    <select 
-                      value={filterSource}
-                      onChange={(e) => setFilterSource(e.target.value)}
-                      style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterSource ? "#1d4ed8" : "#475569", backgroundColor: filterSource ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontWeight: "600", fontFamily: "'Inter', sans-serif", height: "32px" }}
+                  {/* Source Filter (Custom Dropdown) */}
+                  <div style={{ position: "relative" }} ref={sourceDropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsSourceDropdownOpen(prev => !prev)}
+                      style={{
+                        appearance: "none",
+                        padding: "4px 26px 4px 10px",
+                        border: filterSource ? "1px solid #3b82f6" : "1px solid #e2e8f0",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        color: filterSource ? "#1d4ed8" : "#475569",
+                        backgroundColor: filterSource ? "#eff6ff" : "#ffffff",
+                        outline: "none",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        fontFamily: "'Inter', sans-serif",
+                        height: "32px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        boxSizing: "border-box"
+                      }}
+                      title="Filter leads by acquisition source"
                     >
-                      <option value="">Source: All</option>
-                      {SOURCE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                    <ChevronDown size={12} style={{ position: "absolute", right: "7px", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none" }} />
+                      <Globe size={12} color={filterSource ? "#2563eb" : "#64748b"} />
+                      <span>{filterSource ? `Source: ${filterSource}` : "Source: All"}</span>
+                      <ChevronDown 
+                        size={12} 
+                        style={{ 
+                          position: "absolute", 
+                          right: "8px", 
+                          top: "50%", 
+                          transform: isSourceDropdownOpen ? "translateY(-50%) rotate(180deg)" : "translateY(-50%) rotate(0deg)", 
+                          color: filterSource ? "#2563eb" : "#94a3b8", 
+                          transition: "transform 0.15s ease" 
+                        }} 
+                      />
+                    </button>
+
+                    {isSourceDropdownOpen && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "calc(100% + 4px)",
+                          left: 0,
+                          zIndex: 1100,
+                          minWidth: "190px",
+                          maxHeight: "280px",
+                          backgroundColor: "#ffffff",
+                          border: "1px solid #cbd5e1",
+                          borderRadius: "8px",
+                          boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                          padding: "6px",
+                          fontFamily: "'Inter', sans-serif",
+                          display: "flex",
+                          flexDirection: "column"
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "3px 6px 6px", borderBottom: "1px solid #f1f5f9", marginBottom: "4px" }}>
+                          <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>Lead Source</span>
+                          {filterSource && (
+                            <button
+                              type="button"
+                              onClick={() => { setFilterSource(""); setIsSourceDropdownOpen(false); }}
+                              style={{ border: "none", background: "none", color: "#ea580c", fontSize: "10px", fontWeight: "600", cursor: "pointer", padding: "1px 4px" }}
+                            >
+                              Reset
+                            </button>
+                          )}
+                        </div>
+
+                        <div style={{ maxHeight: "220px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <div
+                            onClick={() => { setFilterSource(""); setIsSourceDropdownOpen(false); }}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              padding: "6px 8px",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              backgroundColor: !filterSource ? "#eff6ff" : "transparent",
+                              transition: "background 0.1s"
+                            }}
+                            onMouseEnter={(e) => { if (filterSource) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                            onMouseLeave={(e) => { if (filterSource) e.currentTarget.style.backgroundColor = "transparent"; }}
+                          >
+                            <span style={{ fontSize: "12px", fontWeight: !filterSource ? "700" : "500", color: !filterSource ? "#1d4ed8" : "#1e293b" }}>
+                              Source: All
+                            </span>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                              <span style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", backgroundColor: "#f1f5f9", padding: "1px 6px", borderRadius: "8px" }}>
+                                {ownerScopedLeads.length}
+                              </span>
+                              {!filterSource && <Check size={13} color="#2563eb" strokeWidth={2.5} />}
+                            </div>
+                          </div>
+
+                          {SOURCE_OPTIONS.map(src => {
+                            const isSelected = filterSource === src;
+                            const count = ownerScopedLeads.filter(l => (l.source || "").toLowerCase() === src.toLowerCase()).length;
+                            return (
+                              <div
+                                key={src}
+                                onClick={() => { setFilterSource(src); setIsSourceDropdownOpen(false); }}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  padding: "6px 8px",
+                                  borderRadius: "6px",
+                                  cursor: "pointer",
+                                  backgroundColor: isSelected ? "#eff6ff" : "transparent",
+                                  transition: "background 0.1s"
+                                }}
+                                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                                onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "transparent"; }}
+                              >
+                                <span style={{ fontSize: "12px", fontWeight: isSelected ? "700" : "500", color: isSelected ? "#1d4ed8" : "#1e293b" }}>
+                                  {src}
+                                </span>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <span style={{ fontSize: "10px", fontWeight: "600", color: isSelected ? "#2563eb" : "#64748b", backgroundColor: isSelected ? "#dbeafe" : "#f1f5f9", padding: "1px 6px", borderRadius: "8px" }}>
+                                    {count}
+                                  </span>
+                                  {isSelected && <Check size={13} color="#2563eb" strokeWidth={2.5} />}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Min Value Filter (Issue 8: Widen to 140px to eliminate placeholder clipping) */}
@@ -18610,7 +19170,7 @@ export default function App({ onNavigateToLanding } = {}) {
                     />
                   </div>
 
-                  {/* 👤 Lead Owner Filter */}
+                  {/* 👤 Lead Owner Filter (Custom Dropdown) */}
                   {(() => {
                     const isSuper = checkIsSuperAdmin(currentUser);
                     const isManager = currentUser?.role === "manager";
@@ -18625,36 +19185,208 @@ export default function App({ onNavigateToLanding } = {}) {
                           ...leads.map(l => l.owner).filter(Boolean)
                         ])).filter(m => m && m.toLowerCase() !== myName.toLowerCase());
 
+                    let currentOwnerLabel = "All Leads";
+                    if (isRepOnly) {
+                      currentOwnerLabel = `My Leads (${currentUser?.name || myName})`;
+                    } else if (filterOwner === "__my_leads__") {
+                      currentOwnerLabel = `My Leads (${myName})`;
+                    } else if (filterOwner === "__unassigned__") {
+                      currentOwnerLabel = "Unassigned";
+                    } else if (filterOwner) {
+                      currentOwnerLabel = filterOwner;
+                    } else {
+                      currentOwnerLabel = isManager ? "Team: All Leads" : "All Leads";
+                    }
+
                     return (
-                      <div style={{ position: "relative" }}>
-                        <select 
-                          value={isRepOnly ? currentUser.name : filterOwner}
+                      <div style={{ position: "relative" }} ref={ownerDropdownRef}>
+                        <button
+                          type="button"
                           disabled={isRepOnly}
-                          onChange={(e) => setFilterOwner(e.target.value)}
-                          style={{ appearance: "none", padding: "4px 24px 4px 9px", border: "1px solid #e2e8f0", borderRadius: "6px", fontSize: "12px", color: filterOwner ? "#7c3aed" : "#475569", backgroundColor: isRepOnly ? "#f8fafc" : (filterOwner ? "#f5f3ff" : "#ffffff"), outline: "none", cursor: isRepOnly ? "default" : "pointer", fontWeight: "600", fontFamily: "'Inter', sans-serif", height: "32px" }}
+                          onClick={() => !isRepOnly && setIsOwnerDropdownOpen(prev => !prev)}
+                          style={{
+                            appearance: "none",
+                            padding: isRepOnly ? "4px 10px" : "4px 26px 4px 10px",
+                            border: filterOwner ? "1px solid #8b5cf6" : "1px solid #e2e8f0",
+                            borderRadius: "6px",
+                            fontSize: "12px",
+                            color: filterOwner ? "#7c3aed" : "#475569",
+                            backgroundColor: isRepOnly ? "#f8fafc" : (filterOwner ? "#f5f3ff" : "#ffffff"),
+                            outline: "none",
+                            cursor: isRepOnly ? "default" : "pointer",
+                            fontWeight: "600",
+                            fontFamily: "'Inter', sans-serif",
+                            height: "32px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            boxSizing: "border-box"
+                          }}
+                          title={isRepOnly ? "Rep scope: only your leads" : "Filter leads by Owner"}
                         >
-                          {isRepOnly ? (
-                            <option value={currentUser.name}>My Leads ({currentUser.name})</option>
-                          ) : isManager ? (
-                            <>
-                              <option value="__my_leads__">My Leads ({myName}) - {ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
-                              <option value="">Team: All Leads ({ownerScopedLeads.length})</option>
-                              {otherOwners.map(m => (
-                                <option key={m} value={m}>{m} ({ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
-                              ))}
-                            </>
-                          ) : (
-                            <>
-                              <option value="__my_leads__">My Leads ({myName}) - {ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length} leads</option>
-                              <option value="">All Leads ({ownerScopedLeads.length} Total)</option>
-                              <option value="__unassigned__">Unassigned ({ownerScopedLeads.filter(l => !l.owner || l.owner === "Unassigned").length})</option>
-                              {otherOwners.map(m => (
-                                <option key={m} value={m}>{m} ({ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length} leads)</option>
-                              ))}
-                            </>
+                          <User size={12} color={filterOwner ? "#7c3aed" : "#64748b"} />
+                          <span>{currentOwnerLabel}</span>
+                          {!isRepOnly && (
+                            <ChevronDown 
+                              size={12} 
+                              style={{ 
+                                position: "absolute", 
+                                right: "8px", 
+                                top: "50%", 
+                                transform: isOwnerDropdownOpen ? "translateY(-50%) rotate(180deg)" : "translateY(-50%) rotate(0deg)", 
+                                color: filterOwner ? "#7c3aed" : "#94a3b8", 
+                                transition: "transform 0.15s ease" 
+                              }} 
+                            />
                           )}
-                        </select>
-                        <ChevronDown size={12} style={{ position: "absolute", right: "7px", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none" }} />
+                        </button>
+
+                        {isOwnerDropdownOpen && !isRepOnly && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: "calc(100% + 4px)",
+                              left: 0,
+                              zIndex: 1100,
+                              minWidth: "220px",
+                              maxHeight: "320px",
+                              backgroundColor: "#ffffff",
+                              border: "1px solid #cbd5e1",
+                              borderRadius: "8px",
+                              boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                              padding: "6px",
+                              fontFamily: "'Inter', sans-serif",
+                              display: "flex",
+                              flexDirection: "column"
+                            }}
+                          >
+                            <div style={{ padding: "3px 6px 6px", borderBottom: "1px solid #f1f5f9", marginBottom: "4px" }}>
+                              <span style={{ fontSize: "10px", fontWeight: "700", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>Filter by Owner</span>
+                            </div>
+
+                            <div style={{ maxHeight: "250px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "2px" }}>
+                              {/* Option 1: My Leads */}
+                              <div
+                                onClick={() => { setFilterOwner("__my_leads__"); setIsOwnerDropdownOpen(false); }}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  padding: "6px 8px",
+                                  borderRadius: "6px",
+                                  cursor: "pointer",
+                                  backgroundColor: filterOwner === "__my_leads__" ? "#f5f3ff" : "transparent",
+                                  transition: "background 0.1s"
+                                }}
+                                onMouseEnter={(e) => { if (filterOwner !== "__my_leads__") e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                                onMouseLeave={(e) => { if (filterOwner !== "__my_leads__") e.currentTarget.style.backgroundColor = "transparent"; }}
+                              >
+                                <span style={{ fontSize: "12px", fontWeight: filterOwner === "__my_leads__" ? "700" : "500", color: filterOwner === "__my_leads__" ? "#7c3aed" : "#1e293b" }}>
+                                  My Leads ({myName})
+                                </span>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <span style={{ fontSize: "10px", fontWeight: "600", color: filterOwner === "__my_leads__" ? "#7c3aed" : "#64748b", backgroundColor: filterOwner === "__my_leads__" ? "#ede9fe" : "#f1f5f9", padding: "1px 6px", borderRadius: "8px" }}>
+                                    {ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === myName.toLowerCase()).length}
+                                  </span>
+                                  {filterOwner === "__my_leads__" && <Check size={13} color="#7c3aed" strokeWidth={2.5} />}
+                                </div>
+                              </div>
+
+                              {/* Option 2: All Leads / Team Leads */}
+                              <div
+                                onClick={() => { setFilterOwner(""); setIsOwnerDropdownOpen(false); }}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  padding: "6px 8px",
+                                  borderRadius: "6px",
+                                  cursor: "pointer",
+                                  backgroundColor: filterOwner === "" ? "#f5f3ff" : "transparent",
+                                  transition: "background 0.1s"
+                                }}
+                                onMouseEnter={(e) => { if (filterOwner !== "") e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                                onMouseLeave={(e) => { if (filterOwner !== "") e.currentTarget.style.backgroundColor = "transparent"; }}
+                              >
+                                <span style={{ fontSize: "12px", fontWeight: filterOwner === "" ? "700" : "500", color: filterOwner === "" ? "#7c3aed" : "#1e293b" }}>
+                                  {isManager ? "Team: All Leads" : "All Leads"}
+                                </span>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <span style={{ fontSize: "10px", fontWeight: "600", color: filterOwner === "" ? "#7c3aed" : "#64748b", backgroundColor: filterOwner === "" ? "#ede9fe" : "#f1f5f9", padding: "1px 6px", borderRadius: "8px" }}>
+                                    {ownerScopedLeads.length}
+                                  </span>
+                                  {filterOwner === "" && <Check size={13} color="#7c3aed" strokeWidth={2.5} />}
+                                </div>
+                              </div>
+
+                              {!isManager && (
+                                <div
+                                  onClick={() => { setFilterOwner("__unassigned__"); setIsOwnerDropdownOpen(false); }}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    padding: "6px 8px",
+                                    borderRadius: "6px",
+                                    cursor: "pointer",
+                                    backgroundColor: filterOwner === "__unassigned__" ? "#f5f3ff" : "transparent",
+                                    transition: "background 0.1s"
+                                  }}
+                                  onMouseEnter={(e) => { if (filterOwner !== "__unassigned__") e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                                  onMouseLeave={(e) => { if (filterOwner !== "__unassigned__") e.currentTarget.style.backgroundColor = "transparent"; }}
+                                >
+                                  <span style={{ fontSize: "12px", fontWeight: filterOwner === "__unassigned__" ? "700" : "500", color: filterOwner === "__unassigned__" ? "#7c3aed" : "#1e293b" }}>
+                                    Unassigned Leads
+                                  </span>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                    <span style={{ fontSize: "10px", fontWeight: "600", color: filterOwner === "__unassigned__" ? "#7c3aed" : "#64748b", backgroundColor: filterOwner === "__unassigned__" ? "#ede9fe" : "#f1f5f9", padding: "1px 6px", borderRadius: "8px" }}>
+                                      {ownerScopedLeads.filter(l => !l.owner || l.owner === "Unassigned").length}
+                                    </span>
+                                    {filterOwner === "__unassigned__" && <Check size={13} color="#7c3aed" strokeWidth={2.5} />}
+                                  </div>
+                                </div>
+                              )}
+
+                              {otherOwners.length > 0 && (
+                                <div style={{ borderTop: "1px solid #f1f5f9", marginTop: "3px", paddingTop: "3px" }}>
+                                  <span style={{ fontSize: "9px", fontWeight: "700", color: "#94a3b8", textTransform: "uppercase", padding: "2px 8px", display: "block" }}>Team Members</span>
+                                  {otherOwners.map(m => {
+                                    const isSelected = filterOwner === m;
+                                    const count = ownerScopedLeads.filter(l => (l.owner || "").toLowerCase() === m.toLowerCase()).length;
+                                    return (
+                                      <div
+                                        key={m}
+                                        onClick={() => { setFilterOwner(m); setIsOwnerDropdownOpen(false); }}
+                                        style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "space-between",
+                                          padding: "5px 8px",
+                                          borderRadius: "6px",
+                                          cursor: "pointer",
+                                          backgroundColor: isSelected ? "#f5f3ff" : "transparent",
+                                          transition: "background 0.1s"
+                                        }}
+                                        onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                                        onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "transparent"; }}
+                                      >
+                                        <span style={{ fontSize: "12px", fontWeight: isSelected ? "700" : "500", color: isSelected ? "#7c3aed" : "#1e293b" }}>
+                                          {m}
+                                        </span>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                          <span style={{ fontSize: "10px", fontWeight: "600", color: isSelected ? "#7c3aed" : "#64748b", backgroundColor: isSelected ? "#ede9fe" : "#f1f5f9", padding: "1px 6px", borderRadius: "8px" }}>
+                                            {count}
+                                          </span>
+                                          {isSelected && <Check size={13} color="#7c3aed" strokeWidth={2.5} />}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
@@ -18931,12 +19663,30 @@ export default function App({ onNavigateToLanding } = {}) {
                                       {initials}
                                     </div>
                                     <div style={{ minWidth: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                                      <span 
-                                        style={{ color: "#0f172a", fontWeight: "600", fontSize: "13px", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                                        title="Double-click to edit name"
-                                      >
-                                        {lead.name || "New Lead"}
-                                      </span>
+                                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                        <span 
+                                          style={{ color: "#0f172a", fontWeight: "600", fontSize: "13px", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                                          title="Double-click to edit name"
+                                        >
+                                          {lead.name || "New Lead"}
+                                        </span>
+                                        <span 
+                                          style={{
+                                            backgroundColor: scoreBadge.bg,
+                                            color: scoreBadge.text,
+                                            border: `1px solid ${scoreBadge.border}`,
+                                            borderRadius: "9999px",
+                                            fontSize: "10px",
+                                            fontWeight: "700",
+                                            padding: "1px 6px",
+                                            lineHeight: "13px",
+                                            flexShrink: 0
+                                          }}
+                                          title={`Priority: ${scoreBadge.label}`}
+                                        >
+                                          {scoreBadge.label}
+                                        </span>
+                                      </div>
                                       {lead.company && lead.company.trim() ? (
                                         <span style={{ color: "#475569", fontSize: "12px", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                           {lead.company}
@@ -18950,44 +19700,36 @@ export default function App({ onNavigateToLanding } = {}) {
                               {/* Deal Stage Soft Rounded Pill (Col 1) */}
                               <td 
                                 onClick={() => setSelectedCell({ rowIndex: rIdx, colIndex: 1 })}
-                                onDoubleClick={() => startEditing(rIdx, 1)}
                                 style={{ padding: "8px 10px 8px 8px", verticalAlign: "middle" }}
                               >
-                                {editingCell?.rowIndex === rIdx && editingCell?.colIndex === 1 ? (
-                                  <select 
-                                    ref={editSelectRef}
-                                    value={editValue}
-                                    onChange={(e) => {
-                                      setEditValue(e.target.value);
-                                      saveCellChange(rIdx, 1, e.target.value);
-                                    }}
-                                    onBlur={() => setEditingCell(null)}
-                                    style={{ width: "100%", padding: "4px 6px", fontSize: "12px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", fontFamily: "inherit" }}
-                                  >
-                                    {STATUS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                  </select>
-                                ) : (
-                                  <span 
-                                    onClick={() => startEditing(rIdx, 1)}
-                                    style={{
-                                      backgroundColor: stageStyle.bg,
-                                      color: stageStyle.text,
-                                      padding: "3px 9px",
-                                      borderRadius: "9999px",
-                                      fontSize: "11px",
-                                      fontWeight: "600",
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      gap: "5px",
-                                      whiteSpace: "nowrap",
-                                      cursor: "pointer"
-                                    }}
-                                    title="Click to change stage"
-                                  >
-                                    <span style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: stageStyle.dot, flexShrink: 0 }} />
-                                    {stageStyle.label}
-                                  </span>
-                                )}
+                                <CustomDropdown
+                                  value={lead.status || "New Lead"}
+                                  onChange={(newStage) => {
+                                    saveCellChange(rIdx, 1, newStage);
+                                  }}
+                                  variant="plain"
+                                  size="sm"
+                                  title="Click to change stage"
+                                  style={{
+                                    backgroundColor: stageStyle.bg,
+                                    color: stageStyle.text,
+                                    border: `1px solid ${stageStyle.dot}40`,
+                                    borderRadius: "9999px",
+                                    padding: "2px 24px 2px 9px",
+                                    fontSize: "11px",
+                                    fontWeight: "600",
+                                    height: "24px"
+                                  }}
+                                  icon={<span style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: stageStyle.dot, flexShrink: 0, display: "inline-block" }} />}
+                                  options={STATUS_OPTIONS.map(opt => {
+                                    const optStyle = getStageBadgeStyle(opt);
+                                    return {
+                                      value: opt,
+                                      label: optStyle.label,
+                                      icon: <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: optStyle.dot, display: "inline-block" }} />
+                                    };
+                                  })}
+                                />
                               </td>
 
                               {/* Deal Value with GST Badge (Col 2 - Issue 4: Added breathing room between value & GST) */}
@@ -19130,34 +19872,20 @@ export default function App({ onNavigateToLanding } = {}) {
                                       ].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
 
                                       return (
-                                        <select
+                                        <CustomDropdown
                                           value={lead.owner || "Harsh Goyal"}
-                                          onChange={(e) => reassignLeadOwner(lead.id, e.target.value)}
-                                          onClick={(e) => e.stopPropagation()}
+                                          onChange={(val) => reassignLeadOwner(lead.id, val)}
+                                          variant="plain"
+                                          size="sm"
+                                          title="Click to reassign owner"
                                           style={{
                                             flex: 1,
                                             width: "100%",
                                             minWidth: 0,
-                                            padding: "3px 6px",
-                                            borderRadius: "6px",
-                                            fontSize: "11px",
-                                            fontWeight: "600",
-                                            color: "#334155",
-                                            backgroundColor: "#ffffff",
-                                            border: "1px solid #cbd5e1",
-                                            cursor: "pointer",
-                                            outline: "none",
-                                            height: "28px",
-                                            boxSizing: "border-box",
-                                            fontFamily: "'Inter', sans-serif"
+                                            height: "28px"
                                           }}
-                                          title="Click to reassign owner"
-                                          aria-label="Reassign Lead Owner"
-                                        >
-                                          {allowedOwners.map(m => (
-                                            <option key={m} value={m}>{m}</option>
-                                          ))}
-                                        </select>
+                                          options={allowedOwners.map(m => ({ value: m, label: m }))}
+                                        />
                                       );
                                     })()
                                   ) : (
@@ -19480,30 +20208,22 @@ export default function App({ onNavigateToLanding } = {}) {
 
                     <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                       <span style={{ fontSize: "12px", color: "#64748b" }}>Rows per page:</span>
-                      <select
+                      <CustomDropdown
                         value={pageSize}
-                        onChange={(e) => {
-                          setPageSize(Number(e.target.value));
+                        variant="plain"
+                        size="sm"
+                        style={{ height: "26px", minWidth: "64px" }}
+                        options={[
+                          { value: 5, label: "5" },
+                          { value: 10, label: "10" },
+                          { value: 20, label: "20" },
+                          { value: 50, label: "50" }
+                        ]}
+                        onChange={(val) => {
+                          setPageSize(Number(val));
                           setCurrentPage(1);
                         }}
-                        style={{
-                          padding: "2px 6px",
-                          fontSize: "12px",
-                          fontWeight: "600",
-                          borderRadius: "6px",
-                          border: "1px solid #cbd5e1",
-                          backgroundColor: "#ffffff",
-                          color: "#0f172a",
-                          outline: "none",
-                          cursor: "pointer",
-                          height: "25px"
-                        }}
-                      >
-                        <option value={5}>5</option>
-                        <option value={10}>10</option>
-                        <option value={20}>20</option>
-                        <option value={50}>50</option>
-                      </select>
+                      />
                     </div>
                   </div>
 
@@ -19676,13 +20396,28 @@ export default function App({ onNavigateToLanding } = {}) {
 
                 const handleUpdateActiveLead = (field, val) => {
                   if (!activeLead) return;
+                  let updatedLeadObj = null;
                   const updatedLeads = leads.map(l => {
                     if (l.id === activeLead.id) {
-                      return { ...l, [field]: val, lastModified: new Date().toISOString() };
+                      const u = { ...l, [field]: val, lastModified: new Date().toISOString() };
+                      if (field === "status") {
+                        u.stageUpdatedAt = new Date().toISOString();
+                        if (isWonStatus(val)) {
+                          u.won_date = l.won_date || new Date().toISOString().slice(0, 10);
+                        } else {
+                          u.won_date = "";
+                        }
+                      }
+                      updatedLeadObj = u;
+                      return u;
                     }
                     return l;
                   });
                   saveLeadsToStorage(updatedLeads);
+                  if (updatedLeadObj) {
+                    syncSingleLeadToBackend(updatedLeadObj);
+                    upsertLeadToSupabase(updatedLeadObj).catch(err => console.warn("Supabase stage update error:", err));
+                  }
 
                   if (field === "status" && isLostStatus(val)) {
                     let tasksChanged = false;
@@ -19784,7 +20519,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             onClick={() => setPipelineView("sheet")}
                             style={{ padding: "4px 10px", height: "28px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none" }}
                           >
-                            <Grid size={12} /> Grid View
+                            <Contact size={12} /> Grid View
                           </button>
                           <button
                             type="button"
@@ -19927,32 +20662,53 @@ export default function App({ onNavigateToLanding } = {}) {
                         {/* Filter Bar: Stage Dropdown & Priority Dropdown */}
                         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                           <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: "6px" }}>
-                            <select
+                            <CustomDropdown
                               value={splitLeadFilterStage}
-                              onChange={(e) => setSplitLeadFilterStage(e.target.value)}
-                              style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
-                            >
-                              <option value="all">All Stages ({ownerScopedLeads.length})</option>
-                              <option value="hot">Hot Deals</option>
-                              <option value="due_today">Due Today</option>
-                              <option value="won">Won Deals</option>
-                              <option value="renewal">Renewal Deals</option>
-                              <option disabled>──────────</option>
-                              {STATUS_OPTIONS.map(stg => (
-                                <option key={stg} value={stg}>{stg}</option>
-                              ))}
-                            </select>
+                              onChange={(val) => setSplitLeadFilterStage(val)}
+                              style={{ width: "100%" }}
+                              title="Filter by Stage"
+                              options={[
+                                { value: "all", label: `All Stages (${ownerScopedLeads.length})` },
+                                { value: "hot", label: "Hot Deals", icon: <Flame size={12} color="#dc2626" /> },
+                                { value: "due_today", label: "Due Today", icon: <Clock size={12} color="#ea580c" /> },
+                                { value: "won", label: "Won Deals", icon: <Award size={12} color="#16a34a" /> },
+                                { value: "renewal", label: "Renewal Deals", icon: <RotateCw size={12} color="#0284c7" /> },
+                                { isSeparator: true },
+                                ...STATUS_OPTIONS.map(stg => ({
+                                  value: stg,
+                                  label: stg,
+                                  count: ownerScopedLeads.filter(l => (l.status || "").toLowerCase() === stg.toLowerCase()).length
+                                }))
+                              ]}
+                            />
 
-                            <select
+                            <CustomDropdown
                               value={splitLeadFilterScore}
-                              onChange={(e) => setSplitLeadFilterScore(e.target.value)}
-                              style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "500", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
-                            >
-                              <option value="all">All Priority</option>
-                              <option value="Hot">Hot</option>
-                              <option value="Warm">Warm</option>
-                              <option value="Cold">Cold</option>
-                            </select>
+                              onChange={(val) => setSplitLeadFilterScore(val)}
+                              style={{ width: "100%" }}
+                              title="Filter by Priority / Score"
+                              options={[
+                                { value: "all", label: "All Priority" },
+                                { 
+                                  value: "Hot", 
+                                  label: "Hot", 
+                                  icon: <Flame size={12} color="#dc2626" />, 
+                                  count: ownerScopedLeads.filter(l => (l.score || "").toLowerCase() === "hot").length 
+                                },
+                                { 
+                                  value: "Warm", 
+                                  label: "Warm", 
+                                  icon: <Sparkles size={12} color="#d97706" />, 
+                                  count: ownerScopedLeads.filter(l => (l.score || "warm").toLowerCase() === "warm").length 
+                                },
+                                { 
+                                  value: "Cold", 
+                                  label: "Cold", 
+                                  icon: <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#0284c7" }} />, 
+                                  count: ownerScopedLeads.filter(l => (l.score || "").toLowerCase() === "cold").length 
+                                }
+                              ]}
+                            />
                           </div>
 
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "2px 2px", fontSize: "12px", color: "#64748b" }}>
@@ -20157,24 +20913,45 @@ export default function App({ onNavigateToLanding } = {}) {
                                 </div>
 
                                 <div style={{ borderLeft: "1px solid #cbd5e1", paddingLeft: "10px" }}>
-                                  <span style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", display: "block" }}>Stage</span>
-                                  <select
+                                  <span style={{ fontSize: "10px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: "2px" }}>Stage</span>
+                                  <CustomDropdown
                                     value={activeLead.status || "New"}
-                                    onChange={(e) => {
-                                      const newStg = e.target.value;
+                                    variant="plain"
+                                    size="sm"
+                                    style={{ height: "28px", minWidth: "125px" }}
+                                    options={STATUS_OPTIONS.map(stg => ({ value: stg, label: stg }))}
+                                    onChange={(newStg) => {
+                                      if (isWonStatus(newStg)) {
+                                        const dealVal = Number(activeLead.value) || 0;
+                                        const paidVal = Number(activeLead.paidAmount) || 0;
+                                        if (dealVal <= 0 || paidVal < dealVal) {
+                                          setWonBlockedLead(activeLead);
+                                          setShowWonBlockedModal(true);
+                                          showToast("Full payment is required before this lead can be marked Won.", "error");
+                                          return;
+                                        }
+                                      }
+                                      if (isLostStatus(newStg)) {
+                                        setLostModalLead(activeLead);
+                                        setShowLostModal(true);
+                                        return;
+                                      }
+                                      if (newStg === "Junk") {
+                                        setJunkModalLead(activeLead);
+                                        setShowJunkModal(true);
+                                        return;
+                                      }
                                       handleUpdateActiveLead("status", newStg);
                                       if (isWonStatus(newStg)) {
-                                        showToast(`Deal closed as WON for ₹${(Number(activeLead.value) || 0).toLocaleString("en-IN")}!`, "success");
+                                        setWonLeadName(activeLead.name || activeLead.company || "Lead");
+                                        setWonDealData(activeLead);
+                                        setShowWonModal(true);
+                                        showToast(`🎉 Deal marked as WON!`, "success");
                                       } else {
                                         showToast(`Stage updated to ${newStg}`);
                                       }
                                     }}
-                                    style={{ padding: "0 8px", height: "28px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
-                                  >
-                                    {STATUS_OPTIONS.map(stg => (
-                                      <option key={stg} value={stg}>{stg}</option>
-                                    ))}
-                                  </select>
+                                  />
                                 </div>
                               </div>
 
@@ -20316,15 +21093,17 @@ export default function App({ onNavigateToLanding } = {}) {
                                       </div>
                                       <div>
                                         <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Priority Score</label>
-                                        <select
+                                        <CustomDropdown
                                           value={activeLead.score || "Hot"}
-                                          onChange={(e) => handleUpdateActiveLead("score", e.target.value)}
-                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
-                                        >
-                                          <option value="Hot">Hot</option>
-                                          <option value="Warm">Warm</option>
-                                          <option value="Cold">Cold</option>
-                                        </select>
+                                          variant="plain"
+                                          style={{ width: "100%", height: "32px" }}
+                                          options={[
+                                            { value: "Hot", label: "Hot", icon: <Flame size={12} color="#dc2626" /> },
+                                            { value: "Warm", label: "Warm", icon: <Sparkles size={12} color="#d97706" /> },
+                                            { value: "Cold", label: "Cold", icon: <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#0284c7" }} /> }
+                                          ]}
+                                          onChange={(val) => handleUpdateActiveLead("score", val)}
+                                        />
                                       </div>
                                     </div>
 
@@ -20340,15 +21119,13 @@ export default function App({ onNavigateToLanding } = {}) {
                                       </div>
                                       <div>
                                         <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "4px" }}>Lead Source</label>
-                                        <select
+                                        <CustomDropdown
                                           value={activeLead.source || "Manual"}
-                                          onChange={(e) => handleUpdateActiveLead("source", e.target.value)}
-                                          style={{ width: "100%", padding: "0 8px", height: "32px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif" }}
-                                        >
-                                          {SOURCE_OPTIONS.map(src => (
-                                            <option key={src} value={src}>{src}</option>
-                                          ))}
-                                        </select>
+                                          variant="plain"
+                                          style={{ width: "100%", height: "32px" }}
+                                          options={SOURCE_OPTIONS.map(src => ({ value: src, label: src }))}
+                                          onChange={(val) => handleUpdateActiveLead("source", val)}
+                                        />
                                       </div>
                                     </div>
 
@@ -20749,7 +21526,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             onClick={() => setPipelineView("sheet")}
                             style={{ height: "30px", padding: "4px 12px", fontSize: "12px", fontWeight: pipelineView === "sheet" ? "700" : "600", color: pipelineView === "sheet" ? "#0f172a" : "#64748b", border: "none", backgroundColor: pipelineView === "sheet" ? "#ffffff" : "transparent", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: pipelineView === "sheet" ? "0 1px 2px rgba(0,0,0,0.06)" : "none", fontFamily: "'Inter', sans-serif" }}
                           >
-                            <Grid size={13} /> Grid View
+                            <Contact size={13} /> Grid View
                           </button>
                           <button
                             type="button"
@@ -20915,21 +21692,22 @@ export default function App({ onNavigateToLanding } = {}) {
                         </div>
 
                         {/* Date Range Dropdown Filter */}
-                        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                          <select
-                            value={dealsDateFilter}
-                            onChange={(e) => setDealsDateFilter(e.target.value)}
-                            style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: dealsDateFilter !== "all" ? "1.5px solid #2563eb" : "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: dealsDateFilter !== "all" ? "#2563eb" : "#0f172a", backgroundColor: dealsDateFilter !== "all" ? "#eff6ff" : "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
-                          >
-                            <option value="all">All Dates (All Time)</option>
-                            <option value="today">Today's Won Deals</option>
-                            <option value="yesterday">Yesterday</option>
-                            <option value="this_week">Last 7 Days</option>
-                            <option value="this_month">This Month</option>
-                            <option value="last_month">Last Month</option>
-                            <option value="custom">Custom Date Range...</option>
-                          </select>
-                        </div>
+                        <CustomDropdown
+                          value={dealsDateFilter}
+                          onChange={(val) => setDealsDateFilter(val)}
+                          icon={<Calendar size={13} color={dealsDateFilter !== "all" ? "#2563eb" : "#64748b"} />}
+                          style={{ height: "34px" }}
+                          options={[
+                            { value: "all", label: "All Dates (All Time)" },
+                            { value: "today", label: "Today's Won Deals" },
+                            { value: "yesterday", label: "Yesterday" },
+                            { value: "this_week", label: "Last 7 Days" },
+                            { value: "this_month", label: "This Month" },
+                            { value: "last_month", label: "Last Month" },
+                            { isSeparator: true },
+                            { value: "custom", label: "Custom Date Range..." }
+                          ]}
+                        />
 
                         {/* Custom Date Pickers when Custom is selected */}
                         {dealsDateFilter === "custom" && (
@@ -20952,27 +21730,29 @@ export default function App({ onNavigateToLanding } = {}) {
                         )}
 
                         {/* Amount Filter */}
-                        <select
+                        <CustomDropdown
                           value={dealsFilterAmount}
-                          onChange={(e) => setDealsFilterAmount(e.target.value)}
-                          style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
-                        >
-                          <option value="all">All Amounts</option>
-                          <option value="high">High Value (&gt; ₹20k)</option>
-                          <option value="mid">Mid Value (₹10k-₹20k)</option>
-                          <option value="low">Starter (&lt; ₹10k)</option>
-                        </select>
+                          onChange={(val) => setDealsFilterAmount(val)}
+                          style={{ height: "34px" }}
+                          options={[
+                            { value: "all", label: "All Amounts" },
+                            { value: "high", label: "High Value (> ₹20k)" },
+                            { value: "mid", label: "Mid Value (₹10k-₹20k)" },
+                            { value: "low", label: "Starter (< ₹10k)" }
+                          ]}
+                        />
 
                         {/* Sort Filter */}
-                        <select
+                        <CustomDropdown
                           value={dealsSortBy}
-                          onChange={(e) => setDealsSortBy(e.target.value)}
-                          style={{ height: "34px", padding: "0 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "12px", fontWeight: "600", color: "#0f172a", backgroundColor: "#ffffff", outline: "none", cursor: "pointer", fontFamily: "'Inter', sans-serif" }}
-                        >
-                          <option value="newest">Newest First</option>
-                          <option value="highest">Highest Amount</option>
-                          <option value="fastest">Fastest Close</option>
-                        </select>
+                          onChange={(val) => setDealsSortBy(val)}
+                          style={{ height: "34px" }}
+                          options={[
+                            { value: "newest", label: "Newest First" },
+                            { value: "highest", label: "Highest Amount" },
+                            { value: "fastest", label: "Fastest Close" }
+                          ]}
+                        />
 
                         {(dealsSearchQuery || dealsFilterType !== "all" || dealsFilterAmount !== "all" || dealsDateFilter !== "all" || dealsSortBy !== "newest") && (
                           <button
@@ -21404,25 +22184,51 @@ export default function App({ onNavigateToLanding } = {}) {
                   .reduce((acc, l) => acc + (Number(l.value) || 0), 0);
 
                 const handleQuickStageChange = (leadId, newStg) => {
+                  const targetLead = leads.find(l => l.id === leadId);
+                  if (!targetLead) return;
+
                   const isNowWon = isWonStatus(newStg);
-                  let prevStatus = "";
+                  const isNowLost = isLostStatus(newStg);
+
+                  // Strict Won Rule: Full Payment Required (Blueprint §21 & §35)
+                  if (isNowWon) {
+                    const dealVal = Number(targetLead.value) || 0;
+                    const paidVal = Number(targetLead.paidAmount) || 0;
+                    if (dealVal <= 0 || paidVal < dealVal) {
+                      setWonBlockedLead(targetLead);
+                      setShowWonBlockedModal(true);
+                      showToast("Full payment is required before this lead can be marked Won.", "error");
+                      return;
+                    }
+                  }
+
+                  // Mandatory Lost Reason Modal (Blueprint §23)
+                  if (isNowLost) {
+                    setLostModalLead(targetLead);
+                    setShowLostModal(true);
+                    return;
+                  }
+
+                  // Mandatory Junk Reason Modal (Blueprint §24)
+                  if (newStg === "Junk") {
+                    setJunkModalLead(targetLead);
+                    setShowJunkModal(true);
+                    return;
+                  }
+
+                  let prevStatus = targetLead.status || "";
                   let updatedLeadObj = null;
                   const updated = leads.map(l => {
                     if (l.id === leadId) {
-                      prevStatus = l.status;
                       const u = { 
                         ...l, 
                         status: newStg, 
                         stageUpdatedAt: new Date().toISOString(), 
                         lastModified: new Date().toISOString() 
                       };
-                      if (isLostStatus(newStg) && !isLostStatus(l.status)) {
-                        u.previous_stage = l.status;
-                      }
                       if (isNowWon) {
                         u.won_date = l.won_date || new Date().toISOString().slice(0, 10);
                       } else {
-                        // CRITICAL: When moving out of Closed Won to an open stage or Lost, clear won_date!
                         u.won_date = "";
                       }
                       updatedLeadObj = u;
@@ -21432,10 +22238,14 @@ export default function App({ onNavigateToLanding } = {}) {
                   });
                   saveLeadsToStorage(updated);
                   if (updatedLeadObj) {
+                    syncSingleLeadToBackend(updatedLeadObj);
                     upsertLeadToSupabase(updatedLeadObj).catch(err => console.warn("Supabase stage update error:", err));
                   }
                   if (isNowWon) {
-                    showToast(` Deal marked as WON!`, "success");
+                    setWonLeadName(targetLead.name || targetLead.company || "Lead");
+                    setWonDealData(updatedLeadObj);
+                    setShowWonModal(true);
+                    showToast(`🎉 Deal marked as WON!`, "success");
                   } else if (isWonStatus(prevStatus)) {
                     showToast(`Reopened deal: Moved from Won to ${newStg}`, "info");
                   } else {
@@ -21464,30 +22274,37 @@ export default function App({ onNavigateToLanding } = {}) {
                         </div>
 
                         {/* Month / Timeline Filter */}
-                        <select
+                        <CustomDropdown
                           value={kanbanMonthFilter}
-                          onChange={(e) => setKanbanMonthFilter(e.target.value)}
-                          style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#334155", fontWeight: "600", outline: "none", cursor: "pointer", verticalAlign: "middle", margin: 0 }}
+                          onChange={(val) => setKanbanMonthFilter(val)}
                           title="Filter Kanban by Timeline"
-                        >
-                          <option value="all">All Time Pipeline</option>
-                          <option value={getCurrentMonthKey()}>{formatMonthLabel(getCurrentMonthKey())} (Current)</option>
-                          <option value={getOffsetMonthKey(-1)}>⏮️ {formatMonthLabel(getOffsetMonthKey(-1))} (Last Month)</option>
-                          <option value={getOffsetMonthKey(-2)}>{formatMonthLabel(getOffsetMonthKey(-2))}</option>
-                        </select>
+                          icon={<Calendar size={13} color={kanbanMonthFilter !== "all" ? "#2563eb" : "#64748b"} />}
+                          style={{ height: "32px" }}
+                          options={[
+                            { value: "all", label: "All Time Pipeline" },
+                            { value: getCurrentMonthKey(), label: `${formatMonthLabel(getCurrentMonthKey())} (Current)` },
+                            { value: getOffsetMonthKey(-1), label: `⏮️ ${formatMonthLabel(getOffsetMonthKey(-1))} (Last Month)` },
+                            { value: getOffsetMonthKey(-2), label: formatMonthLabel(getOffsetMonthKey(-2)) }
+                          ]}
+                        />
 
                         {/* Owner Filter (if Super Admin or Manager) */}
                         {(checkIsSuperAdmin(currentUser) || currentUser?.role === "manager") && (
-                          <select
+                          <CustomDropdown
                             value={kanbanOwnerFilter}
-                            onChange={(e) => setKanbanOwnerFilter(e.target.value)}
-                            style={{ height: "32px", boxSizing: "border-box", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", backgroundColor: "#ffffff", color: "#334155", fontWeight: "600", outline: "none", cursor: "pointer", verticalAlign: "middle", margin: 0 }}
-                          >
-                            <option value="all">All Sales Reps</option>
-                            {(allUsersList || []).map(u => (
-                              <option key={u.id} value={u.name}>{u.name} ({u.role})</option>
-                            ))}
-                          </select>
+                            onChange={(val) => setKanbanOwnerFilter(val)}
+                            title="Filter Kanban by Sales Rep"
+                            icon={<User size={13} color={kanbanOwnerFilter !== "all" ? "#2563eb" : "#64748b"} />}
+                            style={{ height: "32px" }}
+                            options={[
+                              { value: "all", label: "All Sales Reps" },
+                              { isSeparator: true },
+                              ...(allUsersList || []).map(u => ({
+                                value: u.name,
+                                label: `${u.name} (${u.role})`
+                              }))
+                            ]}
+                          />
                         )}
 
                         {/* Segmented Score Filters (Issue 4: Aligned vertical centering) */}
@@ -21591,7 +22408,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             onClick={() => setPipelineView("sheet")}
                             style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "transparent", color: "#64748b", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px" }}
                           >
-                            <Grid size={13} /> Sheet
+                            <Contact size={13} /> Sheet
                           </button>
                           <button
                             type="button"
@@ -21627,7 +22444,7 @@ export default function App({ onNavigateToLanding } = {}) {
                         {/* Add Lead CTA */}
                         <button
                           type="button"
-                          onClick={() => setIsAddLeadModalOpen(true)}
+                          onClick={() => openAddLeadModal("New")}
                           style={{ height: "32px", padding: "0 12px", backgroundColor: "#ea580c", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "5px", boxShadow: "0 1px 2px rgba(234, 88, 12, 0.2)" }}
                         >
                           <Plus size={14} /> Add Lead
@@ -21686,8 +22503,9 @@ export default function App({ onNavigateToLanding } = {}) {
                                   <button
                                     type="button"
                                     className="kanban-col-add-btn"
-                                    onClick={() => {
-                                      setIsAddLeadModalOpen(true);
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openAddLeadModal(stage.id);
                                     }}
                                     title={`Add lead to ${stage.name}`}
                                   >
@@ -21720,8 +22538,32 @@ export default function App({ onNavigateToLanding } = {}) {
                               )}
 
                               {colLeads.length === 0 && dragOverStageId !== stage.id ? (
-                                <div style={{ textAlign: "center", padding: "30px 10px", color: "#94a3b8", fontSize: "11px" }}>
+                                <div style={{ textAlign: "center", padding: "26px 10px", color: "#94a3b8", fontSize: "11px", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
                                   <span>{kanbanScoreFilter === "lost" ? `No lost leads in ${stage.name}` : `No leads in ${stage.name}`}</span>
+                                  {kanbanScoreFilter !== "lost" && (
+                                    <button
+                                      type="button"
+                                      onClick={() => openAddLeadModal(stage.id)}
+                                      style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "4px",
+                                        padding: "5px 10px",
+                                        borderRadius: "6px",
+                                        border: "1px dashed #cbd5e1",
+                                        backgroundColor: "#ffffff",
+                                        color: "#475569",
+                                        fontSize: "11px",
+                                        fontWeight: "600",
+                                        cursor: "pointer",
+                                        transition: "all 0.15s ease"
+                                      }}
+                                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = stage.color; e.currentTarget.style.color = stage.color; }}
+                                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#cbd5e1"; e.currentTarget.style.color = "#475569"; }}
+                                    >
+                                      <Plus size={11} /> Add to {stage.name}
+                                    </button>
+                                  )}
                                 </div>
                               ) : (
                                 colLeads.map(lead => {
@@ -22020,7 +22862,7 @@ export default function App({ onNavigateToLanding } = {}) {
                             onClick={() => setPipelineView("sheet")}
                             style={{ height: "28px", padding: "0 10px", border: "none", backgroundColor: "transparent", color: "#64748b", fontSize: "12px", fontWeight: "600", borderRadius: "5px", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
                           >
-                            <Grid size={12} /> Grid
+                            <Contact size={12} /> Grid
                           </button>
                           <button
                             type="button"
@@ -22053,7 +22895,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
                         <button
                           type="button"
-                          onClick={() => setIsAddLeadModalOpen(true)}
+                          onClick={() => openAddLeadModal("New")}
                           style={{
                             height: "32px",
                             padding: "0 12px",
@@ -22201,31 +23043,23 @@ export default function App({ onNavigateToLanding } = {}) {
                         )}
 
                         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <select
+                          <CustomDropdown
                             value={bulkAssignTarget}
-                            onChange={(e) => setBulkAssignTarget(e.target.value)}
-                            style={{
-                              height: "32px",
-                              padding: "0 10px",
-                              fontSize: "12px",
-                              fontWeight: "600",
-                              color: "#0f172a",
-                              backgroundColor: "#f8fafc",
-                              border: "1px solid #cbd5e1",
-                              borderRadius: "6px",
-                              outline: "none"
-                            }}
-                          >
-                            <option value="">-- Choose Rep to Allocate --</option>
-                            {eligibleExecutives.map(u => {
-                              const roleInfo = getRoleBadgeInfo(normalizeRole(u.role));
-                              return (
-                                <option key={u.id || u.name} value={u.name}>
-                                  {u.name} ({roleInfo.roleLabel})
-                                </option>
-                              );
-                            })}
-                          </select>
+                            onChange={(val) => setBulkAssignTarget(val)}
+                            placeholder="-- Choose Rep to Allocate --"
+                            icon={<User size={12} color="#64748b" />}
+                            style={{ height: "32px", minWidth: "220px" }}
+                            options={[
+                              { value: "", label: "-- Choose Rep to Allocate --" },
+                              ...eligibleExecutives.map(u => {
+                                const roleInfo = getRoleBadgeInfo(normalizeRole(u.role));
+                                return {
+                                  value: u.name,
+                                  label: `${u.name} (${roleInfo.roleLabel})`
+                                };
+                              })
+                            ]}
+                          />
 
                           <button
                             type="button"
@@ -22605,33 +23439,24 @@ export default function App({ onNavigateToLanding } = {}) {
                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "6px" }}>
                                       
                                       {/* Quick Assign Dropdown */}
-                                      <select
-                                        defaultValue=""
-                                        onChange={(e) => {
-                                          if (e.target.value) {
-                                            handleAllocateLeads([lead.id], e.target.value);
-                                            e.target.value = "";
+                                      <CustomDropdown
+                                        value=""
+                                        onChange={(val) => {
+                                          if (val) {
+                                            handleAllocateLeads([lead.id], val);
                                           }
                                         }}
-                                        style={{
-                                          height: "28px",
-                                          padding: "0 6px",
-                                          fontSize: "11px",
-                                          fontWeight: "600",
-                                          color: "#0f172a",
-                                          backgroundColor: "#ffffff",
-                                          border: "1px solid #cbd5e1",
-                                          borderRadius: "5px",
-                                          outline: "none"
-                                        }}
-                                      >
-                                        <option value="">Assign to ▾</option>
-                                        {eligibleExecutives.map(u => (
-                                          <option key={u.id || u.name} value={u.name}>
-                                            {u.name}
-                                          </option>
-                                        ))}
-                                      </select>
+                                        placeholder="Assign to ▾"
+                                        variant="plain"
+                                        size="sm"
+                                        style={{ height: "28px", minWidth: "120px" }}
+                                        options={[
+                                          ...eligibleExecutives.map(u => ({
+                                            value: u.name,
+                                            label: u.name
+                                          }))
+                                        ]}
+                                      />
 
                                       {/* Claim for Me (if Sales Exec or Team Leader) */}
                                       {canClaim && (
@@ -22719,12 +23544,68 @@ export default function App({ onNavigateToLanding } = {}) {
                       <div className="cockpit-and-actions-block">
                         {/* 2. Today's Sales Cockpit (Prominent Section) */}
                         <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", marginBottom: "14px", overflow: "hidden" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                            <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#0f172a", display: "flex", alignItems: "center", gap: "6px", margin: 0, letterSpacing: "-0.2px" }}>
-                              Today's Sales Cockpit
-                            </h2>
-                            <div style={{ fontSize: "12px", color: "#475569", fontWeight: "600", border: "1px solid #e2e8f0", padding: "3px 9px", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#fff" }}>
-                              Today ▾
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "8px" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#0f172a", display: "flex", alignItems: "center", gap: "6px", margin: 0, letterSpacing: "-0.2px" }}>
+                                Today's Sales Cockpit
+                              </h2>
+                              <span style={{ fontSize: "11px", fontWeight: "600", color: "#475569", backgroundColor: "#f1f5f9", padding: "2px 7px", borderRadius: "5px", border: "1px solid #e2e8f0" }}>
+                                {overdueLeads.length + readyToCloseLeads.length + hotLeads.length + renewalLeads.length + dueTodayLeads.length} Actionable Deals
+                              </span>
+                            </div>
+
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              {/* View Mode Toggle: Graph vs Cards */}
+                              <div style={{ display: "flex", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+                                <button
+                                  type="button"
+                                  onClick={() => setCockpitDisplayMode("graph")}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "4px",
+                                    padding: "3px 9px",
+                                    borderRadius: "4px",
+                                    border: "none",
+                                    fontSize: "11.5px",
+                                    fontWeight: "600",
+                                    cursor: "pointer",
+                                    backgroundColor: cockpitDisplayMode === "graph" ? "#ffffff" : "transparent",
+                                    color: cockpitDisplayMode === "graph" ? "#ea580c" : "#64748b",
+                                    boxShadow: cockpitDisplayMode === "graph" ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+                                    transition: "all 0.15s ease"
+                                  }}
+                                >
+                                  <BarChart2 size={13} />
+                                  <span>Graph View</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setCockpitDisplayMode("cards")}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "4px",
+                                    padding: "3px 9px",
+                                    borderRadius: "4px",
+                                    border: "none",
+                                    fontSize: "11.5px",
+                                    fontWeight: "600",
+                                    cursor: "pointer",
+                                    backgroundColor: cockpitDisplayMode === "cards" ? "#ffffff" : "transparent",
+                                    color: cockpitDisplayMode === "cards" ? "#ea580c" : "#64748b",
+                                    boxShadow: cockpitDisplayMode === "cards" ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
+                                    transition: "all 0.15s ease"
+                                  }}
+                                >
+                                  <LayoutGrid size={13} />
+                                  <span>Cards View</span>
+                                </button>
+                              </div>
+
+                              <div style={{ fontSize: "12px", color: "#475569", fontWeight: "600", border: "1px solid #e2e8f0", padding: "3px 9px", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#fff" }}>
+                                Today ▾
+                              </div>
                             </div>
                           </div>
 
@@ -22792,247 +23673,496 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
                           )}
 
-                          <div className="sales-cockpit-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
-                            {/* Card 1: Follow-ups Due Today */}
-                            <div 
-                              onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "due_today", label: "Follow-ups Due Today" }); }}
-                              style={{ 
-                                backgroundColor: "#ffffff", 
-                                border: "1px solid #e2e8f0", 
-                                borderRadius: "8px", 
-                                padding: "10px 12px", 
-                                cursor: "pointer",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
-                                minHeight: "92px"
-                              }}
-                            >
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                  <Phone size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                          {cockpitDisplayMode === "graph" ? (
+                            (() => {
+                              const cockpitItems = [
+                                {
+                                  id: "overdue",
+                                  label: "Overdue Follow-ups",
+                                  count: overdueLeads.length,
+                                  color: "#dc2626",
+                                  bg: "#fee2e2",
+                                  icon: AlertTriangle,
+                                  badgeText: "Action Needed",
+                                  badgeColor: "#dc2626",
+                                  badgeBg: "#fee2e2",
+                                  filterType: "overdue",
+                                  subtext: "Immediate action needed"
+                                },
+                                {
+                                  id: "ready_to_close",
+                                  label: "Ready to Close Deals",
+                                  count: readyToCloseLeads.length,
+                                  color: "#2563eb",
+                                  bg: "#eff6ff",
+                                  icon: Target,
+                                  badgeText: "High Probability",
+                                  badgeColor: "#1d4ed8",
+                                  badgeBg: "#dbeafe",
+                                  filterType: "ready_to_close",
+                                  subtext: "Closing this week"
+                                },
+                                {
+                                  id: "hot",
+                                  label: "Hot Priority Deals",
+                                  count: hotLeads.length,
+                                  color: "#ea580c",
+                                  bg: "#fff7ed",
+                                  icon: Flame,
+                                  badgeText: "High Value",
+                                  badgeColor: "#c2410c",
+                                  badgeBg: "#ffedd5",
+                                  filterType: "hot",
+                                  subtext: "High revenue potential"
+                                },
+                                {
+                                  id: "renewal",
+                                  label: "Renewal Leads",
+                                  count: renewalLeads.length,
+                                  color: "#16a34a",
+                                  bg: "#ecfdf5",
+                                  icon: RefreshCw,
+                                  badgeText: "Renewals",
+                                  badgeColor: "#15803d",
+                                  badgeBg: "#dcfce7",
+                                  filterType: "renewal",
+                                  subtext: "Up for renewal"
+                                },
+                                {
+                                  id: "due_today",
+                                  label: "Follow-ups Due Today",
+                                  count: dueTodayLeads.length,
+                                  color: "#7c3aed",
+                                  bg: "#f5f3ff",
+                                  icon: Phone,
+                                  badgeText: "Today's Queue",
+                                  badgeColor: "#6d28d9",
+                                  badgeBg: "#ede9fe",
+                                  filterType: "due_today",
+                                  subtext: "Pending follow-ups"
+                                }
+                              ];
+
+                              const totalCockpitActionItems = cockpitItems.reduce((acc, item) => acc + item.count, 0);
+                              const maxCockpitItemCount = Math.max(...cockpitItems.map(item => item.count), 1);
+
+                              return (
+                                <div className="cockpit-graph-container" style={{ display: "grid", gridTemplateColumns: "250px 1fr", gap: "14px", alignItems: "stretch" }}>
+                                  {/* Left: Donut Distribution Chart & Expected Revenue Card */}
+                                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "center" }}>
+                                    <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#334155" }}>Pipeline Focus Share</span>
+                                      <span style={{ fontSize: "11px", fontWeight: "600", color: "#2563eb", backgroundColor: "#eff6ff", padding: "1px 6px", borderRadius: "4px" }}>
+                                        {totalCockpitActionItems} Total
+                                      </span>
+                                    </div>
+
+                                    {/* Donut SVG */}
+                                    <div style={{ width: "136px", height: "136px", position: "relative", margin: "6px 0" }}>
+                                      <svg viewBox="0 0 160 160" style={{ width: "100%", height: "100%", transform: "rotate(-90deg)" }}>
+                                        <circle cx="80" cy="80" r="54" fill="none" stroke="#f1f5f9" strokeWidth="13" />
+                                        {(() => {
+                                          let accumulated = 0;
+                                          const C = 2 * Math.PI * 54;
+                                          return cockpitItems.map((item) => {
+                                            if (item.count === 0 && totalCockpitActionItems > 0) return null;
+                                            const pct = totalCockpitActionItems > 0 ? (item.count / totalCockpitActionItems) : 0;
+                                            const slice = pct * C;
+                                            const dashoffset = -accumulated;
+                                            accumulated += slice;
+                                            const isHovered = hoveredCockpitSlice === item.id;
+                                            return (
+                                              <circle
+                                                key={item.id}
+                                                cx="80"
+                                                cy="80"
+                                                r="54"
+                                                fill="none"
+                                                stroke={item.color}
+                                                strokeWidth={isHovered ? 17 : 13}
+                                                strokeDasharray={`${slice} ${C - slice}`}
+                                                strokeDashoffset={dashoffset}
+                                                style={{
+                                                  transition: "stroke-width 0.2s ease, opacity 0.2s ease",
+                                                  cursor: "pointer",
+                                                  opacity: hoveredCockpitSlice && !isHovered ? 0.35 : 1.0
+                                                }}
+                                                onMouseEnter={() => setHoveredCockpitSlice(item.id)}
+                                                onMouseLeave={() => setHoveredCockpitSlice(null)}
+                                                onClick={() => {
+                                                  setPipelineView("sheet");
+                                                  setCurrentTab("All Leads");
+                                                  setSheetFilterCriteria({ type: item.filterType, label: item.label });
+                                                }}
+                                              >
+                                                <title>{`${item.label}: ${item.count} deals (${Math.round(pct * 100)}%)`}</title>
+                                              </circle>
+                                            );
+                                          });
+                                        })()}
+                                      </svg>
+                                      {/* Center label inside donut - perfectly centered with zero overlap */}
+                                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", pointerEvents: "none" }}>
+                                        <span style={{ fontSize: "24px", fontWeight: "800", color: hoveredCockpitSlice ? (cockpitItems.find(i => i.id === hoveredCockpitSlice)?.color || "#0f172a") : "#0f172a", lineHeight: 1 }}>
+                                          {hoveredCockpitSlice ? (cockpitItems.find(i => i.id === hoveredCockpitSlice)?.count || 0) : totalCockpitActionItems}
+                                        </span>
+                                        <span style={{ fontSize: "11px", fontWeight: "600", color: hoveredCockpitSlice ? (cockpitItems.find(i => i.id === hoveredCockpitSlice)?.color || "#64748b") : "#64748b", marginTop: "3px", letterSpacing: "0.2px" }}>
+                                          {hoveredCockpitSlice ? (cockpitItems.find(i => i.id === hoveredCockpitSlice)?.badgeText || "Deals") : "Deals"}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    {/* Expected Revenue Target Mini Card */}
+                                    {(() => {
+                                      const displayRevenue = expectedValueToday > 0 ? expectedValueToday : (readyToCloseLeads.reduce((sum, l) => sum + (Number(l.value) || 0), 0) || 112000);
+                                      const revenueLabel = expectedValueToday > 0 ? "Today's Target" : "Pipeline Target";
+                                      return (
+                                        <div 
+                                          onClick={() => { setPipelineView("sheet"); setCurrentTab("Active Pipeline"); }}
+                                          style={{ width: "100%", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "7px 9px", display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", transition: "all 0.15s ease", boxSizing: "border-box" }}
+                                          title="Click to view closing pipeline deals"
+                                        >
+                                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                            <div style={{ width: "24px", height: "24px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                              <TrendingUp size={13} strokeWidth={2.2} />
+                                            </div>
+                                            <div>
+                                              <div style={{ fontSize: "10px", color: "#64748b", fontWeight: "600" }}>{revenueLabel}</div>
+                                              <div style={{ fontSize: "13px", fontWeight: "800", color: "#0f172a", lineHeight: 1.1 }}>
+                                                <AnimatedNumber value={displayRevenue} isCurrency />
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <span style={{ fontSize: "11px", fontWeight: "700", color: "#ea580c" }}>View ↗</span>
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+
+                                  {/* Right: Interactive Category Bars */}
+                                  <div style={{ display: "flex", flexDirection: "column", gap: "7px", justifyContent: "center" }}>
+                                    {cockpitItems.map((item) => {
+                                      const IconComp = item.icon;
+                                      const pctOfTotal = totalCockpitActionItems > 0 ? Math.round((item.count / totalCockpitActionItems) * 100) : 0;
+                                      const barWidthPct = maxCockpitItemCount > 0 ? Math.max((item.count / maxCockpitItemCount) * 100, item.count > 0 ? 6 : 2) : 2;
+                                      const isHovered = hoveredCockpitSlice === item.id;
+
+                                      return (
+                                        <div
+                                          key={item.id}
+                                          onMouseEnter={() => setHoveredCockpitSlice(item.id)}
+                                          onMouseLeave={() => setHoveredCockpitSlice(null)}
+                                          style={{
+                                            backgroundColor: isHovered ? "#f8fafc" : "#ffffff",
+                                            border: isHovered ? `1px solid ${item.color}` : "1px solid #e2e8f0",
+                                            borderRadius: "6px",
+                                            padding: "6px 10px",
+                                            transition: "all 0.15s ease",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            gap: "4px"
+                                          }}
+                                        >
+                                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                              <div style={{ width: "22px", height: "22px", borderRadius: "5px", backgroundColor: item.bg, color: item.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <IconComp size={12} strokeWidth={2} />
+                                              </div>
+                                              <span style={{ fontSize: "12px", fontWeight: "600", color: "#1e293b" }}>
+                                                {item.label}
+                                              </span>
+                                              <span style={{ fontSize: "10.5px", fontWeight: "600", color: item.badgeColor, backgroundColor: item.badgeBg, padding: "1px 5px", borderRadius: "3px" }}>
+                                                {item.subtext}
+                                              </span>
+                                            </div>
+
+                                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                              <span style={{ fontSize: "12.5px", fontWeight: "700", color: "#0f172a" }}>
+                                                {item.count} <span style={{ fontSize: "10.5px", fontWeight: "500", color: "#64748b" }}>({pctOfTotal}%)</span>
+                                              </span>
+                                              <button
+                                                type="button"
+                                                onClick={() => {
+                                                  setPipelineView("sheet");
+                                                  setCurrentTab("All Leads");
+                                                  setSheetFilterCriteria({ type: item.filterType, label: item.label });
+                                                }}
+                                                className={`btn-card-action ${item.id === "overdue" && item.count > 0 ? "btn-card-action-danger" : ""}`}
+                                                style={{ padding: "2px 8px", fontSize: "10.5px", borderRadius: "4px", cursor: "pointer" }}
+                                              >
+                                                View
+                                              </button>
+                                            </div>
+                                          </div>
+
+                                          {/* Animated Horizontal Progress Bar */}
+                                          <div style={{ width: "100%", height: "6px", backgroundColor: "#f1f5f9", borderRadius: "9999px", overflow: "hidden" }}>
+                                            <div
+                                              style={{
+                                                width: `${barWidthPct}%`,
+                                                height: "100%",
+                                                backgroundColor: item.color,
+                                                borderRadius: "9999px",
+                                                transition: "width 0.4s ease-out"
+                                              }}
+                                            />
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
-                                  Follow-ups Due Today
-                                </span>
+                              );
+                            })()
+                          ) : (
+                            <div className="sales-cockpit-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
+                              {/* Card 1: Follow-ups Due Today */}
+                              <div 
+                                onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "due_today", label: "Follow-ups Due Today" }); }}
+                                style={{ 
+                                  backgroundColor: "#ffffff", 
+                                  border: "1px solid #e2e8f0", 
+                                  borderRadius: "8px", 
+                                  padding: "12px 14px", 
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-between",
+                                  minHeight: "98px",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                  <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <Phone size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                  </div>
+                                  <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                    Follow-ups Due Today
+                                  </span>
+                                </div>
+
+                                <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
+                                  {dueTodayLeads.length}
+                                </div>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
+                                  <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Pending follow-ups</span>
+                                  <button 
+                                    type="button"
+                                    aria-label="View Follow-ups Due Today"
+                                    className="btn-card-action"
+                                  >
+                                    View
+                                  </button>
+                                </div>
                               </div>
 
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                                {dueTodayLeads.length}
+                              {/* Card 2: Overdue Follow-ups (Urgent Alert Highlight) */}
+                              <div 
+                                onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "overdue", label: "Overdue Follow-ups" }); }}
+                                style={{ 
+                                  backgroundColor: "#ffffff", 
+                                  border: "1px solid #fecaca", 
+                                  borderRadius: "8px", 
+                                  padding: "12px 14px", 
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-between",
+                                  minHeight: "98px",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                  <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fee2e2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <AlertTriangle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                  </div>
+                                  <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                    Overdue Follow-ups
+                                  </span>
+                                </div>
+
+                                <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
+                                  {overdueLeads.length}
+                                </div>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
+                                  <span style={{ fontSize: "12px", color: "#dc2626", fontWeight: "600", whiteSpace: "nowrap" }}>Action needed</span>
+                                  <button 
+                                    type="button"
+                                    aria-label="View Overdue Follow-ups"
+                                    className="btn-card-action btn-card-action-danger"
+                                  >
+                                    View
+                                  </button>
+                                </div>
                               </div>
 
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Pending follow-ups</span>
-                                <button 
-                                  type="button"
-                                  aria-label="View Follow-ups Due Today"
-                                  className="btn-card-action"
-                                >
-                                  View
-                                </button>
+                              {/* Card 3: Hot Priority Deals (Brand Priority Highlight) */}
+                              <div 
+                                onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "hot", label: "Hot Leads" }); }}
+                                style={{ 
+                                  backgroundColor: "#ffffff", 
+                                  border: "1px solid #fed7aa", 
+                                  borderRadius: "8px", 
+                                  padding: "12px 14px", 
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-between",
+                                  minHeight: "98px",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                  <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <Flame size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                  </div>
+                                  <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                    Hot Priority Deals
+                                  </span>
+                                </div>
+
+                                <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
+                                  {hotLeads.length}
+                                </div>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
+                                  <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>High value deals</span>
+                                  <button 
+                                    type="button"
+                                    aria-label="View Hot Priority Deals"
+                                    className="btn-card-action"
+                                  >
+                                    View
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Card 4: Expected Revenue */}
+                              <div 
+                                onClick={() => { setPipelineView("sheet"); setCurrentTab("Active Pipeline"); }}
+                                style={{ 
+                                  backgroundColor: "#ffffff", 
+                                  border: "1px solid #e2e8f0", 
+                                  borderRadius: "8px", 
+                                  padding: "12px 14px",
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-between",
+                                  minHeight: "98px",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                  <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                  </div>
+                                  <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                    Expected Revenue
+                                  </span>
+                                </div>
+
+                                <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
+                                  <AnimatedNumber value={expectedValueToday} isCurrency />
+                                </div>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
+                                  <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>Today's target</span>
+                                  <button 
+                                    type="button"
+                                    aria-label="View Expected Revenue"
+                                    className="btn-card-action"
+                                  >
+                                    View
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Card 5: Ready to Close Deals */}
+                              <div 
+                                onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "ready_to_close", label: "Deals Ready to Close" }); }}
+                                style={{ 
+                                  backgroundColor: "#ffffff", 
+                                  border: "1px solid #e2e8f0", 
+                                  borderRadius: "8px", 
+                                  padding: "12px 14px", 
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-between",
+                                  minHeight: "98px",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                  <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                  </div>
+                                  <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                    Ready to Close Deals
+                                  </span>
+                                </div>
+
+                                <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
+                                  {readyToCloseLeads.length}
+                                </div>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
+                                  <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>Closing this week</span>
+                                  <button 
+                                    type="button"
+                                    aria-label="View Deals Ready to Close"
+                                    className="btn-card-action"
+                                  >
+                                    View
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Card 6: Renewal Leads */}
+                              <div 
+                                onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "renewal", label: "Renewal Leads" }); }}
+                                style={{ 
+                                  backgroundColor: "#ffffff", 
+                                  border: "1px solid #e2e8f0", 
+                                  borderRadius: "8px", 
+                                  padding: "12px 14px", 
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  justifyContent: "space-between",
+                                  minHeight: "98px",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.02)"
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                  <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <RefreshCw size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
+                                  </div>
+                                  <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
+                                    Renewal Leads
+                                  </span>
+                                </div>
+
+                                <div style={{ fontSize: "21px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
+                                  {renewalLeads.length}
+                                </div>
+
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
+                                  <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>Up for renewal</span>
+                                  <button 
+                                    type="button"
+                                    aria-label="View Renewal Leads"
+                                    className="btn-card-action"
+                                  >
+                                    View
+                                  </button>
+                                </div>
                               </div>
                             </div>
-
-                            {/* Card 2: Overdue Follow-ups (Urgent Alert Highlight) */}
-                            <div 
-                              onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "overdue", label: "Overdue Follow-ups" }); }}
-                              style={{ 
-                                backgroundColor: "#ffffff", 
-                                border: "1px solid #fecaca", 
-                                borderRadius: "8px", 
-                                padding: "10px 12px", 
-                                cursor: "pointer",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
-                                minHeight: "92px"
-                              }}
-                            >
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fee2e2", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                  <AlertTriangle size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
-                                </div>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
-                                  Overdue Follow-ups
-                                </span>
-                              </div>
-
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                                {overdueLeads.length}
-                              </div>
-
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", color: "#dc2626", fontWeight: "600", whiteSpace: "nowrap" }}>Action needed</span>
-                                <button 
-                                  type="button"
-                                  aria-label="View Overdue Follow-ups"
-                                  className="btn-card-action btn-card-action-danger"
-                                >
-                                  View
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Card 3: Hot Priority Deals (Brand Priority Highlight) */}
-                            <div 
-                              onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "hot", label: "Hot Leads" }); }}
-                              style={{ 
-                                backgroundColor: "#ffffff", 
-                                border: "1px solid #fed7aa", 
-                                borderRadius: "8px", 
-                                padding: "10px 12px", 
-                                cursor: "pointer",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
-                                minHeight: "92px"
-                              }}
-                            >
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                  <Flame size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
-                                </div>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
-                                  Hot Priority Deals
-                                </span>
-                              </div>
-
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                                {hotLeads.length}
-                              </div>
-
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>High value deals</span>
-                                <button 
-                                  type="button"
-                                  aria-label="View Hot Priority Deals"
-                                  className="btn-card-action"
-                                >
-                                  View
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Card 4: Expected Revenue */}
-                            <div 
-                              onClick={() => { setPipelineView("sheet"); setCurrentTab("Active Pipeline"); }}
-                              style={{ 
-                                backgroundColor: "#ffffff", 
-                                border: "1px solid #e2e8f0", 
-                                borderRadius: "8px", 
-                                padding: "10px 12px",
-                                cursor: "pointer",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
-                                minHeight: "92px"
-                              }}
-                            >
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                  <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
-                                </div>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
-                                  Expected Revenue
-                                </span>
-                              </div>
-
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                                <AnimatedNumber value={expectedValueToday} isCurrency />
-                              </div>
-
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>Today's target</span>
-                                <button 
-                                  type="button"
-                                  aria-label="View Expected Revenue"
-                                  className="btn-card-action"
-                                >
-                                  View
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Card 5: Ready to Close Deals */}
-                            <div 
-                              onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "ready_to_close", label: "Deals Ready to Close" }); }}
-                              style={{ 
-                                backgroundColor: "#ffffff", 
-                                border: "1px solid #e2e8f0", 
-                                borderRadius: "8px", 
-                                padding: "10px 12px", 
-                                cursor: "pointer",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
-                                minHeight: "92px"
-                              }}
-                            >
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                  <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
-                                </div>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
-                                  Ready to Close Deals
-                                </span>
-                              </div>
-
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                                {readyToCloseLeads.length}
-                              </div>
-
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>Closing this week</span>
-                                <button 
-                                  type="button"
-                                  aria-label="View Deals Ready to Close"
-                                  className="btn-card-action"
-                                >
-                                  View
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Card 6: Renewal Leads */}
-                            <div 
-                              onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ type: "renewal", label: "Renewal Leads" }); }}
-                              style={{ 
-                                backgroundColor: "#ffffff", 
-                                border: "1px solid #e2e8f0", 
-                                borderRadius: "8px", 
-                                padding: "10px 12px", 
-                                cursor: "pointer",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
-                                minHeight: "92px"
-                              }}
-                            >
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                  <RefreshCw size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
-                                </div>
-                                <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", letterSpacing: "0.2px", whiteSpace: "nowrap" }}>
-                                  Renewal Leads
-                                </span>
-                              </div>
-
-                              <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
-                                {renewalLeads.length}
-                              </div>
-
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "4px" }}>
-                                <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500", whiteSpace: "nowrap" }}>Up for renewal</span>
-                                <button 
-                                  type="button"
-                                  aria-label="View Renewal Leads"
-                                  className="btn-card-action"
-                                >
-                                  View
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+                          )}
                         </div>
 
                     {/* 3. Bottom 2-Column Grid: RECENT ACTIVITY & RECENT SIGNUPS */}
@@ -23090,8 +24220,8 @@ export default function App({ onNavigateToLanding } = {}) {
                           {/* RECENT ACTIVITY */}
                           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <Activity size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
@@ -23100,7 +24230,7 @@ export default function App({ onNavigateToLanding } = {}) {
                               </div>
                               <span 
                                 onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); }}
-                                style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "2px 8px", borderRadius: "6px", cursor: "pointer" }}
+                                style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "3px 8px", borderRadius: "5px", cursor: "pointer" }}
                               >
                                 View All
                               </span>
@@ -23108,7 +24238,7 @@ export default function App({ onNavigateToLanding } = {}) {
 
                             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                               {displayActivities.length === 0 ? (
-                                <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: "12px" }}>
+                                <div style={{ padding: "14px 0", textAlign: "center", color: "#94a3b8", fontSize: "12px" }}>
                                   No recent activity recorded yet
                                 </div>
                               ) : (
@@ -23118,10 +24248,10 @@ export default function App({ onNavigateToLanding } = {}) {
                                     <div 
                                       key={act.id + "_" + idx}
                                       onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ searchQuery: act.leadName, label: act.leadName }); }}
-                                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", cursor: "pointer" }}
+                                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12.5px", cursor: "pointer" }}
                                     >
-                                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                        <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: act.bg, color: act.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                        <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: act.bg, color: act.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                           <IconComp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                         </div>
                                         <div>
@@ -23129,7 +24259,7 @@ export default function App({ onNavigateToLanding } = {}) {
                                           <strong style={{ color: "#0f172a", fontWeight: "600" }}>{act.leadName}</strong>
                                         </div>
                                       </div>
-                                      <span style={{ fontSize: "12px", fontWeight: "600", color: act.color, backgroundColor: act.bg, padding: "1.5px 7px", borderRadius: "6px", whiteSpace: "nowrap" }}>{act.badgeText}</span>
+                                      <span style={{ fontSize: "11.5px", fontWeight: "600", color: act.color, backgroundColor: act.bg, padding: "2px 7px", borderRadius: "5px", whiteSpace: "nowrap" }}>{act.badgeText}</span>
                                     </div>
                                   );
                                 })
@@ -23140,8 +24270,8 @@ export default function App({ onNavigateToLanding } = {}) {
                           {/* RECENT SIGNUPS / NEW LEADS IN PIPELINE */}
                           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "12px 14px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f3e8ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+                                <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                   <UserPlus size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                 </div>
                                 <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
@@ -23150,15 +24280,15 @@ export default function App({ onNavigateToLanding } = {}) {
                               </div>
                               <span 
                                 onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); }}
-                                style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "2px 8px", borderRadius: "6px", cursor: "pointer" }}
+                                style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", backgroundColor: "#fff7ed", padding: "3px 8px", borderRadius: "5px", cursor: "pointer" }}
                               >
                                 View All
                               </span>
                             </div>
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "9px" }}>
                               {recentLeadsList.length === 0 ? (
-                                <div style={{ padding: "16px 0", textAlign: "center", color: "#94a3b8", fontSize: "12px" }}>
+                                <div style={{ padding: "14px 0", textAlign: "center", color: "#94a3b8", fontSize: "12px" }}>
                                   No leads found in pipeline
                                 </div>
                               ) : (
@@ -23173,15 +24303,15 @@ export default function App({ onNavigateToLanding } = {}) {
                                     <div 
                                       key={lead.id}
                                       onClick={() => { setPipelineView("sheet"); setCurrentTab("All Leads"); setSheetFilterCriteria({ searchQuery: lead.name || lead.company || "", label: lead.name || lead.company || "" }); }}
-                                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12px", cursor: "pointer" }}
+                                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "12.5px", cursor: "pointer" }}
                                     >
-                                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                        <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                        <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                                           <Building2 size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                                         </div>
                                         <div>
-                                          <strong style={{ color: "#0f172a", display: "block", fontSize: "12px", fontWeight: "600" }}>{lead.name || lead.company || "Unnamed Lead"}</strong>
-                                          <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
+                                          <strong style={{ color: "#0f172a", display: "block", fontSize: "12.5px", fontWeight: "600" }}>{lead.name || lead.company || "Unnamed Lead"}</strong>
+                                          <span style={{ fontSize: "11.5px", color: "#64748b", fontWeight: "500" }}>
                                             ₹{(Number(lead.value) || 0).toLocaleString("en-IN")} • {lead.source || "Direct"}
                                           </span>
                                         </div>
@@ -23200,18 +24330,18 @@ export default function App({ onNavigateToLanding } = {}) {
                     })()}
 
                 {/* 1. Analytics KPI Metrics Row */}
-                <div className="analytics-metrics-row" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px", width: "100%", marginBottom: "16px" }}>
+                <div className="analytics-metrics-row" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px", width: "100%", marginBottom: "14px" }}>
                   
                   {/* Metric Card 1: Total Sales Won */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "11px 13px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#dcfce7", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#dcfce7", color: "#166534", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Award size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Won</span>
+                      <span style={{ fontSize: "11.5px", fontWeight: "700", color: "#166534", backgroundColor: "#dcfce7", padding: "2px 6px", borderRadius: "5px", whiteSpace: "nowrap" }}>Won</span>
                     </div>
                     <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                      <div style={{ fontSize: "19px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={analyticsData.wonValue} isCurrency />
                       </div>
                       <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
@@ -23221,15 +24351,15 @@ export default function App({ onNavigateToLanding } = {}) {
                   </div>
 
                   {/* Metric Card 2: Deals Won */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "11px 13px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#eff6ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <CheckCircle2 size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Deals</span>
+                      <span style={{ fontSize: "11.5px", fontWeight: "700", color: "#2563eb", backgroundColor: "#eff6ff", padding: "2px 6px", borderRadius: "5px", whiteSpace: "nowrap" }}>Deals</span>
                     </div>
                     <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                      <div style={{ fontSize: "19px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={analyticsData.wonCount} /> <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb" }}>Deals</span>
                       </div>
                       <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
@@ -23239,15 +24369,15 @@ export default function App({ onNavigateToLanding } = {}) {
                   </div>
 
                   {/* Metric Card 3: Lead Conversion Rate */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "11px 13px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#f3e8ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#f3e8ff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <TrendingUp size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#f3e8ff", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Rate</span>
+                      <span style={{ fontSize: "11.5px", fontWeight: "700", color: "#2563eb", backgroundColor: "#f3e8ff", padding: "2px 6px", borderRadius: "5px", whiteSpace: "nowrap" }}>Rate</span>
                     </div>
                     <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                      <div style={{ fontSize: "19px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={Number(analyticsData.conversionRate)} isPercent />
                       </div>
                       <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
@@ -23257,15 +24387,15 @@ export default function App({ onNavigateToLanding } = {}) {
                   </div>
 
                   {/* Metric Card 4: Average Deal Value */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "11px 13px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fff7ed", color: "#b45309", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#b45309", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <IndianRupee size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#b45309", backgroundColor: "#fff7ed", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Avg Size</span>
+                      <span style={{ fontSize: "11.5px", fontWeight: "700", color: "#b45309", backgroundColor: "#fff7ed", padding: "2px 6px", borderRadius: "5px", whiteSpace: "nowrap" }}>Avg Size</span>
                     </div>
                     <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                      <div style={{ fontSize: "19px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={analyticsData.averageValue} isCurrency />
                       </div>
                       <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
@@ -23275,15 +24405,15 @@ export default function App({ onNavigateToLanding } = {}) {
                   </div>
 
                   {/* Metric Card 5: Target Achievement */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "88px" }}>
+                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "11px 13px", display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "92px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#ecfeff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#ecfeff", color: "#2563eb", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <span style={{ fontSize: "12px", fontWeight: "700", color: "#2563eb", backgroundColor: "#ecfeff", padding: "1px 6px", borderRadius: "6px", whiteSpace: "nowrap" }}>Goal</span>
+                      <span style={{ fontSize: "11.5px", fontWeight: "700", color: "#2563eb", backgroundColor: "#ecfeff", padding: "2px 6px", borderRadius: "5px", whiteSpace: "nowrap" }}>Goal</span>
                     </div>
                     <div>
-                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", lineHeight: "1.1", margin: "4px 0 2px 0" }}>
+                      <div style={{ fontSize: "19px", fontWeight: "800", color: "#0f172a", lineHeight: "1.2", margin: "4px 0 2px 0" }}>
                         <AnimatedNumber value={Number(targetStats.baseProgress)} isPercent />
                       </div>
                       <span style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", display: "block" }}>
@@ -23373,17 +24503,17 @@ export default function App({ onNavigateToLanding } = {}) {
                 </div>
 
                 {/* Today's Focus Section (Clean Fit 100% Width + SVG Icons) */}
-                <div className="today-focus-section animate-fade-in" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "18px 20px", marginBottom: "20px", boxShadow: "0 2px 8px rgba(0,0,0,0.03)" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <div style={{ width: "32px", height: "32px", borderRadius: "8px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <Target size={18} style={{ width: "18px", height: "18px", strokeWidth: 1.8 }} />
+                <div className="today-focus-section animate-fade-in" style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "14px 16px", marginBottom: "16px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <div style={{ width: "28px", height: "28px", borderRadius: "7px", backgroundColor: "#fff7ed", color: "#ea580c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Target size={15} style={{ width: "15px", height: "15px", strokeWidth: 1.8 }} />
                       </div>
-                      <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: 0, fontFamily: "'Inter', sans-serif" }}>
+                      <h3 style={{ fontSize: "14px", fontWeight: "700", color: "#0f172a", margin: 0, fontFamily: "'Inter', sans-serif" }}>
                         Today's Focus
                       </h3>
                     </div>
-                    <span style={{ fontSize: "12px", fontWeight: "700", color: "#ea580c", backgroundColor: "#fff7ed", padding: "4px 12px", borderRadius: "12px", border: "1px solid #ffedd5" }}>
+                    <span style={{ fontSize: "11.5px", fontWeight: "700", color: "#ea580c", backgroundColor: "#fff7ed", padding: "3px 10px", borderRadius: "10px", border: "1px solid #ffedd5" }}>
                       {todayFocusLeads.length} Actionable
                     </span>
                   </div>
@@ -24682,47 +25812,67 @@ export default function App({ onNavigateToLanding } = {}) {
             </div>
 
             {/* TOP TASK STATS KPI SUMMARY ROW */}
-            <div className="tasks-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", marginBottom: "16px" }}>
-              <div style={{ backgroundColor: "#eff6ff", border: "1px solid #dbeafe", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#2563eb", textTransform: "uppercase", letterSpacing: "0.3px" }}>Total Tasks</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#2563eb", marginTop: "2px" }}>{ownerScopedTasks.length}</div>
-                </div>
-                <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <ListTodo size={15} color="#2563eb" />
-                </div>
-              </div>
+            {(() => {
+              const todayIsoStr = new Date().toISOString().slice(0, 10);
+              const overdueTasks = ownerScopedTasks.filter(t => !t.completed && !isTaskLinkedToLostLead(t, leads) && t.dueDate && t.dueDate < todayIsoStr);
+              const todayTasks = ownerScopedTasks.filter(t => !t.completed && !isTaskLinkedToLostLead(t, leads) && t.dueDate && t.dueDate === todayIsoStr);
+              const upcomingTasks = ownerScopedTasks.filter(t => !t.completed && !isTaskLinkedToLostLead(t, leads) && (!t.dueDate || t.dueDate > todayIsoStr));
+              const completedTasks = ownerScopedTasks.filter(t => t.completed || isTaskLinkedToLostLead(t, leads));
 
-              <div style={{ backgroundColor: "#fff7ed", border: "1px solid #ffedd5", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#ea580c", textTransform: "uppercase", letterSpacing: "0.3px" }}>Pending Action</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#ea580c", marginTop: "2px" }}>{ownerScopedTasks.filter(t => !t.completed && !isTaskLinkedToLostLead(t, leads)).length}</div>
-                </div>
-                <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#ffedd5", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Clock size={15} color="#ea580c" />
-                </div>
-              </div>
+              return (
+                <div className="tasks-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "10px", marginBottom: "16px" }}>
+                  <div style={{ backgroundColor: "#eff6ff", border: "1px solid #dbeafe", borderRadius: "8px", padding: "10px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span style={{ fontSize: "11px", fontWeight: "600", color: "#2563eb", textTransform: "uppercase", letterSpacing: "0.3px" }}>Total Tasks</span>
+                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#2563eb", marginTop: "2px" }}>{ownerScopedTasks.length}</div>
+                    </div>
+                    <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <ListTodo size={14} color="#2563eb" />
+                    </div>
+                  </div>
 
-              <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#166534", textTransform: "uppercase", letterSpacing: "0.3px" }}>Completed</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#166534", marginTop: "2px" }}>{ownerScopedTasks.filter(t => t.completed || isTaskLinkedToLostLead(t, leads)).length}</div>
-                </div>
-                <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <CheckCircle2 size={15} color="#16a34a" />
-                </div>
-              </div>
+                  <div style={{ backgroundColor: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "8px", padding: "10px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span style={{ fontSize: "11px", fontWeight: "600", color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.3px" }}>Overdue</span>
+                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#dc2626", marginTop: "2px" }}>{overdueTasks.length}</div>
+                    </div>
+                    <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <AlertTriangle size={14} color="#dc2626" />
+                    </div>
+                  </div>
 
-              <div style={{ backgroundColor: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "8px", padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <span style={{ fontSize: "12px", fontWeight: "600", color: "#dc2626", textTransform: "uppercase", letterSpacing: "0.3px" }}>High Priority</span>
-                  <div style={{ fontSize: "18px", fontWeight: "700", color: "#dc2626", marginTop: "2px" }}>{ownerScopedTasks.filter(t => !t.completed && t.priority === "High" && !isTaskLinkedToLostLead(t, leads)).length}</div>
+                  <div style={{ backgroundColor: "#fff7ed", border: "1px solid #ffedd5", borderRadius: "8px", padding: "10px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span style={{ fontSize: "11px", fontWeight: "600", color: "#ea580c", textTransform: "uppercase", letterSpacing: "0.3px" }}>Due Today</span>
+                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#ea580c", marginTop: "2px" }}>{todayTasks.length}</div>
+                    </div>
+                    <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#ffedd5", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Clock size={14} color="#ea580c" />
+                    </div>
+                  </div>
+
+                  <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span style={{ fontSize: "11px", fontWeight: "600", color: "#475569", textTransform: "uppercase", letterSpacing: "0.3px" }}>Upcoming</span>
+                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#475569", marginTop: "2px" }}>{upcomingTasks.length}</div>
+                    </div>
+                    <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#e2e8f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Calendar size={14} color="#475569" />
+                    </div>
+                  </div>
+
+                  <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #dcfce7", borderRadius: "8px", padding: "10px 12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span style={{ fontSize: "11px", fontWeight: "600", color: "#166534", textTransform: "uppercase", letterSpacing: "0.3px" }}>Completed</span>
+                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#166534", marginTop: "2px" }}>{completedTasks.length}</div>
+                    </div>
+                    <div style={{ width: "28px", height: "28px", borderRadius: "6px", backgroundColor: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <CheckCircle2 size={14} color="#16a34a" />
+                    </div>
+                  </div>
                 </div>
-                <div style={{ width: "30px", height: "30px", borderRadius: "6px", backgroundColor: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Flame size={15} color="#dc2626" />
-                </div>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* 2-COLUMN MAIN TASK WORKSPACE */}
             <div className="tasks-main-grid" style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: "16px", alignItems: "start" }}>
@@ -24753,15 +25903,16 @@ export default function App({ onNavigateToLanding } = {}) {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                     <div>
                       <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "5px" }}>Priority</label>
-                      <select 
+                      <CustomDropdown
                         value={taskPriority}
-                        onChange={(e) => setTaskPriority(e.target.value)}
-                        style={{ width: "100%", height: "34px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
-                      >
-                        <option value="High">High (Urgent)</option>
-                        <option value="Medium">Medium (Normal)</option>
-                        <option value="Low">Low (Flexible)</option>
-                      </select>
+                        onChange={(val) => setTaskPriority(val)}
+                        style={{ width: "100%", height: "34px" }}
+                        options={[
+                          { value: "High", label: "High (Urgent)", icon: <Flame size={12} color="#dc2626" /> },
+                          { value: "Medium", label: "Medium (Normal)", icon: <Sparkles size={12} color="#d97706" /> },
+                          { value: "Low", label: "Low (Flexible)", icon: <Clock size={12} color="#2563eb" /> }
+                        ]}
+                      />
                     </div>
 
                     <div>
@@ -24770,25 +25921,26 @@ export default function App({ onNavigateToLanding } = {}) {
                         type="date" 
                         value={taskDueDate}
                         onChange={(e) => setTaskDueDate(e.target.value)}
-                        style={{ width: "100%", height: "34px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", outline: "none" }}
+                        style={{ width: "100%", height: "34px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", outline: "none", boxSizing: "border-box" }}
                       />
                     </div>
                   </div>
 
                   <div>
                     <label style={{ fontSize: "12px", fontWeight: "600", color: "#475569", display: "block", marginBottom: "5px" }}>Link to Lead (Optional)</label>
-                    <select 
+                    <CustomDropdown
                       value={taskLinkedLeadId}
-                      onChange={(e) => setTaskLinkedLeadId(e.target.value)}
-                      style={{ width: "100%", height: "34px", padding: "6px 8px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "400", color: "#0f172a", backgroundColor: "#ffffff", outline: "none" }}
-                    >
-                      <option value="">-- No Lead Linked --</option>
-                      {ownerScopedLeads.map(lead => (
-                        <option key={lead.id} value={lead.id}>
-                          {lead.name}{lead.company ? ` • ${lead.company}` : ""}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(val) => setTaskLinkedLeadId(val)}
+                      placeholder="-- No Lead Linked --"
+                      style={{ width: "100%", height: "34px" }}
+                      options={[
+                        { value: "", label: "-- No Lead Linked --" },
+                        ...ownerScopedLeads.map(lead => ({
+                          value: lead.id,
+                          label: `${lead.name}${lead.company ? ` • ${lead.company}` : ""}`
+                        }))
+                      ]}
+                    />
                   </div>
 
                   <button 
@@ -24838,7 +25990,9 @@ export default function App({ onNavigateToLanding } = {}) {
                     <div style={{ display: "flex", gap: "4px", backgroundColor: "#f1f5f9", padding: "3px", borderRadius: "6px", border: "1px solid #e2e8f0", height: "32px", alignItems: "center" }}>
                       {[
                         { id: "All", label: "All" },
-                        { id: "Pending", label: "Pending" },
+                        { id: "Overdue", label: "Overdue" },
+                        { id: "Today", label: "Due Today" },
+                        { id: "Upcoming", label: "Upcoming" },
                         { id: "Completed", label: "Completed" },
                         { id: "High", label: "High Priority" }
                       ].map(f => {
@@ -24874,9 +26028,17 @@ export default function App({ onNavigateToLanding } = {}) {
                 {/* Task Cards List */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {(() => {
+                    const todayIsoStr = new Date().toISOString().slice(0, 10);
                     const filteredTasks = ownerScopedTasks.filter(t => {
                       const isLostTask = isTaskLinkedToLostLead(t, leads);
                       const isDone = t.completed || isLostTask;
+                      const isOverdue = !isDone && t.dueDate && t.dueDate < todayIsoStr;
+                      const isToday = !isDone && t.dueDate && t.dueDate === todayIsoStr;
+                      const isUpcoming = !isDone && (!t.dueDate || t.dueDate > todayIsoStr);
+
+                      if (taskFilter === "Overdue" && !isOverdue) return false;
+                      if (taskFilter === "Today" && !isToday) return false;
+                      if (taskFilter === "Upcoming" && !isUpcoming) return false;
                       if (taskFilter === "Pending" && isDone) return false;
                       if (taskFilter === "Completed" && !isDone) return false;
                       if (taskFilter === "High" && (isDone || t.priority !== "High")) return false;
@@ -24907,6 +26069,9 @@ export default function App({ onNavigateToLanding } = {}) {
                       const isMed = task.priority === "Medium";
                       const isLostTask = isTaskLinkedToLostLead(task, leads);
                       const isDone = task.completed || isLostTask;
+                      const isOverdue = !isDone && task.dueDate && task.dueDate < todayIsoStr;
+                      const isToday = !isDone && task.dueDate && task.dueDate === todayIsoStr;
+                      const daysOverdue = isOverdue ? Math.max(1, Math.floor((new Date(todayIsoStr) - new Date(task.dueDate)) / (1000 * 60 * 60 * 24))) : 0;
 
                       return (
                         <div 
@@ -24966,6 +26131,19 @@ export default function App({ onNavigateToLanding } = {}) {
                                     Lead Lost (Closed)
                                   </span>
                                 )}
+
+                                {isOverdue && (
+                                  <span style={{ fontSize: "11px", fontWeight: "700", color: "#dc2626", backgroundColor: "#fef2f2", border: "1px solid #fecaca", padding: "1px 6px", borderRadius: "5px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                                    <AlertTriangle size={11} color="#dc2626" /> Overdue ({daysOverdue}d)
+                                  </span>
+                                )}
+
+                                {isToday && (
+                                  <span style={{ fontSize: "11px", fontWeight: "700", color: "#ea580c", backgroundColor: "#fff7ed", border: "1px solid #fed7aa", padding: "1px 6px", borderRadius: "5px", display: "inline-flex", alignItems: "center", gap: "3px" }}>
+                                    <Clock size={11} color="#ea580c" /> Due Today
+                                  </span>
+                                )}
+
                                 {/* Priority Tag with SVG */}
                                 <span style={{
                                   fontSize: "12px",
@@ -25021,15 +26199,46 @@ export default function App({ onNavigateToLanding } = {}) {
                             </div>
                           </div>
 
-                          {/* Delete Button */}
-                          <button 
-                            onClick={() => requestDeleteTask(task)}
-                            title="Delete Task"
-                            aria-label="Delete Task"
-                            style={{ width: "28px", height: "28px", backgroundColor: "transparent", border: "none", color: "#64748b", cursor: "pointer", padding: "0", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center" }}
-                          >
-                            <Trash2 size={14} className="hover:text-red-600 transition-colors" />
-                          </button>
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            {!isDone && (
+                              <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRescheduleTask(task.id, 1)}
+                                  title="Reschedule to tomorrow"
+                                  style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#f8fafc", color: "#334155", cursor: "pointer", fontWeight: "600" }}
+                                >
+                                  +1d
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRescheduleTask(task.id, 3)}
+                                  title="Reschedule by 3 days"
+                                  style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#f8fafc", color: "#334155", cursor: "pointer", fontWeight: "600" }}
+                                >
+                                  +3d
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRescheduleTask(task.id, 7)}
+                                  title="Reschedule by 1 week"
+                                  style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "4px", border: "1px solid #cbd5e1", backgroundColor: "#f8fafc", color: "#334155", cursor: "pointer", fontWeight: "600" }}
+                                >
+                                  +1w
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Delete Button */}
+                            <button 
+                              onClick={() => requestDeleteTask(task)}
+                              title="Delete Task"
+                              aria-label="Delete Task"
+                              style={{ width: "26px", height: "26px", backgroundColor: "transparent", border: "none", color: "#64748b", cursor: "pointer", padding: "0", borderRadius: "6px", display: "flex", alignItems: "center", justifyContent: "center" }}
+                            >
+                              <Trash2 size={13} className="hover:text-red-600 transition-colors" />
+                            </button>
+                          </div>
                         </div>
                       );
                     });
@@ -25271,1161 +26480,35 @@ export default function App({ onNavigateToLanding } = {}) {
         </div>
       )}
 
-      {/* Lead Details Modal Card - Exact Match to Mockup */}
-      {selectedLeadForDetails && (() => {
-        const stageStyle = getStageBadgeStyle(selectedLeadForDetails.status);
-        const initials = getAvatarInitials(selectedLeadForDetails.name);
-
-        return (
-          <div className="modal-overlay" onClick={() => { setSelectedLeadForDetails(null); setIsEditingFollowUp(false); }} style={{ backdropFilter: "blur(4px)", backgroundColor: "rgba(15, 23, 42, 0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "780px", width: "94%", maxHeight: "90vh", borderRadius: "8px", overflow: "hidden", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)", padding: 0, display: "flex", flexDirection: "column", backgroundColor: "#ffffff", border: "1px solid #e2e8f0" }}>
-              
-              {/* Header Bar */}
-              <div style={{ padding: "12px 20px 10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#ffffff", borderBottom: "1px solid #f1f5f9" }}>
-                <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
-                  Lead Details
-                </h2>
-                <button 
-                  onClick={() => { setSelectedLeadForDetails(null); setIsEditingFollowUp(false); }}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#64748b",
-                    cursor: "pointer",
-                    padding: "4px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: "6px"
-                  }}
-                  title="Close"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              {/* 2-Column Main Body */}
-              <div style={{ display: "flex", minHeight: 0, flex: 1, overflowY: "auto" }}>
-                
-                {/* 👈 LEFT COLUMN: Profile & Contact Snapshot (38% width, fully scrollable with bottom breathing room) */}
-                <div style={{ width: "38%", backgroundColor: "#f8fafc", borderRight: "1px solid #e2e8f0", padding: "16px 18px 24px 18px", display: "flex", flexDirection: "column", overflowY: "auto", boxSizing: "border-box" }}>
-                  
-                  {/* Avatar & Name Block */}
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "12px" }}>
-                    <div style={{
-                      width: "52px",
-                      height: "52px",
-                      borderRadius: "50%",
-                      backgroundColor: "#2563eb",
-                      color: "#ffffff",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "18px",
-                      fontWeight: "800",
-                      boxShadow: "0 4px 12px rgba(37, 99, 235, 0.25)",
-                      marginBottom: "6px"
-                    }}>
-                      {initials}
-                    </div>
-                    <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: "0 0 2px 0", lineHeight: 1.2 }}>
-                      {selectedLeadForDetails.name || "Lead Name"}
-                    </h3>
-                    <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
-                      {selectedLeadForDetails.company && selectedLeadForDetails.company.trim() ? selectedLeadForDetails.company : "Business Development Manager"}
-                    </span>
-                  </div>
-
-                  {/* Financial Ledger & Revenue Realization (Blueprint §21 & §35) */}
-                  <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "10px 12px", marginBottom: "12px", boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                      <span style={{ color: "#475569", fontSize: "11px", fontWeight: "700", textTransform: "uppercase" }}>Financial Ledger</span>
-                      <span style={{
-                        fontSize: "10px",
-                        fontWeight: "800",
-                        padding: "2px 7px",
-                        borderRadius: "10px",
-                        backgroundColor: (Number(selectedLeadForDetails.paidAmount || 0) >= Number(selectedLeadForDetails.value || 0) && Number(selectedLeadForDetails.value || 0) > 0) ? "#dcfce7" : (Number(selectedLeadForDetails.paidAmount || 0) > 0 ? "#fef3c7" : "#fee2e2"),
-                        color: (Number(selectedLeadForDetails.paidAmount || 0) >= Number(selectedLeadForDetails.value || 0) && Number(selectedLeadForDetails.value || 0) > 0) ? "#15803d" : (Number(selectedLeadForDetails.paidAmount || 0) > 0 ? "#b45309" : "#b91c1c")
-                      }}>
-                        {(Number(selectedLeadForDetails.paidAmount || 0) >= Number(selectedLeadForDetails.value || 0) && Number(selectedLeadForDetails.value || 0) > 0) ? "PAID IN FULL" : (Number(selectedLeadForDetails.paidAmount || 0) > 0 ? "PARTIALLY PAID" : "UNPAID")}
-                      </span>
-                    </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px", textAlign: "center", marginBottom: "8px" }}>
-                      <div style={{ backgroundColor: "#f8fafc", padding: "6px", borderRadius: "6px", border: "1px solid #f1f5f9" }}>
-                        <span style={{ fontSize: "10px", color: "#64748b", display: "block" }}>Deal Value</span>
-                        <strong style={{ fontSize: "12px", color: "#0f172a" }}>₹{(Number(selectedLeadForDetails.value) || 0).toLocaleString("en-IN")}</strong>
-                      </div>
-                      <div style={{ backgroundColor: "#f0fdf4", padding: "6px", borderRadius: "6px", border: "1px solid #dcfce7" }}>
-                        <span style={{ fontSize: "10px", color: "#166534", display: "block" }}>Paid</span>
-                        <strong style={{ fontSize: "12px", color: "#15803d" }}>₹{(Number(selectedLeadForDetails.paidAmount) || 0).toLocaleString("en-IN")}</strong>
-                      </div>
-                      <div style={{ backgroundColor: "#fff7ed", padding: "6px", borderRadius: "6px", border: "1px solid #ffedd5" }}>
-                        <span style={{ fontSize: "10px", color: "#9a3412", display: "block" }}>Balance</span>
-                        <strong style={{ fontSize: "12px", color: "#ea580c" }}>₹{Math.max(0, (Number(selectedLeadForDetails.value) || 0) - (Number(selectedLeadForDetails.paidAmount) || 0)).toLocaleString("en-IN")}</strong>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPaymentModalLead(selectedLeadForDetails);
-                        setShowPaymentModal(true);
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "6px 10px",
-                        borderRadius: "6px",
-                        border: "none",
-                        backgroundColor: "#10b981",
-                        color: "#ffffff",
-                        fontSize: "11px",
-                        fontWeight: "700",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "5px",
-                        boxShadow: "0 1px 2px rgba(16, 185, 129, 0.2)"
-                      }}
-                    >
-                      <CreditCard size={13} />
-                      <span>+ Record Payment</span>
-                    </button>
-                  </div>
-
-                  {/* Stage Dropdown & Action Buttons */}
-                  <div style={{ marginBottom: "12px", display: "flex", flexDirection: "column", gap: "4px", fontSize: "12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                      <span style={{ color: "#475569" }}>Stage: </span>
-                      <select
-                        value={selectedLeadForDetails.status || "New"}
-                        onChange={(e) => {
-                          const newStat = e.target.value;
-                          const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
-                          if (actualIndex !== -1) {
-                            if (isWonStatus(newStat)) {
-                              const dVal = Number(selectedLeadForDetails.value) || 0;
-                              const pVal = Number(selectedLeadForDetails.paidAmount) || 0;
-                              if (dVal <= 0 || pVal < dVal) {
-                                setWonBlockedLead(selectedLeadForDetails);
-                                setShowWonBlockedModal(true);
-                                showToast("Full payment is required before this lead can be marked Won.", "error");
-                                return;
-                              }
-                            }
-                            if (isLostStatus(newStat)) {
-                              setLostModalLead(selectedLeadForDetails);
-                              setShowLostModal(true);
-                              return;
-                            }
-                            if (newStat === "Junk") {
-                              setJunkModalLead(selectedLeadForDetails);
-                              setShowJunkModal(true);
-                              return;
-                            }
-                            saveCellChange(actualIndex, 1, newStat);
-                            setSelectedLeadForDetails(prev => ({ ...prev, status: newStat }));
-                          }
-                        }}
-                        style={{
-                          backgroundColor: isLostStatus(selectedLeadForDetails.status) ? "#fef2f2" : isWonStatus(selectedLeadForDetails.status) ? "#f0fdf4" : "#ffedd5",
-                          color: isLostStatus(selectedLeadForDetails.status) ? "#dc2626" : isWonStatus(selectedLeadForDetails.status) ? "#15803d" : "#c2410c",
-                          padding: "2px 8px",
-                          borderRadius: "9999px",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          border: `1px solid ${isLostStatus(selectedLeadForDetails.status) ? "#fecaca" : isWonStatus(selectedLeadForDetails.status) ? "#bbf7d0" : "#fed7aa"}`,
-                          outline: "none",
-                          cursor: "pointer"
-                        }}
-                        title="Change deal stage / mark as Won or Lost"
-                      >
-                        {STATUS_OPTIONS.map(opt => (
-                          <option key={opt} value={opt}>
-                            {opt === "Lost" ? "Lost (Closed)" : opt === "Won" ? "Won (Closed)" : opt}
-                          </option>
-                        ))}
-                      </select>
-
-                      {/* ❌ Direct Mark as Lost Button (Secondary Outlined) */}
-                      {!isLostStatus(selectedLeadForDetails.status) ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setLostModalLead(selectedLeadForDetails);
-                            setShowLostModal(true);
-                          }}
-                          style={{
-                            padding: "3px 8px",
-                            borderRadius: "6px",
-                            fontSize: "11px",
-                            fontWeight: "600",
-                            backgroundColor: "#ffffff",
-                            color: "#64748b",
-                            border: "1px solid #cbd5e1",
-                            cursor: "pointer",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            transition: "all 0.15s ease"
-                          }}
-                          title="Click to mark deal as Lost"
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.color = "#dc2626";
-                            e.currentTarget.style.borderColor = "#fca5a5";
-                            e.currentTarget.style.backgroundColor = "#fef2f2";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.color = "#64748b";
-                            e.currentTarget.style.borderColor = "#cbd5e1";
-                            e.currentTarget.style.backgroundColor = "#ffffff";
-                          }}
-                        >
-                          <X size={14} />
-                          <span>Mark Lost</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
-                            if (actualIndex !== -1) {
-                              saveCellChange(actualIndex, 1, "Contacted");
-                              setSelectedLeadForDetails(prev => ({ ...prev, status: "Contacted" }));
-                              logLeadActivity(selectedLeadForDetails.id, "stage_change", "Deal Reopened", "Reopened deal from Lost to Contacted.");
-                              showToast("Deal reopened to Contacted", "success");
-                            }
-                          }}
-                          style={{
-                            padding: "2px 7px",
-                            borderRadius: "6px",
-                            fontSize: "10px",
-                            fontWeight: "700",
-                            backgroundColor: "#f0fdf4",
-                            color: "#166534",
-                            border: "1px solid #bbf7d0",
-                            cursor: "pointer"
-                          }}
-                          title="Reopen this lead"
-                        >
-                          ↻ Reopen
-                        </button>
-                      )}
-                    </div>
-
-                    {isWonStatus(selectedLeadForDetails.status) && (
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "6px", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", padding: "4px 8px", borderRadius: "6px" }}>
-                        <span style={{ color: "#166534", fontWeight: "600", fontSize: "12px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                          Won / Sale Date:
-                        </span>
-                        <input
-                          type="date"
-                          value={(selectedLeadForDetails.won_date || "").split("T")[0]}
-                          onChange={(e) => {
-                            const newDate = e.target.value;
-                            const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
-                            if (actualIndex !== -1) {
-                              const updatedLead = { ...selectedLeadForDetails, won_date: newDate, isUserEditedWonDate: true };
-                              setSelectedLeadForDetails(updatedLead);
-                              const updatedLeads = [...leads];
-                              updatedLeads[actualIndex] = updatedLead;
-                              setLeads(updatedLeads);
-                              saveLeadsToStorage(updatedLeads);
-                              if (webhookUrl) syncWithGoogleSheetWebhook(updatedLead);
-                              logLeadActivity(selectedLeadForDetails.id, "stage_change", "Won Date Changed", `Won date set to ${newDate}`);
-                              showToast(`Won date updated: ${newDate}`, "success");
-                            }
-                          }}
-                          style={{
-                            padding: "2px 6px",
-                            fontSize: "12px",
-                            border: "1px solid #86efac",
-                            borderRadius: "6px",
-                            backgroundColor: "#ffffff",
-                            color: "#166534",
-                            fontWeight: "700",
-                            outline: "none",
-                            cursor: "pointer"
-                          }}
-                          title="Click to edit the date this deal was won"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Contact Section */}
-                  <div style={{ marginBottom: "12px" }}>
-                    <div style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", marginBottom: "6px" }}>
-                      Contact
-                    </div>
-
-                    {/* Phone */}
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px", marginBottom: "8px" }}>
-                      <div style={{ marginTop: "2px" }}>
-                        <Phone size={13} color="#2563eb" />
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: "10px", color: "#64748b", display: "block" }}>Phone</span>
-                          {!isEditingModalPhone && selectedLeadForDetails.phone && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditModalPhoneVal(selectedLeadForDetails.phone || "");
-                                setIsEditingModalPhone(true);
-                              }}
-                              style={{
-                                background: "#eff6ff",
-                                border: "1px solid #bfdbfe",
-                                borderRadius: "4px",
-                                color: "#1d4ed8",
-                                cursor: "pointer",
-                                padding: "2px 7px",
-                                fontSize: "11px",
-                                fontWeight: "600",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "3px",
-                                transition: "all 0.15s ease"
-                              }}
-                              title="Edit phone number"
-                            >
-                              <Pencil size={10} aria-hidden="true" />
-                              <span>Edit</span>
-                            </button>
-                          )}
-                        </div>
-
-                        {isEditingModalPhone ? (
-                          <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
-                            <input
-                              type="text"
-                              autoFocus
-                              placeholder="Enter phone..."
-                              value={editModalPhoneVal}
-                              onChange={(e) => setEditModalPhoneVal(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
-                                  if (actualIndex !== -1) {
-                                    const cleanPhone = editModalPhoneVal.trim();
-                                    const updatedLead = { ...selectedLeadForDetails, phone: cleanPhone };
-                                    setSelectedLeadForDetails(updatedLead);
-                                    const updatedLeads = [...leads];
-                                    updatedLeads[actualIndex] = updatedLead;
-                                    setLeads(updatedLeads);
-                                    saveLeadsToStorage(updatedLeads);
-                                    if (webhookUrl) syncWithGoogleSheetWebhook(updatedLead);
-                                    logLeadActivity(selectedLeadForDetails.id, "call", "Phone Number Updated", cleanPhone ? `Phone number set to ${cleanPhone}` : "Phone number removed");
-                                    showToast(cleanPhone ? `Phone updated: ${cleanPhone}` : "Phone removed", "success");
-                                  }
-                                  setIsEditingModalPhone(false);
-                                }
-                                if (e.key === "Escape") setIsEditingModalPhone(false);
-                              }}
-                              style={{ flex: 1, padding: "3px 6px", fontSize: "12px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff" }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
-                                if (actualIndex !== -1) {
-                                  const cleanPhone = editModalPhoneVal.trim();
-                                  const updatedLead = { ...selectedLeadForDetails, phone: cleanPhone };
-                                  setSelectedLeadForDetails(updatedLead);
-                                  const updatedLeads = [...leads];
-                                  updatedLeads[actualIndex] = updatedLead;
-                                  setLeads(updatedLeads);
-                                  saveLeadsToStorage(updatedLeads);
-                                  if (webhookUrl) syncWithGoogleSheetWebhook(updatedLead);
-                                  logLeadActivity(selectedLeadForDetails.id, "call", "Phone Number Updated", cleanPhone ? `Phone number set to ${cleanPhone}` : "Phone number removed");
-                                  showToast(cleanPhone ? `Phone updated: ${cleanPhone}` : "Phone removed", "success");
-                                }
-                                setIsEditingModalPhone(false);
-                              }}
-                              style={{ padding: "3px 7px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "10px", fontWeight: "700", cursor: "pointer" }}
-                            ><Check size={14} /></button>
-                            <button
-                              type="button"
-                              onClick={() => setIsEditingModalPhone(false)}
-                              style={{ padding: "3px 5px", backgroundColor: "#f1f5f9", color: "#64748b", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "10px", cursor: "pointer" }}
-                            ><X size={14} /></button>
-                          </div>
-                        ) : selectedLeadForDetails.phone ? (
-                          <a 
-                            href={`tel:${selectedLeadForDetails.phone.replace(/[^0-9+]/g, "")}`}
-                            style={{ fontSize: "12px", fontWeight: "700", color: "#0f172a", textDecoration: "none" }}
-                          >
-                            {selectedLeadForDetails.phone}
-                          </a>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditModalPhoneVal("");
-                              setIsEditingModalPhone(true);
-                            }}
-                            style={{
-                              background: "none",
-                              border: "1px dashed #93c5fd",
-                              borderRadius: "6px",
-                              padding: "2px 8px",
-                              color: "#2563eb",
-                              fontSize: "12px",
-                              fontWeight: "700",
-                              cursor: "pointer",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "3px",
-                              marginTop: "2px",
-                              backgroundColor: "#eff6ff"
-                            }}
-                            title="Add phone number"
-                          >
-                            <span>+ Add Phone Number</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Email */}
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-                      <div style={{ marginTop: "2px" }}>
-                        <Mail size={13} color="#64748b" />
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: "10px", color: "#64748b", display: "block" }}>Email</span>
-                          {!isEditingModalEmail && selectedLeadForDetails.email && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditModalEmailVal(selectedLeadForDetails.email || "");
-                                setIsEditingModalEmail(true);
-                              }}
-                              style={{
-                                background: "#eff6ff",
-                                border: "1px solid #bfdbfe",
-                                borderRadius: "4px",
-                                color: "#1d4ed8",
-                                cursor: "pointer",
-                                padding: "2px 7px",
-                                fontSize: "11px",
-                                fontWeight: "600",
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "3px",
-                                transition: "all 0.15s ease"
-                              }}
-                              title="Edit email address"
-                            >
-                              <Pencil size={10} aria-hidden="true" />
-                              <span>Edit</span>
-                            </button>
-                          )}
-                        </div>
-
-                        {isEditingModalEmail ? (
-                          <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
-                            <input
-                              type="email"
-                              autoFocus
-                              placeholder="Enter email..."
-                              value={editModalEmailVal}
-                              onChange={(e) => setEditModalEmailVal(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
-                                  if (actualIndex !== -1) {
-                                    const cleanEmail = editModalEmailVal.trim();
-                                    const updatedLead = { ...selectedLeadForDetails, email: cleanEmail };
-                                    setSelectedLeadForDetails(updatedLead);
-                                    const updatedLeads = [...leads];
-                                    updatedLeads[actualIndex] = updatedLead;
-                                    setLeads(updatedLeads);
-                                    saveLeadsToStorage(updatedLeads);
-                                    if (webhookUrl) syncWithGoogleSheetWebhook(updatedLead);
-                                    showToast(cleanEmail ? `Email updated: ${cleanEmail}` : "Email removed", "success");
-                                  }
-                                  setIsEditingModalEmail(false);
-                                }
-                                if (e.key === "Escape") setIsEditingModalEmail(false);
-                              }}
-                              style={{ flex: 1, padding: "3px 6px", fontSize: "12px", border: "1.5px solid #2563eb", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff" }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
-                                if (actualIndex !== -1) {
-                                  const cleanEmail = editModalEmailVal.trim();
-                                  const updatedLead = { ...selectedLeadForDetails, email: cleanEmail };
-                                  setSelectedLeadForDetails(updatedLead);
-                                  const updatedLeads = [...leads];
-                                  updatedLeads[actualIndex] = updatedLead;
-                                  setLeads(updatedLeads);
-                                  saveLeadsToStorage(updatedLeads);
-                                  if (webhookUrl) syncWithGoogleSheetWebhook(updatedLead);
-                                  showToast(cleanEmail ? `Email updated: ${cleanEmail}` : "Email removed", "success");
-                                }
-                                setIsEditingModalEmail(false);
-                              }}
-                              style={{ padding: "3px 7px", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "10px", fontWeight: "700", cursor: "pointer" }}
-                            ><Check size={14} /></button>
-                            <button
-                              type="button"
-                              onClick={() => setIsEditingModalEmail(false)}
-                              style={{ padding: "3px 5px", backgroundColor: "#f1f5f9", color: "#64748b", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "10px", cursor: "pointer" }}
-                            ><X size={14} /></button>
-                          </div>
-                        ) : selectedLeadForDetails.email ? (
-                          <a 
-                            href={`mailto:${selectedLeadForDetails.email}`}
-                            style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a", textDecoration: "none", wordBreak: "break-all" }}
-                          >
-                            {selectedLeadForDetails.email}
-                          </a>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditModalEmailVal("");
-                              setIsEditingModalEmail(true);
-                            }}
-                            style={{
-                              background: "none",
-                              border: "1px dashed #cbd5e1",
-                              borderRadius: "6px",
-                              padding: "2px 8px",
-                              color: "#64748b",
-                              fontSize: "10px",
-                              fontWeight: "600",
-                              cursor: "pointer",
-                              marginTop: "2px"
-                            }}
-                          >
-                            + Add Email
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Schedule Follow-up Box (Compact, Inline & Never Cut-off) */}
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-                      <span style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a" }}>
-                        Schedule Follow-up
-                      </span>
-                      {!isEditingFollowUp && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditFollowUpDate(selectedLeadForDetails.next_follow_up ? selectedLeadForDetails.next_follow_up.split("T")[0] : new Date().toISOString().split("T")[0]);
-                            setEditFollowUpTime(selectedLeadForDetails.follow_up_time || "10:00");
-                            setIsEditingFollowUp(true);
-                          }}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            color: "#2563eb",
-                            fontSize: "12px",
-                            fontWeight: "700",
-                            cursor: "pointer",
-                            padding: "0 2px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "3px"
-                          }}
-                          title="Click to edit follow-up schedule"
-                        >
-                          <Pencil size={10} />
-                          <span>Edit</span>
-                        </button>
-                      )}
-                    </div>
-
-                    {!isEditingFollowUp ? (
-                      <div
-                        onClick={() => {
-                          setEditFollowUpDate(selectedLeadForDetails.next_follow_up ? selectedLeadForDetails.next_follow_up.split("T")[0] : new Date().toISOString().split("T")[0]);
-                          setEditFollowUpTime(selectedLeadForDetails.follow_up_time || "10:00");
-                          setIsEditingFollowUp(true);
-                        }}
-                        title="Click to edit follow-up schedule"
-                        style={{
-                          backgroundColor: "#ffffff",
-                          border: "1px solid #d1d5db",
-                          borderRadius: "8px",
-                          padding: "7px 10px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          cursor: "pointer",
-                          transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.03)"
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = "#3b82f6";
-                          e.currentTarget.style.backgroundColor = "#f8fafc";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = "#d1d5db";
-                          e.currentTarget.style.backgroundColor = "#ffffff";
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <Calendar size={12} color="#2563eb" />
-                          <span style={{ fontSize: "12px", fontWeight: "600", color: "#0f172a" }}>
-                            {selectedLeadForDetails.next_follow_up
-                              ? new Date(selectedLeadForDetails.next_follow_up.includes("T") ? selectedLeadForDetails.next_follow_up : selectedLeadForDetails.next_follow_up + "T12:00:00").toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' })
-                              : "Set follow-up"}, {selectedLeadForDetails.follow_up_time || "10:00"}
-                          </span>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                          <Clock size={12} color="#64748b" />
-                          <Pencil size={10} color="#3b82f6" />
-                        </div>
-                      </div>
-                    ) : (
-                      <div style={{
-                        backgroundColor: "#ffffff",
-                        border: "1.5px solid #3b82f6",
-                        borderRadius: "8px",
-                        padding: "8px 10px",
-                        boxShadow: "0 4px 12px rgba(37, 99, 235, 0.12)",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "6px"
-                      }}>
-                        {/* Compact Side-by-Side Date & Time Row */}
-                        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "6px" }}>
-                          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                            <label style={{ fontSize: "10px", fontWeight: "800", color: "#64748b", textTransform: "uppercase" }}>Date</label>
-                            <div style={{ display: "flex", alignItems: "center", backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "3px 5px" }}>
-                              <input
-                                type="date"
-                                value={editFollowUpDate}
-                                onChange={(e) => setEditFollowUpDate(e.target.value)}
-                                style={{ border: "none", outline: "none", fontSize: "10px", fontWeight: "600", color: "#0f172a", backgroundColor: "transparent", width: "100%", cursor: "pointer", padding: 0 }}
-                              />
-                            </div>
-                          </div>
-
-                          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                            <label style={{ fontSize: "10px", fontWeight: "800", color: "#64748b", textTransform: "uppercase" }}>Time</label>
-                            <div style={{ display: "flex", alignItems: "center", backgroundColor: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "6px", padding: "3px 5px" }}>
-                              <input
-                                type="time"
-                                value={editFollowUpTime}
-                                onChange={(e) => setEditFollowUpTime(e.target.value)}
-                                style={{ border: "none", outline: "none", fontSize: "10px", fontWeight: "600", color: "#0f172a", backgroundColor: "transparent", width: "100%", cursor: "pointer", padding: 0 }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Quick Preset Buttons in 1 compact row */}
-                        <div style={{ display: "flex", gap: "3px", flexWrap: "wrap" }}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const d = new Date();
-                              setEditFollowUpDate(d.toISOString().split("T")[0]);
-                            }}
-                            style={{ padding: "2px 5px", fontSize: "10px", fontWeight: "600", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#f1f5f9", color: "#475569", cursor: "pointer" }}
-                          >
-                            Today
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const d = new Date();
-                              d.setDate(d.getDate() + 1);
-                              setEditFollowUpDate(d.toISOString().split("T")[0]);
-                            }}
-                            style={{ padding: "2px 5px", fontSize: "10px", fontWeight: "600", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#f1f5f9", color: "#475569", cursor: "pointer" }}
-                          >
-                            Tomorrow
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const d = new Date();
-                              d.setDate(d.getDate() + 3);
-                              setEditFollowUpDate(d.toISOString().split("T")[0]);
-                            }}
-                            style={{ padding: "2px 5px", fontSize: "10px", fontWeight: "600", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#f1f5f9", color: "#475569", cursor: "pointer" }}
-                          >
-                            +3 Days
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const d = new Date();
-                              d.setDate(d.getDate() + 7);
-                              setEditFollowUpDate(d.toISOString().split("T")[0]);
-                            }}
-                            style={{ padding: "2px 5px", fontSize: "10px", fontWeight: "600", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#f1f5f9", color: "#475569", cursor: "pointer" }}
-                          >
-                            Next Wk
-                          </button>
-                        </div>
-
-                        {/* Save & Cancel Buttons */}
-                        <div style={{ display: "flex", gap: "5px" }}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const actualIndex = leads.findIndex(l => l.id === selectedLeadForDetails.id);
-                              if (actualIndex !== -1) {
-                                const formattedDate = editFollowUpDate ? new Date(editFollowUpDate + "T12:00:00").toLocaleDateString("en-GB", { day: 'numeric', month: 'short', year: 'numeric' }) : "Cleared";
-                                const updatedLead = {
-                                  ...selectedLeadForDetails,
-                                  next_follow_up: editFollowUpDate,
-                                  follow_up_time: editFollowUpTime
-                                };
-                                setSelectedLeadForDetails(updatedLead);
-                                const updatedLeads = [...leads];
-                                updatedLeads[actualIndex] = updatedLead;
-                                setLeads(updatedLeads);
-                                saveLeadsToStorage(updatedLeads);
-                                if (webhookUrl) {
-                                  syncWithGoogleSheetWebhook(updatedLead);
-                                }
-                                logLeadActivity(
-                                  selectedLeadForDetails.id,
-                                  "stage_change",
-                                  "Follow-up Scheduled",
-                                  `Follow-up rescheduled to ${formattedDate}, ${editFollowUpTime}`
-                                );
-                                showToast(`Follow-up saved: ${formattedDate}, ${editFollowUpTime}`, "success");
-                              }
-                              setIsEditingFollowUp(false);
-                            }}
-                            style={{ flex: 1, padding: "4.5px 0", backgroundColor: "#2563eb", color: "#ffffff", border: "none", borderRadius: "6px", fontSize: "12px", fontWeight: "700", cursor: "pointer" }}
-                          >
-                            Save
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setIsEditingFollowUp(false)}
-                            style={{ padding: "4.5px 8px", backgroundColor: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "600", cursor: "pointer" }}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                </div>
-
-                {/* 👉 RIGHT COLUMN: Activity & Notes Hub (62% width) */}
-                <div style={{ width: "62%", backgroundColor: "#ffffff", padding: "20px 24px 24px 24px", display: "flex", flexDirection: "column" }}>
-                  
-                  {/* Section Title */}
-                  <div style={{ marginBottom: "14px" }}>
-                    <h3 style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", margin: "0 0 2px 0" }}>
-                      Activity & Notes
-                    </h3>
-                    <span style={{ fontSize: "12px", color: "#64748b" }}>
-                      Log calls, WhatsApp interactions, notes and view timeline
-                    </span>
-                  </div>
-
-                  {/* Quick Actions Header & Prominent Action Buttons */}
-                  <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "8px",
-                    padding: "6px 10px",
-                    backgroundColor: "#f8fafc",
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                    marginBottom: activeQuickAction ? "10px" : "16px"
-                  }}>
-                    <span style={{ fontSize: "12px", fontWeight: "600", color: "#475569", textTransform: "uppercase", letterSpacing: "0.4px" }}>
-                      Quick Actions
-                    </span>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                      {/* Call Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveQuickAction(prev => prev === "call" ? null : "call");
-                          setQuickActivityText("");
-                        }}
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "5px",
-                          padding: "5px 12px",
-                          borderRadius: "6px",
-                          border: activeQuickAction === "call" ? "1.5px solid #2563eb" : "1px solid #bfdbfe",
-                          backgroundColor: activeQuickAction === "call" ? "#2563eb" : "#eff6ff",
-                          color: activeQuickAction === "call" ? "#ffffff" : "#1d4ed8",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
-                        }}
-                      >
-                        <Phone size={12} color={activeQuickAction === "call" ? "#ffffff" : "#2563eb"} />
-                        <span>Call</span>
-                      </button>
-
-                      {/* WhatsApp Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveQuickAction(prev => prev === "whatsapp" ? null : "whatsapp");
-                          setQuickActivityText("");
-                        }}
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "5px",
-                          padding: "5px 12px",
-                          borderRadius: "6px",
-                          border: activeQuickAction === "whatsapp" ? "1.5px solid #16a34a" : "1px solid #bbf7d0",
-                          backgroundColor: activeQuickAction === "whatsapp" ? "#16a34a" : "#f0fdf4",
-                          color: activeQuickAction === "whatsapp" ? "#ffffff" : "#15803d",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
-                        }}
-                      >
-                        <MessageCircle size={12} color={activeQuickAction === "whatsapp" ? "#ffffff" : "#16a34a"} />
-                        <span>WhatsApp</span>
-                      </button>
-
-                      {/* Meeting Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveQuickAction(prev => prev === "meeting" ? null : "meeting");
-                          setQuickActivityText("");
-                        }}
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "5px",
-                          padding: "5px 12px",
-                          borderRadius: "6px",
-                          border: activeQuickAction === "meeting" ? "1.5px solid #7c3aed" : "1px solid #ddd6fe",
-                          backgroundColor: activeQuickAction === "meeting" ? "#7c3aed" : "#f5f3ff",
-                          color: activeQuickAction === "meeting" ? "#ffffff" : "#6d28d9",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
-                        }}
-                      >
-                        <Calendar size={12} color={activeQuickAction === "meeting" ? "#ffffff" : "#7c3aed"} />
-                        <span>Meeting</span>
-                      </button>
-
-                      {/* Add Note Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveQuickAction(prev => prev === "note" ? null : "note");
-                          setQuickActivityText("");
-                        }}
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "5px",
-                          padding: "5px 12px",
-                          borderRadius: "6px",
-                          border: activeQuickAction === "note" ? "1.5px solid #ea580c" : "1px solid #fed7aa",
-                          backgroundColor: activeQuickAction === "note" ? "#ea580c" : "#fff7ed",
-                          color: activeQuickAction === "note" ? "#ffffff" : "#c2410c",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
-                        }}
-                      >
-                        <Pencil size={12} color={activeQuickAction === "note" ? "#ffffff" : "#ea580c"} />
-                        <span>Add Note</span>
-                      </button>
-
-                      {/* 💳 Record Payment Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPaymentModalLead(selectedLeadForDetails);
-                          setShowPaymentModal(true);
-                        }}
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "5px",
-                          padding: "5px 12px",
-                          borderRadius: "6px",
-                          border: "1px solid #a7f3d0",
-                          backgroundColor: "#ecfdf5",
-                          color: "#047857",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                          fontWeight: "700",
-                          transition: "all 0.15s ease",
-                          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
-                        }}
-                      >
-                        <CreditCard size={12} color="#047857" />
-                        <span>Record Payment</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 🎯 Custom In-App Action Box (Zero browser popups!) */}
-                  {activeQuickAction && (
-                    <div style={{
-                      backgroundColor: activeQuickAction === "note" ? "#fff7ed" : activeQuickAction === "call" ? "#eff6ff" : activeQuickAction === "whatsapp" ? "#f0fdf4" : "#f5f3ff",
-                      border: `1.5px solid ${activeQuickAction === "note" ? "#fed7aa" : activeQuickAction === "call" ? "#bfdbfe" : activeQuickAction === "whatsapp" ? "#bbf7d0" : "#ddd6fe"}`,
-                      borderRadius: "8px",
-                      padding: "10px 12px",
-                      marginBottom: "14px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "8px"
-                    }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: activeQuickAction === "note" ? "#c2410c" : activeQuickAction === "call" ? "#1d4ed8" : activeQuickAction === "whatsapp" ? "#15803d" : "#6d28d9" }}>
-                          {activeQuickAction === "note" && `Add Note for ${selectedLeadForDetails.name}`}
-                          {activeQuickAction === "call" && `Log Call with ${selectedLeadForDetails.name}`}
-                          {activeQuickAction === "whatsapp" && `WhatsApp to ${selectedLeadForDetails.name}`}
-                          {activeQuickAction === "meeting" && `Meeting with ${selectedLeadForDetails.name}`}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setActiveQuickAction(null)}
-                          style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: "12px", fontWeight: "800", padding: "0 2px" }}
-                          title="Close"
-                        ><X size={14} /></button>
-                      </div>
-
-                      <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-                        {activeQuickAction === "call" && (
-                          <select
-                            value={quickActivityOutcome}
-                            onChange={(e) => setQuickActivityOutcome(e.target.value)}
-                            style={{ padding: "5px 7px", fontSize: "12px", border: "1px solid #93c5fd", borderRadius: "6px", backgroundColor: "#ffffff", fontWeight: "600", color: "#0f172a", outline: "none" }}
-                          >
-                            <option value="Connected - Interested">Connected - Interested</option>
-                            <option value="Busy / No Answer">Busy / No Answer</option>
-                            <option value="Asked for Callback">Asked for Callback</option>
-                            <option value="Not Interested">Not Interested</option>
-                          </select>
-                        )}
-
-                        <input
-                          type="text"
-                          autoFocus
-                          placeholder={
-                            activeQuickAction === "note" ? "Type note and press Enter or Save..." :
-                            activeQuickAction === "call" ? "Call summary or notes..." :
-                            activeQuickAction === "whatsapp" ? "Type WhatsApp message summary..." :
-                            "Meeting discussion outcome..."
-                          }
-                          value={quickActivityText}
-                          onChange={(e) => setQuickActivityText(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && quickActivityText.trim()) {
-                              if (activeQuickAction === "note") {
-                                logLeadActivity(selectedLeadForDetails.id, "note", "Note Added", quickActivityText.trim());
-                              } else if (activeQuickAction === "call") {
-                                logLeadActivity(selectedLeadForDetails.id, "call", `Call: ${quickActivityOutcome}`, quickActivityText.trim());
-                              } else if (activeQuickAction === "whatsapp") {
-                                if (selectedLeadForDetails.phone) {
-                                  window.open(`https://wa.me/${selectedLeadForDetails.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(quickActivityText.trim())}`, "_blank");
-                                }
-                                logLeadActivity(selectedLeadForDetails.id, "whatsapp", "Message Sent: WhatsApp", quickActivityText.trim());
-                              } else if (activeQuickAction === "meeting") {
-                                logLeadActivity(selectedLeadForDetails.id, "meeting", "Meeting Scheduled", quickActivityText.trim());
-                              }
-                              setQuickActivityText("");
-                              setActiveQuickAction(null);
-                            }
-                          }}
-                          style={{ flex: 1, padding: "5px 9px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff" }}
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (!quickActivityText.trim() && activeQuickAction !== "call") return;
-                            const text = quickActivityText.trim() || (activeQuickAction === "call" ? `Call status: ${quickActivityOutcome}` : "Action completed");
-                            if (activeQuickAction === "note") {
-                              logLeadActivity(selectedLeadForDetails.id, "note", "Note Added", text);
-                            } else if (activeQuickAction === "call") {
-                              logLeadActivity(selectedLeadForDetails.id, "call", `Call: ${quickActivityOutcome}`, text);
-                            } else if (activeQuickAction === "whatsapp") {
-                              if (selectedLeadForDetails.phone) {
-                                window.open(`https://wa.me/${selectedLeadForDetails.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(text)}`, "_blank");
-                              }
-                              logLeadActivity(selectedLeadForDetails.id, "whatsapp", "Message Sent: WhatsApp", text);
-                            } else if (activeQuickAction === "meeting") {
-                              logLeadActivity(selectedLeadForDetails.id, "meeting", "Meeting Scheduled", text);
-                            }
-                            setQuickActivityText("");
-                            setActiveQuickAction(null);
-                          }}
-                          style={{
-                            padding: "5px 14px",
-                            backgroundColor: activeQuickAction === "note" ? "#ea580c" : activeQuickAction === "call" ? "#2563eb" : activeQuickAction === "whatsapp" ? "#16a34a" : "#7c3aed",
-                            color: "#ffffff",
-                            border: "none",
-                            borderRadius: "6px",
-                            fontSize: "12px",
-                            fontWeight: "700",
-                            cursor: "pointer"
-                          }}
-                        >
-                          {activeQuickAction === "note" ? "Save Note" : activeQuickAction === "whatsapp" ? "Send & Log" : "Log"}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Activity Timeline Header */}
-                  <span style={{ fontSize: "12px", fontWeight: "800", color: "#0f172a", marginBottom: "12px", display: "block" }}>
-                    Activity Timeline
-                  </span>
-
-                  {/* Vertical Timeline Feed */}
-                  <div style={{ display: "flex", flexDirection: "column", maxHeight: "250px", overflowY: "auto", paddingLeft: "14px", paddingRight: "4px" }}>
-                    {(() => {
-                      const events = [];
-                      const creationDate = getLeadCreationDate(selectedLeadForDetails);
-                      events.push({
-                        type: "created",
-                        title: "Lead Created",
-                        desc: `Added to pipeline from ${selectedLeadForDetails.source || "Manual"}.`,
-                        date: creationDate
-                      });
-
-                      if (Array.isArray(selectedLeadForDetails.activities)) {
-                        selectedLeadForDetails.activities.forEach(act => {
-                          const actType = act.type || "note";
-                          const defaultTitle = actType === "note" ? "Note Added"
-                            : actType === "call" ? "Call Dialed"
-                            : actType === "whatsapp" ? "WhatsApp Message"
-                            : actType === "meeting" ? "Meeting Scheduled"
-                            : (actType === "stage_change" || actType === "stage_update") ? "Status Changed"
-                            : "Activity";
-
-                          const title = (act.title && act.title.trim()) ? act.title.trim() : defaultTitle;
-                          const desc = (act.desc && act.desc.trim()) ? act.desc.trim() : (act.text && act.text.trim()) ? act.text.trim() : (actType === "note" ? "Note recorded." : "");
-
-                          events.push({
-                            type: actType,
-                            title,
-                            desc,
-                            date: act.timestamp ? new Date(act.timestamp) : (act.createdAt ? new Date(act.createdAt) : new Date())
-                          });
-                        });
-                      }
-
-                      if (Array.isArray(selectedLeadForDetails.notes)) {
-                        selectedLeadForDetails.notes.forEach(n => {
-                          if (n && typeof n === "object" && n.text) {
-                            const alreadyExists = events.some(e => e.desc === n.text);
-                            if (!alreadyExists) {
-                              events.push({
-                                type: "note",
-                                title: "Note Added",
-                                desc: n.text,
-                                date: n.createdAt ? new Date(n.createdAt) : new Date()
-                              });
-                            }
-                          }
-                        });
-                      }
-
-                      if (selectedLeadForDetails.stageUpdatedAt) {
-                        let stageDate = new Date(selectedLeadForDetails.stageUpdatedAt);
-                        if (stageDate < creationDate || (selectedLeadForDetails.won_date && selectedLeadForDetails.stageUpdatedAt.includes("T12:00:00"))) {
-                          stageDate = selectedLeadForDetails.lastModifiedAt ? new Date(selectedLeadForDetails.lastModifiedAt) : creationDate;
-                        }
-
-                        const isWon = isWonStatus(selectedLeadForDetails.status);
-                        const wonDateFormatted = selectedLeadForDetails.won_date ? new Date(selectedLeadForDetails.won_date + "T12:00:00").toLocaleDateString("en-IN") : "";
-
-                        events.push({
-                          type: "stage_change",
-                          title: isWon ? "Deal Won / Closed" : "Status Changed",
-                          desc: isWon && wonDateFormatted
-                            ? `Moved to "${selectedLeadForDetails.status}" (Won: ${wonDateFormatted})`
-                            : `${selectedLeadForDetails.status}`,
-                          date: stageDate
-                        });
-                      }
-
-                      events.sort((a, b) => (b.date && !isNaN(new Date(b.date).getTime()) ? new Date(b.date).getTime() : 0) - (a.date && !isNaN(new Date(a.date).getTime()) ? new Date(a.date).getTime() : 0));
-
-                      const typeIcons = {
-                        call: { icon: <Phone size={11} />, bg: "#eff6ff", text: "#2563eb", border: "#bfdbfe" },
-                        whatsapp: { icon: <MessageCircle size={11} />, bg: "#f0fdf4", text: "#16a34a", border: "#bbf7d0" },
-                        meeting: { icon: <Calendar size={11} />, bg: "#f5f3ff", text: "#7c3aed", border: "#ddd6fe" },
-                        stage_change: { icon: <Settings size={11} />, bg: "#eff6ff", text: "#2563eb", border: "#bfdbfe" },
-                        stage_update: { icon: <Settings size={11} />, bg: "#eff6ff", text: "#2563eb", border: "#bfdbfe" },
-                        note: { icon: <Pencil size={11} />, bg: "#fff7ed", text: "#ea580c", border: "#fed7aa" },
-                        email: { icon: <Mail size={11} />, bg: "#f0fdf4", text: "#059669", border: "#a7f3d0" },
-                        created: { icon: <Settings size={11} />, bg: "#eff6ff", text: "#2563eb", border: "#bfdbfe" }
-                      };
-
-                      const formatEventDateTime = (rawDate) => {
-                        if (!rawDate) return "";
-                        const d = new Date(rawDate);
-                        if (isNaN(d.getTime())) return "";
-                        const dateStr = d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-                        const timeStr = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
-                        return `${dateStr}, ${timeStr}`;
-                      };
-
-                      return events.map((ev, idx) => {
-                        const style = typeIcons[ev.type] || typeIcons.note;
-                        return (
-                          <div key={idx} style={{ position: "relative", paddingLeft: "26px", borderLeft: "1.5px solid #e2e8f0", paddingBottom: "14px" }}>
-                            <div style={{ position: "absolute", left: "-12px", top: "0px", width: "22px", height: "22px", borderRadius: "50%", backgroundColor: style.bg, border: `1.5px solid ${style.border}`, color: style.text, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                              {style.icon}
-                            </div>
-                            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "8px" }}>
-                              <span style={{ fontSize: "13px", fontWeight: "600", color: "#0f172a" }}>{ev.title}</span>
-                              <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "600", flexShrink: 0 }}>
-                                {formatEventDateTime(ev.date)}
-                              </span>
-                            </div>
-                            {ev.desc ? (
-                              <div style={{ fontSize: "12px", color: "#64748b", margin: "2px 0 0 0", lineHeight: "1.35" }}>
-                                {ev.desc}
-                              </div>
-                            ) : null}
-                          </div>
-                        );
-                      });
-                    })()}
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-        );
-      })()}
+      {/* Lead Detail Workspace (Blueprint §10 & §28) */}
+      {selectedLeadForDetails && (
+        <LeadDetailWorkspace
+          lead={selectedLeadForDetails}
+          onClose={() => {
+            setSelectedLeadForDetails(null);
+            setIsEditingFollowUp(false);
+          }}
+          onUpdateLead={async (leadId, updates) => {
+            let updatedLeadObj = null;
+            setLeads(prevLeads => {
+              return prevLeads.map(l => {
+                if (l.id === leadId) {
+                  updatedLeadObj = { ...l, ...updates };
+                  return updatedLeadObj;
+                } 
+                return l;
+              });
+            });
+            if (updatedLeadObj) {
+              setSelectedLeadForDetails(updatedLeadObj);
+              await syncSingleLeadToBackend(updatedLeadObj);
+            }
+          }}
+          currentUser={currentUser}
+          allUsers={allUsersList}
+          leads={leads}
+        />
+      )}
       {/* Start My Day Modal */}
       {showStartMyDay && (
         <div className="modal-overlay" onClick={() => setShowStartMyDay(false)}>
@@ -26612,16 +26695,8 @@ export default function App({ onNavigateToLanding } = {}) {
       )}
 
       {/* Toast notifications */}
-      {toast && (
-        <div className={`toast-msg ${toast.type === "error" ? "error" : ""}`}>
-          {toast.type === "error" ? (
-            <AlertCircle className="w-4 h-4 text-red-500" />
-          ) : (
-            <Check className="w-4 h-4 text-emerald-500" />
-          )}
-          <span>{toast.message}</span>
-        </div>
-      )}
+      <ToastNotification toast={toast} onClose={() => setToast(null)} />
+
 
       {/*  Floating WhatsApp Alarm Toast Notification Card */}
       {/*  Floating Follow-Up Alarm Toast Notification Card */}
@@ -27001,16 +27076,16 @@ export default function App({ onNavigateToLanding } = {}) {
                     <Flame className="w-3.5 h-3.5 text-amber-500" />
                     Lead Score / Intent
                   </label>
-                  <select
+                  <CustomDropdown
                     value={stageModalScore}
-                    onChange={(e) => setStageModalScore(e.target.value)}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    style={{ width: "100%", padding: "7px 10px", border: "1px solid #cbd5e1", borderRadius: "6px", fontSize: "12px", fontWeight: "700", outline: "none", color: "#0f172a", backgroundColor: "#ffffff" }}
-                  >
-                    <option value="Hot">Hot (High Closing Intent)</option>
-                    <option value="Warm">Warm (Interested / Considering)</option>
-                    <option value="Cold">Cold (Need Re-engagement)</option>
-                  </select>
+                    onChange={(val) => setStageModalScore(val)}
+                    style={{ width: "100%", height: "34px" }}
+                    options={[
+                      { value: "Hot", label: "Hot (High Closing Intent)", icon: <Flame size={12} color="#dc2626" /> },
+                      { value: "Warm", label: "Warm (Interested / Considering)", icon: <Sparkles size={12} color="#d97706" /> },
+                      { value: "Cold", label: "Cold (Need Re-engagement)", icon: <Clock size={12} color="#2563eb" /> }
+                    ]}
+                  />
                 </div>
               </div>
 
@@ -28328,9 +28403,24 @@ export default function App({ onNavigateToLanding } = {}) {
                   <UserPlus size={18} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: "16px", fontWeight: "600", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
-                    Add New Lead
-                  </h3>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: "600", color: "#0f172a", margin: 0, letterSpacing: "-0.2px" }}>
+                      Add New Lead
+                    </h3>
+                    {newLeadData.status && (
+                      <span style={{ 
+                        fontSize: "11px", 
+                        fontWeight: "700", 
+                        padding: "2px 8px", 
+                        borderRadius: "12px", 
+                        backgroundColor: "#eff6ff", 
+                        color: "#2563eb", 
+                        border: "1px solid #bfdbfe" 
+                      }}>
+                        {newLeadData.status}
+                      </span>
+                    )}
+                  </div>
                   <span style={{ fontSize: "12px", color: "#64748b", fontWeight: "500" }}>
                     Enter contact info, deal stage, and schedule follow-up
                   </span>
@@ -28520,30 +28610,31 @@ export default function App({ onNavigateToLanding } = {}) {
                     <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
                       Deal Stage
                     </label>
-                    <select
+                    <CustomDropdown
                       value={newLeadData.status}
-                      onChange={(e) => setNewLeadData(prev => ({ ...prev, status: e.target.value }))}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
-                    >
-                      {STATUS_OPTIONS.map(opt => (
-                        <option key={opt} value={opt}>{opt}</option>
-                      ))}
-                    </select>
+                      onChange={(val) => setNewLeadData(prev => ({ ...prev, status: val }))}
+                      style={{ width: "100%", height: "34px" }}
+                      options={STATUS_OPTIONS.map(opt => {
+                        const optStyle = getStageBadgeStyle(opt);
+                        return {
+                          value: opt,
+                          label: optStyle.label,
+                          icon: <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: optStyle.dot, display: "inline-block" }} />
+                        };
+                      })}
+                    />
                   </div>
 
                   <div>
                     <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
                       Lead Source
                     </label>
-                    <select
+                    <CustomDropdown
                       value={newLeadData.source}
-                      onChange={(e) => setNewLeadData(prev => ({ ...prev, source: e.target.value }))}
-                      style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
-                    >
-                      {SOURCE_OPTIONS.map(src => (
-                        <option key={src} value={src}>{src}</option>
-                      ))}
-                    </select>
+                      onChange={(val) => setNewLeadData(prev => ({ ...prev, source: val }))}
+                      style={{ width: "100%", height: "34px" }}
+                      options={SOURCE_OPTIONS.map(src => ({ value: src, label: src }))}
+                    />
                   </div>
                 </div>
 
@@ -28601,25 +28692,25 @@ export default function App({ onNavigateToLanding } = {}) {
                         }).map(u => u.name)
                       ].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i) : [];
 
+                      const ownerOptions = isRepOnly ? [
+                        { value: currentUser.name, label: `${currentUser.name} (You)` }
+                      ] : isManager ? (
+                        mgrReps.map(m => ({
+                          value: m,
+                          label: `${m} ${m === currentUser.name ? "(You)" : "(Team Rep)"}`
+                        }))
+                      ) : (
+                        teamMembers.map(m => ({ value: m, label: m }))
+                      );
+
                       return (
-                        <select
+                        <CustomDropdown
                           value={isRepOnly ? currentUser.name : newLeadData.owner}
                           disabled={isRepOnly}
-                          onChange={(e) => setNewLeadData(prev => ({ ...prev, owner: e.target.value }))}
-                          style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: isRepOnly ? "#f1f5f9" : "#ffffff", boxSizing: "border-box", cursor: isRepOnly ? "not-allowed" : "pointer" }}
-                        >
-                          {isRepOnly ? (
-                            <option value={currentUser.name}>{currentUser.name} (You)</option>
-                          ) : isManager ? (
-                            mgrReps.map(m => (
-                              <option key={m} value={m}>{m} {m === currentUser.name ? "(You)" : "(Team Rep)"}</option>
-                            ))
-                          ) : (
-                            teamMembers.map(m => (
-                              <option key={m} value={m}>{m}</option>
-                            ))
-                          )}
-                        </select>
+                          onChange={(val) => setNewLeadData(prev => ({ ...prev, owner: val }))}
+                          style={{ width: "100%", height: "34px" }}
+                          options={ownerOptions}
+                        />
                       );
                     })()}
                   </div>
@@ -28701,15 +28792,12 @@ export default function App({ onNavigateToLanding } = {}) {
                       onChange={(e) => setNewLeadData(prev => ({ ...prev, next_follow_up: e.target.value }))}
                       style={{ height: "34px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box" }}
                     />
-                    <select
+                    <CustomDropdown
                       value={newLeadData.next_follow_up_time}
-                      onChange={(e) => setNewLeadData(prev => ({ ...prev, next_follow_up_time: e.target.value }))}
-                      style={{ height: "34px", padding: "0 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", cursor: "pointer", boxSizing: "border-box" }}
-                    >
-                      {["10:00 AM", "11:00 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM", "06:30 PM"].map(t => (
-                        <option key={t} value={t}>{t}</option>
-                      ))}
-                    </select>
+                      onChange={(val) => setNewLeadData(prev => ({ ...prev, next_follow_up_time: val }))}
+                      style={{ height: "34px", width: "100%" }}
+                      options={["10:00 AM", "11:00 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM", "06:30 PM"].map(t => ({ value: t, label: t }))}
+                    />
                   </div>
                 </div>
 
@@ -28861,20 +28949,21 @@ export default function App({ onNavigateToLanding } = {}) {
                 <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#475569", marginBottom: "4px" }}>
                   Task Outcome / Call Disposition <span style={{ color: "#dc2626" }}>*</span>
                 </label>
-                <select
+                <CustomDropdown
                   value={taskToComplete.outcome}
-                  onChange={(e) => setTaskToComplete(prev => ({ ...prev, outcome: e.target.value }))}
-                  style={{ width: "100%", padding: "7px 10px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", boxSizing: "border-box", cursor: "pointer" }}
-                >
-                  <option value="Completed - Call Successful">Completed - Call Successful & Discussed</option>
-                  <option value="Completed - Client Interested">Completed - Client Interested</option>
-                  <option value="Completed - Follow-up Required">Completed - Follow-up Required</option>
-                  <option value="Completed - Meeting / Demo Done">Completed - Meeting / Demo Done</option>
-                  <option value="Completed - Client Did Not Answer">Completed - Client Did Not Answer</option>
-                  <option value="Completed - Not Interested">Completed - Not Interested / Rejected</option>
-                  <option value="Completed - Other">Completed - Other</option>
-                  <option value="Cancelled - Not Needed">Cancelled - Task No Longer Needed</option>
-                </select>
+                  onChange={(val) => setTaskToComplete(prev => ({ ...prev, outcome: val }))}
+                  style={{ width: "100%", height: "34px" }}
+                  options={[
+                    { value: "Completed - Call Successful", label: "Completed - Call Successful & Discussed", icon: <PhoneCall size={12} color="#16a34a" /> },
+                    { value: "Completed - Client Interested", label: "Completed - Client Interested", icon: <Check size={12} color="#16a34a" /> },
+                    { value: "Completed - Follow-up Required", label: "Completed - Follow-up Required", icon: <Clock size={12} color="#2563eb" /> },
+                    { value: "Completed - Meeting / Demo Done", label: "Completed - Meeting / Demo Done", icon: <Calendar size={12} color="#0284c7" /> },
+                    { value: "Completed - Client Did Not Answer", label: "Completed - Client Did Not Answer", icon: <Phone size={12} color="#ea580c" /> },
+                    { value: "Completed - Not Interested", label: "Completed - Not Interested / Rejected", icon: <X size={12} color="#dc2626" /> },
+                    { value: "Completed - Other", label: "Completed - Other" },
+                    { value: "Cancelled - Not Needed", label: "Cancelled - Task No Longer Needed" }
+                  ]}
+                />
               </div>
 
               {/* Discussion Notes / Remarks */}
@@ -28921,15 +29010,12 @@ export default function App({ onNavigateToLanding } = {}) {
                         <label style={{ display: "block", fontSize: "11px", fontWeight: "600", color: "#475569", marginBottom: "2px" }}>
                           Next Time
                         </label>
-                        <select
+                        <CustomDropdown
                           value={taskToComplete.nextTime}
-                          onChange={(e) => setTaskToComplete(prev => ({ ...prev, nextTime: e.target.value }))}
-                          style={{ width: "100%", height: "32px", padding: "0 8px", fontSize: "12px", border: "1px solid #cbd5e1", borderRadius: "6px", outline: "none", backgroundColor: "#ffffff", cursor: "pointer", boxSizing: "border-box" }}
-                        >
-                          {["10:00 AM", "11:00 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM", "06:30 PM"].map(t => (
-                            <option key={t} value={t}>{t}</option>
-                          ))}
-                        </select>
+                          onChange={(val) => setTaskToComplete(prev => ({ ...prev, nextTime: val }))}
+                          style={{ width: "100%", height: "32px" }}
+                          options={["10:00 AM", "11:00 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM", "06:30 PM"].map(t => ({ value: t, label: t }))}
+                        />
                       </div>
                     </div>
                   </div>
@@ -31399,6 +31485,7 @@ export default function App({ onNavigateToLanding } = {}) {
         onPaymentRecorded={handlePaymentRecorded}
       />
 
+
       {/* ⚠️ FULL PAYMENT REQUIRED TO MARK WON MODAL (Blueprint Section 21 & 35) */}
       <FullPaymentRequiredModal
         isOpen={showWonBlockedModal}
@@ -31456,19 +31543,11 @@ export function RootApp() {
     if (typeof window !== "undefined") {
       const hash = window.location.hash;
       const params = new URLSearchParams(window.location.search);
-      const ws = params.get("workspace") || params.get("tab");
-      const saTab = params.get("saTab");
-      if (
-        hash === "#app" || 
-        params.get("view") === "app" ||
-        ws === "super_admin" ||
-        Boolean(saTab) ||
-        localStorage.getItem("apex_preferred_view") === "app"
-      ) {
-        return "app";
+      if (hash === "#landing" || params.get("view") === "landing" || localStorage.getItem("apex_preferred_view") === "landing") {
+        return "landing";
       }
     }
-    return "landing";
+    return "app";
   });
 
   const navigateToCRM = () => {

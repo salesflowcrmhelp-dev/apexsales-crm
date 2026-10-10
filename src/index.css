@@ -3,7 +3,7 @@
 /* src/index.css */
 
 :root {
-  --crm-zoom: 0.85;
+  --crm-zoom: 0.90;
   --primary-color: #ea580c; /* Orange Brand Primary */
   --primary-hover: #c2410c;
   --orange-accent: #f97316;
@@ -314,6 +314,16 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 }
 
+select, option {
+  color-scheme: light !important;
+}
+
+option {
+  padding: 6px 10px;
+  background-color: #ffffff;
+  color: #1e293b;
+}
+
 #root {
   min-height: 100%;
   width: 100%;
@@ -325,15 +335,15 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   display: flex;
   background-color: #f8fafc;
   overflow: hidden;
-  zoom: var(--crm-zoom, 0.85);
-  width: calc(100vw / var(--crm-zoom, 0.85));
-  height: calc(100vh / var(--crm-zoom, 0.85));
+  zoom: var(--crm-zoom, 1);
+  width: calc(100vw / var(--crm-zoom, 1));
+  height: calc(100vh / var(--crm-zoom, 1));
 }
 
-/* Slim Left Sidebar */
+/* Standard Clean Left Sidebar matching reference image */
 .crm-sidebar {
-  width: 215px;
-  min-width: 215px;
+  width: 232px;
+  min-width: 232px;
   background-color: #ffffff;
   border-right: 1px solid #e2e8f0;
   display: flex;
@@ -347,20 +357,14 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   padding: 0 !important;
   z-index: 25;
   overflow: hidden;
-  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.24s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.24s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   box-sizing: border-box;
 }
 
 .crm-sidebar::-webkit-scrollbar {
-  width: 4px;
-}
-.crm-sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.crm-sidebar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  width: 0px;
+  display: none;
 }
 
 /* Collapsed Icon Rail State */
@@ -415,7 +419,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .crm-sidebar.collapsed .sidebar-nav-group {
   margin-bottom: 3px !important;
-  border-top: 1px solid #f1f5f9 !important;
+  border-top: 1px solid #e2e8f0 !important;
   padding-top: 3px !important;
 }
 .crm-sidebar.collapsed .sidebar-nav-group:first-of-type {
@@ -456,26 +460,18 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 6px 8px;
+  padding: 8px 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   box-sizing: border-box;
+  background-color: #ffffff;
 }
 
 .sidebar-nav-body::-webkit-scrollbar {
-  width: 4px;
-}
-.sidebar-nav-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-.sidebar-nav-body::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-.sidebar-nav-body::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  width: 0px;
+  display: none;
 }
 
 .crm-sidebar.collapsed .sidebar-nav-body {
@@ -485,7 +481,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 /* Pinned Bottom Footer for Sidebar */
 .sidebar-footer {
   flex-shrink: 0;
-  padding: 8px 8px 10px 8px;
+  padding: 8px 10px 10px 10px;
   background-color: #ffffff;
   border-top: 1px solid #f1f5f9;
   box-sizing: border-box;
@@ -536,8 +532,8 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
@@ -550,7 +546,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .sidebar-inside-toggle-btn:hover {
-  background-color: #f1f5f9;
+  background-color: #ffffff;
   border-color: #cbd5e1;
   color: #ea580c;
 }
@@ -610,23 +606,24 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .sidebar-brand {
-  height: 48px;
-  min-height: 48px;
-  max-height: 48px;
+  height: 50px;
+  min-height: 50px;
+  max-height: 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 0 10px;
-  border-bottom: 1px solid #e2e8f0;
+  gap: 6px;
+  padding: 0 12px;
+  border-bottom: 1px solid #f1f5f9;
   margin: 0;
   box-sizing: border-box;
+  background-color: #ffffff;
 }
 
 .brand-logo-icon {
   background: transparent !important;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 0 !important;
   display: flex;
   align-items: center;
@@ -637,9 +634,9 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .brand-name {
   font-family: 'Inter', sans-serif;
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 800;
-  color: #0b192c;
+  color: #0f172a;
   line-height: 1.15;
   display: block;
   letter-spacing: -0.3px;
@@ -651,10 +648,10 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 
 .brand-tag {
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   color: #64748b;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.1px;
   display: block;
   margin-top: 1px;
 }
@@ -663,15 +660,15 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   display: flex;
   flex-direction: column;
   gap: 3px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .nav-group-title {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: #94a3b8;
   letter-spacing: 0.5px;
-  padding: 4px 8px 2px 8px;
+  padding: 6px 12px 2px 12px;
   text-transform: uppercase;
 }
 
@@ -684,13 +681,13 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 7px 10px;
-  min-height: 35px;
-  border-radius: 6px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #475569;
+  gap: 11px;
+  padding: 8px 12px;
+  min-height: 38px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1e293b;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -701,20 +698,34 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .sidebar-nav-item:hover {
-  background-color: #f8fafc;
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.sidebar-nav-item:hover .nav-item-icon {
   color: #0f172a;
 }
 
 .sidebar-nav-item.active {
-  background-color: #eff6ff;
-  color: #2563eb;
-  font-weight: 600;
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
+}
+
+.sidebar-nav-item.active .nav-item-icon {
+  color: #ffffff !important;
+}
+
+.sidebar-nav-item.active span {
+  color: #ffffff !important;
 }
 
 .sidebar-nav-item .nav-item-icon {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
   flex-shrink: 0;
+  color: #475569;
 }
 
 /* Sidebar Submenu & Exact Tree Hierarchy */
@@ -729,11 +740,11 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 7px 10px;
-  min-height: 35px;
-  border-radius: 6px;
+  padding: 8px 12px;
+  min-height: 38px;
+  border-radius: 8px;
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a !important;
   background: transparent !important;
   border: none;
@@ -744,20 +755,20 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .sidebar-parent-btn:hover {
-  background-color: #f8fafc !important;
+  background-color: #f1f5f9 !important;
   color: #0f172a !important;
 }
 
 .sidebar-parent-btn .parent-icon {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
   color: #0f172a !important;
   flex-shrink: 0;
 }
 
 .sidebar-parent-btn .parent-label {
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a !important;
   letter-spacing: -0.2px;
 }
@@ -765,30 +776,25 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .sidebar-parent-btn .sidebar-chevron {
   display: flex;
   align-items: center;
-  color: #475569;
+  color: #64748b;
   margin-left: auto;
 }
 
-/* Tree Container - Vertical trunk line aligned with parent icon (Issue 8: Refined indentation) */
+.sidebar-parent-btn:hover .sidebar-chevron {
+  color: #0f172a;
+}
+
+/* Tree Container - Clean, modern subtle guide line */
 .sidebar-tree-container {
   position: relative;
   margin-top: 2px;
-  margin-bottom: 6px;
-  margin-left: 12px;
+  margin-bottom: 4px;
+  margin-left: 16px;
+  padding-left: 8px;
+  border-left: 1.5px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-}
-
-/* Continuous vertical trunk line that terminates at the last item */
-.sidebar-tree-container::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 17px;
-  width: 1.5px;
-  background-color: #cbd5e1;
-  z-index: 1;
+  gap: 2px;
 }
 
 /* Each tree branch node */
@@ -796,19 +802,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   position: relative;
   display: flex;
   align-items: center;
-  margin: 2px 0;
-}
-
-/* Horizontal branch connector line (├── and └──) */
-.sidebar-tree-node::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 8px;
-  height: 1.5px;
-  background-color: #cbd5e1;
-  z-index: 1;
+  width: 100%;
 }
 
 /* The sub-item button itself */
@@ -817,21 +811,20 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: 8px;
+  margin-left: 0;
   padding: 6.5px 10px;
   min-height: 33px;
   border-radius: 6px;
   font-size: 12.5px;
-  font-weight: 600;
+  font-weight: 500;
   color: #334155;
   background: transparent;
   border: none;
   cursor: pointer;
-  flex: 1;
+  width: 100%;
   text-align: left;
   transition: all 0.15s ease;
   box-sizing: border-box;
-  z-index: 2;
 }
 
 .sidebar-sub-item:hover {
@@ -839,22 +832,31 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   color: #0f172a;
 }
 
-/* Active sub-item (highlighted blue pill exactly matching mockup) */
+.sidebar-sub-item:hover .sub-item-icon {
+  color: #0f172a;
+}
+
+/* Active sub-item */
 .sidebar-sub-item.active {
-  background-color: #eff6ff !important;
-  color: #1d4ed8 !important;
-  font-weight: 700 !important;
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+.sidebar-sub-item.active span {
+  color: #ffffff !important;
 }
 
 .sidebar-sub-item.active .sub-item-icon {
-  color: #1d4ed8 !important;
+  color: #ffffff !important;
 }
 
 .sidebar-sub-item .sub-item-icon {
   width: 15px;
   height: 15px;
   flex-shrink: 0;
-  color: #475569;
+  color: #64748b;
 }
 
 /* Standardized Sidebar Badges (Issue 8: Consistent pill shape & high contrast) */
@@ -863,7 +865,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   font-size: 10px;
   font-weight: 600;
   color: #ffffff !important;
-  background: #059669 !important; /* High contrast emerald green that never blends into active blue row */
+  background: #059669 !important; /* High contrast emerald green */
   padding: 2px 7.5px;
   border-radius: 9999px;
   margin-left: auto !important;
@@ -906,7 +908,7 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 .sidebar-help-widget {
   margin: 0;
   background-color: #fff7ed;
-  border: 1px solid #ffedd5;
+  border: 1px solid #fed7aa;
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 10.5px;
@@ -1748,37 +1750,59 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   to { transform: translateY(-8px); }
 }
 
-/* Floating Toast */
+/* Floating Modern Toast */
 .toast-msg {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  background-color: #0f172a;
-  color: #ffffff;
-  padding: 12px 20px;
-  border-radius: 8px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
+  background-color: #ffffff;
+  color: #0f172a;
+  padding: 12px 16px 14px 14px;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.16), 0 4px 12px rgba(15, 23, 42, 0.06);
+  z-index: 999999;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   font-size: 13px;
   font-weight: 600;
-  border-left: 4px solid var(--primary-color);
-  animation: slideInUp 0.3s ease-out;
+  border: 1.5px solid #d1fae5;
+  animation: toastSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  font-family: 'Inter', sans-serif;
+  min-width: 310px;
+  max-width: 460px;
+  overflow: hidden;
 }
 
 .toast-msg.error {
-  border-left-color: #ef4444;
+  border-color: #fecaca;
 }
 
-@keyframes slideInUp {
+.toast-msg.info {
+  border-color: #bfdbfe;
+}
+
+.toast-msg.warning {
+  border-color: #fde68a;
+}
+
+@keyframes toastSlideIn {
   from {
-    transform: translateY(20px);
+    transform: translateY(20px) scale(0.96);
     opacity: 0;
   }
   to {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes toastProgressShrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
   }
 }
 
@@ -2475,10 +2499,10 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
 }
 
 .kanban-col-add-btn {
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 4px !important;
-  background: #f1f5f9 !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 5px !important;
+  background: #f8fafc !important;
   border: 1px solid #cbd5e1 !important;
   color: #475569 !important;
   display: inline-flex !important;
@@ -2487,13 +2511,19 @@ button, input, select, textarea, table, th, td, h1, h2, h3, h4, h5, h6, span, p,
   cursor: pointer !important;
   line-height: 1 !important;
   padding: 0 !important;
-  transition: all 0.15s ease !important;
+  transition: all 0.18s ease !important;
 }
 
 .kanban-col-add-btn:hover {
   background: #2563eb !important;
   color: #ffffff !important;
   border-color: #2563eb !important;
+  transform: scale(1.08) !important;
+  box-shadow: 0 2px 5px rgba(37, 99, 235, 0.25) !important;
+}
+
+.kanban-col-add-btn:active {
+  transform: scale(0.95) !important;
 }
 
 .kanban-column-title-text {
