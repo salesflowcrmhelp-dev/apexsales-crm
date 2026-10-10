@@ -22379,64 +22379,50 @@ export default function App({ onNavigateToLanding } = {}) {
                             />
                           )}
 
-                          {/* Segmented Score Filters (Issue 4: Aligned vertical centering) */}
-                          <div 
-                            role="group" 
-                            aria-label="Filter by Lead Score" 
-                            style={{ 
-                              height: "32px", 
-                              boxSizing: "border-box", 
-                              display: "inline-flex", 
-                              alignItems: "center", 
-                              backgroundColor: "#f1f5f9", 
-                              border: "1px solid #cbd5e1", 
-                              padding: "2px", 
-                              borderRadius: "6px",
-                              gap: "2px",
-                              verticalAlign: "middle",
-                              margin: 0
-                            }}
-                          >
-                            <span style={{ fontSize: "11px", fontWeight: "700", color: "#64748b", padding: "0 6px" }}>Score:</span>
-                            {[
-                              { id: "all", label: "All" },
-                              { id: "hot", label: "Hot", dot: "#e11d48" },
-                              { id: "warm", label: "Warm", dot: "#f59e0b" },
-                              { id: "cold", label: "Cold", dot: "#64748b" },
-                              { id: "lost", label: "Lost", dot: "#ef4444" }
-                            ].map(pill => {
-                              const isSelected = kanbanScoreFilter === pill.id;
-                              return (
-                                <button
-                                  key={pill.id}
-                                  type="button"
-                                  onClick={() => setKanbanScoreFilter(pill.id)}
-                                  aria-pressed={isSelected}
-                                  style={{
-                                    height: "26px",
-                                    padding: "0 9px",
-                                    fontSize: "11px",
-                                    fontWeight: isSelected ? "750" : "600",
-                                    borderRadius: "4px",
-                                    border: isSelected ? "1px solid #cbd5e1" : "1px solid transparent",
-                                    cursor: "pointer",
-                                    backgroundColor: isSelected ? (pill.id === "lost" ? "#fef2f2" : "#ffffff") : "transparent",
-                                    color: isSelected ? (pill.id === "lost" ? "#b91c1c" : "#0f172a") : "#64748b",
-                                    boxShadow: isSelected ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    gap: "5px",
-                                    transition: "all 0.15s ease"
-                                  }}
-                                >
-                                  {pill.dot && (
-                                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: pill.dot, display: "inline-block" }} />
-                                  )}
-                                  {pill.label}
-                                </button>
-                              );
-                            })}
-                          </div>
+                          {/* Score Filter Dropdown */}
+                          <CustomDropdown
+                            value={kanbanScoreFilter}
+                            onChange={(val) => setKanbanScoreFilter(val)}
+                            title="Filter Kanban by Priority Score"
+                            icon={
+                              kanbanScoreFilter === "hot" ? (
+                                <Flame size={13} color="#e11d48" />
+                              ) : kanbanScoreFilter === "warm" ? (
+                                <Sparkles size={13} color="#f59e0b" />
+                              ) : kanbanScoreFilter === "cold" ? (
+                                <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#64748b", display: "inline-block" }} />
+                              ) : kanbanScoreFilter === "lost" ? (
+                                <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#ef4444", display: "inline-block" }} />
+                              ) : (
+                                <Flame size={13} color="#64748b" />
+                              )
+                            }
+                            style={{ height: "32px" }}
+                            options={[
+                              { value: "all", label: "Score: All" },
+                              { isSeparator: true },
+                              { 
+                                value: "hot", 
+                                label: "Score: Hot", 
+                                icon: <Flame size={12} color="#e11d48" /> 
+                              },
+                              { 
+                                value: "warm", 
+                                label: "Score: Warm", 
+                                icon: <Sparkles size={12} color="#f59e0b" /> 
+                              },
+                              { 
+                                value: "cold", 
+                                label: "Score: Cold", 
+                                icon: <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#64748b", display: "inline-block" }} /> 
+                              },
+                              { 
+                                value: "lost", 
+                                label: "Score: Lost Deals", 
+                                icon: <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#ef4444", display: "inline-block" }} /> 
+                              }
+                            ]}
+                          />
                         </div>
 
                         {/* Total Pipeline Analytical Metric Card (Aligned Right) */}
@@ -23473,76 +23459,21 @@ export default function App({ onNavigateToLanding } = {}) {
                           />
                         </div>
 
-                        <div style={{ display: "flex", alignItems: "center", backgroundColor: "#f1f5f9", padding: "2px", borderRadius: "6px", gap: "2px" }}>
-                          <button
-                            type="button"
-                            onClick={() => setUnassignedFilter("all")}
-                            style={{
-                              height: "26px",
-                              padding: "0 8px",
-                              fontSize: "11px",
-                              fontWeight: unassignedFilter === "all" ? "750" : "600",
-                              color: unassignedFilter === "all" ? "#0f172a" : "#64748b",
-                              backgroundColor: unassignedFilter === "all" ? "#ffffff" : "transparent",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer"
-                            }}
-                          >
-                            All ({unassignedLeadsList.length})
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setUnassignedFilter("hot")}
-                            style={{
-                              height: "26px",
-                              padding: "0 8px",
-                              fontSize: "11px",
-                              fontWeight: unassignedFilter === "hot" ? "750" : "600",
-                              color: unassignedFilter === "hot" ? "#ea580c" : "#64748b",
-                              backgroundColor: unassignedFilter === "hot" ? "#ffffff" : "transparent",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer"
-                            }}
-                          >
-                            Hot ({hotLeads.length})
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setUnassignedFilter("warm")}
-                            style={{
-                              height: "26px",
-                              padding: "0 8px",
-                              fontSize: "11px",
-                              fontWeight: unassignedFilter === "warm" ? "750" : "600",
-                              color: unassignedFilter === "warm" ? "#d97706" : "#64748b",
-                              backgroundColor: unassignedFilter === "warm" ? "#ffffff" : "transparent",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer"
-                            }}
-                          >
-                            Warm ({warmLeads.length})
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setUnassignedFilter("aging")}
-                            style={{
-                              height: "26px",
-                              padding: "0 8px",
-                              fontSize: "11px",
-                              fontWeight: unassignedFilter === "aging" ? "750" : "600",
-                              color: unassignedFilter === "aging" ? "#dc2626" : "#64748b",
-                              backgroundColor: unassignedFilter === "aging" ? "#ffffff" : "transparent",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer"
-                            }}
-                          >
-                            SLA &gt; 2h ({unassignedAgingCriticalCount})
-                          </button>
-                        </div>
+                        {/* Unassigned Filter Dropdown */}
+                        <CustomDropdown
+                          value={unassignedFilter}
+                          onChange={(val) => setUnassignedFilter(val)}
+                          title="Filter unassigned queue"
+                          icon={<Filter size={13} color={unassignedFilter !== "all" ? "#2563eb" : "#64748b"} />}
+                          style={{ height: "32px" }}
+                          options={[
+                            { value: "all", label: `All Queue (${unassignedLeadsList.length})` },
+                            { isSeparator: true },
+                            { value: "hot", label: `Hot Leads (${hotLeads.length})`, icon: <Flame size={12} color="#ea580c" /> },
+                            { value: "warm", label: `Warm Leads (${warmLeads.length})`, icon: <Sparkles size={12} color="#d97706" /> },
+                            { value: "aging", label: `SLA > 2h (${unassignedAgingCriticalCount})`, icon: <Clock size={12} color="#dc2626" /> }
+                          ]}
+                        />
                       </div>
 
                     </div>
