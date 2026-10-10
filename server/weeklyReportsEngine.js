@@ -692,8 +692,10 @@ export async function sendWeeklyEmail({ cfg, toEmail, recipientName, subject, ht
   if (cfg.type === 'smtp' && cfg.user && cfg.pass) {
     try {
       const isGmail = cfg.user.includes('@gmail.com');
+      const isZoho = cfg.user.includes('salesflowhub') || cfg.user.includes('zoho') || (cfg.host && cfg.host.includes('zoho'));
+      const defaultHost = isZoho ? 'smtp.zoho.in' : (isGmail ? 'smtp.gmail.com' : 'smtp.zoho.in');
       const transporter = nodemailer.createTransport({
-        host: cfg.host || (isGmail ? 'smtp.gmail.com' : 'smtp.gmail.com'),
+        host: cfg.host || defaultHost,
         port: cfg.port ? Number(cfg.port) : 465,
         secure: (cfg.port ? Number(cfg.port) : 465) === 465,
         auth: {
@@ -702,15 +704,17 @@ export async function sendWeeklyEmail({ cfg, toEmail, recipientName, subject, ht
         }
       });
 
+      const senderFrom = cfg.fromEmail || `"ApexSales CRM" <${cfg.user.trim()}>`;
+
       const info = await transporter.sendMail({
-        from: `"ApexSales CRM" <${cfg.user.trim()}>`,
+        from: senderFrom,
         to: toEmail,
         subject,
         html: htmlContent
       });
 
-      console.log(`✉️ Weekly Report sent via SMTP to ${toEmail}: ${info.messageId}`);
-      return { sent: true, messageId: info.messageId, provider: 'smtp' };
+      console.log(`✉️ Weekly Report sent via SMTP (${senderFrom}) to ${toEmail}: ${info.messageId}`);
+      return { sent: true, messageId: info.messageId, provider: 'smtp', fromEmail: senderFrom };
     } catch (err) {
       console.error('⚠️ SMTP Weekly Report dispatch failed:', err.message);
       return { sent: false, reason: err.message };

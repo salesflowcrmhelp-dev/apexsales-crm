@@ -203,26 +203,27 @@ const ENV_SMTP_PORT = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 46
 
 async function getEmailConfig() {
   const local = readLocalDB();
-  if (local.settings?.email_api?.apiKey) {
-    return local.settings.email_api;
-  }
   if (local.settings?.smtp?.user && local.settings?.smtp?.pass) {
     return { type: 'smtp', ...local.settings.smtp };
-  }
-  if (ENV_RESEND_KEY) {
-    return { type: 'resend', apiKey: ENV_RESEND_KEY, fromEmail: 'ApexSales CRM <welcome@salesflowhub.cloud>' };
-  }
-  if (ENV_BREVO_KEY) {
-    return { type: 'brevo', apiKey: ENV_BREVO_KEY };
   }
   if (ENV_SMTP_USER && ENV_SMTP_PASS) {
     return {
       type: 'smtp',
       user: ENV_SMTP_USER,
       pass: ENV_SMTP_PASS,
-      host: ENV_SMTP_HOST || 'smtp.gmail.com',
-      port: ENV_SMTP_PORT || 465
+      host: ENV_SMTP_HOST || (ENV_SMTP_USER.includes('salesflowhub') || ENV_SMTP_USER.includes('zoho') ? 'smtp.zoho.in' : 'smtp.gmail.com'),
+      port: ENV_SMTP_PORT || 465,
+      fromEmail: process.env.SMTP_FROM || 'ApexSales CRM <sales@salesflowhub.cloud>'
     };
+  }
+  if (local.settings?.email_api?.apiKey) {
+    return local.settings.email_api;
+  }
+  if (ENV_RESEND_KEY) {
+    return { type: 'resend', apiKey: ENV_RESEND_KEY, fromEmail: 'ApexSales CRM <sales@salesflowhub.cloud>' };
+  }
+  if (ENV_BREVO_KEY) {
+    return { type: 'brevo', apiKey: ENV_BREVO_KEY };
   }
   return null;
 }
