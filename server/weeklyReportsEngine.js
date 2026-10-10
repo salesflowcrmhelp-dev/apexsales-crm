@@ -30,6 +30,7 @@ export function getSprintDateRange() {
   const now = new Date();
   const start = new Date();
   start.setDate(now.getDate() - 7);
+  start.setHours(0, 0, 0, 0);
   
   const options = { day: '2-digit', month: 'short', year: 'numeric' };
   const startStr = start.toLocaleDateString('en-IN', options);
@@ -43,6 +44,7 @@ export function getSprintDateRange() {
 export function computeWeeklyMetrics(leads = [], users = []) {
   const { start, end, rangeText } = getSprintDateRange();
   const startMs = start.getTime();
+  const endMs = end.getTime();
 
   // 1. Company-wide metrics
   let companyWonRevenue = 0;
@@ -81,13 +83,32 @@ export function computeWeeklyMetrics(leads = [], users = []) {
     const isLost = status.includes('lost') || status.includes('junk') || status.includes('drop');
     const isActive = !isWon && !isLost;
 
-    // Check if won in past 7 days (or won overall if no specific date for demo leads)
+    // 🛡️ STRICT 7-DAY FILTER: Only count deals WON in the past 7 days!
     if (isWon) {
-      companyWonRevenue += val;
-      companyWonCount++;
-      if (repStatsMap[ownerName]) {
-        repStatsMap[ownerName].wonRevenue += val;
-        repStatsMap[ownerName].wonCount++;
+      const wonDateStr = lead.won_date || lead.closed_date || lead.wonDate;
+      let isWonInPast7Days = false;
+      if (wonDateStr) {
+        const wonTime = new Date(wonDateStr).getTime();
+        if (!isNaN(wonTime) && wonTime >= startMs && wonTime <= endMs) {
+          isWonInPast7Days = true;
+        }
+      } else {
+        const fallbackDateStr = lead.updated_at || lead.created_at;
+        if (fallbackDateStr) {
+          const fbTime = new Date(fallbackDateStr).getTime();
+          if (!isNaN(fbTime) && fbTime >= startMs && fbTime <= endMs) {
+            isWonInPast7Days = true;
+          }
+        }
+      }
+
+      if (isWonInPast7Days) {
+        companyWonRevenue += val;
+        companyWonCount++;
+        if (repStatsMap[ownerName]) {
+          repStatsMap[ownerName].wonRevenue += val;
+          repStatsMap[ownerName].wonCount++;
+        }
       }
     }
 
@@ -112,11 +133,11 @@ export function computeWeeklyMetrics(leads = [], users = []) {
       }
     }
 
-    // Lead activities count
+    // Lead activities count (past 7 days only)
     if (Array.isArray(lead.activities)) {
       lead.activities.forEach(act => {
         const actTime = act.created_at ? new Date(act.created_at).getTime() : 0;
-        if (actTime >= startMs) {
+        if (actTime >= startMs && actTime <= endMs) {
           if (act.activity_type === 'call') {
             companyCallsLogged++;
             if (repStatsMap[ownerName]) repStatsMap[ownerName].calls++;
@@ -190,11 +211,11 @@ export function computeWeeklyMetrics(leads = [], users = []) {
       activePipelineValue: companyActivePipelineValue,
       activeDealsCount: companyActiveDealsCount,
       newLeadsCount: companyNewLeadsCount,
-      callsLogged: companyCallsLogged || 34,
-      meetingsLogged: companyMeetingsLogged || 12,
+      callsLogged: companyCallsLogged,
+      meetingsLogged: companyMeetingsLogged,
       winRate: companyWonCount + companyActiveDealsCount > 0 
         ? Math.round((companyWonCount / (companyWonCount + companyActiveDealsCount)) * 100) 
-        : 68,
+        : 0,
       leaderboard,
       topHotDeals: hotDealsList.slice(0, 5),
       stalledDeals: stalledDealsList.slice(0, 5)
@@ -385,15 +406,12 @@ export function buildTeamLeaderEmailHtml(metrics, recipient) {
   const targetUser = encodeURIComponent(recipient?.username || recipient?.name?.toLowerCase() || 'team_leader');
   const actionUrl = `https://apex.salesflowhub.cloud/?user=${targetUser}&workspace=pipeline`;
   const summary = teamSummaries.find(t => t.leader.id === recipient.id || t.leader.name === recipient.name) || {
-    teamRevenue: 185000,
-    teamWonCount: 6,
-    teamActiveValue: 240000,
-    teamCalls: 22,
-    teamMeetings: 8,
-    memberBreakdown: [
-      { name: recipient.name, role: 'team_leader', wonRevenue: 100000, wonCount: 3, calls: 12, meetings: 5, targetProgress: 100 },
-      { name: 'Rohan Sharma', role: 'sales_executive', wonRevenue: 85000, wonCount: 3, calls: 10, meetings: 3, targetProgress: 85 }
-    ]
+    teamRevenue: 0,
+    teamWonCount: 0,
+    teamActiveValue: 0,
+    teamCalls: 0,
+    teamMeetings: 0,
+    memberBreakdown: []
   };
 
   return `
@@ -526,18 +544,21 @@ export function buildEmployeeEmailHtml(metrics, recipient) {
   const { repStatsMap, sprintDates } = metrics;
   const targetUser = encodeURIComponent(recipient?.username || recipient?.name?.toLowerCase() || 'employee');
   const actionUrl = `https://apex.salesflowhub.cloud/?user=${targetUser}&workspace=pipeline`;
-  const stat = repStatsMap[recipient.name] || {
-    wonRevenue: 85000,
-    wonCount: 3,
-    activePipelineValue: 145000,
-    activeDealsCount: 5,
-    calls: 14,
-    meetings: 4,
+  const recipientNameLower = (recipient?.name || '').trim().toLowerCase();
+  const matchedStat = Object.values(repStatsMap).find(s => 
+    (s.user.name && s.user.name.trim().toLowerCase() === recipientNameLower) ||
+    (s.user.id && recipient?.id && s.user.id === recipient.id) ||
+    (s.user.email && recipient?.email && s.user.email.toLowerCase() === recipient.email.toLowerCase())
+  );
+  const stat = matchedStat || repStatsMap[recipient?.name] || {
+    wonRevenue: 0,
+    wonCount: 0,
+    activePipelineValue: 0,
+    activeDealsCount: 0,
+    calls: 0,
+    meetings: 0,
     target: 25000,
-    hotLeads: [
-      { name: 'Kiran Shinde', company: 'Google Ads', value: 35000, status: 'Qualified & Demo' },
-      { name: 'Tushar Thakkar', company: 'Facebook Ads', value: 25000, status: 'Proposal & Neg.' }
-    ]
+    hotLeads: []
   };
 
   const targetProgress = stat.target > 0 ? Math.min(100, Math.round((stat.wonRevenue / stat.target) * 100)) : 100;
@@ -607,7 +628,7 @@ export function buildEmployeeEmailHtml(metrics, recipient) {
 
         <div style="background-color: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 12px; text-align: center;">
           <div style="font-size: 10px; font-weight: 700; color: #1e40af; text-transform: uppercase;">Calls Logged</div>
-          <div style="font-size: 20px; font-weight: 850; color: #1e40af; margin: 4px 0;">${stat.calls || 14} Calls</div>
+          <div style="font-size: 20px; font-weight: 850; color: #1e40af; margin: 4px 0;">${stat.calls || 0} Calls</div>
           <div style="font-size: 10px; color: #1e40af;">Direct Outreach</div>
         </div>
 
